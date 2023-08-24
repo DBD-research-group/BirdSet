@@ -1,0 +1,12 @@
+# Please add requirements for installation here
+audiomentations==0.32.0
+datasets==2.14.4
+ipython==8.14.0
+librosa==0.10.1
+matplotlib==3.7.2
+notebook==7.0.2
+numpy==1.24.4
+torch
+torchaudio
+torchvision
+torch_audiomentations==0.11.0
