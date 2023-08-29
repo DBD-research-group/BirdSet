@@ -3,7 +3,7 @@ import tempfile
 import torch
 import torchaudio
 
-from gadme.augmentations import AudioAugmentor, pad_spectrogram_width, RandomTimeStretch
+from gadme.augmentations.augmentations import AudioAugmentor, pad_spectrogram_width, RandomTimeStretch
 
 
 def test_padding_equal_width(sample_spectrogram):
