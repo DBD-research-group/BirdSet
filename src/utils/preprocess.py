@@ -76,7 +76,7 @@ def calculate_mean_std_dataset(
     dataset: datasets.Dataset,
 ) -> Tuple[torch.Tensor, torch.Tensor]:
     """
-    Calculates the mean and standard deviation of a Hugging Face datamodule.
+    Calculates the mean and standard deviation of a Hugging Face dataset.
 
     Args:
         dataset (datasets.Dataset): The Hugging Face dataset containing input tensors.
@@ -255,7 +255,7 @@ def create_dataset(
     Args:
         path (str): Path to the dataset root directory.
         split (str): Split to load from the dataset (e.g., "train", "test").
-        columns (List[str]): List of columns to retain from the datamodule.
+        columns (List[str]): List of columns to retain from the dataset.
         test_size (float): Proportion of examples to use for the test set.
         use_spectrogram (bool): Whether to convert the audio waveform into a spectrogram.
         waveform_augmentations (Optional[Dict]): Dictionary of waveform augmentations to apply.
@@ -269,18 +269,18 @@ def create_dataset(
 
     Returns:
         Tuple[datasets.Dataset, datasets.Dataset, datasets.Dataset, Tuple[float], Tuple[float]]:
-            - train_dataset: Preprocessed training datamodule.
+            - train_dataset: Preprocessed training dataset.
             - train_push_dataset: Preprocessed training dataset for pushing the prototypes.
-            - test_dataset: Preprocessed test datamodule.
+            - test_dataset: Preprocessed test dataset.
             - train_mean: Tuple containing mean values for normalization.
             - train_std: Tuple containing standard deviation values for normalization.
     """
     # Load the dataset and select the specified columns
     dataset = load_dataset(path, split=split)
-    dataset = datamodule.select_columns(columns)
+    dataset = dataset.select_columns(columns)
 
     # Split the dataset into train and test sets
-    train_test_split = datamodule.train_test_split(test_size=test_size, seed=42)
+    train_test_split = dataset.train_test_split(test_size=test_size, seed=42)
     train_dataset = train_test_split["train"]
     test_dataset = train_test_split["test"]
 
