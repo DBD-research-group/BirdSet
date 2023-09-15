@@ -1,0 +1,6 @@
+[submodule "experiments/models/eat"]
+	path = experiments/models/eat
+	url = https://github.com/DBD-research-group/E2E-AudioClassfication
+[submodule ".devcontainer"]
+	path = .devcontainer
+	url = git@github.com:raphaelschwinger/cuda-python-devcontainer.git
