@@ -1,0 +1,28 @@
+defaults:
+  - model: wav2vec2
+  - dataset: sapsucker
+  - transformations: raw_waveforms
+  - _self_
+
+wandb:
+  project: x
+  entity: x
+  group: default
+  reinit: True
+  model: disabled
+
+device: cuda
+val_split: 0
+random_seed: 0 
+val_batch_size: 128
+print_freq_eval: 25
+print_freq_train: 25
+check_freq_model: 15
+
+output_dir: ./output_gadme/
+
+hydra:
+  job:
+    chdir: True
+  run:
+    dir: ${output_dir}/${dataset.name}/${model.name}/${now:%Y-%m-%d_%H%M%S}
