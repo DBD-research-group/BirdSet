@@ -1,0 +1,298 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 1987.4833333333333 
+tiers? <exists> 
+size = 1 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "Cavi1298" 
+        xmin = 0 
+        xmax = 1987.4833333333333 
+        intervals: size = 71 
+        intervals [1]:
+            xmin = 0 
+            xmax = 5.7176413171417915 
+            text = "" 
+        intervals [2]:
+            xmin = 5.7176413171417915 
+            xmax = 6.060427206085184 
+            text = "hl" 
+        intervals [3]:
+            xmin = 6.060427206085184 
+            xmax = 12.263065633663233 
+            text = "" 
+        intervals [4]:
+            xmin = 12.263065633663233 
+            xmax = 12.54352681552601 
+            text = "eh" 
+        intervals [5]:
+            xmin = 12.54352681552601 
+            xmax = 14.490107706460266 
+            text = "" 
+        intervals [6]:
+            xmin = 14.490107706460266 
+            xmax = 14.857130981490567 
+            text = "hl" 
+        intervals [7]:
+            xmin = 14.857130981490567 
+            xmax = 20.997444701987995 
+            text = "" 
+        intervals [8]:
+            xmin = 20.997444701987995 
+            xmax = 21.371392944471697 
+            text = "hl" 
+        intervals [9]:
+            xmin = 21.371392944471697 
+            xmax = 26.65301070074729 
+            text = "" 
+        intervals [10]:
+            xmin = 26.65301070074729 
+            xmax = 26.947321817516872 
+            text = "eh" 
+        intervals [11]:
+            xmin = 26.947321817516872 
+            xmax = 33.90131921378902 
+            text = "" 
+        intervals [12]:
+            xmin = 33.90131921378902 
+            xmax = 34.19909281428531 
+            text = "eh" 
+        intervals [13]:
+            xmin = 34.19909281428531 
+            xmax = 36.80700809701945 
+            text = "" 
+        intervals [14]:
+            xmin = 36.80700809701945 
+            xmax = 37.19480627440995 
+            text = "hl" 
+        intervals [15]:
+            xmin = 37.19480627440995 
+            xmax = 55.79925907341741 
+            text = "" 
+        intervals [16]:
+            xmin = 55.79925907341741 
+            xmax = 56.076257771553486 
+            text = "eh" 
+        intervals [17]:
+            xmin = 56.076257771553486 
+            xmax = 61.15358898795372 
+            text = "" 
+        intervals [18]:
+            xmin = 61.15358898795372 
+            xmax = 61.447900104723296 
+            text = "eh" 
+        intervals [19]:
+            xmin = 61.447900104723296 
+            xmax = 71.40107344484682 
+            text = "" 
+        intervals [20]:
+            xmin = 71.40107344484682 
+            xmax = 71.75770926869701 
+            text = "hl" 
+        intervals [21]:
+            xmin = 71.75770926869701 
+            xmax = 78.63553202298175 
+            text = "" 
+        intervals [22]:
+            xmin = 78.63553202298175 
+            xmax = 78.95408052583824 
+            text = "eh" 
+        intervals [23]:
+            xmin = 78.95408052583824 
+            xmax = 83.07856368086738 
+            text = "" 
+        intervals [24]:
+            xmin = 83.07856368086738 
+            xmax = 83.36594983018355 
+            text = "eh" 
+        intervals [25]:
+            xmin = 83.36594983018355 
+            xmax = 92.41887740136482 
+            text = "" 
+        intervals [26]:
+            xmin = 92.41887740136482 
+            xmax = 92.75820080658153 
+            text = "bx" 
+        intervals [27]:
+            xmin = 92.75820080658153 
+            xmax = 98.2718049725461 
+            text = "" 
+        intervals [28]:
+            xmin = 98.2718049725461 
+            xmax = 98.79810249900463 
+            text = "ac" 
+        intervals [29]:
+            xmin = 98.79810249900463 
+            xmax = 100.89010770646031 
+            text = "" 
+        intervals [30]:
+            xmin = 100.89010770646031 
+            xmax = 101.160181437143 
+            text = "dr" 
+        intervals [31]:
+            xmin = 101.160181437143 
+            xmax = 258.6596031499361 
+            text = "" 
+        intervals [32]:
+            xmin = 258.6596031499361 
+            xmax = 258.9643017178858 
+            text = "au" 
+        intervals [33]:
+            xmin = 258.9643017178858 
+            xmax = 282.47988651441176 
+            text = "" 
+        intervals [34]:
+            xmin = 282.47988651441176 
+            xmax = 282.7395727939143 
+            text = "dr" 
+        intervals [35]:
+            xmin = 282.7395727939143 
+            xmax = 289.75935738099383 
+            text = "" 
+        intervals [36]:
+            xmin = 289.75935738099383 
+            xmax = 290.0536684977634 
+            text = "au" 
+        intervals [37]:
+            xmin = 290.0536684977634 
+            xmax = 307.133963420494 
+            text = "" 
+        intervals [38]:
+            xmin = 307.133963420494 
+            xmax = 307.4213495698102 
+            text = "au" 
+        intervals [39]:
+            xmin = 307.4213495698102 
+            xmax = 1259.4528444416244 
+            text = "" 
+        intervals [40]:
+            xmin = 1259.4528444416244 
+            xmax = 1259.7402305909407 
+            text = "eh" 
+        intervals [41]:
+            xmin = 1259.7402305909407 
+            xmax = 1264.4436135648573 
+            text = "" 
+        intervals [42]:
+            xmin = 1264.4436135648573 
+            xmax = 1264.8140993236143 
+            text = "hl" 
+        intervals [43]:
+            xmin = 1264.8140993236143 
+            xmax = 1270.6074996349134 
+            text = "" 
+        intervals [44]:
+            xmin = 1270.6074996349134 
+            xmax = 1270.8983482679564 
+            text = "ed" 
+        intervals [45]:
+            xmin = 1270.8983482679564 
+            xmax = 1272.398268758146 
+            text = "" 
+        intervals [46]:
+            xmin = 1272.398268758146 
+            xmax = 1272.6579550376487 
+            text = "br" 
+        intervals [47]:
+            xmin = 1272.6579550376487 
+            xmax = 1273.9466640205096 
+            text = "" 
+        intervals [48]:
+            xmin = 1273.9466640205096 
+            xmax = 1274.1786504301986 
+            text = "eg" 
+        intervals [49]:
+            xmin = 1274.1786504301986 
+            xmax = 1275.6225061442328 
+            text = "" 
+        intervals [50]:
+            xmin = 1275.6225061442328 
+            xmax = 1276.0068418378967 
+            text = "hl" 
+        intervals [51]:
+            xmin = 1276.0068418378967 
+            xmax = 1279.830088908703 
+            text = "" 
+        intervals [52]:
+            xmin = 1279.830088908703 
+            xmax = 1280.0447628997586 
+            text = "eg" 
+        intervals [53]:
+            xmin = 1280.0447628997586 
+            xmax = 1282.5453411869648 
+            text = "" 
+        intervals [54]:
+            xmin = 1282.5453411869648 
+            xmax = 1282.901977010815 
+            text = "cn" 
+        intervals [55]:
+            xmin = 1282.901977010815 
+            xmax = 1301.087469278892 
+            text = "" 
+        intervals [56]:
+            xmin = 1301.087469278892 
+            xmax = 1301.2779058838605 
+            text = "bm" 
+        intervals [57]:
+            xmin = 1301.2779058838605 
+            xmax = 1644.5885391039878 
+            text = "" 
+        intervals [58]:
+            xmin = 1644.5885391039878 
+            xmax = 1644.8690002858505 
+            text = "au" 
+        intervals [59]:
+            xmin = 1644.8690002858505 
+            xmax = 1648.0620753183973 
+            text = "" 
+        intervals [60]:
+            xmin = 1648.0620753183973 
+            xmax = 1648.2594368908194 
+            text = "bm" 
+        intervals [61]:
+            xmin = 1648.2594368908194 
+            xmax = 1651.078563680882 
+            text = "" 
+        intervals [62]:
+            xmin = 1651.078563680882 
+            xmax = 1651.3244000254779 
+            text = "dr" 
+        intervals [63]:
+            xmin = 1651.3244000254779 
+            xmax = 1655.768096719892 
+            text = "" 
+        intervals [64]:
+            xmin = 1655.768096719892 
+            xmax = 1656.0970326739284 
+            text = "bx" 
+        intervals [65]:
+            xmin = 1656.0970326739284 
+            xmax = 1659.0858211666 
+            text = "" 
+        intervals [66]:
+            xmin = 1659.0858211666 
+            xmax = 1659.6190436605118 
+            text = "ac" 
+        intervals [67]:
+            xmin = 1659.6190436605118 
+            xmax = 1662.424320515668 
+            text = "" 
+        intervals [68]:
+            xmin = 1662.424320515668 
+            xmax = 1662.6632318928102 
+            text = "dr" 
+        intervals [69]:
+            xmin = 1662.6632318928102 
+            xmax = 1667.1824381926835 
+            text = "" 
+        intervals [70]:
+            xmin = 1667.1824381926835 
+            xmax = 1667.698348267962 
+            text = "ac" 
+        intervals [71]:
+            xmin = 1667.698348267962 
+            xmax = 1987.4833333333333 
+            text = "" 

@@ -1,0 +1,74 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 39.016666666666666 
+tiers? <exists> 
+size = 1 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "Cavi1574" 
+        xmin = 0 
+        xmax = 39.016666666666666 
+        intervals: size = 15 
+        intervals [1]:
+            xmin = 0 
+            xmax = 0.39860127640081433 
+            text = "" 
+        intervals [2]:
+            xmin = 0.39860127640081433 
+            xmax = 0.6859874257169926 
+            text = "en" 
+        intervals [3]:
+            xmin = 0.6859874257169926 
+            xmax = 1.8459194741618081 
+            text = "" 
+        intervals [4]:
+            xmin = 1.8459194741618081 
+            xmax = 2.2475675864591174 
+            text = "hg" 
+        intervals [5]:
+            xmin = 2.2475675864591174 
+            xmax = 4.301485472921106 
+            text = "" 
+        intervals [6]:
+            xmin = 4.301485472921106 
+            xmax = 4.5819466547838825 
+            text = "au" 
+        intervals [7]:
+            xmin = 4.5819466547838825 
+            xmax = 5.724566284595193 
+            text = "" 
+        intervals [8]:
+            xmin = 5.724566284595193 
+            xmax = 6.441300416022288 
+            text = "cb" 
+        intervals [9]:
+            xmin = 6.441300416022288 
+            xmax = 7.6399848219891435 
+            text = "" 
+        intervals [10]:
+            xmin = 7.6399848219891435 
+            xmax = 8.041632934286453 
+            text = "cd" 
+        intervals [11]:
+            xmin = 8.041632934286453 
+            xmax = 9.530500936767858 
+            text = "" 
+        intervals [12]:
+            xmin = 9.530500936767858 
+            xmax = 10.008323691052588 
+            text = "df" 
+        intervals [13]:
+            xmin = 10.008323691052588 
+            xmax = 14.9817803956518 
+            text = "" 
+        intervals [14]:
+            xmin = 14.9817803956518 
+            xmax = 15.670814657265288 
+            text = "cb" 
+        intervals [15]:
+            xmin = 15.670814657265288 
+            xmax = 39.016666666666666 
+            text = "" 

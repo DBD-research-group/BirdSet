@@ -1,0 +1,196 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 49.917097505668934 
+tiers? <exists> 
+size = 6 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "NAWA" 
+        xmin = 0 
+        xmax = 49.917097505668934 
+        intervals: size = 9 
+        intervals [1]:
+            xmin = 0 
+            xmax = 1.5931581621126394 
+            text = "" 
+        intervals [2]:
+            xmin = 1.5931581621126394 
+            xmax = 2.9054394945322963 
+            text = "1" 
+        intervals [3]:
+            xmin = 2.9054394945322963 
+            xmax = 11.661280697381653 
+            text = "" 
+        intervals [4]:
+            xmin = 11.661280697381653 
+            xmax = 13.134750720117562 
+            text = "~1" 
+        intervals [5]:
+            xmin = 13.134750720117562 
+            xmax = 13.596786904971424 
+            text = "" 
+        intervals [6]:
+            xmin = 13.596786904971424 
+            xmax = 15.837013876146933 
+            text = "1" 
+        intervals [7]:
+            xmin = 15.837013876146933 
+            xmax = 25.00717443434182 
+            text = "" 
+        intervals [8]:
+            xmin = 25.00717443434182 
+            xmax = 27.261251340424135 
+            text = "1" 
+        intervals [9]:
+            xmin = 27.261251340424135 
+            xmax = 49.917097505668934 
+            text = "" 
+    item [2]:
+        class = "IntervalTier" 
+        name = "SPTO" 
+        xmin = 0 
+        xmax = 49.917097505668934 
+        intervals: size = 9 
+        intervals [1]:
+            xmin = 0 
+            xmax = 20.130984505074913 
+            text = "" 
+        intervals [2]:
+            xmin = 20.130984505074913 
+            xmax = 20.749242721638776 
+            text = "1" 
+        intervals [3]:
+            xmin = 20.749242721638776 
+            xmax = 27.888625931485333 
+            text = "" 
+        intervals [4]:
+            xmin = 27.888625931485333 
+            xmax = 28.5049480348381 
+            text = "1" 
+        intervals [5]:
+            xmin = 28.5049480348381 
+            xmax = 35.65162956051709 
+            text = "" 
+        intervals [6]:
+            xmin = 35.65162956051709 
+            xmax = 36.36793753829813 
+            text = "~1" 
+        intervals [7]:
+            xmin = 36.36793753829813 
+            xmax = 41.96447399465896 
+            text = "" 
+        intervals [8]:
+            xmin = 41.96447399465896 
+            xmax = 42.63720430078792 
+            text = "1" 
+        intervals [9]:
+            xmin = 42.63720430078792 
+            xmax = 49.917097505668934 
+            text = "" 
+    item [3]:
+        class = "IntervalTier" 
+        name = "OCWA" 
+        xmin = 0 
+        xmax = 49.917097505668934 
+        intervals: size = 1 
+        intervals [1]:
+            xmin = 0 
+            xmax = 49.917097505668934 
+            text = "" 
+    item [4]:
+        class = "IntervalTier" 
+        name = "Martin" 
+        xmin = 0 
+        xmax = 49.917097505668934 
+        intervals: size = 1 
+        intervals [1]:
+            xmin = 0 
+            xmax = 49.917097505668934 
+            text = "" 
+    item [5]:
+        class = "IntervalTier" 
+        name = "CAVI" 
+        xmin = 0 
+        xmax = 49.917097505668934 
+        intervals: size = 5 
+        intervals [1]:
+            xmin = 0 
+            xmax = 10.486811481865649 
+            text = "" 
+        intervals [2]:
+            xmin = 10.486811481865649 
+            xmax = 10.756885212548323 
+            text = "1" 
+        intervals [3]:
+            xmin = 10.756885212548323 
+            xmax = 47.36483135126013 
+            text = "" 
+        intervals [4]:
+            xmin = 47.36483135126013 
+            xmax = 47.686842337843316 
+            text = "1" 
+        intervals [5]:
+            xmin = 47.686842337843316 
+            xmax = 49.917097505668934 
+            text = "" 
+    item [6]:
+        class = "IntervalTier" 
+        name = "BHGR" 
+        xmin = 0 
+        xmax = 49.917097505668934 
+        intervals: size = 13 
+        intervals [1]:
+            xmin = 0 
+            xmax = 25.04526175533553 
+            text = "" 
+        intervals [2]:
+            xmin = 25.04526175533553 
+            xmax = 25.22877339285068 
+            text = "1" 
+        intervals [3]:
+            xmin = 25.22877339285068 
+            xmax = 25.755070919309222 
+            text = "" 
+        intervals [4]:
+            xmin = 25.755070919309222 
+            xmax = 26.000907263904992 
+            text = "1" 
+        intervals [5]:
+            xmin = 26.000907263904992 
+            xmax = 26.312530799308075 
+            text = "" 
+        intervals [6]:
+            xmin = 26.312530799308075 
+            xmax = 26.599916948624255 
+            text = "1" 
+        intervals [7]:
+            xmin = 26.599916948624255 
+            xmax = 26.790353553592805 
+            text = "" 
+        intervals [8]:
+            xmin = 26.790353553592805 
+            xmax = 27.112364540175992 
+            text = "1" 
+        intervals [9]:
+            xmin = 27.112364540175992 
+            xmax = 27.27856375905764 
+            text = "" 
+        intervals [10]:
+            xmin = 27.27856375905764 
+            xmax = 27.54863748974031 
+            text = "1" 
+        intervals [11]:
+            xmin = 27.54863748974031 
+            xmax = 27.673286903901545 
+            text = "" 
+        intervals [12]:
+            xmin = 27.673286903901545 
+            xmax = 27.887960894957004 
+            text = "1" 
+        intervals [13]:
+            xmin = 27.887960894957004 
+            xmax = 49.917097505668934 
+            text = "" 

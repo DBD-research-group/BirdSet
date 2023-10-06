@@ -1,0 +1,606 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 4236.776666666667 
+tiers? <exists> 
+size = 7 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "Cavi1642" 
+        xmin = 0 
+        xmax = 4236.776666666667 
+        intervals: size = 27 
+        intervals [1]:
+            xmin = 0 
+            xmax = 2324.341215127532 
+            text = "" 
+        intervals [2]:
+            xmin = 2324.341215127532 
+            xmax = 2324.6978509513824 
+            text = "aj" 
+        intervals [3]:
+            xmin = 2324.6978509513824 
+            xmax = 2330.6269531645507 
+            text = "" 
+        intervals [4]:
+            xmin = 2330.6269531645507 
+            xmax = 2331.0009014070342 
+            text = "aj" 
+        intervals [5]:
+            xmin = 2331.0009014070342 
+            xmax = 2336.0782326234344 
+            text = "" 
+        intervals [6]:
+            xmin = 2336.0782326234344 
+            xmax = 2336.389856158837 
+            text = "au" 
+        intervals [7]:
+            xmin = 2336.389856158837 
+            xmax = 2340.6112888582143 
+            text = "" 
+        intervals [8]:
+            xmin = 2340.6112888582143 
+            xmax = 2340.971387165791 
+            text = "aj" 
+        intervals [9]:
+            xmin = 2340.971387165791 
+            xmax = 2347.3090624587103 
+            text = "" 
+        intervals [10]:
+            xmin = 2347.3090624587103 
+            xmax = 2347.683010701194 
+            text = "aj" 
+        intervals [11]:
+            xmin = 2347.683010701194 
+            xmax = 2373.605021687775 
+            text = "" 
+        intervals [12]:
+            xmin = 2373.605021687775 
+            xmax = 2373.982432413986 
+            text = "aj" 
+        intervals [13]:
+            xmin = 2373.982432413986 
+            xmax = 2385.092740355355 
+            text = "" 
+        intervals [14]:
+            xmin = 2385.092740355355 
+            xmax = 2385.4009014070316 
+            text = "au" 
+        intervals [15]:
+            xmin = 2385.4009014070316 
+            xmax = 4008.971220906564 
+            text = "" 
+        intervals [16]:
+            xmin = 4008.971220906564 
+            xmax = 4009.3451691490477 
+            text = "aj" 
+        intervals [17]:
+            xmin = 4009.3451691490477 
+            xmax = 4013.1136815167547 
+            text = "" 
+        intervals [18]:
+            xmin = 4013.1136815167547 
+            xmax = 4013.487629759238 
+            text = "aj" 
+        intervals [19]:
+            xmin = 4013.487629759238 
+            xmax = 4016.5699053125304 
+            text = "" 
+        intervals [20]:
+            xmin = 4016.5699053125304 
+            xmax = 4016.89537878284 
+            text = "au" 
+        intervals [21]:
+            xmin = 4016.89537878284 
+            xmax = 4027.634535928924 
+            text = "" 
+        intervals [22]:
+            xmin = 4027.634535928924 
+            xmax = 4028.0154091388613 
+            text = "aj" 
+        intervals [23]:
+            xmin = 4028.0154091388613 
+            xmax = 4215.07377982432 
+            text = "" 
+        intervals [24]:
+            xmin = 4215.07377982432 
+            xmax = 4215.406178262083 
+            text = "cg" 
+        intervals [25]:
+            xmin = 4215.406178262083 
+            xmax = 4232.257949258851 
+            text = "" 
+        intervals [26]:
+            xmin = 4232.257949258851 
+            xmax = 4232.628435017608 
+            text = "cg" 
+        intervals [27]:
+            xmin = 4232.628435017608 
+            xmax = 4236.776666666667 
+            text = "" 
+    item [2]:
+        class = "IntervalTier" 
+        name = "RH1642" 
+        xmin = 0 
+        xmax = 4236.776666666667 
+        intervals: size = 97 
+        intervals [1]:
+            xmin = 0 
+            xmax = 8.487807644996384 
+            text = "" 
+        intervals [2]:
+            xmin = 8.487807644996384 
+            xmax = 11.988378692691036 
+            text = "Okay, male is on the nest" 
+        intervals [3]:
+            xmin = 11.988378692691036 
+            xmax = 22.579314075055834 
+            text = "" 
+        intervals [4]:
+            xmin = 22.579314075055834 
+            xmax = 25.410148727665316 
+            text = "I am going to do a playback experiment, this is Y A/W" 
+        intervals [5]:
+            xmin = 25.410148727665316 
+            xmax = 125.69110868692442 
+            text = "" 
+        intervals [6]:
+            xmin = 125.69110868692442 
+            xmax = 126.83719080046244 
+            text = "He's on the nest" 
+        intervals [7]:
+            xmin = 126.83719080046244 
+            xmax = 190.64675419549366 
+            text = "" 
+        intervals [8]:
+            xmin = 190.64675419549366 
+            xmax = 192.86687130083726 
+            text = "I'd say the playback is" 
+        intervals [9]:
+            xmin = 192.86687130083726 
+            xmax = 218.50072644319968 
+            text = "" 
+        intervals [10]:
+            xmin = 218.50072644319968 
+            xmax = 221.28110087574055 
+            text = "25 meters from the nest" 
+        intervals [11]:
+            xmin = 221.28110087574055 
+            xmax = 225.8286720819555 
+            text = "" 
+        intervals [12]:
+            xmin = 225.8286720819555 
+            xmax = 227.22059054008926 
+            text = "I will have to get a waypoint later" 
+        intervals [13]:
+            xmin = 227.22059054008926 
+            xmax = 253.53798970804465 
+            text = "" 
+        intervals [14]:
+            xmin = 253.53798970804465 
+            xmax = 255.66049223251233 
+            text = "It's almost due south of the nest" 
+        intervals [15]:
+            xmin = 255.66049223251233 
+            xmax = 271.16568799165634 
+            text = "" 
+        intervals [16]:
+            xmin = 271.16568799165634 
+            xmax = 274.23691105724004 
+            text = "It's probably 30m inside his territory" 
+        intervals [17]:
+            xmin = 274.23691105724004 
+            xmax = 276.52332453127394 
+            text = "" 
+        intervals [18]:
+            xmin = 276.52332453127394 
+            xmax = 280.48482156245 
+            text = "Pretty far inside his territory, but that's part of his territory that he doesn't go to much anymore" 
+        intervals [19]:
+            xmin = 280.48482156245 
+            xmax = 284.0868847737942 
+            text = "" 
+        intervals [20]:
+            xmin = 284.0868847737942 
+            xmax = 287.37970679788685 
+            text = "Because the neighbor (A Y/O) has basically deserted" 
+        intervals [21]:
+            xmin = 287.37970679788685 
+            xmax = 541.8445131382018 
+            text = "" 
+        intervals [22]:
+            xmin = 541.8445131382018 
+            xmax = 544.2267019421721 
+            text = "Sounds like maybe a red-shouldered hawk over there" 
+        intervals [23]:
+            xmin = 544.2267019421721 
+            xmax = 545.4357737993191 
+            text = "" 
+        intervals [24]:
+            xmin = 545.4357737993191 
+            xmax = 548.621258827884 
+            text = "Maybe it's just a squirrel or steller's jay" 
+        intervals [25]:
+            xmin = 548.621258827884 
+            xmax = 697.7535093506601 
+            text = "" 
+        intervals [26]:
+            xmin = 697.7535093506601 
+            xmax = 699.5643883397247 
+            text = "Must have been a steller's jay" 
+        intervals [27]:
+            xmin = 699.5643883397247 
+            xmax = 717.9472421802235 
+            text = "" 
+        intervals [28]:
+            xmin = 717.9472421802235 
+            xmax = 719.8723831322693 
+            text = "Unless they are chasing a red-shouldered" 
+        intervals [29]:
+            xmin = 719.8723831322693 
+            xmax = 1854.705526116387 
+            text = "" 
+        intervals [30]:
+            xmin = 1854.705526116387 
+            xmax = 1856.1112945094278 
+            text = "Cooper's hawk" 
+        intervals [31]:
+            xmin = 1856.1112945094278 
+            xmax = 1870.93405004235 
+            text = "" 
+        intervals [32]:
+            xmin = 1870.93405004235 
+            xmax = 1872.2848343435933 
+            text = "I know it has a nest there" 
+        intervals [33]:
+            xmin = 1872.2848343435933 
+            xmax = 1876.7933989412516 
+            text = "" 
+        intervals [34]:
+            xmin = 1876.7933989412516 
+            xmax = 1879.1340379405012 
+            text = "But I don't know what a cooper's hawk nest looks like" 
+        intervals [35]:
+            xmin = 1879.1340379405012 
+            xmax = 1964.4537430177718 
+            text = "" 
+        intervals [36]:
+            xmin = 1964.4537430177718 
+            xmax = 1965.4197759775213 
+            text = "Hutton's vireo again" 
+        intervals [37]:
+            xmin = 1965.4197759775213 
+            xmax = 2301.7484985506803 
+            text = "" 
+        intervals [38]:
+            xmin = 2301.7484985506803 
+            xmax = 2304.996308286326 
+            text = "A Y/O is back" 
+        intervals [39]:
+            xmin = 2304.996308286326 
+            xmax = 2453.897010359839 
+            text = "" 
+        intervals [40]:
+            xmin = 2453.897010359839 
+            xmax = 2455.4205031995875 
+            text = "Hutton's again" 
+        intervals [41]:
+            xmin = 2455.4205031995875 
+            xmax = 2462.6729392328834 
+            text = "" 
+        intervals [42]:
+            xmin = 2462.6729392328834 
+            xmax = 2464.8473790132516 
+            text = "Just a little bit north of this guy's nest" 
+        intervals [43]:
+            xmin = 2464.8473790132516 
+            xmax = 2471.0402950261773 
+            text = "" 
+        intervals [44]:
+            xmin = 2471.0402950261773 
+            xmax = 2473.592145532756 
+            text = "15 or 20 meters northeast" 
+        intervals [45]:
+            xmin = 2473.592145532756 
+            xmax = 2509.4576074448087 
+            text = "" 
+        intervals [46]:
+            xmin = 2509.4576074448087 
+            xmax = 2510.4201779208315 
+            text = "now he's east" 
+        intervals [47]:
+            xmin = 2510.4201779208315 
+            xmax = 2560.917293724309 
+            text = "" 
+        intervals [48]:
+            xmin = 2560.917293724309 
+            xmax = 2564.1270161389607 
+            text = "hutton's now 40m southeast" 
+        intervals [49]:
+            xmin = 2564.1270161389607 
+            xmax = 3034.4737748271773 
+            text = "" 
+        intervals [50]:
+            xmin = 3034.4737748271773 
+            xmax = 3035.4536577218337 
+            text = "Hutton's doing something funny" 
+        intervals [51]:
+            xmin = 3035.4536577218337 
+            xmax = 3093.8818563690397 
+            text = "" 
+        intervals [52]:
+            xmin = 3093.8818563690397 
+            xmax = 3096.994629239344 
+            text = "Hutton's was singing at least four different phrase-types" 
+        intervals [53]:
+            xmin = 3096.994629239344 
+            xmax = 3097.646241216492 
+            text = "" 
+        intervals [54]:
+            xmin = 3097.646241216492 
+            xmax = 3099.5956195546246 
+            text = "Alternating between them" 
+        intervals [55]:
+            xmin = 3099.5956195546246 
+            xmax = 3267.6929016172267 
+            text = "" 
+        intervals [56]:
+            xmin = 3267.6929016172267 
+            xmax = 3269.1886945871615 
+            text = "I think I heard the female" 
+        intervals [57]:
+            xmin = 3269.1886945871615 
+            xmax = 3650.59529427584 
+            text = "" 
+        intervals [58]:
+            xmin = 3650.59529427584 
+            xmax = 3654.1858899004287 
+            text = "It's been an hour, plus the amount of time I spent setting up the speaker" 
+        intervals [59]:
+            xmin = 3654.1858899004287 
+            xmax = 3657.597766444286 
+            text = "" 
+        intervals [60]:
+            xmin = 3657.597766444286 
+            xmax = 3660.3989157791875 
+            text = "Maybe one hour and 20 minutes that the female has been gone" 
+        intervals [61]:
+            xmin = 3660.3989157791875 
+            xmax = 3948.4238182017857 
+            text = "" 
+        intervals [62]:
+            xmin = 3948.4238182017857 
+            xmax = 3950.3974339260053 
+            text = "I see what I think is a vireo" 
+        intervals [63]:
+            xmin = 3950.3974339260053 
+            xmax = 3952.056628667624 
+            text = "" 
+        intervals [64]:
+            xmin = 3952.056628667624 
+            xmax = 3954.085644131471 
+            text = "Could be a hutton's" 
+        intervals [65]:
+            xmin = 3954.085644131471 
+            xmax = 3961.119943689984 
+            text = "" 
+        intervals [66]:
+            xmin = 3961.119943689984 
+            xmax = 3963.3567081774327 
+            text = "it's about 30m" 
+        intervals [67]:
+            xmin = 3963.3567081774327 
+            xmax = 3965.576825282776 
+            text = "" 
+        intervals [68]:
+            xmin = 3965.576825282776 
+            xmax = 3966.7367573312213 
+            text = "Northeast of the nest" 
+        intervals [69]:
+            xmin = 3966.7367573312213 
+            xmax = 3970.643769047997 
+            text = "" 
+        intervals [70]:
+            xmin = 3970.643769047997 
+            xmax = 3971.6617392636467 
+            text = "foraging" 
+        intervals [71]:
+            xmin = 3971.6617392636467 
+            xmax = 3993.5285167697334 
+            text = "" 
+        intervals [72]:
+            xmin = 3993.5285167697334 
+            xmax = 3995.353245693705 
+            text = "Probably more like 20" 
+        intervals [73]:
+            xmin = 3995.353245693705 
+            xmax = 3996.558855067125 
+            text = "" 
+        intervals [74]:
+            xmin = 3996.558855067125 
+            xmax = 3998.4251337958167 
+            text = "No, thirty meters" 
+        intervals [75]:
+            xmin = 3998.4251337958167 
+            xmax = 4041.1441810760666 
+            text = "" 
+        intervals [76]:
+            xmin = 4041.1441810760666 
+            xmax = 4043.183583991093 
+            text = "That was the male singing on the nest" 
+        intervals [77]:
+            xmin = 4043.183583991093 
+            xmax = 4044.8670161187983 
+            text = "" 
+        intervals [78]:
+            xmin = 4044.8670161187983 
+            xmax = 4048.1567913069944 
+            text = "Maybe he is somehow aware that the female is there? Maybe she gave a squeak" 
+        intervals [79]:
+            xmin = 4048.1567913069944 
+            xmax = 4067.7309889381754 
+            text = "" 
+        intervals [80]:
+            xmin = 4067.7309889381754 
+            xmax = 4069.4345309317123 
+            text = "I think I heard a squeak right there" 
+        intervals [81]:
+            xmin = 4069.4345309317123 
+            xmax = 4139.124721767735 
+            text = "" 
+        intervals [82]:
+            xmin = 4139.124721767735 
+            xmax = 4140.9567913069895 
+            text = "Female is about 10 meters north" 
+        intervals [83]:
+            xmin = 4140.9567913069895 
+            xmax = 4159.931979253451 
+            text = "" 
+        intervals [84]:
+            xmin = 4159.931979253451 
+            xmax = 4162.418042569222 
+            text = "I think that's the male squeaking" 
+        intervals [85]:
+            xmin = 4162.418042569222 
+            xmax = 4171.162809088727 
+            text = "" 
+        intervals [86]:
+            xmin = 4171.162809088727 
+            xmax = 4172.575502449221 
+            text = "At least this squeak was" 
+        intervals [87]:
+            xmin = 4172.575502449221 
+            xmax = 4180.897845954067 
+            text = "" 
+        intervals [88]:
+            xmin = 4180.897845954067 
+            xmax = 4182.556791306987 
+            text = "female is 10 northwest" 
+        intervals [89]:
+            xmin = 4182.556791306987 
+            xmax = 4197.80568172699 
+            text = "" 
+        intervals [90]:
+            xmin = 4197.80568172699 
+            xmax = 4199.997433925992 
+            text = "there is a flycatcher there, so it's hard to say" 
+        intervals [91]:
+            xmin = 4199.997433925992 
+            xmax = 4202.394137701396 
+            text = "" 
+        intervals [92]:
+            xmin = 4202.394137701396 
+            xmax = 4203.730656419903 
+            text = "I thought I saw the female though" 
+        intervals [93]:
+            xmin = 4203.730656419903 
+            xmax = 4213.303462607076 
+            text = "" 
+        intervals [94]:
+            xmin = 4213.303462607076 
+            xmax = 4215.436352582723 
+            text = "female is at the nest, male is off" 
+        intervals [95]:
+            xmin = 4215.436352582723 
+            xmax = 4227.765454795892 
+            text = "" 
+        intervals [96]:
+            xmin = 4227.765454795892 
+            xmax = 4231.204366173034 
+            text = "Male flew off the nest as the female flew towards the nest" 
+        intervals [97]:
+            xmin = 4231.204366173034 
+            xmax = 4236.776666666667 
+            text = "" 
+    item [3]:
+        class = "IntervalTier" 
+        name = "Dist1642" 
+        xmin = 0 
+        xmax = 4236.776666666667 
+        intervals: size = 2 
+        intervals [1]:
+            xmin = 0 
+            xmax = 4214.910055056264 
+            text = "0" 
+        intervals [2]:
+            xmin = 4214.910055056264 
+            xmax = 4236.776666666667 
+            text = "?" 
+    item [4]:
+        class = "IntervalTier" 
+        name = "Dir1642" 
+        xmin = 0 
+        xmax = 4236.776666666667 
+        intervals: size = 2 
+        intervals [1]:
+            xmin = 0 
+            xmax = 4214.910055056264 
+            text = "0" 
+        intervals [2]:
+            xmin = 4214.910055056264 
+            xmax = 4236.776666666667 
+            text = "?" 
+    item [5]:
+        class = "IntervalTier" 
+        name = "Bkg1642" 
+        xmin = 0 
+        xmax = 4236.776666666667 
+        intervals: size = 8 
+        intervals [1]:
+            xmin = 0 
+            xmax = 960.7525190353832 
+            text = "1" 
+        intervals [2]:
+            xmin = 960.7525190353832 
+            xmax = 1255.5437796965045 
+            text = "0" 
+        intervals [3]:
+            xmin = 1255.5437796965045 
+            xmax = 2207.6433555665835 
+            text = "1" 
+        intervals [4]:
+            xmin = 2207.6433555665835 
+            xmax = 2298.409956728796 
+            text = "0" 
+        intervals [5]:
+            xmin = 2298.409956728796 
+            xmax = 2885.8935478760877 
+            text = "1" 
+        intervals [6]:
+            xmin = 2885.8935478760877 
+            xmax = 2948.435842227143 
+            text = "0" 
+        intervals [7]:
+            xmin = 2948.435842227143 
+            xmax = 3674.376825282793 
+            text = "1" 
+        intervals [8]:
+            xmin = 3674.376825282793 
+            xmax = 4236.776666666667 
+            text = "0" 
+    item [6]:
+        class = "IntervalTier" 
+        name = "Fem1642" 
+        xmin = 0 
+        xmax = 4236.776666666667 
+        intervals: size = 2 
+        intervals [1]:
+            xmin = 0 
+            xmax = 4214.910055056264 
+            text = "0" 
+        intervals [2]:
+            xmin = 4214.910055056264 
+            xmax = 4236.776666666667 
+            text = "1" 
+    item [7]:
+        class = "IntervalTier" 
+        name = "Chatter1642" 
+        xmin = 0 
+        xmax = 4236.776666666667 
+        intervals: size = 1 
+        intervals [1]:
+            xmin = 0 
+            xmax = 4236.776666666667 
+            text = "" 

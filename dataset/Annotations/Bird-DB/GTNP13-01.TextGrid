@@ -1,0 +1,164 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 77.89714285714285 
+tiers? <exists> 
+size = 2 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "BHGB" 
+        xmin = 0 
+        xmax = 77.89714285714285 
+        intervals: size = 35 
+        intervals [1]:
+            xmin = 0 
+            xmax = 0.01957387864886388 
+            text = "" 
+        intervals [2]:
+            xmin = 0.01957387864886388 
+            xmax = 0.30409634598853563 
+            text = "ra" 
+        intervals [3]:
+            xmin = 0.30409634598853563 
+            xmax = 0.5923625300037294 
+            text = "" 
+        intervals [4]:
+            xmin = 0.5923625300037294 
+            xmax = 0.8394478305881812 
+            text = "lo" 
+        intervals [5]:
+            xmin = 0.8394478305881812 
+            xmax = 1.105251714550243 
+            text = "" 
+        intervals [6]:
+            xmin = 1.105251714550243 
+            xmax = 1.3148998483794747 
+            text = "rb" 
+        intervals [7]:
+            xmin = 1.3148998483794747 
+            xmax = 1.5058293988310967 
+            text = "" 
+        intervals [8]:
+            xmin = 1.5058293988310967 
+            xmax = 1.7117338159848066 
+            text = "nv" 
+        intervals [9]:
+            xmin = 1.7117338159848066 
+            xmax = 1.973793983271346 
+            text = "" 
+        intervals [10]:
+            xmin = 1.973793983271346 
+            xmax = 2.202160700478188 
+            text = "rc" 
+        intervals [11]:
+            xmin = 2.202160700478188 
+            xmax = 2.4455022843871177 
+            text = "" 
+        intervals [12]:
+            xmin = 2.4455022843871177 
+            xmax = 2.6401755515142615 
+            text = "rd" 
+        intervals [13]:
+            xmin = 2.6401755515142615 
+            xmax = 2.7861805018596195 
+            text = "" 
+        intervals [14]:
+            xmin = 2.7861805018596195 
+            xmax = 3.100652702603467 
+            text = "hb" 
+        intervals [15]:
+            xmin = 3.100652702603467 
+            xmax = 8.647085268401595 
+            text = "" 
+        intervals [16]:
+            xmin = 8.647085268401595 
+            xmax = 8.748165618640687 
+            text = "jh" 
+        intervals [17]:
+            xmin = 8.748165618640687 
+            xmax = 9.021456935953793 
+            text = "" 
+        intervals [18]:
+            xmin = 9.021456935953793 
+            xmax = 9.373366303452862 
+            text = "hu" 
+        intervals [19]:
+            xmin = 9.373366303452862 
+            xmax = 9.684094787521188 
+            text = "" 
+        intervals [20]:
+            xmin = 9.684094787521188 
+            xmax = 9.889999204674897 
+            text = "lo" 
+        intervals [21]:
+            xmin = 9.889999204674897 
+            xmax = 10.133340788583826 
+            text = "" 
+        intervals [22]:
+            xmin = 10.133340788583826 
+            xmax = 10.345854865425846 
+            text = "re" 
+        intervals [23]:
+            xmin = 10.345854865425846 
+            xmax = 10.592940166010298 
+            text = "" 
+        intervals [24]:
+            xmin = 10.592940166010298 
+            xmax = 10.869975199998924 
+            text = "ev" 
+        intervals [25]:
+            xmin = 10.869975199998924 
+            xmax = 11.147010233987553 
+            text = "" 
+        intervals [26]:
+            xmin = 11.147010233987553 
+            xmax = 11.36788951784335 
+            text = "rf" 
+        intervals [27]:
+            xmin = 11.36788951784335 
+            xmax = 18.980853688529617 
+            text = "" 
+        intervals [28]:
+            xmin = 18.980853688529617 
+            xmax = 19.085677755444234 
+            text = "jh" 
+        intervals [29]:
+            xmin = 19.085677755444234 
+            xmax = 19.38143137281047 
+            text = "" 
+        intervals [30]:
+            xmin = 19.38143137281047 
+            xmax = 19.695903573554318 
+            text = "ra" 
+        intervals [31]:
+            xmin = 19.695903573554318 
+            xmax = 19.998266850608868 
+            text = "" 
+        intervals [32]:
+            xmin = 19.998266850608868 
+            xmax = 20.21165870111362 
+            text = "lo" 
+        intervals [33]:
+            xmin = 20.21165870111362 
+            xmax = 20.49243745177777 
+            text = "" 
+        intervals [34]:
+            xmin = 20.49243745177777 
+            xmax = 20.702085585607 
+            text = "rb" 
+        intervals [35]:
+            xmin = 20.702085585607 
+            xmax = 77.89714285714285 
+            text = "" 
+    item [2]:
+        class = "IntervalTier" 
+        name = "Martin" 
+        xmin = 0 
+        xmax = 77.89714285714285 
+        intervals: size = 1 
+        intervals [1]:
+            xmin = 0 
+            xmax = 77.89714285714285 
+            text = "" 

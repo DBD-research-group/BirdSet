@@ -1,0 +1,112 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 13.995827664399092 
+tiers? <exists> 
+size = 2 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "North" 
+        xmin = 0 
+        xmax = 13.995827664399092 
+        intervals: size = 23 
+        intervals [1]:
+            xmin = 0 
+            xmax = 1.267697863168443 
+            text = "" 
+        intervals [2]:
+            xmin = 1.267697863168443 
+            xmax = 1.4583805465264805 
+            text = "aa" 
+        intervals [3]:
+            xmin = 1.4583805465264805 
+            xmax = 2.018944058071404 
+            text = "" 
+        intervals [4]:
+            xmin = 2.018944058071404 
+            xmax = 2.19346719199232 
+            text = "ab" 
+        intervals [5]:
+            xmin = 2.19346719199232 
+            xmax = 2.5101943609599076 
+            text = "" 
+        intervals [6]:
+            xmin = 2.5101943609599076 
+            xmax = 2.717036593755067 
+            text = "by" 
+        intervals [7]:
+            xmin = 2.717036593755067 
+            xmax = 3.0693147714843225 
+            text = "" 
+        intervals [8]:
+            xmin = 3.0693147714843225 
+            xmax = 3.23737408563039 
+            text = "bk" 
+        intervals [9]:
+            xmin = 3.23737408563039 
+            xmax = 3.5379417051608555 
+            text = "" 
+        intervals [10]:
+            xmin = 3.5379417051608555 
+            xmax = 3.7932625862673803 
+            text = "bn" 
+        intervals [11]:
+            xmin = 3.7932625862673803 
+            xmax = 4.0970621156852705 
+            text = "" 
+        intervals [12]:
+            xmin = 4.0970621156852705 
+            xmax = 4.384702095666039 
+            text = "ad" 
+        intervals [13]:
+            xmin = 4.384702095666039 
+            xmax = 4.701151212702855 
+            text = "" 
+        intervals [14]:
+            xmin = 4.701151212702855 
+            xmax = 4.865978616961498 
+            text = "am" 
+        intervals [15]:
+            xmin = 4.865978616961498 
+            xmax = 5.150386687054842 
+            text = "" 
+        intervals [16]:
+            xmin = 5.150386687054842 
+            xmax = 5.428330937373337 
+            text = "au" 
+        intervals [17]:
+            xmin = 5.428330937373337 
+            xmax = 5.6998113679169835 
+            text = "" 
+        intervals [18]:
+            xmin = 5.6998113679169835 
+            xmax = 6.006842807222299 
+            text = "ax" 
+        intervals [19]:
+            xmin = 6.006842807222299 
+            xmax = 6.498093110110802 
+            text = "" 
+        intervals [20]:
+            xmin = 6.498093110110802 
+            xmax = 6.7760373604292985 
+            text = "new1" 
+        intervals [21]:
+            xmin = 6.7760373604292985 
+            xmax = 7.034590151423247 
+            text = "" 
+        intervals [22]:
+            xmin = 7.034590151423247 
+            xmax = 7.341621590728562 
+            text = "new3" 
+        intervals [23]:
+            xmin = 7.341621590728562 
+            xmax = 13.995827664399092 
+            text = "" 
+    item [2]:
+        class = "TextTier" 
+        name = "Martin" 
+        xmin = 0 
+        xmax = 13.995827664399092 
+        points: size = 0 

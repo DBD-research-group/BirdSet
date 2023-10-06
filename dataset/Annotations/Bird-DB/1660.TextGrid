@@ -1,0 +1,186 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 140.90333333333334 
+tiers? <exists> 
+size = 1 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "Cavi1660" 
+        xmin = 0 
+        xmax = 140.90333333333334 
+        intervals: size = 43 
+        intervals [1]:
+            xmin = 0 
+            xmax = 3.2239879973887837 
+            text = "" 
+        intervals [2]:
+            xmin = 3.2239879973887837 
+            xmax = 3.7295106214871216 
+            text = "ej" 
+        intervals [3]:
+            xmin = 3.7295106214871216 
+            xmax = 5.703791382234988 
+            text = "" 
+        intervals [4]:
+            xmin = 5.703791382234988 
+            xmax = 6.0258023688181765 
+            text = "di" 
+        intervals [5]:
+            xmin = 6.0258023688181765 
+            xmax = 7.567272663728425 
+            text = "" 
+        intervals [6]:
+            xmin = 7.567272663728425 
+            xmax = 7.820033975777594 
+            text = "eg" 
+        intervals [7]:
+            xmin = 7.820033975777594 
+            xmax = 9.727862509189814 
+            text = "" 
+        intervals [8]:
+            xmin = 9.727862509189814 
+            xmax = 10.022173625959393 
+            text = "br" 
+        intervals [9]:
+            xmin = 10.022173625959393 
+            xmax = 11.32819502745398 
+            text = "" 
+        intervals [10]:
+            xmin = 11.32819502745398 
+            xmax = 11.857955037639224 
+            text = "ej" 
+        intervals [11]:
+            xmin = 11.857955037639224 
+            xmax = 13.062899374531153 
+            text = "" 
+        intervals [12]:
+            xmin = 13.062899374531153 
+            xmax = 13.398760296021143 
+            text = "hc" 
+        intervals [13]:
+            xmin = 13.398760296021143 
+            xmax = 14.915993204844488 
+            text = "" 
+        intervals [14]:
+            xmin = 14.915993204844488 
+            xmax = 15.244929158881078 
+            text = "di" 
+        intervals [15]:
+            xmin = 15.244929158881078 
+            xmax = 17.291922077889662 
+            text = "" 
+        intervals [16]:
+            xmin = 17.291922077889662 
+            xmax = 17.555070841118937 
+            text = "eg" 
+        intervals [17]:
+            xmin = 17.555070841118937 
+            xmax = 19.508576699506598 
+            text = "" 
+        intervals [18]:
+            xmin = 19.508576699506598 
+            xmax = 19.847900104723287 
+            text = "dh" 
+        intervals [19]:
+            xmin = 19.847900104723287 
+            xmax = 22.05350223863179 
+            text = "" 
+        intervals [20]:
+            xmin = 22.05350223863179 
+            xmax = 22.583262248817032 
+            text = "ej" 
+        intervals [21]:
+            xmin = 22.583262248817032 
+            xmax = 25.852511923351052 
+            text = "" 
+        intervals [22]:
+            xmin = 25.852511923351052 
+            xmax = 26.191835328567745 
+            text = "hc" 
+        intervals [23]:
+            xmin = 26.191835328567745 
+            xmax = 29.46867500708349 
+            text = "" 
+        intervals [24]:
+            xmin = 29.46867500708349 
+            xmax = 29.856473184473998 
+            text = "fe" 
+        intervals [25]:
+            xmin = 29.856473184473998 
+            xmax = 32.373698853785584 
+            text = "" 
+        intervals [26]:
+            xmin = 32.373698853785584 
+            xmax = 32.64031010074155 
+            text = "br" 
+        intervals [27]:
+            xmin = 32.64031010074155 
+            xmax = 34.40684183788737 
+            text = "" 
+        intervals [28]:
+            xmin = 34.40684183788737 
+            xmax = 34.81887740136478 
+            text = "fe" 
+        intervals [29]:
+            xmin = 34.81887740136478 
+            xmax = 39.10329984435051 
+            text = "" 
+        intervals [30]:
+            xmin = 39.10329984435051 
+            xmax = 39.63998482198916 
+            text = "ej" 
+        intervals [31]:
+            xmin = 39.63998482198916 
+            xmax = 41.31582694571241 
+            text = "" 
+        intervals [32]:
+            xmin = 41.31582694571241 
+            xmax = 41.6378379322956 
+            text = "di" 
+        intervals [33]:
+            xmin = 41.6378379322956 
+            xmax = 43.68829333503089 
+            text = "" 
+        intervals [34]:
+            xmin = 43.68829333503089 
+            xmax = 43.93412967962666 
+            text = "eg" 
+        intervals [35]:
+            xmin = 43.93412967962666 
+            xmax = 46.9090682373911 
+            text = "" 
+        intervals [36]:
+            xmin = 46.9090682373911 
+            xmax = 47.31764131714181 
+            text = "fe" 
+        intervals [37]:
+            xmin = 47.31764131714181 
+            xmax = 49.537758422485446 
+            text = "" 
+        intervals [38]:
+            xmin = 49.537758422485446 
+            xmax = 49.935944051056055 
+            text = "am" 
+        intervals [39]:
+            xmin = 49.935944051056055 
+            xmax = 52.04526167714526 
+            text = "" 
+        intervals [40]:
+            xmin = 52.04526167714526 
+            xmax = 52.38112259863525 
+            text = "ds" 
+        intervals [41]:
+            xmin = 52.38112259863525 
+            xmax = 53.98425256409779 
+            text = "" 
+        intervals [42]:
+            xmin = 53.98425256409779 
+            xmax = 54.28895113204747 
+            text = "au" 
+        intervals [43]:
+            xmin = 54.28895113204747 
+            xmax = 140.90333333333334 
+            text = "" 

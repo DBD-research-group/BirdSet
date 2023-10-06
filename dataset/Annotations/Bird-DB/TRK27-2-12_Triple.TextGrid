@@ -1,0 +1,164 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 92.43283446712019 
+tiers? <exists> 
+size = 2 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "CATH" 
+        xmin = 0 
+        xmax = 92.43283446712019 
+        intervals: size = 25 
+        intervals [1]:
+            xmin = 0 
+            xmax = 0.44199641935561834 
+            text = "" 
+        intervals [2]:
+            xmin = 0.44199641935561834 
+            xmax = 0.6162855572250056 
+            text = "ang" 
+        intervals [3]:
+            xmin = 0.6162855572250056 
+            xmax = 0.7246274537384084 
+            text = "" 
+        intervals [4]:
+            xmin = 0.7246274537384084 
+            xmax = 0.7811536606149664 
+            text = "ahm" 
+        intervals [5]:
+            xmin = 0.7811536606149664 
+            xmax = 1.0590741777580432 
+            text = "" 
+        intervals [6]:
+            xmin = 1.0590741777580432 
+            xmax = 1.2239422811480043 
+            text = "anh" 
+        intervals [7]:
+            xmin = 1.2239422811480043 
+            xmax = 1.6926387464994646 
+            text = "" 
+        intervals [8]:
+            xmin = 1.6926387464994646 
+            xmax = 1.8575068498894254 
+            text = "ang" 
+        intervals [9]:
+            xmin = 1.8575068498894254 
+            xmax = 1.9446514188241188 
+            text = "" 
+        intervals [10]:
+            xmin = 1.9446514188241188 
+            xmax = 2.0129539187999597 
+            text = "ahm" 
+        intervals [11]:
+            xmin = 2.0129539187999597 
+            xmax = 2.239058746306192 
+            text = "" 
+        intervals [12]:
+            xmin = 2.239058746306192 
+            xmax = 2.4369004703741446 
+            text = "anh" 
+        intervals [13]:
+            xmin = 2.4369004703741446 
+            xmax = 2.9432810736433104 
+            text = "" 
+        intervals [14]:
+            xmin = 2.9432810736433104 
+            xmax = 3.1105044356531275 
+            text = "ang" 
+        intervals [15]:
+            xmin = 3.1105044356531275 
+            xmax = 26.06878760161483 
+            text = "" 
+        intervals [16]:
+            xmin = 26.06878760161483 
+            xmax = 26.231300446384935 
+            text = "ani" 
+        intervals [17]:
+            xmin = 26.231300446384935 
+            xmax = 26.36555018771676 
+            text = "" 
+        intervals [18]:
+            xmin = 26.36555018771676 
+            xmax = 26.537484066966293 
+            text = "ani" 
+        intervals [19]:
+            xmin = 26.537484066966293 
+            xmax = 26.94350979668912 
+            text = "" 
+        intervals [20]:
+            xmin = 26.94350979668912 
+            xmax = 27.122509451798223 
+            text = "anj" 
+        intervals [21]:
+            xmin = 27.122509451798223 
+            xmax = 27.472282714022413 
+            text = "" 
+        intervals [22]:
+            xmin = 27.472282714022413 
+            xmax = 27.6465718518918 
+            text = "ang" 
+        intervals [23]:
+            xmin = 27.6465718518918 
+            xmax = 28.00457116211 
+            text = "" 
+        intervals [24]:
+            xmin = 28.00457116211 
+            xmax = 28.169439265499964 
+            text = "anh" 
+        intervals [25]:
+            xmin = 28.169439265499964 
+            xmax = 92.43283446712019 
+            text = "" 
+    item [2]:
+        class = "IntervalTier" 
+        name = "Martin" 
+        xmin = 0 
+        xmax = 92.43283446712019 
+        intervals: size = 11 
+        intervals [1]:
+            xmin = 0 
+            xmax = 80.86559578612723 
+            text = "" 
+        intervals [2]:
+            xmin = 80.86559578612723 
+            xmax = 82.58022406138282 
+            text = "08:42" 
+        intervals [3]:
+            xmin = 82.58022406138282 
+            xmax = 83.76921683654638 
+            text = "" 
+        intervals [4]:
+            xmin = 83.76921683654638 
+            xmax = 85.24831924981632 
+            text = "This thrasher is upslope" 
+        intervals [5]:
+            xmin = 85.24831924981632 
+            xmax = 85.49695113471134 
+            text = "" 
+        intervals [6]:
+            xmin = 85.49695113471134 
+            xmax = 86.29773906546258 
+            text = "behind D" 
+        intervals [7]:
+            xmin = 86.29773906546258 
+            xmax = 87.54568282725738 
+            text = "" 
+        intervals [8]:
+            xmin = 87.54568282725738 
+            xmax = 88.79868041302109 
+            text = "up in the gulley behind" 
+        intervals [9]:
+            xmin = 88.79868041302109 
+            xmax = 90.79436666887742 
+            text = "" 
+        intervals [10]:
+            xmin = 90.79436666887742 
+            xmax = 91.40908916865999 
+            text = "The tower" 
+        intervals [11]:
+            xmin = 91.40908916865999 
+            xmax = 92.43283446712019 
+            text = "" 

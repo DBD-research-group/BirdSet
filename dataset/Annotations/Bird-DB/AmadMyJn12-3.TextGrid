@@ -1,0 +1,116 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 89.87863945578232 
+tiers? <exists> 
+size = 2 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "CaVi" 
+        xmin = 0 
+        xmax = 89.87863945578232 
+        intervals: size = 17 
+        intervals [1]:
+            xmin = 0 
+            xmax = 0.8051811991047193 
+            text = "" 
+        intervals [2]:
+            xmin = 0.8051811991047193 
+            xmax = 1.1586778857601279 
+            text = "as" 
+        intervals [3]:
+            xmin = 1.1586778857601279 
+            xmax = 4.279409358099399 
+            text = "" 
+        intervals [4]:
+            xmin = 4.279409358099399 
+            xmax = 4.682395580886565 
+            text = "ar" 
+        intervals [5]:
+            xmin = 4.682395580886565 
+            xmax = 6.543328905858158 
+            text = "" 
+        intervals [6]:
+            xmin = 6.543328905858158 
+            xmax = 7.108590975643825 
+            text = "dl" 
+        intervals [7]:
+            xmin = 7.108590975643825 
+            xmax = 9.254945772323788 
+            text = "" 
+        intervals [8]:
+            xmin = 9.254945772323788 
+            xmax = 9.632008904756225 
+            text = "bi" 
+        intervals [9]:
+            xmin = 9.632008904756225 
+            xmax = 15.396801259813603 
+            text = "" 
+        intervals [10]:
+            xmin = 15.396801259813603 
+            xmax = 15.934116223529825 
+            text = "ac" 
+        intervals [11]:
+            xmin = 15.934116223529825 
+            xmax = 17.487145000235923 
+            text = "" 
+        intervals [12]:
+            xmin = 17.487145000235923 
+            xmax = 17.748732548360927 
+            text = "aa" 
+        intervals [13]:
+            xmin = 17.748732548360927 
+            xmax = 23.668309267689224 
+            text = "" 
+        intervals [14]:
+            xmin = 23.668309267689224 
+            xmax = 23.91340030377031 
+            text = "aa" 
+        intervals [15]:
+            xmin = 23.91340030377031 
+            xmax = 25.25904435763857 
+            text = "" 
+        intervals [16]:
+            xmin = 25.25904435763857 
+            xmax = 25.737443206912225 
+            text = "dm" 
+        intervals [17]:
+            xmin = 25.737443206912225 
+            xmax = 89.87863945578232 
+            text = "" 
+    item [2]:
+        class = "IntervalTier" 
+        name = "Martin" 
+        xmin = 0 
+        xmax = 89.87863945578232 
+        intervals: size = 7 
+        intervals [1]:
+            xmin = 0 
+            xmax = 33.86343617642759 
+            text = "" 
+        intervals [2]:
+            xmin = 33.86343617642759 
+            xmax = 34.50208685698504 
+            text = "May 2nd" 
+        intervals [3]:
+            xmin = 34.50208685698504 
+            xmax = 39.95762458720333 
+            text = "" 
+        intervals [4]:
+            xmin = 39.95762458720333 
+            xmax = 41.020471291747256 
+            text = "spring CaVi" 
+        intervals [5]:
+            xmin = 41.020471291747256 
+            xmax = 44.44313604796652 
+            text = "" 
+        intervals [6]:
+            xmin = 44.44313604796652 
+            xmax = 45.43057012602396 
+            text = "07:05" 
+        intervals [7]:
+            xmin = 45.43057012602396 
+            xmax = 89.87863945578232 
+            text = "" 

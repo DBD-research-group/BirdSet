@@ -1,0 +1,170 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 40.28666666666667 
+tiers? <exists> 
+size = 1 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "Cavi1498" 
+        xmin = 0 
+        xmax = 40.28666666666667 
+        intervals: size = 39 
+        intervals [1]:
+            xmin = 0 
+            xmax = 1.8770818277021166 
+            text = "" 
+        intervals [2]:
+            xmin = 1.8770818277021166 
+            xmax = 2.154080525838192 
+            text = "cr" 
+        intervals [3]:
+            xmin = 2.154080525838192 
+            xmax = 3.3244000254631105 
+            text = "" 
+        intervals [4]:
+            xmin = 3.3244000254631105 
+            xmax = 3.6914233004934105 
+            text = "fq" 
+        intervals [5]:
+            xmin = 3.6914233004934105 
+            xmax = 4.658121296771303 
+            text = "" 
+        intervals [6]:
+            xmin = 4.658121296771303 
+            xmax = 5.0528444416152105 
+            text = "bq" 
+        intervals [7]:
+            xmin = 5.0528444416152105 
+            xmax = 6.268176229687241 
+            text = "" 
+        intervals [8]:
+            xmin = 6.268176229687241 
+            xmax = 6.586724732543728 
+            text = "db" 
+        intervals [9]:
+            xmin = 6.586724732543728 
+            xmax = 7.556885212548321 
+            text = "" 
+        intervals [10]:
+            xmin = 7.556885212548321 
+            xmax = 7.896208617765013 
+            text = "ch" 
+        intervals [11]:
+            xmin = 7.896208617765013 
+            xmax = 8.827616740247567 
+            text = "" 
+        intervals [12]:
+            xmin = 8.827616740247567 
+            xmax = 9.211952433911371 
+            text = "da" 
+        intervals [13]:
+            xmin = 9.211952433911371 
+            xmax = 10.216737751182976 
+            text = "" 
+        intervals [14]:
+            xmin = 10.216737751182976 
+            xmax = 10.549136188946266 
+            text = "db" 
+        intervals [15]:
+            xmin = 10.549136188946266 
+            xmax = 11.636356079130362 
+            text = "" 
+        intervals [16]:
+            xmin = 11.636356079130362 
+            xmax = 12.038004191427671 
+            text = "ci" 
+        intervals [17]:
+            xmin = 12.038004191427671 
+            xmax = 14.064222208076052 
+            text = "" 
+        intervals [18]:
+            xmin = 14.064222208076052 
+            xmax = 14.46933280410006 
+            text = "cj" 
+        intervals [19]:
+            xmin = 14.46933280410006 
+            xmax = 15.501152954656941 
+            text = "" 
+        intervals [20]:
+            xmin = 15.501152954656941 
+            xmax = 15.823163941240129 
+            text = "db" 
+        intervals [21]:
+            xmin = 15.823163941240129 
+            xmax = 17.03916076584049 
+            text = "" 
+        intervals [22]:
+            xmin = 17.03916076584049 
+            xmax = 17.37155920360378 
+            text = "ch" 
+        intervals [23]:
+            xmin = 17.37155920360378 
+            xmax = 18.631903280122923 
+            text = "" 
+        intervals [24]:
+            xmin = 18.631903280122923 
+            xmax = 19.012776490060027 
+            text = "da" 
+        intervals [25]:
+            xmin = 19.012776490060027 
+            xmax = 20.505772012796463 
+            text = "" 
+        intervals [26]:
+            xmin = 20.505772012796463 
+            xmax = 20.83470796683305 
+            text = "db" 
+        intervals [27]:
+            xmin = 20.83470796683305 
+            xmax = 22.174689169066315 
+            text = "" 
+        intervals [28]:
+            xmin = 22.174689169066315 
+            xmax = 22.59018721627043 
+            text = "ci" 
+        intervals [29]:
+            xmin = 22.59018721627043 
+            xmax = 23.63998482198914 
+            text = "" 
+        intervals [30]:
+            xmin = 23.63998482198914 
+            xmax = 24.024320515652946 
+            text = "cj" 
+        intervals [31]:
+            xmin = 24.024320515652946 
+            xmax = 25.433551392420227 
+            text = "" 
+        intervals [32]:
+            xmin = 25.433551392420227 
+            xmax = 25.748637411550014 
+            text = "db" 
+        intervals [33]:
+            xmin = 25.748637411550014 
+            xmax = 35.85828755590339 
+            text = "" 
+        intervals [34]:
+            xmin = 35.85828755590339 
+            xmax = 36.15952364012637 
+            text = "en" 
+        intervals [35]:
+            xmin = 36.15952364012637 
+            xmax = 37.561829549440255 
+            text = "" 
+        intervals [36]:
+            xmin = 37.561829549440255 
+            xmax = 37.88037805229674 
+            text = "ai" 
+        intervals [37]:
+            xmin = 37.88037805229674 
+            xmax = 39.306368124180096 
+            text = "" 
+        intervals [38]:
+            xmin = 39.306368124180096 
+            xmax = 39.666466431756994 
+            text = "aj" 
+        intervals [39]:
+            xmin = 39.666466431756994 
+            xmax = 40.28666666666667 
+            text = "" 

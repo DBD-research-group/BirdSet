@@ -1,0 +1,130 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 45.306666666666665 
+tiers? <exists> 
+size = 1 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "Cavi1781" 
+        xmin = 0 
+        xmax = 45.306666666666665 
+        intervals: size = 29 
+        intervals [1]:
+            xmin = 0 
+            xmax = 0.16648930936613054 
+            text = "" 
+        intervals [2]:
+            xmin = 0.16648930936613054 
+            xmax = 0.5705157994323556 
+            text = "ag" 
+        intervals [3]:
+            xmin = 0.5705157994323556 
+            xmax = 1.605593188268685 
+            text = "" 
+        intervals [4]:
+            xmin = 1.605593188268685 
+            xmax = 1.9634452223273415 
+            text = "ci" 
+        intervals [5]:
+            xmin = 1.9634452223273415 
+            xmax = 3.9513657521286665 
+            text = "" 
+        intervals [6]:
+            xmin = 3.9513657521286665 
+            xmax = 4.2938263008514665 
+            text = "ch" 
+        intervals [7]:
+            xmin = 4.2938263008514665 
+            xmax = 5.59825468306528 
+            text = "" 
+        intervals [8]:
+            xmin = 5.59825468306528 
+            xmax = 5.975346073793756 
+            text = "ag" 
+        intervals [9]:
+            xmin = 5.975346073793756 
+            xmax = 11.101700662251657 
+            text = "" 
+        intervals [10]:
+            xmin = 11.101700662251657 
+            xmax = 11.405682497634817 
+            text = "ch" 
+        intervals [11]:
+            xmin = 11.405682497634817 
+            xmax = 13.31664560075686 
+            text = "" 
+        intervals [12]:
+            xmin = 13.31664560075686 
+            xmax = 13.813021002838223 
+            text = "dg" 
+        intervals [13]:
+            xmin = 13.813021002838223 
+            xmax = 15.706173699148534 
+            text = "" 
+        intervals [14]:
+            xmin = 15.706173699148534 
+            xmax = 16.002459791863767 
+            text = "ah" 
+        intervals [15]:
+            xmin = 16.002459791863767 
+            xmax = 18.098120719016084 
+            text = "" 
+        intervals [16]:
+            xmin = 18.098120719016084 
+            xmax = 18.39055894039735 
+            text = "ai" 
+        intervals [17]:
+            xmin = 18.39055894039735 
+            xmax = 19.364070387890255 
+            text = "" 
+        intervals [18]:
+            xmin = 19.364070387890255 
+            xmax = 19.648812866603595 
+            text = "en" 
+        intervals [19]:
+            xmin = 19.648812866603595 
+            xmax = 20.878702743614 
+            text = "" 
+        intervals [20]:
+            xmin = 20.878702743614 
+            xmax = 21.198076064333016 
+            text = "ds" 
+        intervals [21]:
+            xmin = 21.198076064333016 
+            xmax = 24.05946338694418 
+            text = "" 
+        intervals [22]:
+            xmin = 24.05946338694418 
+            xmax = 24.425011163670767 
+            text = "hg" 
+        intervals [23]:
+            xmin = 24.425011163670767 
+            xmax = 31.43682270577105 
+            text = "" 
+        intervals [24]:
+            xmin = 31.43682270577105 
+            xmax = 31.756196026490063 
+            text = "cd" 
+        intervals [25]:
+            xmin = 31.756196026490063 
+            xmax = 32.56666792809839 
+            text = "" 
+        intervals [26]:
+            xmin = 32.56666792809839 
+            xmax = 32.912976348155155 
+            text = "an" 
+        intervals [27]:
+            xmin = 32.912976348155155 
+            xmax = 34.19816537369914 
+            text = "" 
+        intervals [28]:
+            xmin = 34.19816537369914 
+            xmax = 34.45597275307473 
+            text = "hi" 
+        intervals [29]:
+            xmin = 34.45597275307473 
+            xmax = 45.306666666666665 
+            text = "" 
