@@ -12,7 +12,7 @@ import numpy as np
 
 class BaseGADME(L.LightningDataModule):
 
-    def __init__(self, dataset_name, dataset_path, seed, train_batch_size, eval_batch_size, val_split=0.1):
+    def __init__(self, dataset_name, dataset_path, seed, train_batch_size, eval_batch_size, transforms=None, val_split=0.1):
         super().__init__()
         self.dataset_name = dataset_name
         self.dataset_path = dataset_path
@@ -20,6 +20,7 @@ class BaseGADME(L.LightningDataModule):
 
         self.train_batch_size = train_batch_size
         self.eval_batch_size = eval_batch_size
+        self.transforms = transforms
         self.val_split = val_split
         self.feature_extractor = CustomFeatureExtractor()
     
@@ -29,7 +30,7 @@ class BaseGADME(L.LightningDataModule):
             audio_arrays,
             sampling_rate=self.feature_extractor.sampling_rate,
             padding=True,
-            max_length=32_000*5,
+            max_length=32_000*1,
             truncation=True,
             return_tensors="pt"
         )
@@ -61,7 +62,7 @@ class BaseGADME(L.LightningDataModule):
         )
         return transform
     
-    def transform(self, batch):
+    def augmentation(self, batch):
         audio = torch.Tensor(batch["input_values"].unsqueeze(1))
         labels = torch.Tensor(batch["primary"])
 
@@ -94,13 +95,22 @@ class BaseGADME(L.LightningDataModule):
         )
 
         # splits + augmentations
-        self.split = self.dataset["train"].train_test_split(self.val_split, shuffle=True, seed=self.seed)
-        self.train_dataset = self.split["train"].set_transform(self.transform, output_all_columns=False)
-        self.val_dataset = self.split["test"].set_transform(self.transform, output_all_columns=False)
-        self.test_dataset = self.dataset["test"].set_transform(self.transform, output_all_columns=False)
+        #TODO: set format in feature extractor?
+        self.dataset.set_format("np")
+        self.dataset = self.dataset.select_columns(["input_values", "ebird_code"])
 
+        self.split = self.dataset["train"].train_test_split(self.val_split, shuffle=True, seed=self.seed)
+        self.train_dataset = self.split["train"]
+        self.val_dataset = self.split["test"]
+        self.test_dataset = self.dataset["test"]
+
+        if self.transforms:
+            self.train_dataset.set_transform(self.augmentation, output_all_columns=False)
+            self.val_dataset.set_transforms(self.augmentation, output_all_columns=False)
+            self.test_dataset.set_transforms(self.augmentation, output_all_columns=False)
         
     def train_dataloader(self):
+        #TODO: nontype objects in hf dataset 
         return DataLoader(
             self.train_dataset,
             batch_size=self.train_batch_size,
@@ -124,6 +134,7 @@ class BaseGADME(L.LightningDataModule):
         )
     
 #we could incorporate some kind of event detector in the customfeatureextractor
+#TODO: feature extractor has to be model dependent
 class CustomFeatureExtractor(SequenceFeatureExtractor):
     model_input_names = ["input_values", "attention_mask"]
 

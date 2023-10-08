@@ -14,7 +14,7 @@ wandb:
 device: cuda
 val_split: .2
 random_seed: 0 
-train_batch_size: 8
+train_batch_size: 1
 eval_batch_size: 128
 print_freq_eval: 25
 print_freq_train: 25

@@ -46,7 +46,12 @@ def main(args):
     data_module.prepare_data()
     data_module.setup()
 
-    print("hallo")
+
+    # Setup model 
+    logging.info("Building model: %s", args.model_name)
+    model = 
+
+    print(next(iter(data_module.train_dataloader())))
 
 
 #%%
