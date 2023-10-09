@@ -23,9 +23,15 @@ class BaseGADME(L.LightningDataModule):
         self.transforms = transforms
         self.val_split = val_split
         self.feature_extractor = CustomFeatureExtractor()
-    
-    def _preprocess_function(self, samples):
-        audio_arrays = [x["array"] for x in samples["audio"]]
+
+        self.dataset = None
+        self.split = None
+        self.train_dataset = None
+        self.val_dataset = None
+        self.test_dataset = None
+
+    def _preprocess_function(self, batch):
+        audio_arrays = [x["array"] for x in batch["audio"]]
         inputs = self.feature_extractor(
             audio_arrays,
             sampling_rate=self.feature_extractor.sampling_rate,
