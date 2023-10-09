@@ -1,0 +1,74 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 506.50333333333333 
+tiers? <exists> 
+size = 1 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "Cavi1693" 
+        xmin = 0 
+        xmax = 506.50333333333333 
+        intervals: size = 15 
+        intervals [1]:
+            xmin = 0 
+            xmax = 1.9671064045963411 
+            text = "" 
+        intervals [2]:
+            xmin = 1.9671064045963411 
+            xmax = 2.25795503763922 
+            text = "en" 
+        intervals [3]:
+            xmin = 2.25795503763922 
+            xmax = 41.527038453041165 
+            text = "" 
+        intervals [4]:
+            xmin = 41.527038453041165 
+            xmax = 41.82134956981074 
+            text = "ah" 
+        intervals [5]:
+            xmin = 41.82134956981074 
+            xmax = 45.29488578422012 
+            text = "" 
+        intervals [6]:
+            xmin = 45.29488578422012 
+            xmax = 45.568421998629496 
+            text = "ah" 
+        intervals [7]:
+            xmin = 45.568421998629496 
+            xmax = 48.6444376209966 
+            text = "" 
+        intervals [8]:
+            xmin = 48.6444376209966 
+            xmax = 48.976836058759886 
+            text = "ai" 
+        intervals [9]:
+            xmin = 48.976836058759886 
+            xmax = 314.53528625403885 
+            text = "" 
+        intervals [10]:
+            xmin = 314.53528625403885 
+            xmax = 314.8330598545351 
+            text = "ah" 
+        intervals [11]:
+            xmin = 314.8330598545351 
+            xmax = 320.7067623280766 
+            text = "" 
+        intervals [12]:
+            xmin = 320.7067623280766 
+            xmax = 320.9837610262127 
+            text = "en" 
+        intervals [13]:
+            xmin = 320.9837610262127 
+            xmax = 322.5211038008679 
+            text = "" 
+        intervals [14]:
+            xmin = 322.5211038008679 
+            xmax = 322.84311478745104 
+            text = "ai" 
+        intervals [15]:
+            xmin = 322.84311478745104 
+            xmax = 506.50333333333333 
+            text = "" 

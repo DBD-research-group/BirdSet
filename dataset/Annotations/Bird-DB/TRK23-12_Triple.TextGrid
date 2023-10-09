@@ -1,0 +1,724 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 138.33868480725624 
+tiers? <exists> 
+size = 2 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "CATH" 
+        xmin = 0 
+        xmax = 138.33868480725624 
+        intervals: size = 165 
+        intervals [1]:
+            xmin = 0 
+            xmax = 0.25372636792228176 
+            text = "" 
+        intervals [2]:
+            xmin = 0.25372636792228176 
+            xmax = 0.4893908256925539 
+            text = "ael" 
+        intervals [3]:
+            xmin = 0.4893908256925539 
+            xmax = 0.7038454822635015 
+            text = "" 
+        intervals [4]:
+            xmin = 0.7038454822635015 
+            xmax = 0.9465798737668818 
+            text = "ael" 
+        intervals [5]:
+            xmin = 0.9465798737668818 
+            xmax = 1.3024332049999927 
+            text = "" 
+        intervals [6]:
+            xmin = 1.3024332049999927 
+            xmax = 1.5545941748141838 
+            text = "ael" 
+        intervals [7]:
+            xmin = 1.5545941748141838 
+            xmax = 1.856244680760132 
+            text = "" 
+        intervals [8]:
+            xmin = 1.856244680760132 
+            xmax = 2.103692361418918 
+            text = "ael" 
+        intervals [9]:
+            xmin = 2.103692361418918 
+            xmax = 2.3699931986993255 
+            text = "" 
+        intervals [10]:
+            xmin = 2.3699931986993255 
+            xmax = 2.6386506805574355 
+            text = "ael" 
+        intervals [11]:
+            xmin = 2.6386506805574355 
+            xmax = 2.686216802111652 
+            text = "" 
+        intervals [12]:
+            xmin = 2.686216802111652 
+            xmax = 2.8346854105069235 
+            text = "afd" 
+        intervals [13]:
+            xmin = 2.8346854105069235 
+            xmax = 2.9595875731251677 
+            text = "" 
+        intervals [14]:
+            xmin = 2.9595875731251677 
+            xmax = 3.1363359164528717 
+            text = "afe" 
+        intervals [15]:
+            xmin = 3.1363359164528717 
+            xmax = 3.866895735540716 
+            text = "" 
+        intervals [16]:
+            xmin = 3.866895735540716 
+            xmax = 4.015364343935987 
+            text = "afd" 
+        intervals [17]:
+            xmin = 4.015364343935987 
+            xmax = 4.307588271571125 
+            text = "" 
+        intervals [18]:
+            xmin = 4.307588271571125 
+            xmax = 4.49376319320964 
+            text = "afe" 
+        intervals [19]:
+            xmin = 4.49376319320964 
+            xmax = 5.028721512348158 
+            text = "" 
+        intervals [20]:
+            xmin = 5.028721512348158 
+            xmax = 5.141840452077888 
+            text = "aff" 
+        intervals [21]:
+            xmin = 5.141840452077888 
+            xmax = 5.5236594889792014 
+            text = "" 
+        intervals [22]:
+            xmin = 5.5236594889792014 
+            xmax = 5.603785404621094 
+            text = "afg" 
+        intervals [23]:
+            xmin = 5.603785404621094 
+            xmax = 5.693337898573797 
+            text = "" 
+        intervals [24]:
+            xmin = 5.693337898573797 
+            xmax = 5.756967302171771 
+            text = "afh" 
+        intervals [25]:
+            xmin = 5.756967302171771 
+            xmax = 6.322562000820422 
+            text = "" 
+        intervals [26]:
+            xmin = 6.322562000820422 
+            xmax = 6.638352374232586 
+            text = "afi" 
+        intervals [27]:
+            xmin = 6.638352374232586 
+            xmax = 7.490315526156803 
+            text = "" 
+        intervals [28]:
+            xmin = 7.490315526156803 
+            xmax = 7.702413538150048 
+            text = "afj" 
+        intervals [29]:
+            xmin = 7.702413538150048 
+            xmax = 7.9875675320520765 
+            text = "" 
+        intervals [30]:
+            xmin = 7.9875675320520765 
+            xmax = 8.166672519957483 
+            text = "afk" 
+        intervals [31]:
+            xmin = 8.166672519957483 
+            xmax = 8.627360397813677 
+            text = "" 
+        intervals [32]:
+            xmin = 8.627360397813677 
+            xmax = 8.872451433894758 
+            text = "afl" 
+        intervals [33]:
+            xmin = 8.872451433894758 
+            xmax = 9.398951429409374 
+            text = "" 
+        intervals [34]:
+            xmin = 9.398951429409374 
+            xmax = 9.634615887179645 
+            text = "afl" 
+        intervals [35]:
+            xmin = 9.634615887179645 
+            xmax = 9.82079080881816 
+            text = "" 
+        intervals [36]:
+            xmin = 9.82079080881816 
+            xmax = 10.058811911166133 
+            text = "afl" 
+        intervals [37]:
+            xmin = 10.058811911166133 
+            xmax = 11.914603858505133 
+            text = "" 
+        intervals [38]:
+            xmin = 11.914603858505133 
+            xmax = 12.0607158223227 
+            text = "afd" 
+        intervals [39]:
+            xmin = 12.0607158223227 
+            xmax = 12.425995731866623 
+            text = "" 
+        intervals [40]:
+            xmin = 12.425995731866623 
+            xmax = 12.59803078603892 
+            text = "afe" 
+        intervals [41]:
+            xmin = 12.59803078603892 
+            xmax = 13.488812846724006 
+            text = "" 
+        intervals [42]:
+            xmin = 13.488812846724006 
+            xmax = 13.64670803343009 
+            text = "afd" 
+        intervals [43]:
+            xmin = 13.64670803343009 
+            xmax = 14.134533461014552 
+            text = "" 
+        intervals [44]:
+            xmin = 14.134533461014552 
+            xmax = 14.285358713987526 
+            text = "afd" 
+        intervals [45]:
+            xmin = 14.285358713987526 
+            xmax = 14.478068613841728 
+            text = "" 
+        intervals [46]:
+            xmin = 14.478068613841728 
+            xmax = 14.534628083706593 
+            text = "afm" 
+        intervals [47]:
+            xmin = 14.534628083706593 
+            xmax = 14.65299526810915 
+            text = "" 
+        intervals [48]:
+            xmin = 14.65299526810915 
+            xmax = 14.803820521082125 
+            text = "afe" 
+        intervals [49]:
+            xmin = 14.803820521082125 
+            xmax = 15.310499105288208 
+            text = "" 
+        intervals [50]:
+            xmin = 15.310499105288208 
+            xmax = 15.576799942568616 
+            text = "afi" 
+        intervals [51]:
+            xmin = 15.576799942568616 
+            xmax = 16.943696482119012 
+            text = "" 
+        intervals [52]:
+            xmin = 16.943696482119012 
+            xmax = 17.07095528931496 
+            text = "aff" 
+        intervals [53]:
+            xmin = 17.07095528931496 
+            xmax = 19.739326796274685 
+            text = "" 
+        intervals [54]:
+            xmin = 19.739326796274685 
+            xmax = 19.97734789862266 
+            text = "ael" 
+        intervals [55]:
+            xmin = 19.97734789862266 
+            xmax = 20.208299067237526 
+            text = "" 
+        intervals [56]:
+            xmin = 20.208299067237526 
+            xmax = 20.4463201695855 
+            text = "ael" 
+        intervals [57]:
+            xmin = 20.4463201695855 
+            xmax = 21.730691464433487 
+            text = "" 
+        intervals [58]:
+            xmin = 21.730691464433487 
+            xmax = 21.886230006561867 
+            text = "aeo" 
+        intervals [59]:
+            xmin = 21.886230006561867 
+            xmax = 22.04412519326795 
+            text = "" 
+        intervals [60]:
+            xmin = 22.04412519326795 
+            xmax = 22.206733669129438 
+            text = "aeo" 
+        intervals [61]:
+            xmin = 22.206733669129438 
+            xmax = 27.59325503918075 
+            text = "" 
+        intervals [62]:
+            xmin = 27.59325503918075 
+            xmax = 27.727583780109804 
+            text = "aff" 
+        intervals [63]:
+            xmin = 27.727583780109804 
+            xmax = 29.042591454467924 
+            text = "" 
+        intervals [64]:
+            xmin = 29.042591454467924 
+            xmax = 29.271185978505088 
+            text = "afl" 
+        intervals [65]:
+            xmin = 29.271185978505088 
+            xmax = 29.405514719434144 
+            text = "" 
+        intervals [66]:
+            xmin = 29.405514719434144 
+            xmax = 29.64353582178212 
+            text = "afl" 
+        intervals [67]:
+            xmin = 29.64353582178212 
+            xmax = 32.53782686768398 
+            text = "" 
+        intervals [68]:
+            xmin = 32.53782686768398 
+            xmax = 32.75935145798804 
+            text = "afl" 
+        intervals [69]:
+            xmin = 32.75935145798804 
+            xmax = 33.55118403609615 
+            text = "" 
+        intervals [70]:
+            xmin = 33.55118403609615 
+            xmax = 33.70200928906913 
+            text = "afd" 
+        intervals [71]:
+            xmin = 33.70200928906913 
+            xmax = 33.776814685868814 
+            text = "" 
+        intervals [72]:
+            xmin = 33.776814685868814 
+            xmax = 33.840444089466786 
+            text = "afm" 
+        intervals [73]:
+            xmin = 33.840444089466786 
+            xmax = 33.96359683719413 
+            text = "" 
+        intervals [74]:
+            xmin = 33.96359683719413 
+            xmax = 34.116778734744805 
+            text = "afe" 
+        intervals [75]:
+            xmin = 34.116778734744805 
+            xmax = 35.462465403926515 
+            text = "" 
+        intervals [76]:
+            xmin = 35.462465403926515 
+            xmax = 35.74054946409543 
+            text = "afi" 
+        intervals [77]:
+            xmin = 35.74054946409543 
+            xmax = 36.1007976747973 
+            text = "" 
+        intervals [78]:
+            xmin = 36.1007976747973 
+            xmax = 36.197420102483115 
+            text = "afg" 
+        intervals [79]:
+            xmin = 36.197420102483115 
+            xmax = 36.29404253016892 
+            text = "" 
+        intervals [80]:
+            xmin = 36.29404253016892 
+            xmax = 36.34353206630068 
+            text = "afh" 
+        intervals [81]:
+            xmin = 36.34353206630068 
+            xmax = 36.784224602331086 
+            text = "" 
+        intervals [82]:
+            xmin = 36.784224602331086 
+            xmax = 36.92797992157095 
+            text = "aff" 
+        intervals [83]:
+            xmin = 36.92797992157095 
+            xmax = 38.00732313815879 
+            text = "" 
+        intervals [84]:
+            xmin = 38.00732313815879 
+            xmax = 38.15579174655406 
+            text = "afd" 
+        intervals [85]:
+            xmin = 38.15579174655406 
+            xmax = 38.24534424050677 
+            text = "" 
+        intervals [86]:
+            xmin = 38.24534424050677 
+            xmax = 38.30190371037163 
+            text = "afm" 
+        intervals [87]:
+            xmin = 38.30190371037163 
+            xmax = 38.44330238503379 
+            text = "" 
+        intervals [88]:
+            xmin = 38.44330238503379 
+            xmax = 38.6224073729392 
+            text = "afe" 
+        intervals [89]:
+            xmin = 38.6224073729392 
+            xmax = 39.115697729365884 
+            text = "" 
+        intervals [90]:
+            xmin = 39.115697729365884 
+            xmax = 39.22410337994021 
+            text = "aff" 
+        intervals [91]:
+            xmin = 39.22410337994021 
+            xmax = 39.53046717504156 
+            text = "" 
+        intervals [92]:
+            xmin = 39.53046717504156 
+            xmax = 39.78498478943345 
+            text = "afl" 
+        intervals [93]:
+            xmin = 39.78498478943345 
+            xmax = 43.11136556857245 
+            text = "" 
+        intervals [94]:
+            xmin = 43.11136556857245 
+            xmax = 43.33996009260961 
+            text = "afl" 
+        intervals [95]:
+            xmin = 43.33996009260961 
+            xmax = 43.44129580945083 
+            text = "" 
+        intervals [96]:
+            xmin = 43.44129580945083 
+            xmax = 43.66517704433259 
+            text = "afl" 
+        intervals [97]:
+            xmin = 43.66517704433259 
+            xmax = 44.23077174298123 
+            text = "" 
+        intervals [98]:
+            xmin = 44.23077174298123 
+            xmax = 44.4640795561738 
+            text = "afl" 
+        intervals [99]:
+            xmin = 44.4640795561738 
+            xmax = 45.24516937108032 
+            text = "" 
+        intervals [100]:
+            xmin = 45.24516937108032 
+            xmax = 45.55153316618168 
+            text = "afi" 
+        intervals [101]:
+            xmin = 45.55153316618168 
+            xmax = 46.29151956358032 
+            text = "" 
+        intervals [102]:
+            xmin = 46.29151956358032 
+            xmax = 46.37871541295532 
+            text = "afg" 
+        intervals [103]:
+            xmin = 46.37871541295532 
+            xmax = 46.46591126233033 
+            text = "" 
+        intervals [104]:
+            xmin = 46.46591126233033 
+            xmax = 46.5248273767729 
+            text = "afh" 
+        intervals [105]:
+            xmin = 46.5248273767729 
+            xmax = 47.06921227422222 
+            text = "" 
+        intervals [106]:
+            xmin = 47.06921227422222 
+            xmax = 47.16583470190803 
+            text = "afg" 
+        intervals [107]:
+            xmin = 47.16583470190803 
+            xmax = 47.26010048501614 
+            text = "" 
+        intervals [108]:
+            xmin = 47.26010048501614 
+            xmax = 47.316659954881004 
+            text = "afh" 
+        intervals [109]:
+            xmin = 47.316659954881004 
+            xmax = 47.67812262495642 
+            text = "" 
+        intervals [110]:
+            xmin = 47.67812262495642 
+            xmax = 47.77003176348683 
+            text = "afg" 
+        intervals [111]:
+            xmin = 47.77003176348683 
+            xmax = 47.854870968284125 
+            text = "" 
+        intervals [112]:
+            xmin = 47.854870968284125 
+            xmax = 47.9185003718821 
+            text = "afh" 
+        intervals [113]:
+            xmin = 47.9185003718821 
+            xmax = 48.69619308252399 
+            text = "" 
+        intervals [114]:
+            xmin = 48.69619308252399 
+            xmax = 48.851731624652366 
+            text = "afd" 
+        intervals [115]:
+            xmin = 48.851731624652366 
+            xmax = 48.98134707642602 
+            text = "" 
+        intervals [116]:
+            xmin = 48.98134707642602 
+            xmax = 49.04497648002399 
+            text = "afm" 
+        intervals [117]:
+            xmin = 49.04497648002399 
+            xmax = 49.1867361796863 
+            text = "" 
+        intervals [118]:
+            xmin = 49.1867361796863 
+            xmax = 49.363484523014 
+            text = "afe" 
+        intervals [119]:
+            xmin = 49.363484523014 
+            xmax = 49.81596028193292 
+            text = "" 
+        intervals [120]:
+            xmin = 49.81596028193292 
+            xmax = 49.9714988240613 
+            text = "afd" 
+        intervals [121]:
+            xmin = 49.9714988240613 
+            xmax = 50.18595348063224 
+            text = "" 
+        intervals [122]:
+            xmin = 50.18595348063224 
+            xmax = 50.25193952880792 
+            text = "afm" 
+        intervals [123]:
+            xmin = 50.25193952880792 
+            xmax = 50.449897673334945 
+            text = "" 
+        intervals [124]:
+            xmin = 50.449897673334945 
+            xmax = 50.61721943835184 
+            text = "afe" 
+        intervals [125]:
+            xmin = 50.61721943835184 
+            xmax = 50.96225780138334 
+            text = "" 
+        intervals [126]:
+            xmin = 50.96225780138334 
+            xmax = 51.13193621097793 
+            text = "afd" 
+        intervals [127]:
+            xmin = 51.13193621097793 
+            xmax = 51.26626495190699 
+            text = "" 
+        intervals [128]:
+            xmin = 51.26626495190699 
+            xmax = 51.32518106634956 
+            text = "afm" 
+        intervals [129]:
+            xmin = 51.32518106634956 
+            xmax = 53.76806633353665 
+            text = "" 
+        intervals [130]:
+            xmin = 53.76806633353665 
+            xmax = 53.895325140732595 
+            text = "aff" 
+        intervals [131]:
+            xmin = 53.895325140732595 
+            xmax = 55.043011050073815 
+            text = "" 
+        intervals [132]:
+            xmin = 55.043011050073815 
+            xmax = 55.153773345225844 
+            text = "aff" 
+        intervals [133]:
+            xmin = 55.153773345225844 
+            xmax = 55.52140989934746 
+            text = "" 
+        intervals [134]:
+            xmin = 55.52140989934746 
+            xmax = 55.69344495351976 
+            text = "afk" 
+        intervals [135]:
+            xmin = 55.69344495351976 
+            xmax = 55.90789961009071 
+            text = "" 
+        intervals [136]:
+            xmin = 55.90789961009071 
+            xmax = 56.098787820884624 
+            text = "afk" 
+        intervals [137]:
+            xmin = 56.098787820884624 
+            xmax = 56.40515161598598 
+            text = "" 
+        intervals [138]:
+            xmin = 56.40515161598598 
+            xmax = 56.600753115935305 
+            text = "afk" 
+        intervals [139]:
+            xmin = 56.600753115935305 
+            xmax = 56.868155336623666 
+            text = "" 
+        intervals [140]:
+            xmin = 56.868155336623666 
+            xmax = 57.06835231967276 
+            text = "afk" 
+        intervals [141]:
+            xmin = 57.06835231967276 
+            xmax = 57.90166067449148 
+            text = "" 
+        intervals [142]:
+            xmin = 57.90166067449148 
+            xmax = 58.05475248505843 
+            text = "afd" 
+        intervals [143]:
+            xmin = 58.05475248505843 
+            xmax = 62.704171554471 
+            text = "" 
+        intervals [144]:
+            xmin = 62.704171554471 
+            xmax = 62.847842330541525 
+            text = "afd" 
+        intervals [145]:
+            xmin = 62.847842330541525 
+            xmax = 63.20584164140578 
+            text = "" 
+        intervals [146]:
+            xmin = 63.20584164140578 
+            xmax = 63.375420262341486 
+            text = "afe" 
+        intervals [147]:
+            xmin = 63.375420262341486 
+            xmax = 64.97675688520067 
+            text = "" 
+        intervals [148]:
+            xmin = 64.97675688520067 
+            xmax = 65.2619108791027 
+            text = "afi" 
+        intervals [149]:
+            xmin = 65.2619108791027 
+            xmax = 65.6106942766027 
+            text = "" 
+        intervals [150]:
+            xmin = 65.6106942766027 
+            xmax = 65.7002467705554 
+            text = "afg" 
+        intervals [151]:
+            xmin = 65.7002467705554 
+            xmax = 65.81572235486283 
+            text = "" 
+        intervals [152]:
+            xmin = 65.81572235486283 
+            xmax = 65.86521189099459 
+            text = "afh" 
+        intervals [153]:
+            xmin = 65.86521189099459 
+            xmax = 72.36156844714382 
+            text = "" 
+        intervals [154]:
+            xmin = 72.36156844714382 
+            xmax = 72.59487626033639 
+            text = "ael" 
+        intervals [155]:
+            xmin = 72.59487626033639 
+            xmax = 72.79283440486343 
+            text = "" 
+        intervals [156]:
+            xmin = 72.79283440486343 
+            xmax = 73.04028208552221 
+            text = "ael" 
+        intervals [157]:
+            xmin = 73.04028208552221 
+            xmax = 73.26887660955936 
+            text = "" 
+        intervals [158]:
+            xmin = 73.26887660955936 
+            xmax = 73.50925435648503 
+            text = "ael" 
+        intervals [159]:
+            xmin = 73.50925435648503 
+            xmax = 73.94052031420463 
+            text = "" 
+        intervals [160]:
+            xmin = 73.94052031420463 
+            xmax = 74.19032463944112 
+            text = "ael" 
+        intervals [161]:
+            xmin = 74.19032463944112 
+            xmax = 74.47294798907888 
+            text = "" 
+        intervals [162]:
+            xmin = 74.47294798907888 
+            xmax = 74.58842357338631 
+            text = "aff" 
+        intervals [163]:
+            xmin = 74.58842357338631 
+            xmax = 74.94663354919712 
+            text = "" 
+        intervals [164]:
+            xmin = 74.94663354919712 
+            xmax = 75.17994136238968 
+            text = "afl" 
+        intervals [165]:
+            xmin = 75.17994136238968 
+            xmax = 138.33868480725624 
+            text = "" 
+    item [2]:
+        class = "IntervalTier" 
+        name = "Martin" 
+        xmin = 0 
+        xmax = 138.33868480725624 
+        intervals: size = 11 
+        intervals [1]:
+            xmin = 0 
+            xmax = 125.88341150732218 
+            text = "" 
+        intervals [2]:
+            xmin = 125.88341150732218 
+            xmax = 127.7215942779303 
+            text = "the thrasher we just heard is number 9" 
+        intervals [3]:
+            xmin = 127.7215942779303 
+            xmax = 128.56502690123057 
+            text = "" 
+        intervals [4]:
+            xmin = 128.56502690123057 
+            xmax = 129.8022653045245 
+            text = "east of the low point" 
+        intervals [5]:
+            xmin = 129.8022653045245 
+            xmax = 130.47723390843439 
+            text = "" 
+        intervals [6]:
+            xmin = 130.47723390843439 
+            xmax = 131.1111712998364 
+            text = "of the saddle" 
+        intervals [7]:
+            xmin = 131.1111712998364 
+            xmax = 132.48399544957707 
+            text = "" 
+        intervals [8]:
+            xmin = 132.48399544957707 
+            xmax = 134.0040312021953 
+            text = "background is number 10" 
+        intervals [9]:
+            xmin = 134.0040312021953 
+            xmax = 134.56512922668867 
+            text = "" 
+        intervals [10]:
+            xmin = 134.56512922668867 
+            xmax = 136.36324903947582 
+            text = "just west of the low point of the saddle" 
+        intervals [11]:
+            xmin = 136.36324903947582 
+            xmax = 138.33868480725624 
+            text = "" 

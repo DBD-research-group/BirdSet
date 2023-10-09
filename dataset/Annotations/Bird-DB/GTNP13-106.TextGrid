@@ -1,0 +1,228 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 117.27818594104308 
+tiers? <exists> 
+size = 2 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "BHGB" 
+        xmin = 0 
+        xmax = 117.27818594104308 
+        intervals: size = 35 
+        intervals [1]:
+            xmin = 0 
+            xmax = 0.9948073638919631 
+            text = "" 
+        intervals [2]:
+            xmin = 0.9948073638919631 
+            xmax = 1.182343303464358 
+            text = "rn" 
+        intervals [3]:
+            xmin = 1.182343303464358 
+            xmax = 1.4899022443630858 
+            text = "" 
+        intervals [4]:
+            xmin = 1.4899022443630858 
+            xmax = 1.7224468094328556 
+            text = "kd" 
+        intervals [5]:
+            xmin = 1.7224468094328556 
+            xmax = 1.9137334677966984 
+            text = "" 
+        intervals [6]:
+            xmin = 1.9137334677966984 
+            xmax = 2.030005750331583 
+            text = "rh" 
+        intervals [7]:
+            xmin = 2.030005750331583 
+            xmax = 2.3188110972730716 
+            text = "" 
+        intervals [8]:
+            xmin = 2.3188110972730716 
+            xmax = 2.5251006308027057 
+            text = "sf" 
+        intervals [9]:
+            xmin = 2.5251006308027057 
+            xmax = 2.6863815388349654 
+            text = "" 
+        intervals [10]:
+            xmin = 2.6863815388349654 
+            xmax = 2.9826883233593495 
+            text = "sw" 
+        intervals [11]:
+            xmin = 2.9826883233593495 
+            xmax = 3.3615109212955874 
+            text = "" 
+        intervals [12]:
+            xmin = 3.3615109212955874 
+            xmax = 3.635313393071284 
+            text = "rp" 
+        intervals [13]:
+            xmin = 3.635313393071284 
+            xmax = 3.8040957386864394 
+            text = "" 
+        intervals [14]:
+            xmin = 3.8040957386864394 
+            xmax = 4.0540957386864385 
+            text = "ta" 
+        intervals [15]:
+            xmin = 4.0540957386864385 
+            xmax = 7.0777101659505215 
+            text = "" 
+        intervals [16]:
+            xmin = 7.0777101659505215 
+            xmax = 7.277710165950521 
+            text = "rn" 
+        intervals [17]:
+            xmin = 7.277710165950521 
+            xmax = 7.699853924240105 
+            text = "" 
+        intervals [18]:
+            xmin = 7.699853924240105 
+            xmax = 7.8873898638125 
+            text = "kd" 
+        intervals [19]:
+            xmin = 7.8873898638125 
+            xmax = 8.13868802283951 
+            text = "" 
+        intervals [20]:
+            xmin = 8.13868802283951 
+            xmax = 8.258711024165843 
+            text = "rh" 
+        intervals [21]:
+            xmin = 8.258711024165843 
+            xmax = 8.472501995278373 
+            text = "" 
+        intervals [22]:
+            xmin = 8.472501995278373 
+            xmax = 8.693794403973799 
+            text = "sf" 
+        intervals [23]:
+            xmin = 8.693794403973799 
+            xmax = 8.866327468380401 
+            text = "" 
+        intervals [24]:
+            xmin = 8.866327468380401 
+            xmax = 9.166327468380405 
+            text = "sw" 
+        intervals [25]:
+            xmin = 9.166327468380405 
+            xmax = 9.46632746838041 
+            text = "" 
+        intervals [26]:
+            xmin = 9.46632746838041 
+            xmax = 9.616327468380412 
+            text = "so" 
+        intervals [27]:
+            xmin = 9.616327468380412 
+            xmax = 10.416327468380423 
+            text = "" 
+        intervals [28]:
+            xmin = 10.416327468380423 
+            xmax = 10.642308200435178 
+            text = "rn" 
+        intervals [29]:
+            xmin = 10.642308200435178 
+            xmax = 11.077391580243134 
+            text = "" 
+        intervals [30]:
+            xmin = 11.077391580243134 
+            xmax = 11.29868398893856 
+            text = "kd" 
+        intervals [31]:
+            xmin = 11.29868398893856 
+            xmax = 11.498683988938563 
+            text = "" 
+        intervals [32]:
+            xmin = 11.498683988938563 
+            xmax = 11.628127923205625 
+            text = "rh" 
+        intervals [33]:
+            xmin = 11.628127923205625 
+            xmax = 11.928185426521457 
+            text = "" 
+        intervals [34]:
+            xmin = 11.928185426521457 
+            xmax = 12.168231429174122 
+            text = "kh" 
+        intervals [35]:
+            xmin = 12.168231429174122 
+            xmax = 117.27818594104308 
+            text = "" 
+    item [2]:
+        class = "IntervalTier" 
+        name = "Martin" 
+        xmin = 0 
+        xmax = 117.27818594104308 
+        intervals: size = 17 
+        intervals [1]:
+            xmin = 0 
+            xmax = 43.63093030637879 
+            text = "" 
+        intervals [2]:
+            xmin = 43.63093030637879 
+            xmax = 44.96736840848584 
+            text = "going slow and fast here" 
+        intervals [3]:
+            xmin = 44.96736840848584 
+            xmax = 48.319986263581114 
+            text = "" 
+        intervals [4]:
+            xmin = 48.319986263581114 
+            xmax = 49.870062663053815 
+            text = "one just attacked the other" 
+        intervals [5]:
+            xmin = 49.870062663053815 
+            xmax = 50.695024454477924 
+            text = "" 
+        intervals [6]:
+            xmin = 50.695024454477924 
+            xmax = 51.70147784001533 
+            text = "??" 
+        intervals [7]:
+            xmin = 51.70147784001533 
+            xmax = 55.11231655880227 
+            text = "" 
+        intervals [8]:
+            xmin = 55.11231655880227 
+            xmax = 55.92902873231214 
+            text = "one then" 
+        intervals [9]:
+            xmin = 55.92902873231214 
+            xmax = 56.439653274590455 
+            text = "" 
+        intervals [10]:
+            xmin = 56.439653274590455 
+            xmax = 59.071281389233356 
+            text = "was fast moved back across the highway" 
+        intervals [11]:
+            xmin = 59.071281389233356 
+            xmax = 77.93717169899293 
+            text = "" 
+        intervals [12]:
+            xmin = 77.93717169899293 
+            xmax = 79.96496008646277 
+            text = "this is slow and still on the north side" 
+        intervals [13]:
+            xmin = 79.96496008646277 
+            xmax = 100.09219016869662 
+            text = "" 
+        intervals [14]:
+            xmin = 100.09219016869662 
+            xmax = 101.67199199927379 
+            text = "you can hear fast" 
+        intervals [15]:
+            xmin = 101.67199199927379 
+            xmax = 102.4598305100838 
+            text = "" 
+        intervals [16]:
+            xmin = 102.4598305100838 
+            xmax = 103.67167257507262 
+            text = "south across the highway" 
+        intervals [17]:
+            xmin = 103.67167257507262 
+            xmax = 117.27818594104308 
+            text = "" 

@@ -1,0 +1,308 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 18.030294784580498 
+tiers? <exists> 
+size = 2 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "Redthroat" 
+        xmin = 0 
+        xmax = 18.030294784580498 
+        intervals: size = 71 
+        intervals [1]:
+            xmin = 0 
+            xmax = 0.01583016197334188 
+            text = "" 
+        intervals [2]:
+            xmin = 0.01583016197334188 
+            xmax = 0.366731413347953 
+            text = "ae" 
+        intervals [3]:
+            xmin = 0.366731413347953 
+            xmax = 0.6098741187455562 
+            text = "" 
+        intervals [4]:
+            xmin = 0.6098741187455562 
+            xmax = 0.6685637372898052 
+            text = "ag" 
+        intervals [5]:
+            xmin = 0.6685637372898052 
+            xmax = 0.7496113057556729 
+            text = "" 
+        intervals [6]:
+            xmin = 0.7496113057556729 
+            xmax = 0.9703960612316573 
+            text = "aq" 
+        intervals [7]:
+            xmin = 0.9703960612316573 
+            xmax = 1.0179067048150972 
+            text = "" 
+        intervals [8]:
+            xmin = 1.0179067048150972 
+            xmax = 1.2694336414333072 
+            text = "ad" 
+        intervals [9]:
+            xmin = 1.2694336414333072 
+            xmax = 1.3393022349383656 
+            text = "" 
+        intervals [10]:
+            xmin = 1.3393022349383656 
+            xmax = 1.451091984546459 
+            text = "ac" 
+        intervals [11]:
+            xmin = 1.451091984546459 
+            xmax = 1.6718767400224435 
+            text = "" 
+        intervals [12]:
+            xmin = 1.6718767400224435 
+            xmax = 1.761308539708918 
+            text = "ai" 
+        intervals [13]:
+            xmin = 1.761308539708918 
+            xmax = 1.9625300890034862 
+            text = "" 
+        intervals [14]:
+            xmin = 1.9625300890034862 
+            xmax = 2.06314086365077 
+            text = "ai" 
+        intervals [15]:
+            xmin = 2.06314086365077 
+            xmax = 2.261567669205136 
+            text = "" 
+        intervals [16]:
+            xmin = 2.261567669205136 
+            xmax = 2.32584677522979 
+            text = "ag" 
+        intervals [17]:
+            xmin = 2.32584677522979 
+            xmax = 2.392920624994646 
+            text = "" 
+        intervals [18]:
+            xmin = 2.392920624994646 
+            xmax = 2.761826798701354 
+            text = "ae" 
+        intervals [19]:
+            xmin = 2.761826798701354 
+            xmax = 2.9929925858934228 
+            text = "" 
+        intervals [20]:
+            xmin = 2.9929925858934228 
+            xmax = 3.046092716957267 
+            text = "ag" 
+        intervals [21]:
+            xmin = 3.046092716957267 
+            xmax = 3.1355245166437418 
+            text = "" 
+        intervals [22]:
+            xmin = 3.1355245166437418 
+            xmax = 3.339540809678512 
+            text = "aq" 
+        intervals [23]:
+            xmin = 3.339540809678512 
+            xmax = 3.4177936344041777 
+            text = "" 
+        intervals [24]:
+            xmin = 3.4177936344041777 
+            xmax = 3.6581415960615784 
+            text = "ad" 
+        intervals [25]:
+            xmin = 3.6581415960615784 
+            xmax = 3.71962595834603 
+            text = "" 
+        intervals [26]:
+            xmin = 3.71962595834603 
+            xmax = 3.8425946829149327 
+            text = "ac" 
+        intervals [27]:
+            xmin = 3.8425946829149327 
+            xmax = 3.937615970081812 
+            text = "" 
+        intervals [28]:
+            xmin = 3.937615970081812 
+            xmax = 4.027047769768287 
+            text = "av" 
+        intervals [29]:
+            xmin = 4.027047769768287 
+            xmax = 4.130453288155773 
+            text = "" 
+        intervals [30]:
+            xmin = 4.130453288155773 
+            xmax = 4.21525390740595 
+            text = "ay" 
+        intervals [31]:
+            xmin = 4.21525390740595 
+            xmax = 4.259969807249187 
+            text = "" 
+        intervals [32]:
+            xmin = 4.259969807249187 
+            xmax = 4.332633144494448 
+            text = "ay" 
+        intervals [33]:
+            xmin = 4.332633144494448 
+            xmax = 4.380143788077888 
+            text = "" 
+        intervals [34]:
+            xmin = 4.380143788077888 
+            xmax = 4.479796255681065 
+            text = "ay" 
+        intervals [35]:
+            xmin = 4.479796255681065 
+            xmax = 4.56922805536754 
+            text = "" 
+        intervals [36]:
+            xmin = 4.56922805536754 
+            xmax = 4.639096648872598 
+            text = "bx" 
+        intervals [37]:
+            xmin = 4.639096648872598 
+            xmax = 4.662306284399277 
+            text = "" 
+        intervals [38]:
+            xmin = 4.662306284399277 
+            xmax = 4.9018025604516176 
+            text = "ba" 
+        intervals [39]:
+            xmin = 4.9018025604516176 
+            xmax = 5.100229366005983 
+            text = "" 
+        intervals [40]:
+            xmin = 5.100229366005983 
+            xmax = 5.172892703251244 
+            text = "ag" 
+        intervals [41]:
+            xmin = 5.172892703251244 
+            xmax = 5.379703740026216 
+            text = "" 
+        intervals [42]:
+            xmin = 5.379703740026216 
+            xmax = 5.4803145146735 
+            text = "ai" 
+        intervals [43]:
+            xmin = 5.4803145146735 
+            xmax = 5.694578773938384 
+            text = "" 
+        intervals [44]:
+            xmin = 5.694578773938384 
+            xmax = 5.789600061105264 
+            text = "ai" 
+        intervals [45]:
+            xmin = 5.789600061105264 
+            xmax = 5.999205841620439 
+            text = "" 
+        intervals [46]:
+            xmin = 5.999205841620439 
+            xmax = 6.10820084748833 
+            text = "ai" 
+        intervals [47]:
+            xmin = 6.10820084748833 
+            xmax = 6.169685209772782 
+            text = "" 
+        intervals [48]:
+            xmin = 6.169685209772782 
+            xmax = 6.429596377611599 
+            text = "ad" 
+        intervals [49]:
+            xmin = 6.429596377611599 
+            xmax = 6.5022597148568595 
+            text = "" 
+        intervals [50]:
+            xmin = 6.5022597148568595 
+            xmax = 6.616844208205155 
+            text = "ac" 
+        intervals [51]:
+            xmin = 6.616844208205155 
+            xmax = 6.714660239112237 
+            text = "" 
+        intervals [52]:
+            xmin = 6.714660239112237 
+            xmax = 6.913087044666603 
+            text = "ad" 
+        intervals [53]:
+            xmin = 6.913087044666603 
+            xmax = 7.050029487936517 
+            text = "" 
+        intervals [54]:
+            xmin = 7.050029487936517 
+            xmax = 7.111513850220969 
+            text = "ag" 
+        intervals [55]:
+            xmin = 7.111513850220969 
+            xmax = 7.189766674946634 
+            text = "" 
+        intervals [56]:
+            xmin = 7.189766674946634 
+            xmax = 7.558672848653342 
+            text = "ae" 
+        intervals [57]:
+            xmin = 7.558672848653342 
+            xmax = 16.210296628676296 
+            text = "" 
+        intervals [58]:
+            xmin = 16.210296628676296 
+            xmax = 16.299728428247345 
+            text = "ay" 
+        intervals [59]:
+            xmin = 16.299728428247345 
+            xmax = 16.3863654840818 
+            text = "" 
+        intervals [60]:
+            xmin = 16.3863654840818 
+            xmax = 16.46461830870647 
+            text = "ay" 
+        intervals [61]:
+            xmin = 16.46461830870647 
+            xmax = 16.7468874261026 
+            text = "" 
+        intervals [62]:
+            xmin = 16.7468874261026 
+            xmax = 17.09064090570382 
+            text = "ae" 
+        intervals [63]:
+            xmin = 17.09064090570382 
+            xmax = 17.19963591143104 
+            text = "" 
+        intervals [64]:
+            xmin = 17.19963591143104 
+            xmax = 17.272299248582517 
+            text = "af" 
+        intervals [65]:
+            xmin = 17.272299248582517 
+            xmax = 17.40924169167569 
+            text = "" 
+        intervals [66]:
+            xmin = 17.40924169167569 
+            xmax = 17.476315541353976 
+            text = "af" 
+        intervals [67]:
+            xmin = 17.476315541353976 
+            xmax = 17.607668496973957 
+            text = "" 
+        intervals [68]:
+            xmin = 17.607668496973957 
+            xmax = 17.699895040281604 
+            text = "ai" 
+        intervals [69]:
+            xmin = 17.699895040281604 
+            xmax = 17.870374408213916 
+            text = "" 
+        intervals [70]:
+            xmin = 17.870374408213916 
+            xmax = 17.970985182731347 
+            text = "ay" 
+        intervals [71]:
+            xmin = 17.970985182731347 
+            xmax = 18.030294784580498 
+            text = "" 
+    item [2]:
+        class = "IntervalTier" 
+        name = "Martin" 
+        xmin = 0 
+        xmax = 18.030294784580498 
+        intervals: size = 1 
+        intervals [1]:
+            xmin = 0 
+            xmax = 18.030294784580498 
+            text = "" 

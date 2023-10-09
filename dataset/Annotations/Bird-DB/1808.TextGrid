@@ -1,0 +1,154 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 52.83 
+tiers? <exists> 
+size = 1 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "Cavi1808" 
+        xmin = 0 
+        xmax = 52.83 
+        intervals: size = 35 
+        intervals [1]:
+            xmin = 0 
+            xmax = 1.8632318927953129 
+            text = "" 
+        intervals [2]:
+            xmin = 1.8632318927953129 
+            xmax = 2.3652920331669494 
+            text = "bd" 
+        intervals [3]:
+            xmin = 2.3652920331669494 
+            xmax = 4.000249388698124 
+            text = "" 
+        intervals [4]:
+            xmin = 4.000249388698124 
+            xmax = 4.235698282113788 
+            text = "bm" 
+        intervals [5]:
+            xmin = 4.235698282113788 
+            xmax = 5.2882933350308745 
+            text = "" 
+        intervals [6]:
+            xmin = 5.2882933350308745 
+            xmax = 5.610304321614062 
+            text = "hj" 
+        intervals [7]:
+            xmin = 5.610304321614062 
+            xmax = 6.722426634413394 
+            text = "" 
+        intervals [8]:
+            xmin = 6.722426634413394 
+            xmax = 7.054825072176685 
+            text = "be" 
+        intervals [9]:
+            xmin = 7.054825072176685 
+            xmax = 9.488951132047447 
+            text = "" 
+        intervals [10]:
+            xmin = 9.488951132047447 
+            xmax = 9.776337281363626 
+            text = "io" 
+        intervals [11]:
+            xmin = 9.776337281363626 
+            xmax = 11.799092814285306 
+            text = "" 
+        intervals [12]:
+            xmin = 11.799092814285306 
+            xmax = 12.166116089315606 
+            text = "bx" 
+        intervals [13]:
+            xmin = 12.166116089315606 
+            xmax = 12.924400025463113 
+            text = "" 
+        intervals [14]:
+            xmin = 12.924400025463113 
+            xmax = 13.301810751673514 
+            text = "ab" 
+        intervals [15]:
+            xmin = 13.301810751673514 
+            xmax = 14.251196329317901 
+            text = "" 
+        intervals [16]:
+            xmin = 14.251196329317901 
+            xmax = 14.6147571206215 
+            text = "ad" 
+        intervals [17]:
+            xmin = 14.6147571206215 
+            xmax = 15.701977010805596 
+            text = "" 
+        intervals [18]:
+            xmin = 15.701977010805596 
+            xmax = 16.017063029935382 
+            text = "bf" 
+        intervals [19]:
+            xmin = 16.017063029935382 
+            xmax = 17.028773314660388 
+            text = "" 
+        intervals [20]:
+            xmin = 17.028773314660388 
+            xmax = 17.34732181751687 
+            text = "be" 
+        intervals [21]:
+            xmin = 17.34732181751687 
+            xmax = 18.323742228446537 
+            text = "" 
+        intervals [22]:
+            xmin = 18.323742228446537 
+            xmax = 18.725390340743846 
+            text = "ab" 
+        intervals [23]:
+            xmin = 18.725390340743846 
+            xmax = 19.899837360623795 
+            text = "" 
+        intervals [24]:
+            xmin = 19.899837360623795 
+            xmax = 20.2772480868342 
+            text = "bx" 
+        intervals [25]:
+            xmin = 20.2772480868342 
+            xmax = 21.41640523291881 
+            text = "" 
+        intervals [26]:
+            xmin = 21.41640523291881 
+            xmax = 21.793815959129212 
+            text = "ad" 
+        intervals [27]:
+            xmin = 21.793815959129212 
+            xmax = 24.173207315901085 
+            text = "" 
+        intervals [28]:
+            xmin = 24.173207315901085 
+            xmax = 24.467518432670666 
+            text = "bf" 
+        intervals [29]:
+            xmin = 24.467518432670666 
+            xmax = 25.40931400633332 
+            text = "" 
+        intervals [30]:
+            xmin = 25.40931400633332 
+            xmax = 25.786724732543725 
+            text = "bx" 
+        intervals [31]:
+            xmin = 25.786724732543725 
+            xmax = 27.203545613292743 
+            text = "" 
+        intervals [32]:
+            xmin = 27.203545613292743 
+            xmax = 27.546331502236136 
+            text = "be" 
+        intervals [33]:
+            xmin = 27.546331502236136 
+            xmax = 28.934787476643212 
+            text = "" 
+        intervals [34]:
+            xmin = 28.934787476643212 
+            xmax = 29.29142330049341 
+            text = "ad" 
+        intervals [35]:
+            xmin = 29.29142330049341 
+            xmax = 52.83 
+            text = "" 

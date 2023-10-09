@@ -1,0 +1,114 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 80.10303854875283 
+tiers? <exists> 
+size = 1 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "CaVi" 
+        xmin = 0 
+        xmax = 80.10303854875283 
+        intervals: size = 25 
+        intervals [1]:
+            xmin = 0 
+            xmax = 1.1808297315524865 
+            text = "" 
+        intervals [2]:
+            xmin = 1.1808297315524865 
+            xmax = 1.4904390920529154 
+            text = "aa" 
+        intervals [3]:
+            xmin = 1.4904390920529154 
+            xmax = 2.918284613419599 
+            text = "" 
+        intervals [4]:
+            xmin = 2.918284613419599 
+            xmax = 3.31531308747309 
+            text = "ad" 
+        intervals [5]:
+            xmin = 3.31531308747309 
+            xmax = 4.863625866328243 
+            text = "" 
+        intervals [6]:
+            xmin = 4.863625866328243 
+            xmax = 5.40635286297017 
+            text = "ac" 
+        intervals [7]:
+            xmin = 5.40635286297017 
+            xmax = 6.7966328639171705 
+            text = "" 
+        intervals [8]:
+            xmin = 6.7966328639171705 
+            xmax = 7.139024391999997 
+            text = "aa" 
+        intervals [9]:
+            xmin = 7.139024391999997 
+            xmax = 9.254709606859265 
+            text = "" 
+        intervals [10]:
+            xmin = 9.254709606859265 
+            xmax = 9.680877785430445 
+            text = "as" 
+        intervals [11]:
+            xmin = 9.680877785430445 
+            xmax = 11.03587404550291 
+            text = "" 
+        intervals [12]:
+            xmin = 11.03587404550291 
+            xmax = 11.54946133762715 
+            text = "ab" 
+        intervals [13]:
+            xmin = 11.54946133762715 
+            xmax = 13.096085853100693 
+            text = "" 
+        intervals [14]:
+            xmin = 13.096085853100693 
+            xmax = 13.52225403167187 
+            text = "ad" 
+        intervals [15]:
+            xmin = 13.52225403167187 
+            xmax = 40.82762989594801 
+            text = "" 
+        intervals [16]:
+            xmin = 40.82762989594801 
+            xmax = 41.1918762024191 
+            text = "af" 
+        intervals [17]:
+            xmin = 41.1918762024191 
+            xmax = 42.59422448233282 
+            text = "" 
+        intervals [18]:
+            xmin = 42.59422448233282 
+            xmax = 42.9839680302569 
+            text = "ag" 
+        intervals [19]:
+            xmin = 42.9839680302569 
+            xmax = 44.4246797596493 
+            text = "" 
+        intervals [20]:
+            xmin = 44.4246797596493 
+            xmax = 44.741574046279155 
+            text = "af" 
+        intervals [21]:
+            xmin = 44.741574046279155 
+            xmax = 46.08114095942879 
+            text = "" 
+        intervals [22]:
+            xmin = 46.08114095942879 
+            xmax = 46.3798229288851 
+            text = "ah" 
+        intervals [23]:
+            xmin = 46.3798229288851 
+            xmax = 47.50815006381715 
+            text = "" 
+        intervals [24]:
+            xmin = 47.50815006381715 
+            xmax = 47.744910159195314 
+            text = "bg" 
+        intervals [25]:
+            xmin = 47.744910159195314 
+            xmax = 80.10303854875283 
+            text = "" 

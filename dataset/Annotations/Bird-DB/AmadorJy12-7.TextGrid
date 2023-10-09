@@ -1,0 +1,164 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 133.2302947845805 
+tiers? <exists> 
+size = 2 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "CAVI" 
+        xmin = 0 
+        xmax = 133.2302947845805 
+        intervals: size = 25 
+        intervals [1]:
+            xmin = 0 
+            xmax = 0.8942060759817898 
+            text = "" 
+        intervals [2]:
+            xmin = 0.8942060759817898 
+            xmax = 1.271047455838901 
+            text = "bi" 
+        intervals [3]:
+            xmin = 1.271047455838901 
+            xmax = 2.8420049581182325 
+            text = "" 
+        intervals [4]:
+            xmin = 2.8420049581182325 
+            xmax = 3.2212015965994505 
+            text = "bq" 
+        intervals [5]:
+            xmin = 3.2212015965994505 
+            xmax = 5.407718626959157 
+            text = "" 
+        intervals [6]:
+            xmin = 5.407718626959157 
+            xmax = 5.678573368731455 
+            text = "cr" 
+        intervals [7]:
+            xmin = 5.678573368731455 
+            xmax = 18.87411357457302 
+            text = "" 
+        intervals [8]:
+            xmin = 18.87411357457302 
+            xmax = 19.187362971579244 
+            text = "ai" 
+        intervals [9]:
+            xmin = 19.187362971579244 
+            xmax = 23.22518644568262 
+            text = "" 
+        intervals [10]:
+            xmin = 23.22518644568262 
+            xmax = 23.57140946342634 
+            text = "aj" 
+        intervals [11]:
+            xmin = 23.57140946342634 
+            xmax = 27.479423836523196 
+            text = "" 
+        intervals [12]:
+            xmin = 27.479423836523196 
+            xmax = 27.79267323352942 
+            text = "en" 
+        intervals [13]:
+            xmin = 27.79267323352942 
+            xmax = 30.44602077711463 
+            text = "" 
+        intervals [14]:
+            xmin = 30.44602077711463 
+            xmax = 30.749849139624427 
+            text = "ak" 
+        intervals [15]:
+            xmin = 30.749849139624427 
+            xmax = 35.451709215334745 
+            text = "" 
+        intervals [16]:
+            xmin = 35.451709215334745 
+            xmax = 35.802642750326676 
+            text = "an" 
+        intervals [17]:
+            xmin = 35.802642750326676 
+            xmax = 40.00896553848864 
+            text = "" 
+        intervals [18]:
+            xmin = 40.00896553848864 
+            xmax = 40.27982028026094 
+            text = "dd" 
+        intervals [19]:
+            xmin = 40.27982028026094 
+            xmax = 57.92373529241649 
+            text = "" 
+        intervals [20]:
+            xmin = 57.92373529241649 
+            xmax = 58.401852793110194 
+            text = "ap" 
+        intervals [21]:
+            xmin = 58.401852793110194 
+            xmax = 103.20552233355941 
+            text = "" 
+        intervals [22]:
+            xmin = 103.20552233355941 
+            xmax = 103.47402181578276 
+            text = "en" 
+        intervals [23]:
+            xmin = 103.47402181578276 
+            xmax = 107.31473983324469 
+            text = "" 
+        intervals [24]:
+            xmin = 107.31473983324469 
+            xmax = 107.60828735424856 
+            text = "en" 
+        intervals [25]:
+            xmin = 107.60828735424856 
+            xmax = 133.2302947845805 
+            text = "" 
+    item [2]:
+        class = "IntervalTier" 
+        name = "Martin" 
+        xmin = 0 
+        xmax = 133.2302947845805 
+        intervals: size = 11 
+        intervals [1]:
+            xmin = 0 
+            xmax = 54.4539225030778 
+            text = "" 
+        intervals [2]:
+            xmin = 54.4539225030778 
+            xmax = 55.16992112480631 
+            text = "July 5" 
+        intervals [3]:
+            xmin = 55.16992112480631 
+            xmax = 59.20377034666233 
+            text = "" 
+        intervals [4]:
+            xmin = 59.20377034666233 
+            xmax = 60.1105449169435 
+            text = "07:30" 
+        intervals [5]:
+            xmin = 60.1105449169435 
+            xmax = 78.27529220957085 
+            text = "" 
+        intervals [6]:
+            xmin = 78.27529220957085 
+            xmax = 79.40346109051808 
+            text = "this is the upper" 
+        intervals [7]:
+            xmin = 79.40346109051808 
+            xmax = 79.80621031524036 
+            text = "" 
+        intervals [8]:
+            xmin = 79.80621031524036 
+            xmax = 80.23486738482782 
+            text = "spring" 
+        intervals [9]:
+            xmin = 80.23486738482782 
+            xmax = 80.64939290267066 
+            text = "" 
+        intervals [10]:
+            xmin = 80.64939290267066 
+            xmax = 81.08040523088222 
+            text = "CAVI" 
+        intervals [11]:
+            xmin = 81.08040523088222 
+            xmax = 133.2302947845805 
+            text = "" 

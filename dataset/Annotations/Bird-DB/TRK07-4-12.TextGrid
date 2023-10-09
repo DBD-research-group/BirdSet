@@ -1,0 +1,316 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 156.10195011337868 
+tiers? <exists> 
+size = 2 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "CATH" 
+        xmin = 0 
+        xmax = 156.10195011337868 
+        intervals: size = 35 
+        intervals [1]:
+            xmin = 0 
+            xmax = 0.31735576534366333 
+            text = "" 
+        intervals [2]:
+            xmin = 0.31735576534366333 
+            xmax = 0.39276839036241906 
+            text = "apv" 
+        intervals [3]:
+            xmin = 0.39276839036241906 
+            xmax = 0.7274119138831474 
+            text = "" 
+        intervals [4]:
+            xmin = 0.7274119138831474 
+            xmax = 0.9630763670667589 
+            text = "azn" 
+        intervals [5]:
+            xmin = 0.9630763670667589 
+            xmax = 1.538097632834771 
+            text = "" 
+        intervals [6]:
+            xmin = 1.538097632834771 
+            xmax = 1.7690487969547104 
+            text = "azo" 
+        intervals [7]:
+            xmin = 1.7690487969547104 
+            xmax = 1.9410838477787469 
+            text = "" 
+        intervals [8]:
+            xmin = 1.9410838477787469 
+            xmax = 2.188531523621539 
+            text = "azo" 
+        intervals [9]:
+            xmin = 2.188531523621539 
+            xmax = 2.5632380041834812 
+            text = "" 
+        intervals [10]:
+            xmin = 2.5632380041834812 
+            xmax = 2.803615746430765 
+            text = "azn" 
+        intervals [11]:
+            xmin = 2.803615746430765 
+            xmax = 3.1995320277792323 
+            text = "" 
+        intervals [12]:
+            xmin = 3.1995320277792323 
+            xmax = 3.6307979771052414 
+            text = "azp" 
+        intervals [13]:
+            xmin = 3.6307979771052414 
+            xmax = 4.011606130947841 
+            text = "" 
+        intervals [14]:
+            xmin = 4.011606130947841 
+            xmax = 4.108228556753121 
+            text = "bat" 
+        intervals [15]:
+            xmin = 4.108228556753121 
+            xmax = 4.744522580348872 
+            text = "" 
+        intervals [16]:
+            xmin = 4.744522580348872 
+            xmax = 4.8364317170904805 
+            text = "bat" 
+        intervals [17]:
+            xmin = 4.8364317170904805 
+            xmax = 4.956620588214123 
+            text = "" 
+        intervals [18]:
+            xmin = 4.956620588214123 
+            xmax = 5.100375904656126 
+            text = "bat" 
+        intervals [19]:
+            xmin = 5.100375904656126 
+            xmax = 50.39176939802445 
+            text = "" 
+        intervals [20]:
+            xmin = 50.39176939802445 
+            xmax = 50.608580699173096 
+            text = "azn" 
+        intervals [21]:
+            xmin = 50.608580699173096 
+            xmax = 51.119972572534586 
+            text = "" 
+        intervals [22]:
+            xmin = 51.119972572534586 
+            xmax = 51.386273409815 
+            text = "azn" 
+        intervals [23]:
+            xmin = 51.386273409815 
+            xmax = 61.019798263193955 
+            text = "" 
+        intervals [24]:
+            xmin = 61.019798263193955 
+            xmax = 61.24839278723112 
+            text = "azo" 
+        intervals [25]:
+            xmin = 61.24839278723112 
+            xmax = 73.41143488586629 
+            text = "" 
+        intervals [26]:
+            xmin = 73.41143488586629 
+            xmax = 73.65652591717725 
+            text = "azn" 
+        intervals [27]:
+            xmin = 73.65652591717725 
+            xmax = 74.14670797979916 
+            text = "" 
+        intervals [28]:
+            xmin = 74.14670797979916 
+            xmax = 74.40122558923746 
+            text = "azn" 
+        intervals [29]:
+            xmin = 74.40122558923746 
+            xmax = 74.95739369875078 
+            text = "" 
+        intervals [30]:
+            xmin = 74.95739369875078 
+            xmax = 75.28968057773967 
+            text = "azp" 
+        intervals [31]:
+            xmin = 75.28968057773967 
+            xmax = 75.65075433699775 
+            text = "" 
+        intervals [32]:
+            xmin = 75.65075433699775 
+            xmax = 75.7709432081214 
+            text = "bat" 
+        intervals [33]:
+            xmin = 75.7709432081214 
+            xmax = 75.88406214564954 
+            text = "" 
+        intervals [34]:
+            xmin = 75.88406214564954 
+            xmax = 76.03960068475071 
+            text = "bat" 
+        intervals [35]:
+            xmin = 76.03960068475071 
+            xmax = 156.10195011337868 
+            text = "" 
+    item [2]:
+        class = "IntervalTier" 
+        name = "Martin" 
+        xmin = 0 
+        xmax = 156.10195011337868 
+        intervals: size = 39 
+        intervals [1]:
+            xmin = 0 
+            xmax = 11.990149176614914 
+            text = "" 
+        intervals [2]:
+            xmin = 11.990149176614914 
+            xmax = 12.826758001699384 
+            text = "April 26" 
+        intervals [3]:
+            xmin = 12.826758001699384 
+            xmax = 14.66183610755536 
+            text = "" 
+        intervals [4]:
+            xmin = 14.66183610755536 
+            xmax = 15.590354071170234 
+            text = "14:48" 
+        intervals [5]:
+            xmin = 15.590354071170234 
+            xmax = 63.72480867681674 
+            text = "" 
+        intervals [6]:
+            xmin = 63.72480867681674 
+            xmax = 66.12151621234041 
+            text = "this thrasher is 30-60 feet downslope" 
+        intervals [7]:
+            xmin = 66.12151621234041 
+            xmax = 67.3361358770716 
+            text = "" 
+        intervals [8]:
+            xmin = 67.3361358770716 
+            xmax = 68.45082876232499 
+            text = "and halfway uproad" 
+        intervals [9]:
+            xmin = 68.45082876232499 
+            xmax = 69.47651991794982 
+            text = "" 
+        intervals [10]:
+            xmin = 69.47651991794982 
+            xmax = 70.31312874303428 
+            text = "in pole 9" 
+        intervals [11]:
+            xmin = 70.31312874303428 
+            xmax = 81.95486820703883 
+            text = "" 
+        intervals [12]:
+            xmin = 81.95486820703883 
+            xmax = 82.73020427310303 
+            text = "in addition" 
+        intervals [13]:
+            xmin = 82.73020427310303 
+            xmax = 84.8163418981759 
+            text = "" 
+        intervals [14]:
+            xmin = 84.8163418981759 
+            xmax = 86.83598630126714 
+            text = "between pole 9 and the next pole" 
+        intervals [15]:
+            xmin = 86.83598630126714 
+            xmax = 87.47514407757953 
+            text = "" 
+        intervals [16]:
+            xmin = 87.47514407757953 
+            xmax = 88.98810989646468 
+            text = "two thrashers on the road" 
+        intervals [17]:
+            xmin = 88.98810989646468 
+            xmax = 90.39339754431109 
+            text = "" 
+        intervals [18]:
+            xmin = 90.39339754431109 
+            xmax = 91.81445422466582 
+            text = "feeding on the merging termites" 
+        intervals [19]:
+            xmin = 91.81445422466582 
+            xmax = 92.29428498313132 
+            text = "" 
+        intervals [20]:
+            xmin = 92.29428498313132 
+            xmax = 93.79546757912794 
+            text = "the road at the asphalt road" 
+        intervals [21]:
+            xmin = 93.79546757912794 
+            xmax = 99.72619662713 
+            text = "" 
+        intervals [22]:
+            xmin = 99.72619662713 
+            xmax = 100.74426708469757 
+            text = "right now one of those" 
+        intervals [23]:
+            xmin = 100.74426708469757 
+            xmax = 102.01342003331041 
+            text = "" 
+        intervals [24]:
+            xmin = 102.01342003331041 
+            xmax = 104.39363105679017 
+            text = "thrashers is on the road, the other one is upslope" 
+        intervals [25]:
+            xmin = 104.39363105679017 
+            xmax = 122.5581015597777 
+            text = "" 
+        intervals [26]:
+            xmin = 122.5581015597777 
+            xmax = 124.17711638465947 
+            text = "thrasher on the road is now" 
+        intervals [27]:
+            xmin = 124.17711638465947 
+            xmax = 126.09917003416079 
+            text = "" 
+        intervals [28]:
+            xmin = 126.09917003416079 
+            xmax = 127.21621956399188 
+            text = "2/3rds of the way" 
+        intervals [29]:
+            xmin = 127.21621956399188 
+            xmax = 127.85722688912703 
+            text = "" 
+        intervals [30]:
+            xmin = 127.85722688912703 
+            xmax = 128.71268887083312 
+            text = "uproad from" 
+        intervals [31]:
+            xmin = 128.71268887083312 
+            xmax = 128.91925901114993 
+            text = "" 
+        intervals [32]:
+            xmin = 128.91925901114993 
+            xmax = 129.8595601976533 
+            text = "pole 83" 
+        intervals [33]:
+            xmin = 129.8595601976533 
+            xmax = 133.08671081927537 
+            text = "" 
+        intervals [34]:
+            xmin = 133.08671081927537 
+            xmax = 134.58318012611662 
+            text = "still feeding on the side of the road" 
+        intervals [35]:
+            xmin = 134.58318012611662 
+            xmax = 138.05026780515402 
+            text = "" 
+        intervals [36]:
+            xmin = 138.05026780515402 
+            xmax = 140.05577234077904 
+            text = "thrasher downslope from 9 still" 
+        intervals [37]:
+            xmin = 140.05577234077904 
+            xmax = 141.95897283365875 
+            text = "" 
+        intervals [38]:
+            xmin = 141.95897283365875 
+            xmax = 143.26926721886147 
+            text = "sporatically singing" 
+        intervals [39]:
+            xmin = 143.26926721886147 
+            xmax = 156.10195011337868 
+            text = "" 

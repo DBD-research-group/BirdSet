@@ -1,0 +1,58 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 466.24666666666667 
+tiers? <exists> 
+size = 1 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "Cavi1791" 
+        xmin = 0 
+        xmax = 466.24666666666667 
+        intervals: size = 11 
+        intervals [1]:
+            xmin = 0 
+            xmax = 249.7520998952763 
+            text = "" 
+        intervals [2]:
+            xmin = 249.7520998952763 
+            xmax = 250.03948604459248 
+            text = "cg" 
+        intervals [3]:
+            xmin = 250.03948604459248 
+            xmax = 257.3126969802495 
+            text = "" 
+        intervals [4]:
+            xmin = 257.3126969802495 
+            xmax = 257.5412209062117 
+            text = "cr" 
+        intervals [5]:
+            xmin = 257.5412209062117 
+            xmax = 261.48565490745244 
+            text = "" 
+        intervals [6]:
+            xmin = 261.48565490745244 
+            xmax = 261.79381595912884 
+            text = "cg" 
+        intervals [7]:
+            xmin = 261.79381595912884 
+            xmax = 266.25828755590294 
+            text = "" 
+        intervals [8]:
+            xmin = 266.25828755590294 
+            xmax = 266.535286254039 
+            text = "cr" 
+        intervals [9]:
+            xmin = 266.535286254039 
+            xmax = 310.77782637404 
+            text = "" 
+        intervals [10]:
+            xmin = 310.77782637404 
+            xmax = 311.07906245826297 
+            text = "cg" 
+        intervals [11]:
+            xmin = 311.07906245826297 
+            xmax = 466.24666666666667 
+            text = "" 

@@ -1,0 +1,186 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 1671.4233333333334 
+tiers? <exists> 
+size = 1 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "Cavi1704" 
+        xmin = 0 
+        xmax = 1671.4233333333334 
+        intervals: size = 43 
+        intervals [1]:
+            xmin = 0 
+            xmax = 1071.4074077978164 
+            text = "" 
+        intervals [2]:
+            xmin = 1071.4074077978164 
+            xmax = 1071.7227662481466 
+            text = "be" 
+        intervals [3]:
+            xmin = 1071.7227662481466 
+            xmax = 1076.5267782647368 
+            text = "" 
+        intervals [4]:
+            xmin = 1076.5267782647368 
+            xmax = 1076.8037452515484 
+            text = "be" 
+        intervals [5]:
+            xmin = 1076.8037452515484 
+            xmax = 1078.9123307886664 
+            text = "" 
+        intervals [6]:
+            xmin = 1078.9123307886664 
+            xmax = 1079.1755865385073 
+            text = "io" 
+        intervals [7]:
+            xmin = 1079.1755865385073 
+            xmax = 1106.1494524829898 
+            text = "" 
+        intervals [8]:
+            xmin = 1106.1494524829898 
+            xmax = 1106.3989969958598 
+            text = "io" 
+        intervals [9]:
+            xmin = 1106.3989969958598 
+            xmax = 1110.2489096282793 
+            text = "" 
+        intervals [10]:
+            xmin = 1110.2489096282793 
+            xmax = 1110.5286188624852 
+            text = "be" 
+        intervals [11]:
+            xmin = 1110.5286188624852 
+            xmax = 1113.9094044814979 
+            text = "" 
+        intervals [12]:
+            xmin = 1113.9094044814979 
+            xmax = 1114.4414004759678 
+            text = "ac" 
+        intervals [13]:
+            xmin = 1114.4414004759678 
+            xmax = 1124.024946991603 
+            text = "" 
+        intervals [14]:
+            xmin = 1124.024946991603 
+            xmax = 1124.5596852334672 
+            text = "ac" 
+        intervals [15]:
+            xmin = 1124.5596852334672 
+            xmax = 1129.125324435767 
+            text = "" 
+        intervals [16]:
+            xmin = 1129.125324435767 
+            xmax = 1129.4489096282796 
+            text = "bx" 
+        intervals [17]:
+            xmin = 1129.4489096282796 
+            xmax = 1150.2008189443802 
+            text = "" 
+        intervals [18]:
+            xmin = 1150.2008189443802 
+            xmax = 1150.4585901994328 
+            text = "io" 
+        intervals [19]:
+            xmin = 1150.4585901994328 
+            xmax = 1453.4439586635922 
+            text = "" 
+        intervals [20]:
+            xmin = 1453.4439586635922 
+            xmax = 1453.819646556594 
+            text = "bx" 
+        intervals [21]:
+            xmin = 1453.819646556594 
+            xmax = 1458.9611577116707 
+            text = "" 
+        intervals [22]:
+            xmin = 1458.9611577116707 
+            xmax = 1459.232640203694 
+            text = "io" 
+        intervals [23]:
+            xmin = 1459.232640203694 
+            xmax = 1462.7781633753607 
+            text = "" 
+        intervals [24]:
+            xmin = 1462.7781633753607 
+            xmax = 1463.049645867384 
+            text = "be" 
+        intervals [25]:
+            xmin = 1463.049645867384 
+            xmax = 1467.0693751292392 
+            text = "" 
+        intervals [26]:
+            xmin = 1467.0693751292392 
+            xmax = 1467.612340113286 
+            text = "ac" 
+        intervals [27]:
+            xmin = 1467.612340113286 
+            xmax = 1470.1788809652314 
+            text = "" 
+        intervals [28]:
+            xmin = 1470.1788809652314 
+            xmax = 1470.5079506525326 
+            text = "bx" 
+        intervals [29]:
+            xmin = 1470.5079506525326 
+            xmax = 1473.760053353022 
+            text = "" 
+        intervals [30]:
+            xmin = 1473.760053353022 
+            xmax = 1474.0178246080745 
+            text = "io" 
+        intervals [31]:
+            xmin = 1474.0178246080745 
+            xmax = 1477.3933284413017 
+            text = "" 
+        intervals [32]:
+            xmin = 1477.3933284413017 
+            xmax = 1477.6867489124786 
+            text = "be" 
+        intervals [33]:
+            xmin = 1477.6867489124786 
+            xmax = 1481.7423300994615 
+            text = "" 
+        intervals [34]:
+            xmin = 1481.7423300994615 
+            xmax = 1482.0357505706384 
+            text = "be" 
+        intervals [35]:
+            xmin = 1482.0357505706384 
+            xmax = 1492.4006348846106 
+            text = "" 
+        intervals [36]:
+            xmin = 1492.4006348846106 
+            xmax = 1492.7351890666998 
+            text = "bx" 
+        intervals [37]:
+            xmin = 1492.7351890666998 
+            xmax = 1498.1150730360666 
+            text = "" 
+        intervals [38]:
+            xmin = 1498.1150730360666 
+            xmax = 1498.6525535253252 
+            text = "ac" 
+        intervals [39]:
+            xmin = 1498.6525535253252 
+            xmax = 1506.2097819256671 
+            text = "" 
+        intervals [40]:
+            xmin = 1506.2097819256671 
+            xmax = 1506.4702954281138 
+            text = "io" 
+        intervals [41]:
+            xmin = 1506.4702954281138 
+            xmax = 1518.1212937699547 
+            text = "" 
+        intervals [42]:
+            xmin = 1518.1212937699547 
+            xmax = 1518.4147142411314 
+            text = "be" 
+        intervals [43]:
+            xmin = 1518.4147142411314 
+            xmax = 1671.4233333333334 
+            text = "" 

@@ -1,0 +1,180 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 90.99319727891157 
+tiers? <exists> 
+size = 2 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "CAVI" 
+        xmin = 0 
+        xmax = 90.99319727891157 
+        intervals: size = 21 
+        intervals [1]:
+            xmin = 0 
+            xmax = 2.0167759400611516 
+            text = "" 
+        intervals [2]:
+            xmin = 2.0167759400611516 
+            xmax = 2.301762232647524 
+            text = "cr" 
+        intervals [3]:
+            xmin = 2.301762232647524 
+            xmax = 8.024065421609881 
+            text = "" 
+        intervals [4]:
+            xmin = 8.024065421609881 
+            xmax = 8.466854041496147 
+            text = "bq" 
+        intervals [5]:
+            xmin = 8.466854041496147 
+            xmax = 10.014258952481658 
+            text = "" 
+        intervals [6]:
+            xmin = 10.014258952481658 
+            xmax = 10.29217946921878 
+            text = "cr" 
+        intervals [7]:
+            xmin = 10.29217946921878 
+            xmax = 11.766661429159088 
+            text = "" 
+        intervals [8]:
+            xmin = 11.766661429159088 
+            xmax = 12.127015997470782 
+            text = "fq" 
+        intervals [9]:
+            xmin = 12.127015997470782 
+            xmax = 14.258403748166623 
+            text = "" 
+        intervals [10]:
+            xmin = 14.258403748166623 
+            xmax = 14.531613748563029 
+            text = "cr" 
+        intervals [11]:
+            xmin = 14.531613748563029 
+            xmax = 20.41170712831486 
+            text = "" 
+        intervals [12]:
+            xmin = 20.41170712831486 
+            xmax = 20.710824973576443 
+            text = "db" 
+        intervals [13]:
+            xmin = 20.710824973576443 
+            xmax = 22.940545442693413 
+            text = "" 
+        intervals [14]:
+            xmin = 22.940545442693413 
+            xmax = 23.291478977685347 
+            text = "ch" 
+        intervals [15]:
+            xmin = 23.291478977685347 
+            xmax = 24.311305961923654 
+            text = "" 
+        intervals [16]:
+            xmin = 24.311305961923654 
+            xmax = 24.709344669397726 
+            text = "da" 
+        intervals [17]:
+            xmin = 24.709344669397726 
+            xmax = 26.102592448939987 
+            text = "" 
+        intervals [18]:
+            xmin = 26.102592448939987 
+            xmax = 26.378157707960497 
+            text = "db" 
+        intervals [19]:
+            xmin = 26.378157707960497 
+            xmax = 28.781544551480376 
+            text = "" 
+        intervals [20]:
+            xmin = 28.781544551480376 
+            xmax = 29.118346534727667 
+            text = "ch" 
+        intervals [21]:
+            xmin = 29.118346534727667 
+            xmax = 90.99319727891157 
+            text = "" 
+    item [2]:
+        class = "IntervalTier" 
+        name = "Martin" 
+        xmin = 0 
+        xmax = 90.99319727891157 
+        intervals: size = 19 
+        intervals [1]:
+            xmin = 0 
+            xmax = 19.222301523140857 
+            text = "" 
+        intervals [2]:
+            xmin = 19.222301523140857 
+            xmax = 20.72731178394519 
+            text = "same CAVI as the last track" 
+        intervals [3]:
+            xmin = 20.72731178394519 
+            xmax = 46.00546848320932 
+            text = "" 
+        intervals [4]:
+            xmin = 46.00546848320932 
+            xmax = 47.35267641619849 
+            text = "there are two distant CAVIs" 
+        intervals [5]:
+            xmin = 47.35267641619849 
+            xmax = 49.85911752558491 
+            text = "" 
+        intervals [6]:
+            xmin = 49.85911752558491 
+            xmax = 52.64303321927931 
+            text = "one is way south over the creek and up the hillside" 
+        intervals [7]:
+            xmin = 52.64303321927931 
+            xmax = 54.43445314917778 
+            text = "" 
+        intervals [8]:
+            xmin = 54.43445314917778 
+            xmax = 55.722779616564274 
+            text = "one back towards the mine" 
+        intervals [9]:
+            xmin = 55.722779616564274 
+            xmax = 61.65532353836489 
+            text = "" 
+        intervals [10]:
+            xmin = 61.65532353836489 
+            xmax = 64.54522587014411 
+            text = "the one we can hear right now is the one way up the hillside" 
+        intervals [11]:
+            xmin = 64.54522587014411 
+            xmax = 71.40374230923551 
+            text = "" 
+        intervals [12]:
+            xmin = 71.40374230923551 
+            xmax = 72.91110782866394 
+            text = "also heard on these tracks" 
+        intervals [13]:
+            xmin = 72.91110782866394 
+            xmax = 74.8261565882649 
+            text = "" 
+        intervals [14]:
+            xmin = 74.8261565882649 
+            xmax = 77.4098752989102 
+            text = "pacific slope flycatchers, spotted towhee, robin" 
+        intervals [15]:
+            xmin = 77.4098752989102 
+            xmax = 80.80718239036722 
+            text = "" 
+        intervals [16]:
+            xmin = 80.80718239036722 
+            xmax = 81.48549687411001 
+            text = "junco" 
+        intervals [17]:
+            xmin = 81.48549687411001 
+            xmax = 81.84820670222248 
+            text = "" 
+        intervals [18]:
+            xmin = 81.84820670222248 
+            xmax = 82.5359422204617 
+            text = "chipping sparrow" 
+        intervals [19]:
+            xmin = 82.5359422204617 
+            xmax = 90.99319727891157 
+            text = "" 

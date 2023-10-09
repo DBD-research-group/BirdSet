@@ -1,0 +1,82 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 97.85333333333334 
+tiers? <exists> 
+size = 1 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "Cavi1553" 
+        xmin = 0 
+        xmax = 97.85333333333334 
+        intervals: size = 17 
+        intervals [1]:
+            xmin = 0 
+            xmax = 8.844437260743248 
+            text = "" 
+        intervals [2]:
+            xmin = 8.844437260743248 
+            xmax = 11.597111823470499 
+            text = "Chatter" 
+        intervals [3]:
+            xmin = 11.597111823470499 
+            xmax = 12.716159103723234 
+            text = "" 
+        intervals [4]:
+            xmin = 12.716159103723234 
+            xmax = 15.198759935767809 
+            text = "Chatter" 
+        intervals [5]:
+            xmin = 15.198759935767809 
+            xmax = 23.67741430481295 
+            text = "" 
+        intervals [6]:
+            xmin = 23.67741430481295 
+            xmax = 25.81376676418743 
+            text = "Chatter" 
+        intervals [7]:
+            xmin = 25.81376676418743 
+            xmax = 85.0061838592375 
+            text = "" 
+        intervals [8]:
+            xmin = 85.0061838592375 
+            xmax = 85.393982036628 
+            text = "cd" 
+        intervals [9]:
+            xmin = 85.393982036628 
+            xmax = 87.24361338321464 
+            text = "" 
+        intervals [10]:
+            xmin = 87.24361338321464 
+            xmax = 87.72143613749937 
+            text = "df" 
+        intervals [11]:
+            xmin = 87.72143613749937 
+            xmax = 89.6812019268121 
+            text = "" 
+        intervals [12]:
+            xmin = 89.6812019268121 
+            xmax = 90.03783775066229 
+            text = "cd" 
+        intervals [13]:
+            xmin = 90.03783775066229 
+            xmax = 91.95671877178295 
+            text = "" 
+        intervals [14]:
+            xmin = 91.95671877178295 
+            xmax = 92.42415407488758 
+            text = "df" 
+        intervals [15]:
+            xmin = 92.42415407488758 
+            xmax = 94.5715590219705 
+            text = "" 
+        intervals [16]:
+            xmin = 94.5715590219705 
+            xmax = 94.9316573295474 
+            text = "cd" 
+        intervals [17]:
+            xmin = 94.9316573295474 
+            xmax = 97.85333333333334 
+            text = "" 

@@ -1,0 +1,212 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 62.68807256235828 
+tiers? <exists> 
+size = 2 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "CATH" 
+        xmin = 0 
+        xmax = 62.68807256235828 
+        intervals: size = 33 
+        intervals [1]:
+            xmin = 0 
+            xmax = 3.260079323329964 
+            text = "" 
+        intervals [2]:
+            xmin = 3.260079323329964 
+            xmax = 3.514447254733514 
+            text = "amh" 
+        intervals [3]:
+            xmin = 3.514447254733514 
+            xmax = 6.458747984733661 
+            text = "" 
+        intervals [4]:
+            xmin = 6.458747984733661 
+            xmax = 6.552958328988211 
+            text = "aog" 
+        intervals [5]:
+            xmin = 6.552958328988211 
+            xmax = 7.040496860505513 
+            text = "" 
+        intervals [6]:
+            xmin = 7.040496860505513 
+            xmax = 7.14412823918552 
+            text = "aog" 
+        intervals [7]:
+            xmin = 7.14412823918552 
+            xmax = 7.308996341630984 
+            text = "" 
+        intervals [8]:
+            xmin = 7.308996341630984 
+            xmax = 7.398496168672808 
+            text = "alf" 
+        intervals [9]:
+            xmin = 7.398496168672808 
+            xmax = 11.21006256443427 
+            text = "" 
+        intervals [10]:
+            xmin = 11.21006256443427 
+            xmax = 11.553930318268833 
+            text = "aoh" 
+        intervals [11]:
+            xmin = 11.553930318268833 
+            xmax = 19.134655918486285 
+            text = "" 
+        intervals [12]:
+            xmin = 19.134655918486285 
+            xmax = 19.23593203776633 
+            text = "aog" 
+        intervals [13]:
+            xmin = 19.23593203776633 
+            xmax = 19.553891947133902 
+            text = "" 
+        intervals [14]:
+            xmin = 19.553891947133902 
+            xmax = 19.641036514886498 
+            text = "aog" 
+        intervals [15]:
+            xmin = 19.641036514886498 
+            xmax = 19.796483581688424 
+            text = "" 
+        intervals [16]:
+            xmin = 19.796483581688424 
+            xmax = 19.897759700968464 
+            text = "alf" 
+        intervals [17]:
+            xmin = 19.897759700968464 
+            xmax = 20.48505256357105 
+            text = "" 
+        intervals [18]:
+            xmin = 20.48505256357105 
+            xmax = 20.84069661034515 
+            text = "aoh" 
+        intervals [19]:
+            xmin = 20.84069661034515 
+            xmax = 20.988219263714857 
+            text = "" 
+        intervals [20]:
+            xmin = 20.988219263714857 
+            xmax = 21.183705726511217 
+            text = "aoi" 
+        intervals [21]:
+            xmin = 21.183705726511217 
+            xmax = 21.596854690658137 
+            text = "" 
+        intervals [22]:
+            xmin = 21.596854690658137 
+            xmax = 21.858288397934007 
+            text = "amh" 
+        intervals [23]:
+            xmin = 21.858288397934007 
+            xmax = 25.045686104784124 
+            text = "" 
+        intervals [24]:
+            xmin = 25.045686104784124 
+            xmax = 25.175225327119062 
+            text = "aof" 
+        intervals [25]:
+            xmin = 25.175225327119062 
+            xmax = 25.63616771350702 
+            text = "" 
+        intervals [26]:
+            xmin = 25.63616771350702 
+            xmax = 25.725667540548848 
+            text = "aei" 
+        intervals [27]:
+            xmin = 25.725667540548848 
+            xmax = 25.78454900570794 
+            text = "" 
+        intervals [28]:
+            xmin = 25.78454900570794 
+            xmax = 25.87640409135613 
+            text = "aei" 
+        intervals [29]:
+            xmin = 25.87640409135613 
+            xmax = 26.255865993360384 
+            text = "" 
+        intervals [30]:
+            xmin = 26.255865993360384 
+            xmax = 26.48903659714697 
+            text = "aof" 
+        intervals [31]:
+            xmin = 26.48903659714697 
+            xmax = 26.64448366633803 
+            text = "" 
+        intervals [32]:
+            xmin = 26.64448366633803 
+            xmax = 26.90827263223801 
+            text = "aof" 
+        intervals [33]:
+            xmin = 26.90827263223801 
+            xmax = 62.68807256235828 
+            text = "" 
+    item [2]:
+        class = "IntervalTier" 
+        name = "Martin" 
+        xmin = 0 
+        xmax = 62.68807256235828 
+        intervals: size = 15 
+        intervals [1]:
+            xmin = 0 
+            xmax = 37.03707243148633 
+            text = "" 
+        intervals [2]:
+            xmin = 37.03707243148633 
+            xmax = 38.22647803666034 
+            text = "This Thrasher is singing" 
+        intervals [3]:
+            xmin = 38.22647803666034 
+            xmax = 40.045508225619535 
+            text = "" 
+        intervals [4]:
+            xmin = 40.045508225619535 
+            xmax = 41.4586634000837 
+            text = "upslope from A" 
+        intervals [5]:
+            xmin = 41.4586634000837 
+            xmax = 41.95226384995439 
+            text = "" 
+        intervals [6]:
+            xmin = 41.95226384995439 
+            xmax = 43.297116524319456 
+            text = "across the tower road" 
+        intervals [7]:
+            xmin = 43.297116524319456 
+            xmax = 43.89667839669771 
+            text = "" 
+        intervals [8]:
+            xmin = 43.89667839669771 
+            xmax = 46.864304263072455 
+            text = "and up behind the first pole on the tower road" 
+        intervals [9]:
+            xmin = 46.864304263072455 
+            xmax = 48.31161407057433 
+            text = "" 
+        intervals [10]:
+            xmin = 48.31161407057433 
+            xmax = 50.13929476288131 
+            text = "East is flown back" 
+        intervals [11]:
+            xmin = 50.13929476288131 
+            xmax = 51.06332667467988 
+            text = "" 
+        intervals [12]:
+            xmin = 51.06332667467988 
+            xmax = 53.59287443697074 
+            text = "South, so he is the one that is the long term singer" 
+        intervals [13]:
+            xmin = 53.59287443697074 
+            xmax = 54.64090157978731 
+            text = "" 
+        intervals [14]:
+            xmin = 54.64090157978731 
+            xmax = 56.56514787568269 
+            text = "upslope from the split" 
+        intervals [15]:
+            xmin = 56.56514787568269 
+            xmax = 62.68807256235828 
+            text = "" 
