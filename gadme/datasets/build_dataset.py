@@ -7,12 +7,24 @@ import lightning as L
 from transformers import BatchFeature
 from transformers import SequenceFeatureExtractor
 from transformers.utils import PaddingStrategy
+from transformers import AutoFeatureExtractor
+
 import numpy as np 
 
 
 class BaseGADME(L.LightningDataModule):
 
-    def __init__(self, dataset_name, dataset_path, seed, train_batch_size, eval_batch_size, transforms=None, val_split=0.1):
+    def __init__(
+            self,
+            dataset_name, 
+            feature_extractor,
+            dataset_path,
+            seed, 
+            train_batch_size, 
+            eval_batch_size, 
+            transforms=None, 
+            val_split=0.1):
+        
         super().__init__()
         self.dataset_name = dataset_name
         self.dataset_path = dataset_path
@@ -22,7 +34,9 @@ class BaseGADME(L.LightningDataModule):
         self.eval_batch_size = eval_batch_size
         self.transforms = transforms
         self.val_split = val_split
-        self.feature_extractor = CustomFeatureExtractor()
+        #self.feature_extractor = feature_extractor
+        self.feature_extractor = AutoFeatureExtractor.from_pretrained(feature_extractor)
+        #self.feature_extractor = CustomFeatureExtractor()
 
         self.dataset = None
         self.split = None
@@ -36,7 +50,7 @@ class BaseGADME(L.LightningDataModule):
             audio_arrays,
             sampling_rate=self.feature_extractor.sampling_rate,
             padding=True,
-            max_length=32_000*1,
+            max_length=self.feature_extractor.sampling_rate*1,
             truncation=True,
             return_tensors="pt"
         )
@@ -82,7 +96,7 @@ class BaseGADME(L.LightningDataModule):
         load_dataset("DBD-research-group/gadme_v1_1", self.dataset_name, cache_dir=self.dataset_path)
     
     def setup(self, stage=None):
-        self.dataset = load_dataset("DBD-research-group/gadme_v1_1", self.dataset_name)
+        self.dataset = load_dataset("DBD-research-group/gadme_v1_1", self.dataset_name, cache_dir=self.dataset_path)
         self.dataset = self.dataset.cast_column(
             column="audio",
             feature=Audio(
@@ -95,15 +109,20 @@ class BaseGADME(L.LightningDataModule):
             self._preprocess_function,
             remove_columns=["audio"],
             batched=True,
-            batch_size=500,
+            batch_size=100,
             load_from_cache_file=True,
-            num_proc=4
+            num_proc=1,
         )
 
         # splits + augmentations
         #TODO: set format in feature extractor?
         self.dataset.set_format("np")
-        self.dataset = self.dataset.select_columns(["input_values", "ebird_code"])
+        try: 
+            self.dataset = self.dataset.select_columns(["input_values", "attention_mask","ebird_code"])
+        except:
+            self.dataset = self.dataset.select_columns(["input_values","ebird_code"])
+
+        self.dataset = self.dataset.rename_column("ebird_code", "labels")
 
         self.split = self.dataset["train"].train_test_split(self.val_split, shuffle=True, seed=self.seed)
         self.train_dataset = self.split["train"]
@@ -138,7 +157,21 @@ class BaseGADME(L.LightningDataModule):
             shuffle=False,
             num_workers=4
         )
-    
+
+def preprocess_function(samples, feature_extractor):
+    audio_arrays = [x["array"] for x in samples["audio"]]
+    inputs = feature_extractor(
+        audio_arrays,
+        sampling_rate=feature_extractor.sampling_rate,
+        padding=True,
+        max_length=32_000*1,
+        truncation=True,
+        return_tensors="pt"
+    )
+    return inputs
+
+
+
 #we could incorporate some kind of event detector in the customfeatureextractor
 #TODO: feature extractor has to be model dependent
 class CustomFeatureExtractor(SequenceFeatureExtractor):
@@ -149,7 +182,7 @@ class CustomFeatureExtractor(SequenceFeatureExtractor):
         feature_size=1,
         sampling_rate=32_000,
         padding_value=0.0,
-        return_attention_mask=False,
+        return_attention_mask=True,
         do_normalize=True,
         **kwargs
     ):

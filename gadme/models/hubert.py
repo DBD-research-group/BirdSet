@@ -3,9 +3,9 @@ import torch.nn as nn
 from transformers import AutoModelForAudioClassification
 
 
-class Wav2vec2SequenceClassifier(nn.Module):
+class HubertSequenceClassifier(nn.Module):
     def __init__(self, checkpoint, num_classes):
-        super(Wav2vec2SequenceClassifier, self).__init__()
+        super(HubertSequenceClassifier, self).__init__()
 
         self.checkpoint = checkpoint
         self.num_classes = num_classes
@@ -13,7 +13,7 @@ class Wav2vec2SequenceClassifier(nn.Module):
             self.checkpoint,
             num_labels=self.num_classes
         )
-
+        
     def forward(self, input_values, attention_mask=None, labels=None, return_hidden_state=False):
 
         outputs = self.model(
@@ -50,6 +50,3 @@ class Wav2vec2SequenceClassifier(nn.Module):
     def get_representations(self, dataloader, device):
         pass
     
-
-
-

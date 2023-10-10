@@ -33,20 +33,20 @@ class BaseModuleTransformer(L.LightningModule):
         return self.model.forward(*args, **kwargs)
     
     def training_step(self, batch):
-        logits = self(batch["input_ids"], batch["attention_mask"])
+        logits = self(**batch)
         loss = self.loss_fn(logits, batch["labels"])
         self.log("train_loss", loss, prog_bar=True)
         #self.log_train_metrics
         return {"loss": loss}
 
     def validation_step(self, batch, batch_idx):
-        logits = self(batch["input_ids"], batch["attention_mask"])
+        logits = self(**batch)
         loss = self.loss_fn(logits, batch["labels"])
         self.log("val_loss", loss, prog_bar=True)
         return loss
     
     def predict_step(self, batch, batch_idx, dataloader_idx=0):
-        logits = self(batch['input_ids'], batch['attention_mask'])
+        logits = self(**batch)
         logits = self._gather(logits)
         targets = self._gather(batch['labels'])
         #cc_fn = metrics.Accuracy().to('cuda')
@@ -54,7 +54,6 @@ class BaseModuleTransformer(L.LightningModule):
         return logits, targets 
 
     def configure_optimizers(self):
-
         if self.optimizer is None:
             self.optimizer = torch.optim.AdamW(self.parameters(), lr=5e-5)
         if isinstance(self.optimizer, functools.partial):
