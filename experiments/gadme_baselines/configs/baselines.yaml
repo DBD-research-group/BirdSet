@@ -12,10 +12,10 @@ wandb:
   mode: disabled
 
 device: cuda
-val_split: .01
+val_split: .05
 random_seed: 0 
-train_batch_size: 4
-eval_batch_size: 4
+train_batch_size: 16
+eval_batch_size: 16
 print_freq_eval: 25
 print_freq_train: 25
 check_freq_model: 15

@@ -33,7 +33,7 @@ def main(args):
     initialize_wandb(args)
 
     # Setup data
-    logging.info('Building dataset %s', args.dataset.name)
+    logging.info("Instantiate data module %s", args.dataset.name)
     data_module = datasets.BaseGADME(
         dataset_name=args.dataset.name_hf,
         feature_extractor=args.model.name_hf,
@@ -63,8 +63,16 @@ def main(args):
         accelerator="gpu",
         strategy="auto"
     )
-
     trainer.fit(model, data_module)
+
+    # Evaluation
+    trainer.test(ckpt_path="last", datamodule=data_module)
+    #predictions = trainer.predict(model, test_dataloader)
+
+
+
+    
+
     print("hallo")
 
 def build_model(args, **kwargs):
@@ -81,6 +89,13 @@ def build_model(args, **kwargs):
             checkpoint=args.model.name_hf,
             num_classes=args.dataset.n_classes
         )
+    
+    elif args.model.name == "ast":
+        base_model = models.ast.ASTSequenceClassifier(
+            checkpoint=args.model.name_hf,
+            num_classes=args.dataset.n_classes
+        )
+
     
     else:
         raise NotImplementedError (f'Model {args.model.name} not implemented')
@@ -126,7 +141,9 @@ def build_model(args, **kwargs):
         train_metrics={"train_acc": torchmetrics.classification.Accuracy(
             task="multiclass", 
             num_classes=args.dataset.n_classes)},
-        val_metrics=None
+        eval_metrics={"acc": torchmetrics.classification.Accuracy(
+            task="multiclass", 
+            num_classes=args.dataset.n_classes)},
     )
 
 

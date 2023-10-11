@@ -1,5 +1,5 @@
-name: hubert
-name_hf: facebook/hubert-base-ls960
+name: ast
+name_hf: MIT/ast-finetuned-audioset-10-10-0.4593
 
 optimizer:
   _target_: torch.optim.AdamW
@@ -13,5 +13,5 @@ scheduler:
     warmup_ratio: 0.05
 
 trainer:
-  n_epochs: 1
-  batch_size: 16
+  n_epochs: 5
+  batch_size: 12

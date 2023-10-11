@@ -114,8 +114,6 @@ class BaseGADME(L.LightningDataModule):
             num_proc=1,
         )
 
-        # splits + augmentations
-        #TODO: set format in feature extractor?
         self.dataset.set_format("np")
         try: 
             self.dataset = self.dataset.select_columns(["input_values", "attention_mask","ebird_code"])
@@ -124,10 +122,13 @@ class BaseGADME(L.LightningDataModule):
 
         self.dataset = self.dataset.rename_column("ebird_code", "labels")
 
-        self.split = self.dataset["train"].train_test_split(self.val_split, shuffle=True, seed=self.seed)
-        self.train_dataset = self.split["train"]
-        self.val_dataset = self.split["test"]
-        self.test_dataset = self.dataset["test"]
+        if stage == "fit":
+            self.split = self.dataset["train"].train_test_split(self.val_split, shuffle=True, seed=self.seed)
+            self.train_dataset = self.split["train"]
+            self.val_dataset = self.split["test"]
+
+        if stage == "test":
+            self.test_dataset = self.dataset["test"]
 
         if self.transforms:
             self.train_dataset.set_transform(self.augmentation, output_all_columns=False)
