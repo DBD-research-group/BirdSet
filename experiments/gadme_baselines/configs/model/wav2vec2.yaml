@@ -3,7 +3,7 @@ name_hf: facebook/wav2vec2-base-960h
 
 optimizer:
   _target_: torch.optim.AdamW
-  lr: 5e-5
+  lr: 3e-5
   weight_decay: 0.01
 
 scheduler:
@@ -13,5 +13,5 @@ scheduler:
     warmup_ratio: 0.05
 
 trainer:
-  n_epochs: 5
+  n_epochs: 10
   batch_size: 12

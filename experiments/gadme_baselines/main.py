@@ -1,4 +1,3 @@
-#%%
 import os 
 import time 
 import json 
@@ -9,10 +8,9 @@ import hydra
 import math
 import transformers
 import lightning as L 
-#from lightning.pytorch import seed_everything
 import wandb
 import torchmetrics
-
+from lightning.pytorch.callbacks.early_stopping import EarlyStopping
 from omegaconf import OmegaConf
 from torch.utils.data import DataLoader
 from utils import initialize_wandb
@@ -33,35 +31,40 @@ def main(args):
     initialize_wandb(args)
 
     # Setup data
+    # instantiate and mapping are a problem, turn the omegaconf into dict!
     logging.info("Instantiate data module %s", args.dataset.name)
-    data_module = datasets.BaseGADME(
-        dataset_name=args.dataset.name_hf,
-        feature_extractor=args.model.name_hf,
-        dataset_path=args.dataset_path,
+    data_module = datasets.BaseDataModule(
+        data_dir=args.dataset_path,
+        dataset_name=args.dataset.name,
+        feature_extractor_name=args.model.name_hf,
+        dataset_loading=dict(args.dataset.loading),
         seed=args.random_seed,
         train_batch_size=args.train_batch_size,
         eval_batch_size=args.eval_batch_size,
         val_split=args.val_split
     )
-    #data_module.prepare_data()´
+
+    data_module.prepare_data()
     #data_module.setup()
 
     # Setup model 
     logging.info("Building model: %s", args.model.name)
     model = build_model(args, len_trainset=500)
-    #print(next(iter(data_module.train_dataloader())))
-
+    #print(next(iter(data_module.train_dataloader()))
     # Training
     trainer = L.Trainer(
         max_epochs=args.model.trainer.n_epochs,
         default_root_dir=args.output_dir,
+        callbacks=[EarlyStopping(
+            monitor="val_loss",
+            patience=2,
+        )],
         enable_checkpointing=False,
         fast_dev_run=False,
         enable_progress_bar=True,
-        callbacks=None,
         devices=1,
         accelerator="gpu",
-        strategy="auto"
+        strategy="auto",
     )
     trainer.fit(model, data_module)
 
@@ -95,7 +98,6 @@ def build_model(args, **kwargs):
             checkpoint=args.model.name_hf,
             num_classes=args.dataset.n_classes
         )
-
     
     else:
         raise NotImplementedError (f'Model {args.model.name} not implemented')
@@ -120,18 +122,6 @@ def build_model(args, **kwargs):
         _convert_="partial"
     )
 
-    # optimizer = torch.optim.AdamW(
-    #     base_model.parameters(),
-    #     lr=args.model.optimizer_lr,%
-    #     weight_decay=args.model.optimizer.weight_decay 
-    # )
-
-    # scheduler = transformers.get_linear_schedule_with_warmup(
-    #     optimizer=optimizer,
-    #     num_warmup_steps=math.ceil(args.model.n_epochs * len_trainset * args.model.optimizer.warmup_ratio),
-    #     num_training_steps=args.model.n_epochs * len_trainset
-    # )
-
     model = models.BaseModuleTransformer(
         model=base_model,
         loss_fn=nn.CrossEntropyLoss(),
@@ -151,7 +141,5 @@ def build_model(args, **kwargs):
     return model
 
 
-#%%
 if __name__ == "__main__":
     main()
-# %%

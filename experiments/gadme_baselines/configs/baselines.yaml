@@ -1,5 +1,5 @@
 defaults:
-  - model: hubert
+  - model: wav2vec2
   - dataset: sapsucker
   - transformations: raw_waveforms
   - _self_
@@ -13,13 +13,13 @@ wandb:
 
 device: cuda
 val_split: .05
-random_seed: 0 
-train_batch_size: 16
+random_seed: 1 
+train_batch_size: 5
 eval_batch_size: 16
 print_freq_eval: 25
 print_freq_train: 25
 check_freq_model: 15
-dataset_path: ~/data_gadme
+dataset_path: data/
 output_dir: ./output_gadme/
 
 hydra:

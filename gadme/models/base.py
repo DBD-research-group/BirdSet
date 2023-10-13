@@ -1,3 +1,4 @@
+from typing import Any, Optional
 import lightning.pytorch as pl
 import torch
 import torch.nn as nn
@@ -26,9 +27,6 @@ class BaseModuleTransformer(L.LightningModule):
         self.train_metrics = nn.ModuleDict(train_metrics)
         self.eval_metrics = nn.ModuleDict(eval_metrics)
     
-    # def model_step(self, batch, *args, **kwargs):
-    #     logits = 
-
     def forward(self, *args, **kwargs):
         return self.model.forward(*args, **kwargs)
     
@@ -45,29 +43,25 @@ class BaseModuleTransformer(L.LightningModule):
         self.log("val_loss", loss, prog_bar=True)
         return loss
     
-    def predict_step(self, batch, batch_idx, dataloader_idx=0):
+    def test_step(self, batch, batch_idx):
         logits = self(**batch)
-        logits = self._gather(logits)
-        targets = self._gather(batch['labels'])
+        targets = batch['labels']
         self.log_eval_metrics(logits, targets)
-        #cc_fn = metrics.Accuracy().to('cuda')
-        #self.log('test_accuracy', acc_fn(logits, targets), prog_bar=True)
         return logits, targets 
     
     def test_step(self, batch, batch_idx):
         logits = self(**batch)
-        logits = self._gather(logits)
-        targets = self._gather(batch['labels'])
+        targets = batch['labels']
         self.log_eval_metrics(logits, targets)
         return logits, targets 
 
     def log_train_metrics(self, logits, targets):
-        metrics = {metric_name: metric(logits, targets) for metric_name, metric in self.train_metrics.item}
-        self.log_dict(self.metrics, prog_bar=True)
+        metrics = {metric_name: metric(logits, targets) for metric_name, metric in self.train_metrics.items()}
+        self.log_dict(metrics, prog_bar=True)
 
     def log_eval_metrics(self, logits, targets):
-        metrics = {metric_name: metric(logits, targets) for metric_name, metric in self.train_metrics.item}
-        self.log_dict(self.metrics, prog_bar=True, on_epoch=True)
+        metrics = {metric_name: metric(logits, targets) for metric_name, metric in self.eval_metrics.items()}
+        self.log_dict(metrics, prog_bar=True, on_epoch=True)
 
     def configure_optimizers(self):
         if self.optimizer is None:
@@ -91,6 +85,8 @@ class BaseModuleTransformer(L.LightningModule):
             }
         }
 
+    def on_train_batch_start(self, batch: Any, batch_idx: int):
+        print(self.lr_scheduler.get_lr())
 
 class BaseCallbacks(L.Callback):
     def on_test_end(self, trainer, module):

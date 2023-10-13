@@ -13,5 +13,5 @@ scheduler:
     warmup_ratio: 0.05
 
 trainer:
-  n_epochs: 5
-  batch_size: 12
+  n_epochs: 100
+  batch_size: 8

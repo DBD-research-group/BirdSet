@@ -1,4 +1,8 @@
 name: sapsucker
-name_hf: NA_subset500
 n_classes: 500
-path: ~/hf_datasets
+
+loading:
+  _target_: datasets.load_dataset
+  path: DBD-research-group/gadme_v1_1
+  name: NA_subset500
+  cache_dir: ~/data_gadme
