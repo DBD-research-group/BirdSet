@@ -1,6 +1,6 @@
 defaults:
-  - model: wav2vec2
-  - dataset: sapsucker
+  - model: ast
+  - dataset: esc50
   - transformations: raw_waveforms
   - _self_
 
@@ -26,4 +26,7 @@ hydra:
   job:
     chdir: True
   run:
-    dir: ${output_dir}/${dataset.name}/${model.name}/${now:%Y-%m-%d_%H%M%S}
+    dir: ${output_dir}/${dataset.name}/${model.name}
+    
+    
+#/${now:%Y-%m-%d_%H%M%S}

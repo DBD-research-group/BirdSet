@@ -33,17 +33,7 @@ def main(args):
     # Setup data
     # instantiate and mapping are a problem, turn the omegaconf into dict!
     logging.info("Instantiate data module %s", args.dataset.name)
-    data_module = datasets.BaseDataModule(
-        data_dir=args.dataset_path,
-        dataset_name=args.dataset.name,
-        feature_extractor_name=args.model.name_hf,
-        dataset_loading=dict(args.dataset.loading),
-        seed=args.random_seed,
-        train_batch_size=args.train_batch_size,
-        eval_batch_size=args.eval_batch_size,
-        val_split=args.val_split
-    )
-
+    data_module = build_dataset(args)
     data_module.prepare_data()
     #data_module.setup()
 
@@ -77,6 +67,44 @@ def main(args):
     
 
     print("hallo")
+def build_dataset (args, **kwargs):
+    if args.dataset.name == "sapsucker":
+        datamodule = datasets.SapsuckerWoods(
+            data_dir=args.dataset_path,
+            dataset_name=args.dataset.name,
+            feature_extractor_name=args.model.name_hf,
+            dataset_loading=dict(args.dataset.loading),
+            seed=args.random_seed,
+            train_batch_size=args.train_batch_size,
+            eval_batch_size=args.eval_batch_size,
+            val_split=args.val_split,
+            column_list=["input_values", "ebird_code"]
+        )
+    
+    elif args.dataset.name == "esc50":
+        datamodule = datasets.ESC50(
+            data_dir=args.dataset_path,
+            dataset_name=args.dataset.name,
+            feature_extractor_name=args.model.name_hf,
+            dataset_loading=dict(args.dataset.loading),
+            seed=args.random_seed,
+            train_batch_size=args.train_batch_size,
+            eval_batch_size=args.eval_batch_size,
+            val_split=args.val_split,
+            column_list=["input_values", "target"]
+        )
+        
+    else:
+        raise NotImplementedError(
+            f'Dataset {args.dataset.name} not implemented.'
+        )
+
+    return datamodule
+
+
+
+
+
 
 def build_model(args, **kwargs):
     len_trainset = kwargs["len_trainset"]
