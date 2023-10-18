@@ -1,18 +1,17 @@
 defaults:
   - model: ast
-  - dataset: esc50
+  - dataset: hsn
   - transformations: raw_waveforms
   - _self_
 
 wandb:
-  project: x
-  entity: x
+  project: birds
+  entity: dal-nlp
   group: default
-  reinit: True
-  mode: disabled
+  mode: offline
 
 device: cuda
-val_split: .05
+val_split: .2
 random_seed: 1 
 train_batch_size: 5
 eval_batch_size: 16

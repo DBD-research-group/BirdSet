@@ -1,6 +1,6 @@
-from .base_datamodule import BaseDataModuleC
+from .base_datamodule import BaseDataModule
 
-class ESC50(BaseDataModuleC):
+class ESC50(BaseDataModule):
     def __init__(
             self, 
             data_dir,

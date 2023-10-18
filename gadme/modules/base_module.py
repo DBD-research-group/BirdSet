@@ -4,10 +4,14 @@ import torch
 import torch.nn as nn
 import torch.distributed as dist
 import functools
+import logging
 
+from pytorch_lightning import Callback, LightningModule, Trainer
+
+#logger = logging.getLogger(__name__)
 import lightning as L
 
-class BaseModuleTransformer(L.LightningModule):
+class BaseModule(L.LightningModule):
     def __init__(
         self,
         model,
@@ -18,7 +22,7 @@ class BaseModuleTransformer(L.LightningModule):
         eval_metrics,
         scheduler_interval):
 
-        super(BaseModuleTransformer, self).__init__()
+        super(BaseModule, self).__init__()
         self.model = model
         self.loss_fn = loss_fn
         self.optimizer = optimizer
@@ -84,17 +88,15 @@ class BaseModuleTransformer(L.LightningModule):
                 "interval" : self.scheduler_interval
             }
         }
-
     def on_train_batch_start(self, batch: Any, batch_idx: int):
-        print(self.lr_scheduler.get_lr())
+        pass
 
-class BaseCallbacks(L.Callback):
-    def on_test_end(self, trainer, module):
-        acc = trainer.logged_metrics("test")
-        
+    def on_test_epoch_end(self):
+        pass
 
 
-        
+
+
 
 
 
