@@ -1,0 +1,8 @@
+name: esc50
+n_classes: 50
+
+loading:
+  _target_: datasets.load_dataset
+  path: ashraq/esc50
+  name: None
+  cache_dir: ~/data_gadme

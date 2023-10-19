@@ -67,7 +67,6 @@ class BaseDataModule(L.LightningDataModule):
     # prepare data is 
     def prepare_data(self):
         logging.info("Check if preparing has already been done.")
-        data_path = os.path.join(self.data_dir, f"{self.dataset_name}_processed")
 
         if self._prepare_done:
             logging.info("Skip preparing.")
@@ -75,7 +74,10 @@ class BaseDataModule(L.LightningDataModule):
         
         logging.info("> Loading data set.")
 
-        dataset = hydra.utils.instantiate(self.dataset_loading)
+        dataset = hydra.utils.instantiate(
+            self.dataset_loading,
+            cache_dir=self.data_dir)
+        
         dataset = dataset.cast_column(
             column="audio",
             feature=Audio(
@@ -109,6 +111,7 @@ class BaseDataModule(L.LightningDataModule):
             "valid": val_dataset,
             "test": test_dataset
         })
+        data_path = os.path.join(self.data_dir, f"{self.dataset_name}_processed")
         data_path = os.path.join(data_path, train_dataset._fingerprint)
         self.data_path = data_path
         self._prepare_done = True

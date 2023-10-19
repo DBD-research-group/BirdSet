@@ -21,13 +21,14 @@ def initialize_wandb(args):
             args, 
             resolve=True, 
             throw_on_missing=True
-        )
+        ),
+        dir=args.paths.log_dir
     )
 
 def initialize_wandb_logger(args):
     wandb_logger = WandbLogger(
         name=args.model.name+'_'+args.dataset.name+'#'+str(args.random_seed),
-        save_dir=args.output_dir,
+        save_dir=args.paths.log_dir,
         project=args.wandb.project,
         mode=args.wandb.mode,
         entity=args.wandb.entity,
@@ -44,7 +45,7 @@ def initialize_wandb_logger(args):
 def build_dataset (args, **kwargs):
     if args.dataset.name == "sapsucker":
         datamodule = datasets.SapsuckerWoods(
-            data_dir=args.dataset_path,
+            data_dir=args.paths.dataset_path,
             dataset_name=args.dataset.name,
             feature_extractor_name=args.model.name_hf,
             dataset_loading=dict(args.dataset.loading),

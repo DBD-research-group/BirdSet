@@ -1,8 +1,10 @@
 defaults:
-  - model: ast
-  - dataset: hsn
-  - transformations: raw_waveforms
   - _self_
+  - dataset: sapsucker
+  - model: ast
+  - callbacks: default
+  - paths: default
+  - transformations: none
 
 wandb:
   project: birds
@@ -19,14 +21,11 @@ print_freq_eval: 25
 print_freq_train: 25
 check_freq_model: 15
 
-dataset_path: data/
-output_dir: ./output_gadme/
+dataset_path: ~/data_gadme/
+#output_dir: ./output_gadme/
 
 hydra:
   job:
     chdir: True
   run:
-    dir: ${output_dir}/${dataset.name}/${model.name}
-    
-    
-#/${now:%Y-%m-%d_%H%M%S}
+    dir: ./output_gadme/${dataset.name}/${model.name}/${now:%Y-%m-%d_%H%M%S}

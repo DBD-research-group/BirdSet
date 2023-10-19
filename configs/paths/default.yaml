@@ -1,0 +1,6 @@
+root_dir: .
+work_dir: ${hydra:runtime.cwd}
+output_dir: ${hydra:runtime.output_dir}
+dataset_path: ${paths.output_dir}/data_gadme
+log_dir: ${paths.output_dir}/logs/
+
