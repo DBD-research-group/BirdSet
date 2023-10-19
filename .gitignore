@@ -10,3 +10,7 @@ wandb/
 *.csv
 *.json
 output_gadme/
+
+data/*
+
+logs/*
