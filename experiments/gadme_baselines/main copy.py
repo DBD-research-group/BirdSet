@@ -7,15 +7,14 @@ from omegaconf import OmegaConf
 from utils import build_dataset, build_model, initialize_wandb_logger
 from gadme.utils.instantiate import instantiate_callbacks
 
-#rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
+rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
 
 @hydra.main(version_base=None, config_path="../../configs", config_name="default")
 def main(args):
     logging.info('Using config: \n%s', OmegaConf.to_yaml(args))
 
     L.seed_everything(args.random_seed)
-    #os.makedirs(args.output_dir, exist_ok=True)
-    os.makedirs(args.dataset_path, exist_ok=True)
+    os.makedirs(args.paths.dataset_path, exist_ok=True)
     os.makedirs(args.paths.log_dir, exist_ok=True)
 
     # logging

@@ -5,5 +5,5 @@ loading:
   _target_: datasets.load_dataset
   path: DBD-research-group/gadme_v1_1
   name: NA_subset500
-  cache_dir: ${dataset_path}
+  cache_dir: ${paths.dataset_path}
 

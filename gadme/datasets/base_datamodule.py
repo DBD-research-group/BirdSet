@@ -111,8 +111,11 @@ class BaseDataModule(L.LightningDataModule):
             "valid": val_dataset,
             "test": test_dataset
         })
-        data_path = os.path.join(self.data_dir, f"{self.dataset_name}_processed")
-        data_path = os.path.join(data_path, train_dataset._fingerprint)
+        data_path = os.path.join(
+            self.data_dir, 
+            f"{self.dataset_name}_processed", 
+            train_dataset._fingerprint
+        )
         self.data_path = data_path
         self._prepare_done = True
 
@@ -120,8 +123,8 @@ class BaseDataModule(L.LightningDataModule):
             logging.info("Dataset exists on disk.")
             return 
 
-        logging.info(f"Saving to disk: {os.path.join(os.getcwd(), data_path)}")
-        complete.save_to_disk(data_path)
+        logging.info(f"Saving to disk: {os.path.join(self.data_path)}")
+        complete.save_to_disk(self.data_path)
         
     def setup(self, stage=None):
         if not self.train_dataset and not self.val_dataset:
