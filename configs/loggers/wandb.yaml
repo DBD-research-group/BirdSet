@@ -1,0 +1,15 @@
+wandb:
+  _target_: pytorch_lightning.loggers.WandbLogger
+  name: ${model.name}_${dataset.load.dataset_name}_#${random_seed}
+  #+#+($str({random_seed)))
+  save_dir: "${paths.log_dir}"
+  mode: offline
+  id: null # pass correct id to resume experiment!
+  project: "gadme"
+  log_model: False # upload lightning ckpts
+  entity: "deepbirddetect" 
+  tags: []
+  job_type: ""
+
+
+

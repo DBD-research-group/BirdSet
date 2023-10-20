@@ -18,7 +18,8 @@ class BaseDataModule(L.LightningDataModule):
             data_dir,
             dataset_name,
             feature_extractor_name,
-            dataset_loading,
+            hf_path,
+            hf_name,
             seed, 
             train_batch_size, 
             eval_batch_size, 
@@ -28,19 +29,21 @@ class BaseDataModule(L.LightningDataModule):
     ):
         
         super().__init__()
-        self.dataset_name = dataset_name
         self.data_dir = data_dir
-        self.dataset_loading = dataset_loading
-        self.seed = seed
-        self.column_list = column_list
-
-        self.train_batch_size = train_batch_size
-        self.eval_batch_size = eval_batch_size
-        self.transforms = transforms
-        self.val_split = val_split
+        self.dataset_name = dataset_name
         self.feature_extractor = AutoFeatureExtractor.from_pretrained(
             feature_extractor_name
         )
+        self.hf_path = hf_path
+        self.hf_name = hf_name
+        self.seed = seed
+        self.train_batch_size = train_batch_size
+        self.eval_batch_size = eval_batch_size
+        self.val_split = val_split
+        self.column_list = column_list
+
+        self.transforms = transforms
+        
         self.train_dataset = None
         self.val_dataset = None
         self.test_dataset = None
@@ -48,6 +51,7 @@ class BaseDataModule(L.LightningDataModule):
         self._prepare_done = False
         self._setup_done = False
         self.data_path = None
+        self.len_trainset = None
     
 
     def _create_splits(self, dataset):
@@ -74,9 +78,11 @@ class BaseDataModule(L.LightningDataModule):
         
         logging.info("> Loading data set.")
 
-        dataset = hydra.utils.instantiate(
-            self.dataset_loading,
-            cache_dir=self.data_dir)
+        dataset = load_dataset(
+            name=self.hf_name,
+            path=self.hf_path,
+            cache_dir=self.data_dir
+        )
         
         dataset = dataset.cast_column(
             column="audio",
@@ -118,6 +124,7 @@ class BaseDataModule(L.LightningDataModule):
         )
         self.data_path = data_path
         self._prepare_done = True
+        self.len_trainset = len(train_dataset)
 
         if os.path.exists(data_path):
             logging.info("Dataset exists on disk.")
@@ -227,5 +234,3 @@ class BaseDataModule(L.LightningDataModule):
             shuffle=False,
             num_workers=4
         )
-
-

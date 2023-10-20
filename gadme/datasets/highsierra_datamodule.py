@@ -1,6 +1,6 @@
 from .base_datamodule import BaseDataModule
 
-class SapsuckerWoods(BaseDataModule):
+class HighSierra(BaseDataModule):
     def __init__(
             self,
             data_dir,
@@ -31,5 +31,5 @@ class SapsuckerWoods(BaseDataModule):
 
     @property
     def num_classes(self):
-        return 500
+        return 21
 

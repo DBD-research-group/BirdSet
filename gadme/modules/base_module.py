@@ -15,35 +15,37 @@ class BaseModule(L.LightningModule):
     def __init__(
         self,
         model,
-        loss_fn,
+        loss,
         optimizer,
         lr_scheduler,
         train_metrics,
         eval_metrics,
-        scheduler_interval):
+        scheduler_interval,
+        torch_compile):
 
         super(BaseModule, self).__init__()
         self.model = model
-        self.loss_fn = loss_fn
+        self.loss = loss
         self.optimizer = optimizer
         self.lr_scheduler = lr_scheduler
         self.scheduler_interval = scheduler_interval
         self.train_metrics = nn.ModuleDict(train_metrics)
         self.eval_metrics = nn.ModuleDict(eval_metrics)
+        self.compile = torch_compile
     
     def forward(self, *args, **kwargs):
         return self.model.forward(*args, **kwargs)
     
     def training_step(self, batch):
         logits = self(**batch)
-        loss = self.loss_fn(logits, batch["labels"])
+        loss = self.loss(logits, batch["labels"])
         self.log("train_loss", loss, prog_bar=True)
         #self.log_train_metrics
         return {"loss": loss}
 
     def validation_step(self, batch, batch_idx):
         logits = self(**batch)
-        loss = self.loss_fn(logits, batch["labels"])
+        loss = self.loss(logits, batch["labels"])
         self.log("val_loss", loss, prog_bar=True)
         return loss
     

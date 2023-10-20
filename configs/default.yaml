@@ -1,16 +1,11 @@
 defaults:
   - _self_
-  - dataset: sapsucker
+  - dataset: esc50
   - model: ast
   - callbacks: default
   - paths: default
   - transformations: none
-
-wandb:
-  project: birds
-  entity: dal-nlp
-  group: default
-  mode: offline
+  - loggers: wandb
 
 device: cuda
 val_split: .2
@@ -25,4 +20,4 @@ hydra:
   job:
     chdir: True
   run:
-    dir: ./output/${dataset.name}/${model.name}/${now:%Y-%m-%d_%H%M%S}
+    dir: ./output/${dataset.load.dataset_name}/${model.name}/${now:%Y-%m-%d_%H%M%S}

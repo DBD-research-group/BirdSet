@@ -1,8 +1,0 @@
-name: hsn
-n_classes: 21
-
-loading:
-  _target_: datasets.load_dataset
-  path: DBD-research-group/gadme_v1
-  name: HSN
-  cache_dir: ~/data_gadme

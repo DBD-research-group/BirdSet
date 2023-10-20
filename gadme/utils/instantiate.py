@@ -1,9 +1,10 @@
 import hydra
 from lightning import Callback
 from omegaconf import DictConfig
+from omegaconf import OmegaConf
 from lightning.pytorch.loggers import Logger
 import logging
-
+import wandb
 
 def instantiate_callbacks(callbacks_args):
     callbacks = []
@@ -18,4 +19,25 @@ def instantiate_callbacks(callbacks_args):
             callbacks.append(hydra.utils.instantiate(cb_conf))
     
     return callbacks
+    
+
+def instantiate_wandb(args):
+    logger_args = args.loggers
+    logger = None
+
+    if not logger_args:
+        logging.warning("No callbacks found")
+        return logger
+    
+    #logging.info(f"Instantiating logger <{logger_args._target_}>")
+
+    logger = hydra.utils.instantiate(
+        logger_args
+    )
+    wandb.config.update(OmegaConf.to_container(
+            args,
+            resolve=True,
+            throw_on_missing=True
+        ))
+    return logger
     

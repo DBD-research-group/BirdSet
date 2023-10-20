@@ -27,11 +27,11 @@ def initialize_wandb(args):
 
 def initialize_wandb_logger(args):
     wandb_logger = WandbLogger(
-        name=args.model.name+'_'+args.dataset.name+'#'+str(args.random_seed),
+        name=args.model.name+'_'+args.dataset.dataset_name+'#'+str(args.random_seed),
         save_dir=args.paths.log_dir,
-        project=args.wandb.project,
-        mode=args.wandb.mode,
-        entity=args.wandb.entity,
+        project=args.loggers.wandb.project,
+        mode=args.loggers.wandb.mode,
+        entity=args.loggers.wandb.entity,
         config=OmegaConf.to_container(
             args,
             resolve=True,
@@ -42,73 +42,74 @@ def initialize_wandb_logger(args):
     return wandb_logger
 
 
-def build_dataset (args, **kwargs):
-    if args.dataset.name == "sapsucker":
-        datamodule = datasets.SapsuckerWoods(
-            data_dir=args.paths.dataset_path,
-            dataset_name=args.dataset.name,
-            feature_extractor_name=args.model.name_hf,
-            dataset_loading=dict(args.dataset.loading),
-            seed=args.random_seed,
-            train_batch_size=args.train_batch_size,
-            eval_batch_size=args.eval_batch_size,
-            val_split=args.val_split,
-            column_list=["input_values", "ebird_code"]
-        )
+# def build_dataset (args, **kwargs):
+#     if args.dataset.name == "sapsucker":
+#         datamodule = datasets.SapsuckerWoods(
+#             data_dir=args.paths.dataset_path,
+#             dataset_name=args.dataset.name,
+#             feature_extractor_name=args.model.name_hf,
+#             dataset_loading=dict(args.dataset.loading),
+#             seed=args.random_seed,
+#             train_batch_size=args.train_batch_size,
+#             eval_batch_size=args.eval_batch_size,
+#             val_split=args.val_split,
+#             column_list=["input_values", "ebird_code"]
+#         )
     
-    elif args.dataset.name == "hsn":
-         datamodule = datasets.SapsuckerWoods(
-            data_dir=args.dataset_path,
-            dataset_name=args.dataset.name,
-            feature_extractor_name=args.model.name_hf,
-            dataset_loading=dict(args.dataset.loading),
-            seed=args.random_seed,
-            train_batch_size=args.train_batch_size,
-            eval_batch_size=args.eval_batch_size,
-            val_split=args.val_split,
-            column_list=["input_values", "ebird_code"]
-        )       
+#     elif args.dataset.name == "hsn":
+#          datamodule = datasets.SapsuckerWoods(
+#             data_dir=args.dataset_path,
+#             dataset_name=args.dataset.name,
+#             feature_extractor_name=args.model.name_hf,
+#             dataset_loading=dict(args.dataset.loading),
+#             seed=args.random_seed,
+#             train_batch_size=args.train_batch_size,
+#             eval_batch_size=args.eval_batch_size,
+#             val_split=args.val_split,
+#             column_list=["input_values", "ebird_code"]
+#         )       
     
-    elif args.dataset.name == "esc50":
-        datamodule = datasets.ESC50(
-            data_dir=args.dataset_path,
-            dataset_name=args.dataset.name,
-            feature_extractor_name=args.model.name_hf,
-            dataset_loading=dict(args.dataset.loading),
-            seed=args.random_seed,
-            train_batch_size=args.train_batch_size,
-            eval_batch_size=args.eval_batch_size,
-            val_split=args.val_split,
-            column_list=["input_values", "target"]
-        )
+#     elif args.dataset.name == "esc50":
+#         datamodule = datasets.ESC50(
+#             data_dir=args.dataset_path,
+#             dataset_name=args.dataset.name,
+#             feature_extractor_name=args.model.name_hf,
+#             dataset_loading=dict(args.dataset.loading),
+#             seed=args.random_seed,
+#             train_batch_size=args.train_batch_size,
+#             eval_batch_size=args.eval_batch_size,
+#             val_split=args.val_split,
+#             column_list=["input_values", "target"]
+#         )
         
-    else:
-        raise NotImplementedError(
-            f'Dataset {args.dataset.name} not implemented.'
-        )
+#     else:
+#         raise NotImplementedError(
+#             f'Dataset {args.dataset.name} not implemented.'
+#         )
 
-    return datamodule
+#     return datamodule
 
 def build_model(args, **kwargs):
     len_trainset = kwargs["len_trainset"]
+    num_classes = kwargs["num_classes"]
 
     if args.model.name == "wav2vec2":
         
         base_model = models.w2v2.Wav2vec2SequenceClassifier(
             checkpoint=args.model.name_hf,
-            num_classes=args.dataset.n_classes
+            num_classes=num_classes
         )
     
     elif args.model.name == "hubert":
         base_model = models.hubert.HubertSequenceClassifier(
             checkpoint=args.model.name_hf,
-            num_classes=args.dataset.n_classes
+            num_classes=num_classes
         )
     
     elif args.model.name == "ast":
         base_model = models.ast.ASTSequenceClassifier(
             checkpoint=args.model.name_hf,
-            num_classes=args.dataset.n_classes
+            num_classes=num_classes
         )
     
     else:
@@ -142,10 +143,10 @@ def build_model(args, **kwargs):
         scheduler_interval="step",
         train_metrics={"train_acc": torchmetrics.classification.Accuracy(
             task="multiclass", 
-            num_classes=args.dataset.n_classes)},
+            num_classes=num_classes)},
         eval_metrics={"acc": torchmetrics.classification.Accuracy(
             task="multiclass", 
-            num_classes=args.dataset.n_classes)},
+            num_classes=num_classes)},
     )
 
     return model

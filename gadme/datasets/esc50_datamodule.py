@@ -1,36 +1,40 @@
 from .base_datamodule import BaseDataModule
 
+from .base_datamodule import BaseDataModule
+
 class ESC50(BaseDataModule):
     def __init__(
-            self, 
+            self,
             data_dir,
-            dataset_name, 
-            feature_extractor_name, 
-            dataset_loading,
-            seed,
-            train_batch_size,
-            eval_batch_size,
+            dataset_name,
+            feature_extractor_name,
+            hf_path,
+            hf_name,
+            seed, 
+            train_batch_size, 
+            eval_batch_size, 
             val_split,
-            column_list,
+            column_list=None, 
             transforms=None
     ):
         super().__init__(
-              data_dir,
-              dataset_name, 
-              feature_extractor_name,
-              dataset_loading,
-              seed,
-              train_batch_size,
-              eval_batch_size,
-              val_split,
-              column_list=column_list,
-              transforms=transforms
+            data_dir,
+            dataset_name,
+            feature_extractor_name,
+            hf_path,
+            hf_name,
+            seed, 
+            train_batch_size, 
+            eval_batch_size, 
+            val_split,
+            column_list=column_list, 
+            transforms=transforms
         )
 
     @property
     def num_classes(self):
         return 50
-    
+
     def _create_splits(self, dataset):
         split_1 = dataset["train"].train_test_split(self.val_split, shuffle=True, seed=self.seed)
         split_2 = split_1["test"].train_test_split(0.5, shuffle=False, seed=self.seed)
