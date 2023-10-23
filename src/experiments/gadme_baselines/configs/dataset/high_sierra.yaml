@@ -1,5 +1,5 @@
 _target_: gadme.datasets.sapsucker_datamodule.HighSierra
-data_dir: ${paths.dataset_path}
+data_dir: ${paths.data_dir}
 dataset_name: high_sierra
 feature_extractor_name: ${model.name_hf}
 hf_path: DBD-research-group/gadme_v1

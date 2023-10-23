@@ -1,13 +1,12 @@
-from .base_datamodule import BaseDataModule
+from .hf_datamodule import BaseDataModule
 
-from .base_datamodule import BaseDataModule
+from .hf_datamodule import BaseDataModule
 
 class ESC50(BaseDataModule):
     def __init__(
             self,
             data_dir,
             dataset_name,
-            feature_extractor_name,
             hf_path,
             hf_name,
             seed, 
@@ -20,7 +19,6 @@ class ESC50(BaseDataModule):
         super().__init__(
             data_dir,
             dataset_name,
-            feature_extractor_name,
             hf_path,
             hf_name,
             seed, 

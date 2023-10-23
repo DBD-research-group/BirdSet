@@ -11,13 +11,12 @@ from torch.utils.data import DataLoader
 from transformers import AutoFeatureExtractor
 
 
-class BaseDataModule(L.LightningDataModule):
+class HFDataModule(L.LightningDataModule):
 
     def __init__(
             self,
             data_dir,
             dataset_name,
-            feature_extractor_name,
             hf_path,
             hf_name,
             seed, 
@@ -31,9 +30,6 @@ class BaseDataModule(L.LightningDataModule):
         super().__init__()
         self.data_dir = data_dir
         self.dataset_name = dataset_name
-        self.feature_extractor = AutoFeatureExtractor.from_pretrained(
-            feature_extractor_name
-        )
         self.hf_path = hf_path
         self.hf_name = hf_name
         self.seed = seed

@@ -14,7 +14,7 @@ def main(args):
     logging.info('Using config: \n%s', OmegaConf.to_yaml(args))
 
     L.seed_everything(args.random_seed)
-    os.makedirs(args.paths.dataset_path, exist_ok=True)
+    os.makedirs(args.paths.data_dir, exist_ok=True)
     os.makedirs(args.paths.log_dir, exist_ok=True)
 
     # logging

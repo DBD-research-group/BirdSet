@@ -46,7 +46,7 @@ def initialize_wandb_logger(args):
 # def build_dataset (args, **kwargs):
 #     if args.dataset.name == "sapsucker":
 #         datamodule = datasets.SapsuckerWoods(
-#             data_dir=args.paths.dataset_path,
+#             data_dir=args.paths.data_dir,
 #             dataset_name=args.dataset.name,
 #             feature_extractor_name=args.model.name_hf,
 #             dataset_loading=dict(args.dataset.loading),
