@@ -1,0 +1,43 @@
+_target_: gadme.modules.base_module.BaseModule
+
+model:
+  _target_: gadme.modules.models.ast.ASTSequenceClassifier
+  checkpoint: MIT/ast-finetuned-audioset-10-10-0.4593
+  num_class: ${dataset.extras.num_classes}
+
+loss:
+  _target_: torch.nn.CrossEntropyLoss
+
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 5e-5
+  weight_decay: 0.01
+
+lr_scheduler:
+  main:
+    _target_: transformers.get_linear_schedule_with_warmup
+  extras:
+    warmup_ratio: 0.05
+
+train_metrics:
+  _target_: torchmetrics.classification.Accuracy
+  task: "multiclass"
+  num_classes: ${dataset.extras.num_classes}
+
+eval_metrics:
+  _target_: torchmetrics.classification.Accuracy
+  task: "multiclass"
+  num_classes: ${dataset.extras.num_classes}
+
+scheduler_interval: "step"
+torch_compile: true
+
+
+
+
+
+
+
+
+
+

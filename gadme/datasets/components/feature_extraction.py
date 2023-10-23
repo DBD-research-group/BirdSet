@@ -3,8 +3,8 @@ from transformers import SequenceFeatureExtractor
 from transformers.utils import PaddingStrategy
 import numpy as np 
 
-# we could incorporate some kind of event detector in the customfeatureextractor
-
+#we could incorporate some kind of event detector in the customfeatureextractor
+#TODO: feature extractor has to be model dependent
 class CustomFeatureExtractor(SequenceFeatureExtractor):
     model_input_names = ["input_values", "attention_mask"]
 
@@ -13,7 +13,7 @@ class CustomFeatureExtractor(SequenceFeatureExtractor):
         feature_size=1,
         sampling_rate=32_000,
         padding_value=0.0,
-        return_attention_mask=False,
+        return_attention_mask=True,
         do_normalize=True,
         **kwargs
     ):
@@ -115,4 +115,3 @@ class CustomFeatureExtractor(SequenceFeatureExtractor):
             )
   
         return padded_inputs 
-

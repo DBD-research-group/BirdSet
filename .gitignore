@@ -7,5 +7,14 @@ wandb/
 *.MP3
 *.Mp3
 *.WAV
-#*.csv
+*.csv
 *.json
+output_gadme/
+
+data/*
+
+logs/*
+
+output/*
+
+data_gadme/*
