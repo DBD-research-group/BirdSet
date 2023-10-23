@@ -5,6 +5,7 @@ import torch.nn as nn
 import torch.distributed as dist
 import functools
 import logging
+import math 
 
 from pytorch_lightning import Callback, LightningModule, Trainer
 
@@ -21,9 +22,12 @@ class BaseModule(L.LightningModule):
         train_metrics,
         eval_metrics,
         scheduler_interval,
-        torch_compile):
+        torch_compile,
+        num_epochs=5,
+        len_trainset=1000):
 
         super(BaseModule, self).__init__()
+
         self.model = model
         self.loss = loss
         self.optimizer = optimizer
@@ -31,8 +35,17 @@ class BaseModule(L.LightningModule):
         self.scheduler_interval = scheduler_interval
         self.train_metrics = nn.ModuleDict(train_metrics)
         self.eval_metrics = nn.ModuleDict(eval_metrics)
-        self.compile = torch_compile
-    
+        self.torch_compile = torch_compile
+
+        # partial
+        self.num_epochs = num_epochs
+        self.len_trainset = len_trainset
+        
+        # if not self.hparams: # throws copy errors! 
+        #     # we get an error here otherwise for specific models, something with deepcopy, 
+        #     # this is called more than once with initiate
+        #     self.save_hyperparameters(ignore="graph_queue") 
+
     def forward(self, *args, **kwargs):
         return self.model.forward(*args, **kwargs)
     
@@ -69,6 +82,10 @@ class BaseModule(L.LightningModule):
         metrics = {metric_name: metric(logits, targets) for metric_name, metric in self.eval_metrics.items()}
         self.log_dict(metrics, prog_bar=True, on_epoch=True)
 
+    def setup(self, stage):
+        if self.torch_compile and stage=="fit":
+            self.model = torch.compile(self.model)
+
     def configure_optimizers(self):
         if self.optimizer is None:
             self.optimizer = torch.optim.AdamW(self.parameters(), lr=5e-5)
@@ -80,9 +97,15 @@ class BaseModule(L.LightningModule):
                 "optimizer": self.optimizer,
                 "lr_scheduler": None
             }
-        if isinstance(self.lr_scheduler, functools.partial):
-            self.lr_scheduler = self.lr_scheduler(self.optimizer)
-
+        if isinstance(self.lr_scheduler.main, functools.partial):
+            self.lr_scheduler = self.lr_scheduler.main(
+                optimizer=self.optimizer,
+                num_warmup_steps=math.ceil(
+                    self.num_epochs * self.len_trainset * self.lr_scheduler.extras.warmup_ratio
+                ),
+                num_training_steps=self.num_epochs * self.len_trainset
+            )
+            
         return {
             "optimizer": self.optimizer, 
             "lr_scheduler": {
@@ -95,8 +118,6 @@ class BaseModule(L.LightningModule):
 
     def on_test_epoch_end(self):
         pass
-
-
 
 
 
