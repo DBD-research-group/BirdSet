@@ -1,3 +1,4 @@
+from src.models import base_module
 import wandb 
 import torch
 import torch.nn as nn
@@ -6,7 +7,7 @@ import torchmetrics
 import hydra 
 from omegaconf import OmegaConf
 from gadme import datasets
-from gadme.modules import models,base_module
+from gadme.modules import models
 from pytorch_lightning.loggers import WandbLogger
 
 def initialize_wandb(args):
