@@ -1,7 +1,7 @@
 defaults:
   - _self_
-  - dataset: esc50
-  - model: ast
+  - dataset: high_sierra
+  - model: wav2vec2
   - callbacks: default
   - paths: default
   - transformations: none
@@ -20,4 +20,4 @@ hydra:
   job:
     chdir: True
   run:
-    dir: ./output/${dataset.load.dataset_name}/${model.name}/${now:%Y-%m-%d_%H%M%S}
+    dir: ./output/${dataset.instantiate.dataset_name}/${model.extras.name}/${now:%Y-%m-%d_%H%M%S}

@@ -1,17 +1,58 @@
-name: ast
-name_hf: MIT/ast-finetuned-audioset-10-10-0.4593
+instantiate:
+  _target_: gadme.modules.base_module.BaseModule
 
-optimizer:
-  _target_: torch.optim.AdamW
-  lr: 5e-5
-  weight_decay: 0.01
+  model:
+    _target_: gadme.modules.models.ast.ASTSequenceClassifier
+    checkpoint: MIT/ast-finetuned-audioset-10-10-0.4593
+    num_classes: ${dataset.extras.num_classes}
 
-scheduler:
-  scheduler:
-    _target_: transformers.get_linear_schedule_with_warmup
-  extras:
-    warmup_ratio: 0.05
+  loss:
+    _target_: torch.nn.CrossEntropyLoss
 
-trainer:
+  optimizer:
+    _target_: torch.optim.AdamW
+    _partial_: true #we need model params during training
+    lr: 5e-5
+    weight_decay: 0.01
+
+  lr_scheduler:
+    main:
+      _target_: transformers.get_linear_schedule_with_warmup
+      _partial_: true
+    extras:
+      warmup_ratio: 0.05
+
+  train_metrics:
+    train_accuracy:
+      _target_: "torchmetrics.classification.Accuracy"
+      task: "multiclass" # depends on dataset
+      num_classes: ${dataset.extras.num_classes}
+    train_f1:
+      _target_: "torchmetrics.classification.MulticlassF1Score"
+      num_classes: ${dataset.extras.num_classes}
+
+  eval_metrics:
+    eval_accuracy:
+      _target_: "torchmetrics.classification.Accuracy"
+      task: "multiclass" # depends on dataset
+      num_classes: ${dataset.extras.num_classes}
+    eval_f1:
+      _target_: "torchmetrics.classification.MulticlassF1Score"
+      num_classes: ${dataset.extras.num_classes}
+
+  scheduler_interval: "step"
+  torch_compile: false
+
+extras:
+  name: ast
   n_epochs: 5
-  batch_size: 8
+
+
+
+
+
+
+
+
+
+

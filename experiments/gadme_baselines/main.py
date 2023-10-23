@@ -21,30 +21,30 @@ def main(args):
     results = {}
     logging.info(f"Instantiate logger {[loggers for loggers in args['loggers']]}")
     wandb_logger = initialize_wandb_logger(args)
-    #wandb_logger = instantiate_wandb(args) # throws an error
+    #wandb_logger = instantiate_wandb(args) # throws an error in .fit
 
     # Setup data
     # instantiate and mapping are a problem, turn the omegaconf into dict!
-    logging.info("Instantiate data module %s", args.dataset.load.dataset_name)
+    logging.info("Instantiate data module %s", args.dataset.instantiate)
     #data_module = build_dataset(args)
-    data_module = hydra.utils.instantiate(args.dataset.load)
+    data_module = hydra.utils.instantiate(args.dataset.instantiate)
     data_module.prepare_data()
     #data_module.setup()
 
     # Setup model 
-    logging.info("Building model: %s", args.model.name)
-    model = build_model(
-        args, 
-        len_trainset=data_module.len_trainset, 
-        num_classes=data_module.num_classes)
-    #print(next(iter(data_module.train_dataloader()))
-    # Training
+    logging.info("Building model: %s", args.model.extras.name)
+    model = hydra.utils.instantiate(
+        args.model.instantiate,
+        num_epochs=5,
+        len_trainset=data_module.len_trainset
+    )
 
+    # Training
     logging.info('Instantiate callbacks %s', [callbacks for callbacks in args["callbacks"]])
     callbacks = instantiate_callbacks(args["callbacks"])
 
     trainer = L.Trainer(
-        max_epochs=args.model.trainer.n_epochs,
+        max_epochs=5,
         default_root_dir=args.paths.output_dir,
         callbacks=callbacks,
         enable_checkpointing=False,
