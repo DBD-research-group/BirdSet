@@ -54,12 +54,11 @@ hydra-colorlog = "^1.2"
 hydra-optuna-sweeper = "^1.2"
 
 # --------- loggers --------- #
-wandb
-
+wand = "^0.6.11"
 # --------- others --------- #
 rootutils = "^1.0.7"    # standardizing the project root setup
 pre-commit = "^3.5.0"   # hooks for applying linters on commit
-rich = "^13.6.0" . # beautiful text formatting in terminal
+rich = "^13.6.0"  # beautiful text formatting in terminal
 pytest = "^7.4.2"
 sh = "^2.0.6"          # for running bash commands in some tests (linux/macos only)
 matplotlib = "^3.8.0"
@@ -67,7 +66,6 @@ seaborn = "^0.13.0"
 tensorboard = "^2.14.1"
 ipywidgets = "^8.1.1"
 jupyter = "^1.0.0"
-
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.25.2"

@@ -1,10 +1,11 @@
-from typing import Any, Optional
+from typing import Any, List, Optional
 import lightning.pytorch as pl
 import torch
 import torch.nn as nn
 import torch.distributed as dist
 import functools
 import logging
+import torch.optim.scheduler as scheduler
 
 from pytorch_lightning import Callback, LightningModule, Trainer
 
@@ -12,26 +13,31 @@ from pytorch_lightning import Callback, LightningModule, Trainer
 import lightning as L
 
 class BaseModule(L.LightningModule):
-    def __init__(
-        self,
-        model,
-        loss,
-        optimizer,
-        lr_scheduler,
-        train_metrics,
-        eval_metrics,
-        scheduler_interval,
-        torch_compile):
 
-        super(BaseModule, self).__init__()
-        self.model = model
-        self.loss = loss
-        self.optimizer = optimizer
-        self.lr_scheduler = lr_scheduler
-        self.scheduler_interval = scheduler_interval
-        self.train_metrics = nn.ModuleDict(train_metrics)
-        self.eval_metrics = nn.ModuleDict(eval_metrics)
-        self.compile = torch_compile
+    class BaseModule:
+        def __init__(
+            self,
+            model: Any,
+            loss: Any,
+            optimizer: Any,
+            scheduler: scheduler._LRScheduler,
+            train_metrics: List[Any],
+            eval_metrics: List[Any],
+            scheduler_interval: int,
+            compile: bool
+        ) -> None:
+            super(BaseModule, self).__init__()
+            self.model = model
+            self.loss = loss
+            self.optimizer = optimizer
+            self.scheduler = scheduler
+            self.scheduler_interval = scheduler_interval
+            self.train_metrics = nn.ModuleDict(train_metrics)
+            self.eval_metrics = nn.ModuleDict(eval_metrics)
+            self.compile = compile
+             # this line allows to access init params with 'self.hparams' attribute
+            # also ensures init params will be stored in ckpt
+            self.save_hyperparameters(logger=False)
     
     def forward(self, *args, **kwargs):
         return self.model.forward(*args, **kwargs)
@@ -75,18 +81,18 @@ class BaseModule(L.LightningModule):
         if isinstance(self.optimizer, functools.partial):
             self.optimizer = self.optimizer(self.parameters())
 
-        if self.lr_scheduler is None: 
+        if self.scheduler is None: 
             return {
                 "optimizer": self.optimizer,
-                "lr_scheduler": None
+                "scheduler": None
             }
-        if isinstance(self.lr_scheduler, functools.partial):
-            self.lr_scheduler = self.lr_scheduler(self.optimizer)
+        if isinstance(self.scheduler, functools.partial):
+            self.scheduler = self.scheduler(self.optimizer)
 
         return {
             "optimizer": self.optimizer, 
-            "lr_scheduler": {
-                "scheduler": self.lr_scheduler,
+            "scheduler": {
+                "scheduler": self.scheduler,
                 "interval" : self.scheduler_interval
             }
         }

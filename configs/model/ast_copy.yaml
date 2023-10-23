@@ -13,7 +13,7 @@ optimizer:
   lr: 5e-5
   weight_decay: 0.01
 
-lr_scheduler:
+scheduler:
   main:
     _target_: transformers.get_linear_schedule_with_warmup
   extras:
@@ -30,7 +30,7 @@ eval_metrics:
   num_classes: ${dataset.extras.num_classes}
 
 scheduler_interval: "step"
-torch_compile: true
+compile: true
 
 
 

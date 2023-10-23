@@ -140,7 +140,7 @@ def build_model(args, **kwargs):
         model=base_model,
         loss_fn=nn.CrossEntropyLoss(),
         optimizer=optimizer,
-        lr_scheduler=scheduler,
+        scheduler=scheduler,
         scheduler_interval="step",
         train_metrics={"train_acc": torchmetrics.classification.Accuracy(
             task="multiclass", 
