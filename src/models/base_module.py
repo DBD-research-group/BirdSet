@@ -6,6 +6,7 @@ import torch.distributed as dist
 import functools
 import logging
 import torch.optim.scheduler as scheduler
+import math 
 
 from pytorch_lightning import Callback, LightningModule, Trainer
 
@@ -13,32 +14,39 @@ from pytorch_lightning import Callback, LightningModule, Trainer
 import lightning as L
 
 class BaseModule(L.LightningModule):
+    def __init__(
+        self,
+        model,
+        loss,
+        optimizer,
+        lr_scheduler,
+        train_metrics,
+        eval_metrics,
+        scheduler_interval,
+        torch_compile,
+        num_epochs=5,
+        len_trainset=1000):
 
-    class BaseModule:
-        def __init__(
-            self,
-            model: Any,
-            loss: Any,
-            optimizer: Any,
-            scheduler: scheduler._LRScheduler,
-            train_metrics: List[Any],
-            eval_metrics: List[Any],
-            scheduler_interval: int,
-            compile: bool
-        ) -> None:
-            super(BaseModule, self).__init__()
-            self.model = model
-            self.loss = loss
-            self.optimizer = optimizer
-            self.scheduler = scheduler
-            self.scheduler_interval = scheduler_interval
-            self.train_metrics = nn.ModuleDict(train_metrics)
-            self.eval_metrics = nn.ModuleDict(eval_metrics)
-            self.compile = compile
-             # this line allows to access init params with 'self.hparams' attribute
-            # also ensures init params will be stored in ckpt
-            self.save_hyperparameters(logger=False)
-    
+        super(BaseModule, self).__init__()
+
+        self.model = model
+        self.loss = loss
+        self.optimizer = optimizer
+        self.lr_scheduler = lr_scheduler
+        self.scheduler_interval = scheduler_interval
+        self.train_metrics = nn.ModuleDict(train_metrics)
+        self.eval_metrics = nn.ModuleDict(eval_metrics)
+        self.torch_compile = torch_compile
+
+        # partial
+        self.num_epochs = num_epochs
+        self.len_trainset = len_trainset
+        
+        # if not self.hparams: # throws copy errors! 
+        #     # we get an error here otherwise for specific models, something with deepcopy, 
+        #     # this is called more than once with initiate
+        #     self.save_hyperparameters(ignore="graph_queue") 
+
     def forward(self, *args, **kwargs):
         return self.model.forward(*args, **kwargs)
     
@@ -75,6 +83,10 @@ class BaseModule(L.LightningModule):
         metrics = {metric_name: metric(logits, targets) for metric_name, metric in self.eval_metrics.items()}
         self.log_dict(metrics, prog_bar=True, on_epoch=True)
 
+    def setup(self, stage):
+        if self.torch_compile and stage=="fit":
+            self.model = torch.compile(self.model)
+
     def configure_optimizers(self):
         if self.optimizer is None:
             self.optimizer = torch.optim.AdamW(self.parameters(), lr=5e-5)
@@ -86,9 +98,15 @@ class BaseModule(L.LightningModule):
                 "optimizer": self.optimizer,
                 "scheduler": None
             }
-        if isinstance(self.scheduler, functools.partial):
-            self.scheduler = self.scheduler(self.optimizer)
-
+        if isinstance(self.lr_scheduler.main, functools.partial):
+            self.lr_scheduler = self.lr_scheduler.main(
+                optimizer=self.optimizer,
+                num_warmup_steps=math.ceil(
+                    self.num_epochs * self.len_trainset * self.lr_scheduler.extras.warmup_ratio
+                ),
+                num_training_steps=self.num_epochs * self.len_trainset
+            )
+            
         return {
             "optimizer": self.optimizer, 
             "scheduler": {
@@ -101,8 +119,6 @@ class BaseModule(L.LightningModule):
 
     def on_test_epoch_end(self):
         pass
-
-
 
 
 

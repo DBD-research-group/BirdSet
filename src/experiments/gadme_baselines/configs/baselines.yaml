@@ -26,7 +26,7 @@ hydra:
   job:
     chdir: True
   run:
-    dir: ${output_dir}/${dataset.name}/${model.name}
+    dir: ${output_dir}/${dataset.name}/${model.extras.name}
     
     
 #/${now:%Y-%m-%d_%H%M%S}

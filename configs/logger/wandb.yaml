@@ -1,6 +1,7 @@
 wandb:
   _target_: pytorch_lightning.loggers.WandbLogger
-  name: ${model.name}_${dataset.load.dataset_name}_#${random_seed}
+  _partial_: true
+  name: ${model.extras.name}_${dataset.instantiate}_#${random_seed}
   #+#+($str({random_seed)))
   save_dir: "${paths.log_dir}"
   mode: offline

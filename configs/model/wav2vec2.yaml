@@ -1,17 +1,64 @@
-name: wav2vec2
-name_hf: facebook/wav2vec2-base-960h
+instantiate:
+  _target_: gadme.modules.base_module.BaseModule
 
-optimizer:
-  _target_: torch.optim.AdamW
-  lr: 3e-5
-  weight_decay: 0.01
+  model:
+    _target_: gadme.modules.models.w2v2.Wav2vec2SequenceClassifier
+    checkpoint: facebook/wav2vec2-base-960h
+    num_classes: ${dataset.extras.num_classes}
 
-scheduler:
-  scheduler:
-    _target_: transformers.get_linear_schedule_with_warmup
-  extras:
-    warmup_ratio: 0.05
+  loss:
+    _target_: torch.nn.CrossEntropyLoss
 
-trainer:
-  n_epochs: 10
-  batch_size: 12
+  optimizer:
+    _target_: torch.optim.AdamW
+    _partial_: true #we need model params during training
+    lr: 1e-5
+    weight_decay: 0.01
+
+  lr_scheduler:
+    main:
+      _target_: transformers.get_linear_schedule_with_warmup
+      _partial_: true
+    extras:
+      warmup_ratio: 0.05
+
+  train_metrics:
+    train_accuracy:
+      _target_: "torchmetrics.classification.Accuracy"
+      task: "multiclass" # depends on dataset
+      num_classes: ${dataset.extras.num_classes}
+    train_f1:
+      _target_: "torchmetrics.classification.MulticlassF1Score"
+      num_classes: ${dataset.extras.num_classes}
+
+  eval_metrics:
+    eval_accuracy:
+      _target_: "torchmetrics.classification.Accuracy"
+      task: "multiclass" # depends on dataset
+      num_classes: ${dataset.extras.num_classes}
+    eval_f1:
+      _target_: "torchmetrics.classification.MulticlassF1Score"
+      num_classes: ${dataset.extras.num_classes}
+
+  scheduler_interval: "step"
+  torch_compile: false
+
+extras:
+  name: w2v2
+  n_epochs: 5
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
