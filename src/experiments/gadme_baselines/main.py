@@ -4,7 +4,7 @@ import rootutils
 import hydra
 import lightning as L 
 from omegaconf import OmegaConf
-from utils import build_model, initialize_wandb_logger
+from utils import initialize_wandb_logger
 from gadme.utils.instantiate import instantiate_callbacks, instantiate_wandb
 
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
@@ -24,12 +24,9 @@ def main(args):
     #wandb_logger = instantiate_wandb(args) # throws an error in .fit
 
     # Setup data
-    # instantiate and mapping are a problem, turn the omegaconf into dict!
     logging.info("Instantiate data module %s", args.dataset.instantiate)
-    #data_module = build_dataset(args)
     data_module = hydra.utils.instantiate(args.dataset.instantiate)
     data_module.prepare_data()
-    #data_module.setup()
 
     # Setup model 
     logging.info("Building model: %s", args.model.extras.name)
@@ -43,18 +40,11 @@ def main(args):
     logging.info('Instantiate callbacks %s', [callbacks for callbacks in args["callbacks"]])
     callbacks = instantiate_callbacks(args["callbacks"])
 
-    trainer = L.Trainer(
-        max_epochs=5,
-        default_root_dir=args.paths.output_dir,
-        callbacks=callbacks,
-        enable_checkpointing=False,
-        fast_dev_run=False,
-        enable_progress_bar=True,
-        devices=1,
-        accelerator="gpu",
-        strategy="auto",
-        logger=wandb_logger
+    logging.info(f"Instantiate trainer")
+    trainer = hydra.utils.instantiate(
+        args.trainer, callbacks= callbacks, logger=wandb_logger
     )
+
     trainer.fit(model, data_module)
 
     # Evaluation
