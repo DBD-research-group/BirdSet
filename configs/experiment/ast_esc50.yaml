@@ -25,7 +25,7 @@ trainer:
 data:
   train_batch_size: 64
   eval_batch_size: 64
-  num_workers: 32
+  num_workers: 1
 
 logger:
   wandb:

@@ -18,7 +18,7 @@ class BaseModule(L.LightningModule):
         model,
         loss,
         optimizer,
-        lr_scheduler,
+        scheduler,
         train_metrics,
         eval_metrics,
         scheduler_interval,
@@ -31,7 +31,7 @@ class BaseModule(L.LightningModule):
         self.model = model
         self.loss = loss
         self.optimizer = optimizer
-        self.lr_scheduler = lr_scheduler
+        self.scheduler = scheduler
         self.scheduler_interval = scheduler_interval
         self.train_metrics = nn.ModuleDict(train_metrics)
         self.eval_metrics = nn.ModuleDict(eval_metrics)
@@ -97,11 +97,11 @@ class BaseModule(L.LightningModule):
                 "optimizer": self.optimizer,
                 "scheduler": None
             }
-        if isinstance(self.lr_scheduler.main, functools.partial):
-            self.lr_scheduler = self.lr_scheduler.main(
+        if isinstance(self.scheduler.main, functools.partial):
+            self.scheduler = self.scheduler.main(
                 optimizer=self.optimizer,
                 num_warmup_steps=math.ceil(
-                    self.num_epochs * self.len_trainset * self.lr_scheduler.extras.warmup_ratio
+                    self.num_epochs * self.len_trainset * self.scheduler.extras.warmup_ratio
                 ),
                 num_training_steps=self.num_epochs * self.len_trainset
             )
@@ -119,8 +119,8 @@ class BaseModule(L.LightningModule):
     def on_test_epoch_end(self):
         pass
     
-    def on_train_start(self, trainer, pl_module):
-        pass
+    # def on_train_start(self, trainer, pl_module):
+    #     pass
 
 
 
