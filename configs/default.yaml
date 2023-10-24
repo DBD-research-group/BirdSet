@@ -1,10 +1,11 @@
 defaults:
   - _self_
-  - dataset: high_sierra
+  - dataset: esc50
   - model: wav2vec2
   - callbacks: default
   - paths: default
   - transformations: none
+  - trainer: default
   - loggers: wandb
 
 device: cuda
