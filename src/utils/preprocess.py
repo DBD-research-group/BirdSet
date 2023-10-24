@@ -5,7 +5,7 @@ from datasets import load_dataset
 import numpy.typing as npt
 import torch
 
-from src.gadme.augmentations.augmentations import AudioAugmentor
+from src.src.augmentations.augmentations import AudioAugmentor
 
 
 def standardize_tensor(

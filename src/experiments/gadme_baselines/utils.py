@@ -7,7 +7,7 @@ import torchmetrics
 import hydra 
 from omegaconf import OmegaConf
 from gadme import datasets
-from gadme.modules import models
+from src.modules import models
 from pytorch_lightning.loggers import WandbLogger
 
 def initialize_wandb(args):

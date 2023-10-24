@@ -1,8 +1,8 @@
 instantiate:
-  _target_: gadme.modules.base_module.BaseModule
+  _target_: src.modules.base_module.BaseModule
 
   model:
-    _target_: gadme.modules.models.hubert.HubertSequenceClassifier
+    _target_: src.modules.models.hubert.HubertSequenceClassifier
     checkpoint: facebook/hubert-base-ls960
     num_classes: ${dataset.extras.num_classes}
 

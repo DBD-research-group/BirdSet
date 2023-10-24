@@ -5,7 +5,7 @@ import hydra
 import lightning as L 
 from omegaconf import OmegaConf
 from utils import initialize_wandb_logger
-from gadme.utils.instantiate import instantiate_callbacks, instantiate_wandb
+from src.utils.instantiate import instantiate_callbacks, instantiate_wandb
 
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
 

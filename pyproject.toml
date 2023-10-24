@@ -66,6 +66,9 @@ seaborn = "^0.13.0"
 tensorboard = "^2.14.1"
 ipywidgets = "^8.1.1"
 jupyter = "^1.0.0"
+torch-audiomentations = "^0.11.0"
+datasets = "^2.14.6"
+transformers = "^4.34.1"
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.25.2"

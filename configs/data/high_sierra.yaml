@@ -1,5 +1,5 @@
 instantiate:
-  _target_: gadme.datasets.highsierra_datamodule.HighSierra
+  _target_: src.datasets.highsierra_datamodule.HighSierra
   data_dir: ${paths.dataset_path}
   dataset_name: high_sierra
   feature_extractor_name: ${model.instantiate.model.checkpoint}

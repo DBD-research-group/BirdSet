@@ -1,8 +1,8 @@
-from .hf_datamodule import BaseDataModule
+from .hf_datamodule import HFDataModule
 
-from .hf_datamodule import BaseDataModule
+from .hf_datamodule import HFDataModule
 
-class ESC50(BaseDataModule):
+class ESC50(HFDataModule):
     def __init__(
             self,
             data_dir,

@@ -1,6 +1,6 @@
-from .base_datamodule import BaseDataModule
+from .hf_datamodule import HFDataModule
 
-class SapsuckerWoods(BaseDataModule):
+class SapsuckerWoods(HFDataModule):
     def __init__(
             self,
             data_dir,

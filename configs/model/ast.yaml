@@ -1,8 +1,8 @@
 instantiate:
-  _target_: gadme.modules.base_module.BaseModule
+  _target_: src.modules.base_module.BaseModule
 
   model:
-    _target_: gadme.modules.models.ast.ASTSequenceClassifier
+    _target_: src.modules.models.ast.ASTSequenceClassifier
     checkpoint: MIT/ast-finetuned-audioset-10-10-0.4593
     num_classes: ${dataset.extras.num_classes}
 

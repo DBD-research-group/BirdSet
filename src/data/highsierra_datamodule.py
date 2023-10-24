@@ -1,6 +1,6 @@
-from .base_datamodule import BaseDataModule
+from .hf_datamodule import HFDataModule
 
-class HighSierra(BaseDataModule):
+class HighSierra(HFDataModule):
     def __init__(
             self,
             data_dir,

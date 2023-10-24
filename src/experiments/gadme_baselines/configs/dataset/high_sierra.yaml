@@ -1,4 +1,4 @@
-_target_: gadme.datasets.sapsucker_datamodule.HighSierra
+_target_: src.datasets.sapsucker_datamodule.HighSierra
 data_dir: ${paths.data_dir}
 dataset_name: high_sierra
 feature_extractor_name: ${model.extras.name_hf}
