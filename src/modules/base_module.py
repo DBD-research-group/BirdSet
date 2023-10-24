@@ -23,6 +23,7 @@ class BaseModule(L.LightningModule):
         eval_metrics,
         scheduler_interval,
         torch_compile,
+        model_name,
         num_epochs=5,
         len_trainset=1000):
 
@@ -36,6 +37,7 @@ class BaseModule(L.LightningModule):
         self.train_metrics = nn.ModuleDict(train_metrics)
         self.eval_metrics = nn.ModuleDict(eval_metrics)
         self.torch_compile = torch_compile
+        self.model_name = model_name
 
         # partial
         self.num_epochs = num_epochs

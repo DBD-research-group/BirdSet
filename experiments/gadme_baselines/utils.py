@@ -5,8 +5,8 @@ import math
 import torchmetrics
 import hydra 
 from omegaconf import OmegaConf
-from gadme import datasets
-from gadme.modules import models,base_module
+from src import dataset
+from src.modules import models,base_module
 from pytorch_lightning.loggers import WandbLogger
 
 def initialize_wandb(args):
@@ -16,7 +16,7 @@ def initialize_wandb(args):
         group=args.wandb.group,
         reinit=args.wandb.reinit,
         mode = args.wandb.mode,
-        name=args.model.extras.name+'_'+args.dataset.instantiate+'#'+str(args.random_seed),
+        name=args.model.model_name+'_'+args.dataset+'#'+str(args.seed),
         config = OmegaConf.to_container(
             args, 
             resolve=True, 
@@ -27,7 +27,7 @@ def initialize_wandb(args):
 
 def initialize_wandb_logger(args):
     wandb_logger = WandbLogger(
-        name=args.model.extras.name+'_'+args.dataset.instantiate.dataset_name+'#'+str(args.random_seed),
+        name=args.model.model_name+'_'+args.dataset.dataset_name+'#'+str(args.seed),
         save_dir=args.paths.log_dir,
         project=args.loggers.wandb.project,
         mode=args.loggers.wandb.mode,
@@ -49,7 +49,7 @@ def initialize_wandb_logger(args):
 #             dataset_name=args.dataset.name,
 #             feature_extractor_name=args.model.extras.name_hf,
 #             dataset_loading=dict(args.dataset.loading),
-#             seed=args.random_seed,
+#             seed=args.seed,
 #             train_batch_size=args.train_batch_size,
 #             eval_batch_size=args.eval_batch_size,
 #             val_split=args.val_split,
@@ -62,7 +62,7 @@ def initialize_wandb_logger(args):
 #             dataset_name=args.dataset.name,
 #             feature_extractor_name=args.model.extras.name_hf,
 #             dataset_loading=dict(args.dataset.loading),
-#             seed=args.random_seed,
+#             seed=args.seed,
 #             train_batch_size=args.train_batch_size,
 #             eval_batch_size=args.eval_batch_size,
 #             val_split=args.val_split,
@@ -75,7 +75,7 @@ def initialize_wandb_logger(args):
 #             dataset_name=args.dataset.name,
 #             feature_extractor_name=args.model.extras.name_hf,
 #             dataset_loading=dict(args.dataset.loading),
-#             seed=args.random_seed,
+#             seed=args.seed,
 #             train_batch_size=args.train_batch_size,
 #             eval_batch_size=args.eval_batch_size,
 #             val_split=args.val_split,
@@ -93,27 +93,27 @@ def initialize_wandb_logger(args):
 #     len_trainset = kwargs["len_trainset"]
 #     num_classes = kwargs["num_classes"]
 
-#     if args.model.extras.name == "wav2vec2":
+#     if args.model.model_name == "wav2vec2":
         
 #         base_model = models.w2v2.Wav2vec2SequenceClassifier(
 #             checkpoint=args.model.extras.name_hf,
 #             num_classes=num_classes
 #         )
     
-#     elif args.model.extras.name == "hubert":
+#     elif args.model.model_name == "hubert":
 #         base_model = models.hubert.HubertSequenceClassifier(
 #             checkpoint=args.model.extras.name_hf,
 #             num_classes=num_classes
 #         )
     
-#     elif args.model.extras.name == "ast":
+#     elif args.model.model_name == "ast":
 #         base_model = models.ast.ASTSequenceClassifier(
 #             checkpoint=args.model.extras.name_hf,
 #             num_classes=num_classes
 #         )
     
 #     else:
-#         raise NotImplementedError (f'Model {args.model.extras.name} not implemented')
+#         raise NotImplementedError (f'Model {args.model.model_name} not implemented')
     
 #     model = torch.compile(base_model)
 

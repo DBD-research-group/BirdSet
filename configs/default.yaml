@@ -1,24 +1,26 @@
 defaults:
   - _self_
   - dataset: esc50
-  - model: wav2vec2
+  - model: ast
   - callbacks: default
   - paths: default
-  - transformations: none
   - trainer: default
   - loggers: wandb
+  - hydra: default
+  - transformations: none
+  - experiment: null
 
-device: cuda
+#device: cuda
 val_split: .2
-random_seed: 1 
+seed: 1 
 train_batch_size: 5
 eval_batch_size: 16
 print_freq_eval: 25
 print_freq_train: 25
 check_freq_model: 15
 
-hydra:
-  job:
-    chdir: True
-  run:
-    dir: ./output/${dataset.instantiate.dataset_name}/${model.extras.name}/${now:%Y-%m-%d_%H%M%S}
+# hydra:
+#   job:
+#     chdir: True
+#   run:
+#     dir: ./output/${dataset.dataset_name}/${model.model_name}/${now:%Y-%m-%d_%H%M%S}
