@@ -16,7 +16,7 @@ def initialize_wandb(args):
         group=args.wandb.group,
         reinit=args.wandb.reinit,
         mode = args.wandb.mode,
-        name=args.model.extras.name+'_'+args.dataset.instantiate+'#'+str(args.random_seed),
+        name=args.model.extras.name+'_'+args.dataset.instantiate+'#'+str(args.seed),
         config = OmegaConf.to_container(
             args, 
             resolve=True, 
@@ -27,7 +27,7 @@ def initialize_wandb(args):
 
 def initialize_wandb_logger(args):
     wandb_logger = WandbLogger(
-        name=args.model.extras.name+'_'+args.dataset.instantiate.dataset_name+'#'+str(args.random_seed),
+        name=args.model.extras.name+'_'+args.dataset.instantiate.dataset_name+'#'+str(args.seed),
         save_dir=args.paths.log_dir,
         project=args.loggers.wandb.project,
         mode=args.loggers.wandb.mode,
@@ -49,7 +49,7 @@ def initialize_wandb_logger(args):
 #             dataset_name=args.dataset.name,
 #             feature_extractor_name=args.model.extras.name_hf,
 #             dataset_loading=dict(args.dataset.loading),
-#             seed=args.random_seed,
+#             seed=args.seed,
 #             train_batch_size=args.train_batch_size,
 #             eval_batch_size=args.eval_batch_size,
 #             val_split=args.val_split,
@@ -62,7 +62,7 @@ def initialize_wandb_logger(args):
 #             dataset_name=args.dataset.name,
 #             feature_extractor_name=args.model.extras.name_hf,
 #             dataset_loading=dict(args.dataset.loading),
-#             seed=args.random_seed,
+#             seed=args.seed,
 #             train_batch_size=args.train_batch_size,
 #             eval_batch_size=args.eval_batch_size,
 #             val_split=args.val_split,
@@ -75,7 +75,7 @@ def initialize_wandb_logger(args):
 #             dataset_name=args.dataset.name,
 #             feature_extractor_name=args.model.extras.name_hf,
 #             dataset_loading=dict(args.dataset.loading),
-#             seed=args.random_seed,
+#             seed=args.seed,
 #             train_batch_size=args.train_batch_size,
 #             eval_batch_size=args.eval_batch_size,
 #             val_split=args.val_split,

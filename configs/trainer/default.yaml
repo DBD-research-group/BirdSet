@@ -2,7 +2,7 @@ _target_: lightning.Trainer
 default_root_dir: paths.output_dir
 min_epochs: 1
 max_epochs: 5
-accelerator: "gpu"
+accelerator: "cpu"
 enable_checkpointing: false
 fast_dev_run: false
 devices: 1

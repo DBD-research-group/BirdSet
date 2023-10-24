@@ -1,0 +1,8 @@
+defaults: 
+  - override hydra_logging: colorlog
+  - override job_logging: colorlog 
+
+job:
+  chdir: True
+run:
+  dir: ./output/${dataset.instantiate.dataset_name}/${model.extras.name}/${now:%Y-%m-%d_%H%M%S}

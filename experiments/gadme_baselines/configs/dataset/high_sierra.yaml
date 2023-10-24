@@ -4,7 +4,7 @@ dataset_name: high_sierra
 feature_extractor_name: ${model.extras.name_hf}
 hf_path: DBD-research-group/gadme_v1
 hf_name: HSN
-seed: ${random_seed}
+seed: ${seed}
 train_batch_size: ${train_batch_size}
 eval_batch_size: ${eval_batch_size}
 val_split: ${val_split}

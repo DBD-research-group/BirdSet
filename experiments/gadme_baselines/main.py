@@ -13,7 +13,7 @@ rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
 def main(args):
     logging.info('Using config: \n%s', OmegaConf.to_yaml(args))
 
-    L.seed_everything(args.random_seed)
+    L.seed_everything(args.seed)
     os.makedirs(args.paths.dataset_path, exist_ok=True)
     os.makedirs(args.paths.log_dir, exist_ok=True)
 
@@ -32,7 +32,7 @@ def main(args):
     logging.info("Building model: %s", args.model.extras.name)
     model = hydra.utils.instantiate(
         args.model.instantiate,
-        num_epochs=5,
+        num_epochs=args.trainer.max_epochs,
         len_trainset=data_module.len_trainset
     )
 

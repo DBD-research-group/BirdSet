@@ -30,7 +30,7 @@ instantiate:
     train_f1:
       _target_: "torchmetrics.classification.MulticlassF1Score"
       num_classes: ${dataset.extras.num_classes}
-
+  
   eval_metrics:
     eval_accuracy:
       _target_: "torchmetrics.classification.Accuracy"

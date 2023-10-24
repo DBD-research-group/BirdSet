@@ -1,8 +1,7 @@
 wandb:
   _target_: pytorch_lightning.loggers.WandbLogger
   _partial_: true
-  name: ${model.extras.name}_${dataset.instantiate}_#${random_seed}
-  #+#+($str({random_seed)))
+  name: ${model.extras.name}_${dataset.instantiate}_#${seed}
   save_dir: "${paths.log_dir}"
   mode: offline
   id: null # pass correct id to resume experiment!
