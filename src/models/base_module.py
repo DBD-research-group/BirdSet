@@ -5,7 +5,6 @@ import torch.nn as nn
 import torch.distributed as dist
 import functools
 import logging
-import torch.optim.scheduler as scheduler
 import math 
 
 from pytorch_lightning import Callback, LightningModule, Trainer
@@ -118,6 +117,9 @@ class BaseModule(L.LightningModule):
         pass
 
     def on_test_epoch_end(self):
+        pass
+    
+    def on_train_start(self, trainer, pl_module):
         pass
 
 

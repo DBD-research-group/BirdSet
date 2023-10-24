@@ -17,6 +17,7 @@ class HFDataModule(L.LightningDataModule):
             self,
             data_dir,
             dataset_name,
+            feature_extractor_name,
             hf_path,
             hf_name,
             seed, 
@@ -24,12 +25,16 @@ class HFDataModule(L.LightningDataModule):
             eval_batch_size, 
             val_split,
             column_list=None, 
-            transforms=None
+            transforms=None,
+            num_workers=0
     ):
         
         super().__init__()
         self.data_dir = data_dir
         self.dataset_name = dataset_name
+        self.feature_extractor = AutoFeatureExtractor.from_pretrained(
+            feature_extractor_name
+        )
         self.hf_path = hf_path
         self.hf_name = hf_name
         self.seed = seed
@@ -48,6 +53,7 @@ class HFDataModule(L.LightningDataModule):
         self._setup_done = False
         self.data_path = None
         self.len_trainset = None
+        self.num_workers = num_workers
     
 
     def _create_splits(self, dataset):
@@ -96,7 +102,7 @@ class HFDataModule(L.LightningDataModule):
             batched=True,
             batch_size=100,
             load_from_cache_file=True,
-            num_proc=5,
+            num_proc=self.num_workers,
         )
         if self.feature_extractor.return_attention_mask:
             self.column_list.append("attention_mask")
@@ -213,14 +219,14 @@ class HFDataModule(L.LightningDataModule):
             self.train_dataset,
             batch_size=self.train_batch_size,
             shuffle=False,
-            num_workers=4)
+            num_workers=self.num_workers)
     
     def val_dataloader(self):
         return DataLoader(
             self.val_dataset,
             batch_size=self.eval_batch_size,
             shuffle=False,
-            num_workers=4
+            num_workers=self.num_workers
         )
 
     def test_dataloader(self):
@@ -228,5 +234,5 @@ class HFDataModule(L.LightningDataModule):
             self.test_dataset,
             batch_size=self.eval_batch_size,
             shuffle=False,
-            num_workers=4
+            num_workers=self.num_workers
         )
