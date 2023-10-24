@@ -1,0 +1,24 @@
+
+defaults:
+  - override /data: esc50
+  - override /model: ast
+  - override /trainer: gpu
+  - override /callbacks: default
+
+# all parameters below will be merged with parameters from default configurations set above
+# this allows you to overwrite only specified parameters
+
+tags: ["ast", "esc50"]
+
+seed: 12345
+
+trainer:
+  min_epochs: 10
+  max_epochs: 10
+  gradient_clip_val: 0.5
+
+
+data:
+  train_batch_size: 64
+  eval_batch_size: 64
+  num_workers: 1

@@ -1,15 +1,15 @@
 from setuptools import find_packages
 from setuptools import setup
-from gadme import __version__
+from src import __version__
 
-def requirements():
-     with open("requirements.txt", "r") as file:
-         lines = file.readlines()
-         lines = [line.rstrip() for line in lines]
-     return lines
+# def requirements():
+#      with open("requirements.txt", "r") as file:
+#          lines = file.readlines()
+#          lines = [line.rstrip() for line in lines]
+#      return lines
 
 setup(
-    name='gadme',
+    name='src',
     version=__version__,
     description='General Avian Monitoring Evaluation',
     author='Lukas Rauch',
@@ -17,7 +17,7 @@ setup(
     url='https://github.com/DBD-research-group/Bird2Vec/tree/toolbox-structure',
     license='BSD 3-Clause',
     packages=find_packages(),
-    install_requires=requirements(),
+    #install_requires=requirements(),
     extras_require={
     },
     classifiers=[

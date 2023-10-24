@@ -6,6 +6,8 @@ from lightning.pytorch.loggers import Logger
 import logging
 import wandb
 
+from pytorch_lightning.loggers import WandbLogger
+
 def instantiate_callbacks(callbacks_args):
     callbacks = []
 
@@ -34,10 +36,25 @@ def instantiate_wandb(args):
     logger = hydra.utils.instantiate(
         logger_args
     )
-    wandb.config.update(OmegaConf.to_container(
+    # wandb.config.update(OmegaConf.to_container(
+    #         args,
+    #         resolve=True,
+    #         throw_on_missing=True
+    #     ))
+    return logger
+    
+def initialize_wandb_logger(args):
+    wandb_logger = WandbLogger(
+        name=args.model.model_name+'_'+args.dataset.dataset_name+'#'+str(args.seed),
+        save_dir=args.paths.log_dir,
+        project=args.loggers.wandb.project,
+        mode=args.loggers.wandb.mode,
+        entity=args.loggers.wandb.entity,
+        config=OmegaConf.to_container(
             args,
             resolve=True,
             throw_on_missing=True
-        ))
-    return logger
-    
+        )
+    )
+
+    return wandb_logger

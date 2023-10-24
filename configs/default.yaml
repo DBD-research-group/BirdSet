@@ -23,4 +23,4 @@ check_freq_model: 15
 #   job:
 #     chdir: True
 #   run:
-#     dir: ./output/${dataset.instantiate.dataset_name}/${model.extras.name}/${now:%Y-%m-%d_%H%M%S}
+#     dir: ./output/${dataset.dataset_name}/${model.model_name}/${now:%Y-%m-%d_%H%M%S}

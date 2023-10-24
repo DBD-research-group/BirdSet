@@ -25,7 +25,8 @@ class BaseDataModule(L.LightningDataModule):
             eval_batch_size, 
             val_split,
             column_list=None, 
-            transforms=None
+            transforms=None,
+            num_workers=1
     ):
         
         super().__init__()
@@ -41,6 +42,7 @@ class BaseDataModule(L.LightningDataModule):
         self.eval_batch_size = eval_batch_size
         self.val_split = val_split
         self.column_list = column_list
+        self.num_workers = num_workers
 
         self.transforms = transforms
         
@@ -100,7 +102,7 @@ class BaseDataModule(L.LightningDataModule):
             batched=True,
             batch_size=100,
             load_from_cache_file=True,
-            num_proc=5,
+            num_proc=self.num_workers,
         )
         if self.feature_extractor.return_attention_mask:
             self.column_list.append("attention_mask")
