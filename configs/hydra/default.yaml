@@ -5,4 +5,4 @@ defaults:
 job:
   chdir: True
 run:
-  dir: ./output/${dataset.dataset_name}/${model.model_name}/${now:%Y-%m-%d_%H%M%S}
+  dir: ./output/${datamodule.dataset.dataset_name}/${module.model_name}/${now:%Y-%m-%d_%H%M%S}

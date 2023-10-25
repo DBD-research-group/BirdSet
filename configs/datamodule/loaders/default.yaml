@@ -1,0 +1,20 @@
+train:
+  batch_size: 12
+  shuffle: True
+  num_workers: 4
+  drop_last: False
+  pin_memory: True
+
+valid:
+  batch_size: 48
+  shuffle: False
+  num_workers: 4
+  drop_last: False
+  pin_memory: True
+
+test:
+  batch_size: 48
+  shuffle: False
+  num_workers: 4
+  drop_last: False
+  pin_memory: True

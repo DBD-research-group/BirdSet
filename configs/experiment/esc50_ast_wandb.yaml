@@ -1,6 +1,8 @@
+# @package _global_
+#package global is neccessary!
 defaults:
-  - override /dataset: esc50.yaml
-  - override /model: ast.yaml
+  - override /datamodule: esc50.yaml
+  - override /module: ast.yaml
   - override /callbacks: default.yaml 
   - override /trainer: single_gpu.yaml
 
@@ -8,17 +10,27 @@ defaults:
 tags: ["esc50", "ast"]
 seed: 5
 
-model:
+module:
   optimizer:
-  lr: 2e-5
+    lr: 2e-5
 
 trainer:
-  min_epochs: 5
-  max_epochs: 10 
+  min_epochs: 1
+  max_epochs: 3 
 
-dataset:
-  instantiate:
-    train_batch_size: 16
-    eval_batch_size: 48
-    val_split: 0.15
-  
+datamodule:
+  dataset:
+    val_split: 0.2
+  loaders:
+    train:
+      batch_size: 2
+    valid:
+      batch_size: 2
+    test:
+      batch_size: 2
+
+logger:
+  wandb:
+    tags: ${tags}
+    group: "esc50"
+    mode: online

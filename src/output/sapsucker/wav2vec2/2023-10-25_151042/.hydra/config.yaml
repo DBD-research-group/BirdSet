@@ -1,0 +1,123 @@
+val_split: 0.2
+seed: 1
+train_batch_size: 5
+eval_batch_size: 16
+print_freq_eval: 25
+print_freq_train: 25
+check_freq_model: 15
+datamodule:
+  _target_: src.datamodule.sapsucker_datamodule.SapsuckerWoods
+  dataset:
+    data_dir: ${paths.dataset_path}
+    dataset_name: sapsucker
+    hf_path: DBD-research-group/gadme_v1_1
+    hf_name: NA_subset500
+    seed: ${seed}
+    feature_extractor:
+      _target_: transformers.AutoFeatureExtractor.from_pretrained
+      pretrained_model_name_or_path: ${module.model.checkpoint}
+    n_classes: 500
+    n_workers: 1
+    column_list:
+    - input_values
+    - target
+    val_split: 0.2
+  loaders:
+    train:
+      batch_size: 2
+      shuffle: true
+      num_workers: 4
+      drop_last: false
+      pin_memory: false
+    valid:
+      batch_size: 2
+      shuffle: false
+      num_workers: 4
+      drop_last: false
+      pin_memory: false
+    test:
+      batch_size: 2
+      shuffle: false
+      num_workers: 4
+      drop_last: false
+      pin_memory: false
+  transforms: null
+module:
+  _target_: src.modules.base_module.BaseModule
+  model:
+    _target_: src.modules.models.w2v2.Wav2vec2SequenceClassifier
+    checkpoint: facebook/wav2vec2-base-960h
+    num_classes: ${datamodule.dataset.n_classes}
+  loss:
+    _target_: torch.nn.CrossEntropyLoss
+  optimizer:
+    _target_: torch.optim.AdamW
+    _partial_: true
+    lr: 1.0e-05
+    weight_decay: 0.01
+  lr_scheduler:
+    main:
+      _target_: transformers.get_linear_schedule_with_warmup
+      _partial_: true
+    extras:
+      warmup_ratio: 0.05
+  train_metrics:
+    train_accuracy:
+      _target_: torchmetrics.classification.Accuracy
+      task: multiclass
+      num_classes: ${datamodule.dataset.n_classes}
+    train_f1:
+      _target_: torchmetrics.classification.MulticlassF1Score
+      num_classes: ${datamodule.dataset.n_classes}
+  eval_metrics:
+    eval_accuracy:
+      _target_: torchmetrics.classification.Accuracy
+      task: multiclass
+      num_classes: ${datamodule.dataset.n_classes}
+    eval_f1:
+      _target_: torchmetrics.classification.MulticlassF1Score
+      num_classes: ${datamodule.dataset.n_classes}
+  scheduler_interval: step
+  model_name: wav2vec2
+  torch_compile: false
+callbacks:
+  early_stopping:
+    _target_: lightning.pytorch.callbacks.EarlyStopping
+    monitor: val_loss
+    patience: 5
+    min_delta: 0
+  lr_monitor:
+    _target_: lightning.pytorch.callbacks.LearningRateMonitor
+    logging_interval: step
+  time_tracking:
+    _target_: src.callbacks.TimeCallback
+paths:
+  root_dir: ${oc.env:PROJECT_ROOT}
+  work_dir: ${hydra:runtime.cwd}
+  output_dir: ${hydra:runtime.output_dir}
+  dataset_path: ${paths.root_dir}/data_gadme
+  log_dir: ${paths.output_dir}/logs/
+trainer:
+  _target_: lightning.Trainer
+  default_root_dir: paths.output_dir
+  min_epochs: 1
+  max_epochs: 5
+  accelerator: gpu
+  devices: 1
+  enable_checkpointing: false
+  fast_dev_run: false
+  strategy: auto
+  deterministic: false
+logger:
+  wandb:
+    _target_: pytorch_lightning.loggers.WandbLogger
+    name: ${module.model_name}_${datamodule.dataset.dataset_name}_#${seed}
+    save_dir: ${paths.log_dir}
+    mode: offline
+    id: null
+    project: gadme
+    log_model: false
+    entity: deepbirddetect
+    group: ''
+    tags: []
+    job_type: ''
