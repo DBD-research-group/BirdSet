@@ -1,8 +1,9 @@
+# @package _global_
 
 defaults:
-  - override /data: esc50
+  - override /dataset: esc50
   - override /model: ast
-  - override /trainer: gpu
+  - override /trainer: single_gpu
   - override /callbacks: default
 
 # all parameters below will be merged with parameters from default configurations set above

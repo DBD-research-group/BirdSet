@@ -1,0 +1,132 @@
+[2023-10-25 09:16:40,962][root][INFO] - Using config: 
+val_split: 0.2
+seed: 12345
+train_batch_size: 5
+eval_batch_size: 16
+print_freq_eval: 25
+print_freq_train: 25
+check_freq_model: 15
+dataset:
+  _target_: src.dataset.esc50_datamodule.ESC50
+  data_dir: ${paths.dataset_path}
+  dataset_name: esc50
+  feature_extractor_name: ${model.model.checkpoint}
+  hf_path: ashraq/esc50
+  hf_name: None
+  seed: ${seed}
+  train_batch_size: ${train_batch_size}
+  eval_batch_size: ${eval_batch_size}
+  val_split: ${val_split}
+  column_list:
+  - input_values
+  - target
+  n_classes: 50
+  num_workers: 1
+model:
+  _target_: src.modules.base_module.BaseModule
+  model:
+    _target_: src.modules.models.ast.ASTSequenceClassifier
+    checkpoint: MIT/ast-finetuned-audioset-10-10-0.4593
+    num_classes: ${dataset.n_classes}
+  loss:
+    _target_: torch.nn.CrossEntropyLoss
+  optimizer:
+    _target_: torch.optim.AdamW
+    _partial_: true
+    lr: 5.0e-05
+    weight_decay: 0.01
+  lr_scheduler:
+    main:
+      _target_: transformers.get_linear_schedule_with_warmup
+      _partial_: true
+    extras:
+      warmup_ratio: 0.05
+  train_metrics:
+    train_accuracy:
+      _target_: torchmetrics.classification.Accuracy
+      task: multiclass
+      num_classes: ${dataset.n_classes}
+    train_f1:
+      _target_: torchmetrics.classification.MulticlassF1Score
+      num_classes: ${dataset.n_classes}
+  eval_metrics:
+    eval_accuracy:
+      _target_: torchmetrics.classification.Accuracy
+      task: multiclass
+      num_classes: ${dataset.n_classes}
+    eval_f1:
+      _target_: torchmetrics.classification.MulticlassF1Score
+      num_classes: ${dataset.n_classes}
+  scheduler_interval: step
+  model_name: ast
+  torch_compile: false
+callbacks:
+  early_stopping:
+    _target_: lightning.pytorch.callbacks.EarlyStopping
+    monitor: val_loss
+    patience: 5
+    min_delta: 0
+  lr_monitor:
+    _target_: lightning.pytorch.callbacks.LearningRateMonitor
+    logging_interval: step
+  time_tracking:
+    _target_: src.callbacks.TimeCallback
+paths:
+  root_dir: ${oc.env:PROJECT_ROOT}
+  work_dir: ${hydra:runtime.cwd}
+  output_dir: ${hydra:runtime.output_dir}
+  dataset_path: ${paths.root_dir}/data_gadme
+  log_dir: ${paths.output_dir}/logs/
+trainer:
+  _target_: lightning.Trainer
+  default_root_dir: paths.output_dir
+  min_epochs: 10
+  max_epochs: 10
+  accelerator: gpu
+  enable_checkpointing: false
+  fast_dev_run: false
+  devices: 1
+  strategy: auto
+  gradient_clip_val: 0.5
+loggers:
+  wandb:
+    _target_: pytorch_lightning.loggers.WandbLogger
+    _partial_: true
+    name: ${model.model_name}_${dataset}_#${seed}
+    save_dir: ${paths.log_dir}
+    mode: offline
+    id: null
+    project: gadme
+    log_model: false
+    entity: deepbirddetect
+    tags: []
+    job_type: ''
+transformations: {}
+tags:
+- ast
+- esc50
+data:
+  train_batch_size: 64
+  eval_batch_size: 64
+  num_workers: 1
+
+[2023-10-25 09:16:40,965][root][INFO] - Instantiate logger ['wandb']
+[2023-10-25 09:16:43,423][root][INFO] - Instantiate data module {'_target_': 'src.dataset.esc50_datamodule.ESC50', 'data_dir': '${paths.dataset_path}', 'dataset_name': 'esc50', 'feature_extractor_name': '${model.model.checkpoint}', 'hf_path': 'ashraq/esc50', 'hf_name': 'None', 'seed': '${seed}', 'train_batch_size': '${train_batch_size}', 'eval_batch_size': '${eval_batch_size}', 'val_split': '${val_split}', 'column_list': ['input_values', 'target'], 'n_classes': 50, 'num_workers': 1}
+[2023-10-25 09:16:44,074][root][INFO] - Check if preparing has already been done.
+[2023-10-25 09:16:44,075][root][INFO] - > Loading data set.
+[2023-10-25 09:16:45,748][huggingface_hub.repocard][WARNING] - Repo card metadata block was not found. Setting CardData to empty.
+[2023-10-25 09:16:46,889][root][INFO] - > Mapping data set.
+[2023-10-25 09:16:59,585][root][INFO] - Saving to disk: /home/lukas/projects/GADME/data_gadme/esc50_processed/5f6a101713cd5261
+[2023-10-25 09:16:59,999][root][INFO] - Building model: ast
+[2023-10-25 09:17:00,553][root][INFO] - Instantiate callbacks ['early_stopping', 'lr_monitor', 'time_tracking']
+[2023-10-25 09:17:00,554][root][INFO] - Instantiate callbacks <lightning.pytorch.callbacks.EarlyStopping>
+[2023-10-25 09:17:00,554][root][INFO] - Instantiate callbacks <lightning.pytorch.callbacks.LearningRateMonitor>
+[2023-10-25 09:17:00,554][root][INFO] - Instantiate callbacks <src.callbacks.TimeCallback>
+[2023-10-25 09:17:00,555][root][INFO] - Instantiate trainer
+[2023-10-25 09:17:00,689][root][INFO] - Check if preparing has already been done.
+[2023-10-25 09:17:00,689][root][INFO] - Skip preparing.
+[2023-10-25 09:17:00,703][root][INFO] - fit
+[2023-10-25 09:20:00,171][src.callbacks.timetracker][INFO] - Training took 179.02 seconds
+[2023-10-25 09:20:00,171][root][INFO] - Check if preparing has already been done.
+[2023-10-25 09:20:00,171][root][INFO] - Skip preparing.
+[2023-10-25 09:20:00,172][root][INFO] - test

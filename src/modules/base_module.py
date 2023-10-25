@@ -24,8 +24,8 @@ class BaseModule(L.LightningModule):
         scheduler_interval,
         torch_compile,
         model_name,
-        num_epochs=5,
-        len_trainset=1000):
+        num_epochs,
+        len_trainset):
 
         super(BaseModule, self).__init__()
 

@@ -9,7 +9,7 @@ from src.utils.instantiate import instantiate_callbacks, instantiate_wandb, init
 
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
 
-@hydra.main(version_base=None, config_path="../configs", config_name="default")
+@hydra.main(version_base=None, config_path="../configs", config_name="main")
 def main(args):
     logging.info('Using config: \n%s', OmegaConf.to_yaml(args))
 
