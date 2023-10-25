@@ -32,7 +32,7 @@ This dataset offers a unified, well-structured platform for avian bioacoustics a
 By creating a set of tasks, BirdSet enables an overall performance score for models and uncovers their limitations \
 in certain areas.
 Note that each BirdSet dataset has its own citation. Please see the source to get the correct citation for each 
-contained dataset. 
+contained datamodule. 
 """
 #############################################
 _SAPSUCKER_WOODS_CITATION = """\
@@ -169,7 +169,7 @@ class BirdSetConfig(datasets.BuilderConfig):
 
 
 class BirdSet(datasets.GeneratorBasedBuilder):
-    """TODO: Short description of my dataset."""
+    """TODO: Short description of my datamodule."""
 
     BUILDER_CONFIGS = [
         BirdSetConfig(

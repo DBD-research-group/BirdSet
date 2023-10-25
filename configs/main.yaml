@@ -1,14 +1,13 @@
 # @package _global_
 defaults:
   - _self_
-  - dataset: high_sierra
-  - model: ast
+  - datamodule: sapsucker
+  - module: wav2vec2
   - callbacks: default
   - paths: default
-  - trainer: default
-  - loggers: wandb
+  - trainer: single_gpu
+  - logger: wandb
   - hydra: default
-  - transformations: none
   - experiment: null
 
 #device: cuda
@@ -24,4 +23,4 @@ check_freq_model: 15
 #   job:
 #     chdir: True
 #   run:
-#     dir: ./output/${dataset.dataset_name}/${model.model_name}/${now:%Y-%m-%d_%H%M%S}
+#     dir: ./output/${datamodule.dataset.dataset_name}/${module.model_name}/${now:%Y-%m-%d_%H%M%S}
