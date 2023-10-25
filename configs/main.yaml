@@ -1,6 +1,7 @@
+# @package _global_
 defaults:
   - _self_
-  - dataset: esc50
+  - dataset: high_sierra
   - model: ast
   - callbacks: default
   - paths: default

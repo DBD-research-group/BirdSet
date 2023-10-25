@@ -12,7 +12,7 @@ class ESC50(BaseDataModule):
             hf_name=None,
             seed=1, 
             train_batch_size=12, 
-            eval_batch_size=12, 
+            eval_batch_size=48, 
             val_split=0.2,
             column_list=["input_values", "target"], 
             transforms=None,

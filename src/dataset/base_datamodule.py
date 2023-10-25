@@ -83,7 +83,8 @@ class BaseDataModule(L.LightningDataModule):
         dataset = load_dataset(
             name=self.hf_name,
             path=self.hf_path,
-            cache_dir=self.data_dir
+            cache_dir=self.data_dir,
+            num_proc=3
         )
         
         dataset = dataset.cast_column(
