@@ -1,6 +1,15 @@
 # discuss; do we need this here? 
-
 _target_: src.modules.base_module.BaseModule
+
 defaults:
   - _self_
   - model: ast.yaml
+
+optimizer: 
+  - _target_: torch.optim.AdamW
+  
+scheduler: 
+  - 
+
+logging: 
+  - 

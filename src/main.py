@@ -1,15 +1,13 @@
 import os 
-#import logging
 import rootutils
 import hydra
 import lightning as L 
 from omegaconf import OmegaConf
-#from utils import initialize_wandb_logger
-from src.utils.instantiate import instantiate_callbacks, instantiate_wandb, initialize_wandb_logger
+from src.utils.instantiate import instantiate_callbacks, instantiate_wandb
 from src.utils.pylogger import get_pylogger
 from src.utils.utils import close_loggers
-log = get_pylogger(__name__)
 
+log = get_pylogger(__name__)
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
 
 @hydra.main(version_base=None, config_path="../configs", config_name="main")
@@ -45,11 +43,13 @@ def main(args):
         args.trainer, callbacks= callbacks, logger=logger
     )
 
-    trainer.fit(model, data_module)
+    trainer.fit(
+        model=model, 
+        datamodule=data_module,
+        ckpt_path=args.get("ckpt_path"))
 
     # Evaluation
     trainer.test(ckpt_path="last", datamodule=data_module)
-    #predictions = trainer.predict(model, test_dataloader)
     close_loggers()
 
 if __name__ == "__main__":    

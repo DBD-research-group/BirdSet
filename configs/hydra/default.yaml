@@ -5,4 +5,7 @@ defaults:
 job:
   chdir: True
 run:
-  dir: ./output/${datamodule.dataset.dataset_name}/${module.model_name}/${now:%Y-%m-%d_%H%M%S}
+  dir: ./output/${task_name}/runs/${datamodule.dataset.dataset_name}/${module.model_name}/${now:%Y-%m-%d_%H%M%S}
+sweep: 
+  dir: ./output/${task_name}/multiruns/${datamodule.dataset.dataset_name}/${module.model_name}/${now:%Y-%m-%d_%H%M%S}
+  subdir: ${hydra.job.num}

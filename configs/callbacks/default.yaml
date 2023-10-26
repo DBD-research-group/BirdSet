@@ -3,3 +3,5 @@ defaults:
   - early_stopping.yaml
   - learning_rate_monitor.yaml
   - time_tracking.yaml
+  - model_summary.yaml
+  - rich_progress_bar.yaml

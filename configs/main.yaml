@@ -8,19 +8,12 @@ defaults:
   - trainer: single_gpu
   - logger: wandb
   - hydra: default
+  - extras: default
+
   - experiment: null
+  - hparams_search: null
+  - debug: null
 
-#device: cuda
-val_split: .2
-seed: 1 
-train_batch_size: 5
-eval_batch_size: 16
-print_freq_eval: 25
-print_freq_train: 25
-check_freq_model: 15
-
-# hydra:
-#   job:
-#     chdir: True
-#   run:
-#     dir: ./output/${datamodule.dataset.dataset_name}/${module.model_name}/${now:%Y-%m-%d_%H%M%S}
+task_name: "train"
+ckpt_path: null
+seed: 1
