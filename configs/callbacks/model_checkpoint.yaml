@@ -1,12 +1,12 @@
 model_checkpoint:
-  _target_: ligthning.pytorch.callbacks.ModelCheckpoint
+  _target_: lightning.pytorch.callbacks.ModelCheckpoint
   dirpath: ${paths.output_dir}/checkpoints
-  filename: ${replace:"epoch{epoch:03d}-loss_valid{__loss__/valid:.4f}-metric_valid{__metric__/valid:.4f}"}
-  monitor: ${replace:"__metric__/valid"}
+  filename: test_${module.model_name}_${datamodule.dataset.dataset_name}_{epoch:02d}
+  monitor: "val_loss"
   verbose: False
   save_last: True
   save_top_k: 2
-  mode: "max"
+  mode: "min"
   auto_insert_metric_name: False
   save_weights_only: False
   every_n_train_steps: null

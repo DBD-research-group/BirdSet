@@ -11,45 +11,62 @@ log = get_pylogger(__name__)
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
 
 @hydra.main(version_base=None, config_path="../configs", config_name="main")
-def main(args):
-    log.info('Using config: \n%s', OmegaConf.to_yaml(args))
+def main(cfg):
+    log.info('Using config: \n%s', OmegaConf.to_yaml(cfg))
 
-    L.seed_everything(args.seed)
-    os.makedirs(args.paths.dataset_path, exist_ok=True)
-    os.makedirs(args.paths.log_dir, exist_ok=True)
+    log.info(f"Dataset path: <{os.path.abspath(cfg.paths.dataset_path)}>")
+    os.makedirs(cfg.paths.dataset_path, exist_ok=True)
 
-    log.info(f"Instantiate logger {[loggers for loggers in args['logger']]}")
-    logger = instantiate_wandb(args) # throws an error in .fit
+    log.info(f"Log path: <{os.path.abspath(cfg.paths.log_dir)}>")
+    os.makedirs(cfg.paths.log_dir, exist_ok=True)
+
+    log.info(f"Seed everything with <{cfg.seed}>")
+    L.seed_everything(cfg.seed)
 
     # Setup data
-    log.info(f"Instantiate data module , <{args.datamodule._target_}>")
-    data_module = hydra.utils.instantiate(args.datamodule)
+    log.info(f"Instantiate datamodule <{cfg.datamodule._target_}>")
+    data_module = hydra.utils.instantiate(cfg.datamodule)
     data_module.prepare_data()
 
     # Setup model 
-    log.info("Building model: %s", args.module.model_name)
+    log.info(f"Instantiate model <{cfg.module.model._target_}>")
     model = hydra.utils.instantiate(
-        args.module,
-        num_epochs=args.trainer.max_epochs,
+        cfg.module,
+        num_epochs=cfg.trainer.max_epochs,
         len_trainset=data_module.len_trainset
     )
 
-    # Training
-    log.info('Instantiate callbacks %s', [callbacks for callbacks in args["callbacks"]])
-    callbacks = instantiate_callbacks(args["callbacks"])
+    # Setup logger
+    log.info(f"Instantiate logger <{[loggers for loggers in cfg['logger']]}>")
+    logger = instantiate_wandb(cfg) # throws an error in .fit
 
-    log.info(f"Instantiate trainer")
+    # Setup callbacks
+    log.info(f"Instantiate callbacks <{[callbacks for callbacks in cfg['callbacks']]}>")
+    callbacks = instantiate_callbacks(cfg["callbacks"])
+
+    # Training
+    log.info(f"Instantiate trainer <{cfg.trainer._target_}>")
     trainer = hydra.utils.instantiate(
-        args.trainer, callbacks= callbacks, logger=logger
+        cfg.trainer, callbacks= callbacks, logger=logger
     )
 
-    trainer.fit(
-        model=model, 
-        datamodule=data_module,
-        ckpt_path=args.get("ckpt_path"))
+    if cfg.get("train"):
+        log.info(f"Starting training")
+        trainer.fit(
+            model=model, 
+            datamodule=data_module,
+            ckpt_path=cfg.get("ckpt_path"))
 
-    # Evaluation
-    trainer.test(ckpt_path="last", datamodule=data_module)
+    if cfg.get("test"):
+        log.info(f"Starting testing")
+        ckpt_path = trainer.checkpoint_callback.best_model_path
+        if ckpt_path == "":
+            log.warning(
+                "No ckpt saved or found. Using current weights for testing"
+            )
+            ckpt_path = None
+        trainer.test(model=model, datamodule=data_module, ckpt_path=ckpt_path)
+
     close_loggers()
 
 if __name__ == "__main__":    

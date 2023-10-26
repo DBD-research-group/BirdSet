@@ -16,3 +16,7 @@ def close_loggers() -> None:
         if wandb.run:
             log.info("Closing wandb!")
             wandb.finish()
+
+
+def log_hyperparameters(object_dict):
+    pass
