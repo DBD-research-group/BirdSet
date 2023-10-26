@@ -1,0 +1,15 @@
+model_checkpoint:
+  _target_: ligthning.pytorch.callbacks.ModelCheckpoint
+  dirpath: ${paths.output_dir}/checkpoints
+  filename: ${replace:"epoch{epoch:03d}-loss_valid{__loss__/valid:.4f}-metric_valid{__metric__/valid:.4f}"}
+  monitor: ${replace:"__metric__/valid"}
+  verbose: False
+  save_last: True
+  save_top_k: 2
+  mode: "max"
+  auto_insert_metric_name: False
+  save_weights_only: False
+  every_n_train_steps: null
+  train_time_interval: null
+  every_n_epochs: null
+  save_on_train_epoch_end: null
