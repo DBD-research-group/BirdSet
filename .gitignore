@@ -10,6 +10,7 @@ wandb/
 *.csv
 *.json
 output_gadme/
+*.hydra
 
 data/*
 
@@ -19,6 +20,7 @@ output/*
 
 data_gadme/*
 
+src/output/*
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
