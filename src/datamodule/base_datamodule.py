@@ -1,13 +1,11 @@
-import torch
-import hydra
 import logging
 import os 
 
 import lightning as L
-import torch_audiomentations
 
 from datasets import load_dataset, load_from_disk, Audio, DatasetDict
 from torch.utils.data import DataLoader
+
 from omegaconf import DictConfig
 
 class BaseDataModuleHF(L.LightningDataModule):
@@ -136,14 +134,16 @@ class BaseDataModuleHF(L.LightningDataModule):
 
         if self.transforms:
             self.train_dataset.set_transform(
-                self.transforms, 
+                self._train_transforms,
                 output_all_columns=False
             )
             self.val_dataset.set_transforms(
-                self.transforms, 
+                self._valid_test_predict_transforms,
                 output_all_columns=False
             )
-            self.transforms.set_transforms(self.augmentation, 
+
+            self.test_dataset.set_transforms(
+                self._valid_test_predict_transforms,
                 output_all_columns=False
             )
             
@@ -159,40 +159,17 @@ class BaseDataModuleHF(L.LightningDataModule):
         )
         return inputs
 
-    def _eval_transform(self):
-        pass
+    def _train_transforms(self):
+        transforms = hydra.utils.instantiate(args.transforms,
+                                            mode="train",
+                                            )
+        return transforms
 
-    def _train_transform(self):
-        transform = torch_audiomentations.Compose(
-            transforms=[
-                torch_audiomentations.Gain(
-                    min_gain_in_db=-15.0,
-                    max_gain_in_db=5.0,
-                    p=0.5,
-                    output_type="tensor"
-                ),
-                torch_audiomentations.AddColoredNoise(
-                    p=0.5,
-                    sample_rate=32_000,
-                    output_type="tensor"
-                ),
-                torch_audiomentations.PolarityInversion(
-                    p=0.5,
-                    output_type="tensor"
-                )
-            ],
-            output_type="tensor"
-        )
-        return transform
-    
-    def augmentation(self, batch):
-        audio = torch.Tensor(batch["input_values"].unsqueeze(1))
-        labels = torch.Tensor(batch["primary"])
-
-        augmented = [self._train_transform(raw_audio).squeeze() for raw_audio in audio.unsqueeze(1)]
-        batch["input_values"] = augmented
-        batch["labels"] = labels
-        return batch
+    def _valid_test_predict_transforms(self):
+        transforms = hydra.utils.instantiate(args.transforms,
+                                            mode="test",
+                                            )
+        return transforms
     
     def train_dataloader(self):
         #TODO: nontype objects in hf dataset 
