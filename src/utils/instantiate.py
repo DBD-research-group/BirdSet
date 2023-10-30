@@ -36,11 +36,11 @@ def instantiate_wandb(args):
         logger_args
     )
     logger = logger.wandb
-    wandb.config.update(OmegaConf.to_container(
-        args,
-        resolve=True,
-        throw_on_missing=True
-    ))
+    # wandb.config.update(OmegaConf.to_container(
+    #     args,
+    #     resolve=True,
+    #     throw_on_missing=True
+    # ))
     return logger
 
 

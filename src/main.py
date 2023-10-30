@@ -5,7 +5,7 @@ import lightning as L
 from omegaconf import OmegaConf
 from src.utils.instantiate import instantiate_callbacks, instantiate_wandb
 from src.utils.pylogger import get_pylogger
-from src.utils.utils import close_loggers
+from src.utils import utils 
 
 log = get_pylogger(__name__)
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
@@ -25,15 +25,15 @@ def main(cfg):
 
     # Setup data
     log.info(f"Instantiate datamodule <{cfg.datamodule._target_}>")
-    data_module = hydra.utils.instantiate(cfg.datamodule)
-    data_module.prepare_data()
+    datamodule = hydra.utils.instantiate(cfg.datamodule)
+    datamodule.prepare_data()
 
     # Setup model 
     log.info(f"Instantiate model <{cfg.module.model._target_}>")
     model = hydra.utils.instantiate(
         cfg.module,
         num_epochs=cfg.trainer.max_epochs,
-        len_trainset=data_module.len_trainset
+        len_trainset=datamodule.len_trainset
     )
 
     # Setup logger
@@ -50,12 +50,26 @@ def main(cfg):
         cfg.trainer, callbacks= callbacks, logger=logger
     )
 
+    object_dict = {
+        "cfg": cfg, 
+        "datamodule": datamodule,
+        "model": model,
+        "callbacks": callbacks,
+        "logger": logger,
+        "trainer": trainer
+    }
+
+    log.info("Logging Hyperparams")
+    utils.log_hyperparameters(object_dict)
+
     if cfg.get("train"):
         log.info(f"Starting training")
         trainer.fit(
             model=model, 
-            datamodule=data_module,
+            datamodule=datamodule,
             ckpt_path=cfg.get("ckpt_path"))
+    
+    train_metrics = trainer.callback_metrics
 
     if cfg.get("test"):
         log.info(f"Starting testing")
@@ -65,9 +79,12 @@ def main(cfg):
                 "No ckpt saved or found. Using current weights for testing"
             )
             ckpt_path = None
-        trainer.test(model=model, datamodule=data_module, ckpt_path=ckpt_path)
+        trainer.test(model=model, datamodule=datamodule, ckpt_path=ckpt_path)
+    test_metrics = trainer.callback_metrics
 
-    close_loggers()
+    metric_dict = {**train_metrics, **test_metrics}
+    
+    utils.close_loggers()
 
 if __name__ == "__main__":    
     main()
