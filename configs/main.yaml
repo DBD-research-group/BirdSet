@@ -1,8 +1,8 @@
 # @package _global_
 defaults:
   - _self_
-  - datamodule: sapsucker
-  - module: wav2vec2
+  - datamodule: esc50
+  - module: ast
   - callbacks: default
   - paths: default
   - trainer: single_gpu
@@ -17,3 +17,6 @@ defaults:
 task_name: "train"
 ckpt_path: null
 seed: 1
+
+train: True
+test: True

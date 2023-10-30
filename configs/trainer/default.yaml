@@ -7,7 +7,7 @@ max_epochs: 5
 accelerator: "cpu"
 devices: 1
 
-enable_checkpointing: false
+enable_checkpointing: True
 fast_dev_run: false
 
 strategy: "auto"
