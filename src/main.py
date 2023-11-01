@@ -29,19 +29,20 @@ def main(cfg):
     datamodule.prepare_data()
 
     # Setup model 
-    log.info(f"Instantiate model <{cfg.module.model._target_}>")
+    log.info(f"Instantiate model <{cfg.module.model._target_}>")     
     model = hydra.utils.instantiate(
         cfg.module,
         num_epochs=cfg.trainer.max_epochs,
-        len_trainset=datamodule.len_trainset
+        len_trainset=datamodule.len_trainset,
+        _recursive_=False # manually instantiate!
     )
 
     # Setup logger
-    log.info(f"Instantiate logger <{[loggers for loggers in cfg['logger']]}>")
-    logger = instantiate_wandb(cfg) # throws an error in .fit
+    log.info(f"Instantiate logger")
+    logger = instantiate_wandb(cfg) 
 
     # Setup callbacks
-    log.info(f"Instantiate callbacks <{[callbacks for callbacks in cfg['callbacks']]}>")
+    log.info(f"Instantiate callbacks")
     callbacks = instantiate_callbacks(cfg["callbacks"])
 
     # Training

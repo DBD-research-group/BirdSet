@@ -16,18 +16,18 @@ module:
 
 trainer:
   min_epochs: 1
-  max_epochs: 3 
+  max_epochs: 5 
 
 datamodule:
   dataset:
     val_split: 0.2
   loaders:
     train:
-      batch_size: 2
+      batch_size: 6
     valid:
-      batch_size: 2
+      batch_size: 6
     test:
-      batch_size: 2
+      batch_size: 6
 
 logger:
   wandb:

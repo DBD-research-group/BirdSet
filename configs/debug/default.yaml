@@ -3,7 +3,7 @@
 task_name: "debug"
 
 callbacks: null
-logger: null
+#logger: null
 
 extras: 
   ignore_warnings: False
