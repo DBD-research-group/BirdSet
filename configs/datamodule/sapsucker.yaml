@@ -37,7 +37,27 @@ loaders:
     pin_memory: False
 
 transforms:
-  null
+  use_spectrogram: False
+  n_fft: null
+  hop_length: null
+  n_mels: null
+  db_scale: null
+  normalize: False
+  waveform_augmentations:
+    colored_noise:
+      prob: 0.5
+      min_snr_in_db: 3.0
+      max_snr_in_db: 30.0
+      min_f_decay: -2.0
+      max_f_decay: 2.0
+    #background_noise:
+    #    background_paths: "/mnt/home/rheinrich/deep_bird_detect/datapipeline/speech_command_dataset"
+    #    prob: 0.5
+    #    min_snr_in_db: 3.0
+    #    max_snr_in_db: 30.0
+
+  spectrogram_augmentations:
+    null
 
 
 

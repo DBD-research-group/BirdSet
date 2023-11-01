@@ -1,7 +1,7 @@
 # @package _global_
 defaults:
   - _self_
-  - datamodule: sapsucker
+  - datamodule: esc50
   - module: wav2vec2
   - callbacks: default
   - paths: default

@@ -19,7 +19,9 @@ def main(args):
     os.makedirs(args.paths.log_dir, exist_ok=True)
 
     log.info(f"Instantiate logger {[loggers for loggers in args['logger']]}")
-    logger = instantiate_wandb(args) # throws an error in .fit
+
+    # TODO: This line throws an error in .fit which has to be fixed
+    #logger = instantiate_wandb(args)
 
     # Setup data
     log.info(f"Instantiate data module , <{args.datamodule._target_}>")
