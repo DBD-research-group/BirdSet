@@ -123,16 +123,18 @@ class BaseDataModuleHF(L.LightningDataModule):
                 self.test_dataset = load_from_disk(os.path.join(self.data_path, "test"))
 
         if self.transforms:
-            self.train_dataset.set_transform(
-                self._train_transforms, output_all_columns=False
-            )
-            self.val_dataset.set_transforms(
-                self._valid_test_predict_transforms, output_all_columns=False
-            )
+            if stage == "fit":
+                self.train_dataset.set_transform(
+                    self._train_transform, output_all_columns=False
+                )
+                self.val_dataset.set_transform(
+                    self._valid_test_predict_transform, output_all_columns=False
+                )
 
-            self.test_dataset.set_transforms(
-                self._valid_test_predict_transforms, output_all_columns=False
-            )
+            if stage == "test":
+                self.test_dataset.set_transform(
+                    self._valid_test_predict_transform, output_all_columns=False
+                )
 
     def _preprocess_function(self, batch):
         audio_arrays = [x["array"] for x in batch["audio"]]
@@ -146,9 +148,10 @@ class BaseDataModuleHF(L.LightningDataModule):
         )
         return inputs
 
-    def _train_transforms(self):
-        train_transforms = TransformsWrapper(
+    def _train_transform(self, examples):
+        train_transform = TransformsWrapper(
             mode="train",
+            sample_rate=self.feature_extractor.sampling_rate,
             normalize=self.transforms.normalize,
             use_spectrogram=self.transforms.use_spectrogram,
             n_fft = self.transforms.n_fft,
@@ -158,11 +161,12 @@ class BaseDataModuleHF(L.LightningDataModule):
             waveform_augmentations = self.transforms.waveform_augmentations,
             spectrogram_augmentations = self.transforms.spectrogram_augmentations,
         )
-        return train_transforms
+        return train_transform(examples)
 
-    def _valid_test_predict_transforms(self):
-        valid_test_predict_transforms = TransformsWrapper(
+    def _valid_test_predict_transform(self, examples):
+        valid_test_predict_transform = TransformsWrapper(
             mode="test",
+            sample_rate=self.feature_extractor.sampling_rate,
             normalize=self.transforms.normalize,
             use_spectrogram=self.transforms.use_spectrogram,
             n_fft = self.transforms.n_fft,
@@ -172,7 +176,7 @@ class BaseDataModuleHF(L.LightningDataModule):
             waveform_augmentations = None,
             spectrogram_augmentations = None,
         )
-        return valid_test_predict_transforms
+        return valid_test_predict_transform(examples)
 
     def train_dataloader(self):
         # TODO: nontype objects in hf dataset
