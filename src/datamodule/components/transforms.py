@@ -1,5 +1,6 @@
 from typing import Dict, List, Optional
 
+import numpy as np
 from omegaconf import DictConfig
 import torch
 
@@ -9,6 +10,7 @@ from src.datamodule.components.augmentations import AudioAugmentor, WaveAugmenta
 class TransformsWrapper:
     def __init__(self,
                  mode: str,
+                 sample_rate: int,
                  normalize: bool = False,
                  use_spectrogram: bool = False,
                  n_fft: Optional[int] = 2048,
@@ -25,6 +27,7 @@ class TransformsWrapper:
         """
 
         self.normalize = normalize
+        self.sample_rate = sample_rate
 
         self.use_spectrogram = use_spectrogram
         self.n_fft = n_fft
@@ -69,7 +72,7 @@ class TransformsWrapper:
             torch.Tensor: The preprocessed audio waveform or spectrogram as a tensor.
         """
         audio_augmentor = AudioAugmentor(
-            sample_rate=waveform["sampling_rate"],
+            sample_rate=self.sample_rate,
             use_spectrogram=self.use_spectrogram,
             spectrogram_augmentations=self.spectrogram_augmentations,
             waveform_augmentations=self.waveform_augmentations,
@@ -79,7 +82,10 @@ class TransformsWrapper:
             db_scale=self.db_scale,
         )
 
-        audio_augmented = audio_augmentor.combined_augmentations(waveform["array"])
+        waveform = np.array(waveform)
+        print(waveform.shape)
+
+        audio_augmented = audio_augmentor.combined_augmentations(waveform)
 
         if self.normalize:
             raise NotImplementedError("Normalizations are not implemented yet!")
@@ -125,10 +131,13 @@ class TransformsWrapper:
             preprocessed results will be stored in the 'input_values' key.
         """
         # Preprocess and augment each audio waveform in the 'audio' list and store the results in 'input_values'
+
+        print(np.array(examples["input_values"]).shape)
+
         examples["input_values"] = [
             self._transform_function(
                 waveform=audio,
             )
-            for audio in examples["audio"]
+            for audio in examples["input_values"]
         ]
         return examples
