@@ -1,32 +1,44 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from omegaconf import DictConfig
 import torch
 
-from src.datamodule.components.augmentations import AudioAugmentor
+from src.datamodule.components.augmentations import AudioAugmentor, WaveAugmentations, SpecAugmentations
 
 
 class TransformsWrapper:
-    def __init__(self, mode: str, transforms_config: DictConfig) -> None:
+    def __init__(self,
+                 mode: str,
+                 normalize: bool = False,
+                 use_spectrogram: bool = False,
+                 n_fft: Optional[int] = 2048,
+                 hop_length: Optional[int] = 1024,
+                 n_mels: Optional[int] = None,
+                 db_scale: Optional[bool] = False,
+                 waveform_augmentations: Optional[WaveAugmentations] = None,
+                 spectrogram_augmentations: Optional[SpecAugmentations] = None,
+                 ) -> None:
         """TransformsWrapper module.
 
         Args:
             transforms_config (DictConfig): Transforms config.
         """
 
-        self.use_spectrogram = transforms_config.use_spectrogram
-        self.n_fft = transforms_config.n_fft
-        self.hop_length = transforms_config.hop_length
-        self.n_mels = transforms_config.n_mels
-        self.db_scale = transforms_config.db_scale
-        self.normalize = transforms_config.normalize
+        self.normalize = normalize
+
+        self.use_spectrogram = use_spectrogram
+        self.n_fft = n_fft
+        self.hop_length = hop_length
+        self.n_mels = n_mels
+        self.db_scale = db_scale
 
         if mode == "train":
-            self.spectrogram_augmentations = transforms_config.spectrogram_augmentations
-            self.waveform_augmentations = transforms_config.waveform_augmentations
+            self.waveform_augmentations = waveform_augmentations
+            self.spectrogram_augmentations = spectrogram_augmentations
+
         elif mode in ("valid", "test", "predict"):
-            self.spectrogram_augmentations = None
             self.waveform_augmentations = None
+            self.spectrogram_augmentations = None
         else:
             raise NotImplementedError(f"The mode {mode} is not implemented.")
 

@@ -20,6 +20,10 @@ def main(cfg):
 
     log.info(f"Seed everything with <{cfg.seed}>")
     L.seed_everything(cfg.seed)
+    log.info(f"Instantiate logger {[loggers for loggers in cfg['logger']]}")
+
+    # TODO: This line throws an error in .fit which has to be fixed
+    #logger = instantiate_wandb(args)
 
     # Setup data
     log.info(f"Instantiate datamodule <{cfg.datamodule._target_}>")
