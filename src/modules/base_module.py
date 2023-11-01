@@ -69,12 +69,6 @@ class BaseModule(L.LightningModule):
         targets = batch['labels']
         self.log_eval_metrics(logits, targets)
         return logits, targets 
-    
-    def test_step(self, batch, batch_idx):
-        logits = self(**batch)
-        targets = batch['labels']
-        self.log_eval_metrics(logits, targets)
-        return logits, targets 
 
     def log_train_metrics(self, logits, targets):
         metrics = {metric_name: metric(logits, targets) for metric_name, metric in self.train_metrics.items()}

@@ -2,7 +2,7 @@
 defaults:
   - _self_
   - datamodule: esc50
-  - module: wav2vec2
+  - module: ast
   - callbacks: default
   - paths: default
   - trainer: single_gpu
@@ -17,3 +17,6 @@ defaults:
 task_name: "train"
 ckpt_path: null
 seed: 1
+
+train: True
+test: True
