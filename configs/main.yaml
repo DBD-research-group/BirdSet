@@ -2,7 +2,7 @@
 defaults:
   - _self_
   - datamodule: esc50
-  - module: ast
+  - module: wav2vec2
   - callbacks: default
   - paths: default
   - trainer: single_gpu
@@ -20,3 +20,5 @@ seed: 1
 
 train: True
 test: True
+save_state_dict: True
+

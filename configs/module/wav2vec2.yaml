@@ -10,36 +10,35 @@ loss:
 
 optimizer:
   _target_: torch.optim.AdamW
-  _partial_: true #we need model params during training
   lr: 1e-5
   weight_decay: 0.01
 
 lr_scheduler:
-  main:
+  scheduler:
     _target_: transformers.get_linear_schedule_with_warmup
-    _partial_: true
   extras:
+    interval: step
     warmup_ratio: 0.05
 
-train_metrics:
-  train_accuracy:
+metrics: 
+  main: 
     _target_: "torchmetrics.classification.Accuracy"
-    task: "multiclass" # depends on dataset
+    task: "multiclass"
     num_classes: ${datamodule.dataset.n_classes}
-  train_f1:
-    _target_: "torchmetrics.classification.MulticlassF1Score"
-    num_classes: ${datamodule.dataset.n_classes}
+    top_k: 1
+  val_best: 
+    _target_: "torchmetrics.MaxMetric"
 
-eval_metrics:
-  eval_accuracy:
-    _target_: "torchmetrics.classification.Accuracy"
-    task: "multiclass" # depends on dataset
-    num_classes: ${datamodule.dataset.n_classes}
-  eval_f1:
-    _target_: "torchmetrics.classification.MulticlassF1Score"
-    num_classes: ${datamodule.dataset.n_classes}
+output_activation: 
+  _target_: "torch.softmax"
+  dim: 1
 
-scheduler_interval: "step"
+logging_params:
+  on_step: True
+  on_epoch: True
+  sync_dist: False
+  prog_bar: True
+
 model_name: wav2vec2
 torch_compile: false
 

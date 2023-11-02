@@ -11,10 +11,14 @@ class TimeCallback(L.Callback):
 
     def on_fit_start(self, trainer, pl_module):
         self.start = time.time()
-
+    
     def on_fit_end(self, trainer, pl_module):
-        logger.info("Training took %5.2f seconds", (time.time() - self.start))
+        logger.info("Training/Val took %5.2f seconds", (time.time() - self.start))
+
+    def on_test_start(self, trainer, pl_module):
+        self.start = time.time()
 
     def on_test_end(self, trainer, pl_module):
-        print("Hallo")
+        logger.info("Testing took %5.2f seconds", (time.time() - self.start))
+
         

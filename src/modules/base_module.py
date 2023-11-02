@@ -64,6 +64,8 @@ class BaseModule(L.LightningModule):
         # partial
         self.num_epochs = num_epochs
         self.len_trainset = len_trainset
+
+        self.save_hyperparameters()
         
         # if not self.hparams: # throws copy errors! 
         #     # we get an error here otherwise for specific models, something with deepcopy, 
