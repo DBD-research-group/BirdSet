@@ -1,0 +1,17 @@
+model:
+  _target_: src.modules.models.hubert.HubertSequenceClassifier
+  checkpoint: facebook/hubert-base-ls960
+  num_classes: ${datamodule.dataset.n_classes}
+
+model_name: hubert
+torch_compile: false
+
+
+
+
+
+
+
+
+
+

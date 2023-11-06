@@ -1,18 +1,17 @@
 _target_: src.modules.base_module.BaseModule
 
-model:
-  _target_: src.modules.models.w2v2.Wav2vec2SequenceClassifier
-  checkpoint: facebook/wav2vec2-base-960h
-  num_classes: ${datamodule.dataset.n_classes}
-
-loss:
-  _target_: torch.nn.CrossEntropyLoss
+defaults:
+  - _self_
+  - network: ast.yaml
 
 optimizer:
   _target_: torch.optim.AdamW
   lr: 1e-5
   weight_decay: 0.01
 
+loss:
+  _target_: torch.nn.CrossEntropyLoss
+  
 lr_scheduler:
   scheduler:
     _target_: transformers.get_linear_schedule_with_warmup
@@ -28,33 +27,22 @@ metrics:
     top_k: 1
   val_best: 
     _target_: "torchmetrics.MaxMetric"
+  # additional: 
+  #   f1:
+  #     _target_: "torchmetrics.classification.MulticlassF1Score"
+  #     num_classes: ${datamodule.dataset.n_classes}  
+  #   recall:
+  #     _target_: "torchmetrics.classification.Recall"
+  #     task: "multiclass"
+  #     average: "macro"
+  #     num_classes: ${datamodule.dataset.n_classes} 
 
 output_activation: 
-  _target_: "torch.softmax"
+  _target_: "torch.sigmoid"
   dim: 1
 
 logging_params:
-  on_step: True
+  on_step: False
   on_epoch: True
   sync_dist: False
-  prog_bar: True
-
-model_name: wav2vec2
-torch_compile: false
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  prog_bar: True  

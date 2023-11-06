@@ -1,17 +1,18 @@
-_target_: src.datamodule.esc50_datamodule.ESC50
+#UHH
+_target_: src.datamodule.gadme_datamodule.GADMEDataModule
 
 dataset:
   data_dir: ${paths.dataset_path}
-  dataset_name: esc50
-  hf_path: ashraq/esc50
-  hf_name: None
+  dataset_name: hawaiian_islands
+  hf_path: DBD-research-group/gadme_v1
+  hf_name: hawaiian_islands
   seed: ${seed}
-  feature_extractor: 
+  feature_extractor:
     _target_: transformers.AutoFeatureExtractor.from_pretrained
     pretrained_model_name_or_path: ${module.network.model.checkpoint}
-  n_classes: 50
-  n_workers: 1
-  column_list: ["input_values", "target"]
+  n_classes: 21
+  n_workers: 3
+  column_list: ["input_values", "ebird_code"]
   val_split: 0.2
 
 loaders:
@@ -38,3 +39,8 @@ loaders:
 
 transforms:
   null
+
+
+
+
+

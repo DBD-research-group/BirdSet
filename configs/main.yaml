@@ -1,8 +1,8 @@
 # @package _global_
 defaults:
   - _self_
-  - datamodule: esc50
-  - module: wav2vec2
+  - datamodule: bird_db
+  - module: multiclass
   - callbacks: default
   - paths: default
   - trainer: single_gpu
@@ -17,6 +17,9 @@ defaults:
 task_name: "train"
 ckpt_path: null
 seed: 1
+
+module:
+  network: ast
 
 train: True
 test: True

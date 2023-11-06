@@ -1,6 +1,6 @@
 wandb:
   _target_: pytorch_lightning.loggers.WandbLogger
-  name: ${module.model_name}_${datamodule.dataset.dataset_name}_#${seed}
+  name: ${module.network.model_name}_${datamodule.dataset.dataset_name}_#${seed}
   save_dir: "${paths.log_dir}"
   mode: offline
   id: null # pass correct id to resume experiment!

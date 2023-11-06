@@ -125,7 +125,9 @@ class BaseModule(L.LightningModule):
         self.log(
             f"train_loss",
             train_loss,
-            **self.logging_params
+            on_step=True,
+            on_epoch=True,
+            prog_bar=True
         )
 
         self.train_metric(preds, targets)
@@ -135,9 +137,8 @@ class BaseModule(L.LightningModule):
             **self.logging_params
         )
 
-        self.train_add_metrics(preds, targets)
-        self.log_dict(self.train_add_metrics, **self.logging_params)
-
+        #self.train_add_metrics(preds, targets)
+        #self.log_dict(self.train_add_metrics, **self.logging_params)
 
         return {"loss": train_loss}
     
@@ -147,7 +148,9 @@ class BaseModule(L.LightningModule):
         self.log(
             f"val_loss",
             val_loss,
-            **self.logging_params,
+            on_step=True,
+            on_epoch=True,
+            prog_bar=True
         )
 
         self.valid_metric(preds, targets)
@@ -175,7 +178,9 @@ class BaseModule(L.LightningModule):
         self.log(
             f"test_loss",
             test_loss, 
-            **self.logging_params
+            on_step=False,
+            on_epoch=True,
+            prog_bar=True
         )
 
         self.test_metric(preds, targets)
@@ -188,14 +193,15 @@ class BaseModule(L.LightningModule):
         self.test_add_metrics(preds, targets)
         self.log_dict(self.test_add_metrics, **self.logging_params)
         return {"loss": test_loss, "preds": preds, "targets": targets}
+        
 
-    def log_train_metrics(self, logits, targets):
-        metrics = {metric_name: metric(logits, targets) for metric_name, metric in self.train_metrics.items()}
-        self.log_dict(metrics, prog_bar=True)
+    # def log_train_metrics(self, logits, targets):
+    #     metrics = {metric_name: metric(logits, targets) for metric_name, metric in self.train_metrics.items()}
+    #     self.log_dict(metrics, prog_bar=True)
 
-    def log_eval_metrics(self, logits, targets):
-        metrics = {metric_name: metric(logits, targets) for metric_name, metric in self.eval_metrics.items()}
-        self.log_dict(metrics, prog_bar=True, on_epoch=True)
+    # def log_eval_metrics(self, logits, targets):
+    #     metrics = {metric_name: metric(logits, targets) for metric_name, metric in self.eval_metrics.items()}
+    #     self.log_dict(metrics, prog_bar=True, on_epoch=True)
 
     def setup(self, stage):
         if self.torch_compile and stage=="fit":

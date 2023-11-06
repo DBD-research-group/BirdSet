@@ -2,9 +2,12 @@
 
 task_name: "debug"
 train: True
-#callbacks: null
+# callbacks: null
 #logger: null
-
+module:
+  model:
+    problem_type: "multi-label-classification"
+    
 extras: 
   ignore_warnings: False
 
@@ -15,7 +18,7 @@ hydra:
 
 trainer: 
   max_epochs: 1
-  accelerator: gpu
+  accelerator: cpu
   devices: 1
   detect_anomaly: True
   fast_dev_run: False

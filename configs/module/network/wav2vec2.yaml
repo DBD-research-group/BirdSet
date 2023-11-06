@@ -1,0 +1,24 @@
+network:
+  _target_: src.modules.models.w2v2.Wav2vec2SequenceClassifier
+  checkpoint: facebook/wav2vec2-base-960h
+  num_classes: ${datamodule.dataset.n_classes}
+
+model_name: wav2vec2
+torch_compile: false
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

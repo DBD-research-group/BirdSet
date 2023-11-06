@@ -14,9 +14,9 @@ class ASTSequenceClassifier(nn.Module):
             num_labels=self.num_classes,
             ignore_mismatched_sizes=True
         )
+        #TODO! problem type not really used, only bcewithlogits on logits
         
     def forward(self, input_values, attention_mask=None, labels=None, return_hidden_state=False):
-
         outputs = self.model(
             input_values, 
             attention_mask,

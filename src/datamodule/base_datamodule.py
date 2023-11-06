@@ -8,10 +8,9 @@ import torch_audiomentations
 
 from datasets import load_dataset, load_from_disk, Audio, DatasetDict
 from torch.utils.data import DataLoader
-from transformers import AutoFeatureExtractor
 from omegaconf import DictConfig
 
-class BaseDataModule(L.LightningDataModule):
+class BaseDataModuleHF(L.LightningDataModule):
 
     def __init__(
             self, 
