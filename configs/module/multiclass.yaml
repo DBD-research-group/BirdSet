@@ -38,7 +38,7 @@ metrics:
   #     num_classes: ${datamodule.dataset.n_classes} 
 
 output_activation: 
-  _target_: "torch.sigmoid"
+  _target_: "torch.softmax"
   dim: 1
 
 logging_params:

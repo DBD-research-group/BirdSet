@@ -19,21 +19,19 @@ import lightning as L
 class BaseModule(L.LightningModule):
     def __init__(
         self,
-        model,
+        network,
         output_activation,
         loss,
         optimizer,
         lr_scheduler,
         metrics,
         logging_params,
-        torch_compile,
-        model_name,
         num_epochs,
         len_trainset):
 
         super(BaseModule, self).__init__()
 
-        self.model = hydra.utils.instantiate(model)
+        self.model = hydra.utils.instantiate(network.model)
         self.opt_params = optimizer
         self.lrs_params = lr_scheduler
 
@@ -58,8 +56,8 @@ class BaseModule(L.LightningModule):
 
         # self.train_metrics = nn.ModuleDict(train_metrics)
         # self.eval_metrics = nn.ModuleDict(eval_metrics)
-        self.torch_compile = torch_compile
-        self.model_name = model_name
+        self.torch_compile = network.torch_compile
+        self.model_name = network.model_name
 
         # partial
         self.num_epochs = num_epochs

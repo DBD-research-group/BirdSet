@@ -2,13 +2,13 @@
 #package global is neccessary!
 defaults:
   - override /datamodule: esc50.yaml
-  - override /module: ast.yaml
+  - override /module: multiclass.yaml
   - override /callbacks: default.yaml 
   - override /trainer: single_gpu.yaml
 
 
 tags: ["esc50", "ast"]
-seed: 5
+seed: 2
 
 module:
   optimizer:
