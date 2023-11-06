@@ -1,7 +1,7 @@
 from omegaconf import DictConfig
-from .base_datamodule import BaseDataModule
+from .base_datamodule import BaseDataModuleHF
 
-class ESC50(BaseDataModule):
+class ESC50(BaseDataModuleHF):
     def __init__(
             self,
             dataset: DictConfig,

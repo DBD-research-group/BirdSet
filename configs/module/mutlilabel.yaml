@@ -1,0 +1,48 @@
+_target_: src.modules.base_module.BaseModule
+
+defaults:
+  - _self_
+  - network: ast.yaml
+
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 1e-5
+  weight_decay: 0.01
+
+loss:
+  _target_: torch.nn.BCEWithLogitsLoss
+  
+lr_scheduler:
+  scheduler:
+    _target_: transformers.get_linear_schedule_with_warmup
+  extras:
+    interval: step
+    warmup_ratio: 0.05
+
+metrics: 
+  main: 
+    _target_: "torchmetrics.classification.Accuracy"
+    task: "multilabel"
+    num_classes: ${datamodule.dataset.n_classes}
+    top_k: 1
+  val_best: 
+    _target_: "torchmetrics.MaxMetric"
+  # additional: 
+  #   f1:
+  #     _target_: "torchmetrics.classification.MulticlassF1Score"
+  #     num_classes: ${datamodule.dataset.n_classes}  
+  #   recall:
+  #     _target_: "torchmetrics.classification.Recall"
+  #     task: "multiclass"
+  #     average: "macro"
+  #     num_classes: ${datamodule.dataset.n_classes} 
+
+output_activation: 
+  _target_: "torch.softmax"
+  dim: 1
+
+logging_params:
+  on_step: False
+  on_epoch: True
+  sync_dist: False
+  prog_bar: True  

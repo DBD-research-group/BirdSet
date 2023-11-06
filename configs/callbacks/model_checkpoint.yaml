@@ -1,11 +1,11 @@
 model_checkpoint:
   _target_: lightning.pytorch.callbacks.ModelCheckpoint
   dirpath: ${paths.output_dir}/checkpoints
-  filename: test_${module.model_name}_${datamodule.dataset.dataset_name}_{epoch:02d}
+  filename: test_${module.network.model_name}_${datamodule.dataset.dataset_name}_{epoch:02d}
   monitor: "val_loss"
   verbose: False
-  save_last: True
-  save_top_k: 2
+  save_last: False
+  save_top_k: 0
   mode: "min"
   auto_insert_metric_name: False
   save_weights_only: False

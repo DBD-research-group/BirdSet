@@ -1,0 +1,1 @@
+from src.modules.losses.loader import load_loss

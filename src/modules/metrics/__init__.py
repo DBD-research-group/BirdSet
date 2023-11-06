@@ -1,0 +1,1 @@
+from src.modules.metrics.loader import load_metrics

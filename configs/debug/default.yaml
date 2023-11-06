@@ -1,10 +1,13 @@
 # @package _global_
 
 task_name: "debug"
-
-callbacks: null
-logger: null
-
+train: True
+# callbacks: null
+#logger: null
+module:
+  model:
+    problem_type: "multi-label-classification"
+    
 extras: 
   ignore_warnings: False
 
@@ -18,6 +21,7 @@ trainer:
   accelerator: cpu
   devices: 1
   detect_anomaly: True
+  fast_dev_run: False
 
 datamodule: 
   loaders:

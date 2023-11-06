@@ -2,6 +2,7 @@
 from importlib.util import find_spec
 from src.utils import pylogger
 from pytorch_lightning.utilities import rank_zero_only
+from omegaconf import OmegaConf
 
 log = pylogger.get_pylogger(__name__)
 
@@ -36,5 +37,7 @@ def log_hyperparameters(object_dict):
     hparams["ckpt_path"] = cfg.get("ckpt_path")
     hparams["seed"] = cfg.get("seed")
 
-    trainer.logger.log_hyperparams(hparams)
+    #trainer.logger.experiment.config.update(hparams, allow_val_change=True)
+    trainer.logger.log_hyperparams(OmegaConf.to_container(cfg))
+    #trainer.logger.log_hyperparams(hparams)
     
