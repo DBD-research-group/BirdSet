@@ -41,7 +41,7 @@ def main(cfg):
     )
 
     # Setup model 
-    log.info(f"Instantiate model <{cfg.module.model._target_}>")     
+    log.info(f"Instantiate model <{cfg.module.network.model._target_}>")     
     model = hydra.utils.instantiate(
         cfg.module,
         num_epochs=cfg.trainer.max_epochs,

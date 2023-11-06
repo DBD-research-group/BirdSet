@@ -7,27 +7,27 @@ defaults:
   - override /trainer: single_gpu.yaml
 
 
-tags: ["esc50", "wav2vec2"]
-seed: 5
+tags: ["wav2vec2", "ast"]
+seed: 2
 
 module:
   optimizer:
-    lr: 1e-5
+    lr: 2e-5
 
 trainer:
   min_epochs: 1
-  max_epochs: 1
+  max_epochs: 5
 
 datamodule:
   dataset:
     val_split: 0.2
   loaders:
     train:
-      batch_size: 12
+      batch_size: 1
     valid:
-      batch_size: 20
+      batch_size: 1
     test:
-      batch_size: 20
+      batch_size: 1
 
 logger:
   wandb:
