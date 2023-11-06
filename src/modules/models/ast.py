@@ -17,6 +17,8 @@ class ASTSequenceClassifier(nn.Module):
         
     def forward(self, input_values, attention_mask=None, labels=None, return_hidden_state=False):
 
+        input_values = input_values.transpose(1, 2)
+
         outputs = self.model(
             input_values, 
             attention_mask,
