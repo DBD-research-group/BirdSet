@@ -221,8 +221,6 @@ class AudioAugmentor:
                 )
                 augmentations_audiomentations.append(time_mask)
 
-                print("time mask was used")
-
             # Change the speed or duration of the signal without changing the pitch.
             if "time_stretch" in self.waveform_augmentations:
                 min_rate = self.waveform_augmentations["time_stretch"]["min_rate"]
@@ -232,8 +230,6 @@ class AudioAugmentor:
                     min_rate=min_rate, max_rate=max_rate, p=prob
                 )
                 augmentations_audiomentations.append(time_stretch)
-
-                print("time stretch was used")
 
             waveform_transforms_audiomentations = audiomentations.Compose(
                 transforms=augmentations_audiomentations
@@ -272,8 +268,6 @@ class AudioAugmentor:
                 )
                 augmentations_torch_audiomentations.append(colored_noise)
 
-                print("colored noise was used")
-
             # Add background noise to the input audio.
             if "background_noise" in self.waveform_augmentations:
                 prob = self.waveform_augmentations["background_noise"]["prob"]
@@ -294,8 +288,6 @@ class AudioAugmentor:
                 )
                 augmentations_torch_audiomentations.append(background_noise)
 
-                print("background noise was used")
-
             # Pitch-shift sounds up or down without changing the tempo.
             if "pitch_shift" in self.waveform_augmentations:
                 prob = self.waveform_augmentations["pitch_shift"]["prob"]
@@ -312,8 +304,6 @@ class AudioAugmentor:
                     max_transpose_semitones=max_transpose_semitones,
                 )
                 augmentations_torch_audiomentations.append(pitch_shift)
-
-                print("pitch shift was used")
 
             waveform_transforms_torch_audiomentations = torch_audiomentations.Compose(
                 transforms=augmentations_torch_audiomentations

@@ -17,6 +17,9 @@ class ASTSequenceClassifier(nn.Module):
         #TODO! problem type not really used, only bcewithlogits on logits
         
     def forward(self, input_values, attention_mask=None, labels=None, return_hidden_state=False):
+
+        input_values = input_values.transpose(1, 2)
+
         outputs = self.model(
             input_values, 
             attention_mask,

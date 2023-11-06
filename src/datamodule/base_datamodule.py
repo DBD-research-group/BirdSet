@@ -158,6 +158,8 @@ class BaseDataModuleHF(L.LightningDataModule):
             hop_length = self.transforms.hop_length,
             n_mels = self.transforms.n_mels,
             db_scale = self.transforms.db_scale,
+            target_height=self.transforms.target_height,
+            target_width=self.transforms.target_width,
             waveform_augmentations = self.transforms.waveform_augmentations,
             spectrogram_augmentations = self.transforms.spectrogram_augmentations,
         )
@@ -173,6 +175,8 @@ class BaseDataModuleHF(L.LightningDataModule):
             hop_length = self.transforms.hop_length,
             n_mels = self.transforms.n_mels,
             db_scale = self.transforms.db_scale,
+            target_height=self.transforms.target_height,
+            target_width=self.transforms.target_width,
             waveform_augmentations = None,
             spectrogram_augmentations = None,
         )

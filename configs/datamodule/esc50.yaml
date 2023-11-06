@@ -6,9 +6,10 @@ dataset:
   hf_path: ashraq/esc50
   hf_name: None
   seed: ${seed}
-  feature_extractor: 
-    _target_: transformers.AutoFeatureExtractor.from_pretrained
-    pretrained_model_name_or_path: ${module.network.model.checkpoint}
+  feature_extractor:
+    _target_: src.utils.ast_extractor.CustomASTFeatureExtractor
+    #_target_: transformers.AutoFeatureExtractor.from_pretrained
+    #pretrained_model_name_or_path: ${module.model.checkpoint}
   n_classes: 50
   n_workers: 1
   column_list: ["input_values", "target"]
@@ -37,12 +38,15 @@ loaders:
     pin_memory: False
 
 transforms:
-  normalize: False
-  use_spectrogram: False
-  n_fft: null
-  hop_length: null
-  n_mels: null
-  db_scale: null
+  use_channel_dim: False
+  normalize: True
+  use_spectrogram: True
+  n_fft: 1024
+  hop_length: 79
+  n_mels: 128
+  db_scale: True
+  target_height: null
+  target_width: 1024
   waveform_augmentations:
     colored_noise:
       prob: 0.5
@@ -57,5 +61,14 @@ transforms:
     #    max_snr_in_db: 30.0
 
   spectrogram_augmentations:
-    null
+    time_masking:
+      time_mask_param: 100
+      prob: 0.5
+    frequency_masking:
+      freq_mask_param: 100
+      prob: 0.5
+    time_stretch:
+      prob: 0.5
+      min_rate: 0.8
+      max_rate: 1.2
 

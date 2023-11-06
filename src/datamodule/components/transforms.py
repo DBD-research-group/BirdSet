@@ -5,6 +5,7 @@ from omegaconf import DictConfig
 import torch
 
 from src.datamodule.components.augmentations import AudioAugmentor, WaveAugmentations, SpecAugmentations
+from src.datamodule.components.resize import Resizer
 
 
 class TransformsWrapper:
@@ -12,11 +13,14 @@ class TransformsWrapper:
                  mode: str,
                  sample_rate: int,
                  normalize: bool = False,
+                 use_channel_dim: bool = False,
                  use_spectrogram: bool = False,
                  n_fft: Optional[int] = 2048,
                  hop_length: Optional[int] = 1024,
                  n_mels: Optional[int] = None,
                  db_scale: Optional[bool] = False,
+                 target_height: Optional[int] = None,
+                 target_width: Optional[int] = None,
                  waveform_augmentations: Optional[WaveAugmentations] = None,
                  spectrogram_augmentations: Optional[SpecAugmentations] = None,
                  ) -> None:
@@ -26,6 +30,7 @@ class TransformsWrapper:
             transforms_config (DictConfig): Transforms config.
         """
 
+        self.use_channel_dim = use_channel_dim
         self.normalize = normalize
         self.sample_rate = sample_rate
 
@@ -34,6 +39,10 @@ class TransformsWrapper:
         self.hop_length = hop_length
         self.n_mels = n_mels
         self.db_scale = db_scale
+
+        self.resizer = Resizer(use_spectrogram=use_spectrogram)
+        self.target_height = target_height
+        self.target_width = target_width
 
         if mode == "train":
             self.waveform_augmentations = waveform_augmentations
@@ -83,12 +92,18 @@ class TransformsWrapper:
         )
 
         waveform = np.array(waveform)
-        print(waveform.shape)
 
         audio_augmented = audio_augmentor.combined_augmentations(waveform)
 
+        # resize the data
+        audio_augmented = self.resizer.resize(audio_augmented, target_height=self.target_height, target_width=self.target_width)
+
+        if not self.use_channel_dim:
+            audio_augmented = audio_augmented.squeeze(0)
+
         if self.normalize:
-            raise NotImplementedError("Normalizations are not implemented yet!")
+            # TODO: currently hardcoded, here we need a normalization module!
+            audio_augmented = (audio_augmented - (-4.268)) / (4.569 * 2)
 
         return audio_augmented
 
@@ -131,8 +146,6 @@ class TransformsWrapper:
             preprocessed results will be stored in the 'input_values' key.
         """
         # Preprocess and augment each audio waveform in the 'audio' list and store the results in 'input_values'
-
-        print(np.array(examples["input_values"]).shape)
 
         examples["input_values"] = [
             self._transform_function(
