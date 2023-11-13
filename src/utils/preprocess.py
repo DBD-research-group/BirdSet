@@ -377,11 +377,11 @@ def collate_batch(
         class as a string.
     """
     # Extract 'input_values' tensor from each sample and stack them to create a batch tensor
-    input_features = [sample["input_values"].unsqueeze(0) for sample in batch]
+    input_features = [sample["input_values"].unsqueeze(0).unsqueeze(0) for sample in batch]
     input_features = torch.cat(input_features, 0)
 
     # Extract 'target' tensor from each sample and convert it to a tensor of integers
-    targets = [sample["target"] for sample in batch]
+    targets = [sample["labels"] for sample in batch]
     targets = torch.tensor(targets)
     targets = targets.to(torch.int64)
 

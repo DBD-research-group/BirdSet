@@ -1,5 +1,7 @@
 from omegaconf import DictConfig
 from .base_datamodule import BaseDataModuleHF
+from torch.utils.data import DataLoader
+from src.utils.preprocess import collate_batch
 
 class ESC50(BaseDataModuleHF):
     def __init__(
@@ -27,3 +29,19 @@ class ESC50(BaseDataModuleHF):
         val_dataset = split_2["train"]
         test_dataset = split_2["test"]
         return train_dataset, val_dataset, test_dataset
+    
+    def train_dataloader(self):
+        return DataLoader(
+            self.train_dataset,
+            collate_fn = lambda x: collate_batch(x, return_category=False),**self.loaders.get("train")
+        )
+    def val_dataloader(self):
+        return DataLoader(
+            self.val_dataset,
+            collate_fn = lambda x: collate_batch(x, return_category=False),**self.loaders.get("valid")
+        )
+    def test_dataloader(self):
+        return DataLoader(
+            self.test_dataset,
+            collate_fn = lambda x: collate_batch(x, return_category=False),**self.loaders.get("test")
+        )

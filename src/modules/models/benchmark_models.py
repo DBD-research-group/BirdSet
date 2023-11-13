@@ -1,6 +1,6 @@
 from typing import List, Literal, Tuple
 
-import pytorch_lightning as pl
+from lightning import LightningModule
 import torch
 import torchmetrics
 from torch import nn
@@ -20,7 +20,7 @@ EfficientNetVersion = Literal[
 ]
 
 
-class LightningResNet(pl.LightningModule):
+class LightningResNet(LightningModule):
     def __init__(
         self,
         baseline_architecture: ResNetVersion,
@@ -175,7 +175,7 @@ class LightningResNet(pl.LightningModule):
         self.log("test_acc", acc, prog_bar=True, logger=True)
 
 
-class LightningEfficientNet(pl.LightningModule):
+class LightningEfficientNet(LightningModule):
     def __init__(
         self,
         baseline_architecture: EfficientNetVersion,
