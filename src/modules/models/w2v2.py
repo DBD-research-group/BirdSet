@@ -11,7 +11,7 @@ class Wav2vec2SequenceClassifier(nn.Module):
         self.num_classes = num_classes
         self.model = AutoModelForAudioClassification.from_pretrained(
             self.checkpoint,
-            num_labels=self.num_classes
+            num_labels=self.num_classes,
         )
 
     def forward(self, input_values, attention_mask=None, labels=None, return_hidden_state=False):

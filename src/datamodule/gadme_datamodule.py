@@ -1,7 +1,7 @@
-from .base_datamodule import BaseDataModule
 from omegaconf import DictConfig
+from .base_datamodule import BaseDataModuleHF
 
-class HighSierra(BaseDataModule):
+class GADMEDataModule(BaseDataModuleHF):
     def __init__(
             self,
             dataset: DictConfig,

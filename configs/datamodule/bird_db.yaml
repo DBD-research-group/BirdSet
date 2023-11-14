@@ -1,36 +1,36 @@
-_target_: src.datamodule.sapsucker_datamodule.SapsuckerWoods
+_target_: src.datamodule.gadme_datamodule.GADMEDataModule
 
 dataset:
   data_dir: ${paths.dataset_path}
-  dataset_name: sapsucker
-  hf_path: DBD-research-group/gadme_v1_1
-  hf_name: NA_subset500
+  dataset_name: bird_db
+  hf_path: DBD-research-group/gadme_v1
+  hf_name: bird_db
   seed: ${seed}
-  feature_extractor: 
+  feature_extractor:
     _target_: transformers.AutoFeatureExtractor.from_pretrained
-    pretrained_model_name_or_path: ${module.model.checkpoint}
-  n_classes: 500
-  n_workers: 1
+    pretrained_model_name_or_path: ${module.network.model.checkpoint}
+  n_classes: 4
+  n_workers: 3
   column_list: ["input_values", "ebird_code"]
   val_split: 0.2
 
 loaders:
   train:
-    batch_size: 2
+    batch_size: 6
     shuffle: True
     num_workers: 4
     drop_last: False
     pin_memory: False
   
   valid:
-    batch_size: 2
+    batch_size: 6
     shuffle: False
     num_workers: 4
     drop_last: False
     pin_memory: False
   
   test:
-    batch_size: 2
+    batch_size: 6
     shuffle: False
     num_workers: 4
     drop_last: False
@@ -58,6 +58,8 @@ transforms:
 
   spectrogram_augmentations:
     null
+
+
 
 
 

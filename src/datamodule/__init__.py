@@ -1,4 +1,4 @@
-from .sapsucker_datamodule import SapsuckerWoods
+from .gadme_datamodule import GADMEDataModule
 from .esc50_datamodule import ESC50
-from .highsierra_datamodule import HighSierra
+
 

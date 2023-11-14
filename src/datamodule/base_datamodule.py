@@ -11,7 +11,7 @@ from omegaconf import DictConfig
 from src.datamodule.components.transforms import TransformsWrapper
 
 
-class BaseDataModule(L.LightningDataModule):
+class BaseDataModuleHF(L.LightningDataModule):
     def __init__(
         self, dataset: DictConfig, loaders: DictConfig, transforms: DictConfig
     ):

@@ -46,7 +46,7 @@ def instantiate_wandb(args):
 
 def initialize_wandb_logger(args):
     wandb_logger = WandbLogger(
-        name=args.module.model_name+'_'+args.datamodule.dataset.dataset_name+'#'+str(args.seed),
+        name=args.module.network.model_name+'_'+args.datamodule.dataset.dataset_name+'#'+str(args.seed),
         save_dir=args.paths.log_dir,
         project=args.logger.wandb.project,
         mode=args.logger.wandb.mode,

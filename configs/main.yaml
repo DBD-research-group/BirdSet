@@ -2,7 +2,7 @@
 defaults:
   - _self_
   - datamodule: esc50
-  - module: ast
+  - module: multiclass
   - callbacks: default
   - paths: default
   - trainer: single_gpu
@@ -18,5 +18,12 @@ task_name: "train"
 ckpt_path: null
 seed: 1
 
+module:
+  network: ast
+logger:
+  wandb:
+    mode: online
 train: True
 test: True
+save_state_dict: True
+

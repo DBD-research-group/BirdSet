@@ -3,11 +3,9 @@ import rootutils
 import hydra
 import lightning as L 
 from omegaconf import OmegaConf
-from src.utils.instantiate import instantiate_callbacks, instantiate_wandb
-from src.utils.pylogger import get_pylogger
-from src.utils import utils 
+from src import utils
 
-log = get_pylogger(__name__)
+log = utils.get_pylogger(__name__)
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
 
 @hydra.main(version_base=None, config_path="../configs", config_name="main")
@@ -22,32 +20,37 @@ def main(cfg):
 
     log.info(f"Seed everything with <{cfg.seed}>")
     L.seed_everything(cfg.seed)
+    log.info(f"Instantiate logger {[loggers for loggers in cfg['logger']]}")
+
+    # TODO: This line throws an error in .fit which has to be fixed
+    #logger = instantiate_wandb(args)
 
     # Setup data
     log.info(f"Instantiate datamodule <{cfg.datamodule._target_}>")
     datamodule = hydra.utils.instantiate(cfg.datamodule)
     datamodule.prepare_data()
 
-    # Setup model 
-    log.info(f"Instantiate model <{cfg.module.model._target_}>")
-    model = hydra.utils.instantiate(
-        cfg.module,
-        num_epochs=cfg.trainer.max_epochs,
-        len_trainset=datamodule.len_trainset
-    )
-
     # Setup logger
-    log.info(f"Instantiate logger <{[loggers for loggers in cfg['logger']]}>")
-    logger = instantiate_wandb(cfg) # throws an error in .fit
+    log.info(f"Instantiate logger")
+    logger = utils.instantiate_wandb(cfg) 
 
     # Setup callbacks
-    log.info(f"Instantiate callbacks <{[callbacks for callbacks in cfg['callbacks']]}>")
-    callbacks = instantiate_callbacks(cfg["callbacks"])
+    log.info(f"Instantiate callbacks")
+    callbacks = utils.instantiate_callbacks(cfg["callbacks"])
 
     # Training
     log.info(f"Instantiate trainer <{cfg.trainer._target_}>")
     trainer = hydra.utils.instantiate(
         cfg.trainer, callbacks= callbacks, logger=logger
+    )
+
+    # Setup model 
+    log.info(f"Instantiate model <{cfg.module.network.model._target_}>")     
+    model = hydra.utils.instantiate(
+        cfg.module,
+        num_epochs=cfg.trainer.max_epochs,
+        len_trainset=datamodule.len_trainset,
+        _recursive_=False # manually instantiate!
     )
 
     object_dict = {
@@ -74,13 +77,30 @@ def main(cfg):
     if cfg.get("test"):
         log.info(f"Starting testing")
         ckpt_path = trainer.checkpoint_callback.best_model_path
+        print(ckpt_path)
         if ckpt_path == "":
             log.warning(
                 "No ckpt saved or found. Using current weights for testing"
             )
             ckpt_path = None
+        else:
+            log.info(
+                f"The best checkpoint for {cfg.callbacks.model_checkpoint.monitor}"
+                f" is {trainer.checkpoint_callback.best_model_score}"
+                f" and saved in {ckpt_path}"   
+            )
         trainer.test(model=model, datamodule=datamodule, ckpt_path=ckpt_path)
+
     test_metrics = trainer.callback_metrics
+
+    if cfg.get("save_state_dict"):
+        log.info("Saving state dicts")
+        utils.save_state_dicts(
+            trainer=trainer,
+            model=model, 
+            dirname=cfg.paths.output_dir,
+            **cfg.extras.state_dict_saving_params  
+        )
 
     metric_dict = {**train_metrics, **test_metrics}
     

@@ -6,3 +6,8 @@ print_config: True
 
 plugins: null
 
+state_dict_saving_params: 
+  symbols: 6
+  exceptions: ["loss"]
+
+
