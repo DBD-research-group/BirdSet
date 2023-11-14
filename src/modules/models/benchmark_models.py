@@ -85,6 +85,7 @@ class LightningResNet(LightningModule):
         resnet_model.conv1 = nn.Conv2d(
             num_channels, 64, kernel_size=7, stride=2, padding=3, bias=False
         )
+        resnet_model.bn1 = nn.BatchNorm2d(64)
 
         self.model = resnet_model
 
