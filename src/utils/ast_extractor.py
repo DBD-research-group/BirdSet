@@ -64,13 +64,11 @@ class CustomASTFeatureExtractor(SequenceFeatureExtractor):
         self,
         feature_size=1,
         sampling_rate=16000,
-        max_length=1024,
         padding_value=0.0,
         return_attention_mask=False,
         **kwargs,
     ):
         super().__init__(feature_size=feature_size, sampling_rate=sampling_rate, padding_value=padding_value, **kwargs)
-        self.max_length = max_length
         self.return_attention_mask = return_attention_mask
 
     def __call__(
