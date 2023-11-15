@@ -20,7 +20,7 @@ class BaseDataModuleHF(L.LightningDataModule):
         self.dataset = dataset
         self.loaders = loaders
         self.transforms = transforms
-        self.feature_extractor = hydra.utils.instantiate(self.dataset.feature_extractor)
+        self.feature_extractor = self.dataset.feature_extractor
 
         self.data_path = None
         self.train_dataset = None

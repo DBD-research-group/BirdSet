@@ -8,8 +8,11 @@ dataset:
   seed: ${seed}
   feature_extractor:
     _target_: src.utils.ast_extractor.CustomASTFeatureExtractor
-    #_target_: transformers.AutoFeatureExtractor.from_pretrained
-    #pretrained_model_name_or_path: ${module.model.checkpoint}
+    n_classes: 50
+    n_workers: 1
+    column_list: ["input_values", "target"]
+    sampling_rate: 32000
+    return_tensor: 'pt'
   n_classes: 50
   n_workers: 1
   column_list: ["input_values", "target"]

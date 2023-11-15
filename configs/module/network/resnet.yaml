@@ -1,0 +1,8 @@
+model_name: "resnet18"
+model:
+  _target_: src.modules.models.resnet.ResNetClassifier
+  baseline_architecture: 'resnet18'
+  num_classes: 50
+  num_channels: 1
+  pretrained: True
+torch_compile: False
