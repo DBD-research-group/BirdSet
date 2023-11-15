@@ -11,6 +11,11 @@ defaults:
 tags: ["esc50", "resnet"]
 seed: 2
 
+callbacks:
+  early_stopping:
+    patience: 50
+    min_delta: 5e-10
+
 module:
   lr_scheduler:
     _target_: torch.optim.lr_scheduler
@@ -26,10 +31,10 @@ datamodule:
   loaders:
     train:
       batch_size: 64
-      num_workers: 32
+      num_workers: 16
     valid:
       batch_size: 64
-      num_workers: 32
+      num_workers: 16
     test:
       batch_size: 6
   transforms:

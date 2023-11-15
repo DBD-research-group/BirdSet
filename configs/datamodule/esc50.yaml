@@ -24,6 +24,7 @@ loaders:
     shuffle: True
     num_workers: 4
     drop_last: False
+    persistent_workers: True
     pin_memory: False
   
   valid:
@@ -31,6 +32,7 @@ loaders:
     shuffle: False
     num_workers: 4
     drop_last: False
+    persistent_workers: True
     pin_memory: False
   
   test:
