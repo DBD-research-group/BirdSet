@@ -1,14 +1,13 @@
 import logging
 import os
 
+import hydra
 import lightning as L
 
 from datasets import load_dataset, load_from_disk, Audio, DatasetDict
 from torch.utils.data import DataLoader
 
 from omegaconf import DictConfig
-
-from src.datamodule.components.transforms import TransformsWrapper
 
 
 class BaseDataModuleHF(L.LightningDataModule):
@@ -149,37 +148,23 @@ class BaseDataModuleHF(L.LightningDataModule):
         return inputs
 
     def _train_transform(self, examples):
-        train_transform = TransformsWrapper(
+        train_transform = hydra.utils.instantiate(
+            self.transforms,
             mode="train",
             sample_rate=self.feature_extractor.sampling_rate,
-            normalize=self.transforms.normalize,
-            use_spectrogram=self.transforms.use_spectrogram,
-            n_fft = self.transforms.n_fft,
-            hop_length = self.transforms.hop_length,
-            n_mels = self.transforms.n_mels,
-            db_scale = self.transforms.db_scale,
-            target_height=self.transforms.target_height,
-            target_width=self.transforms.target_width,
-            waveform_augmentations = self.transforms.waveform_augmentations,
-            spectrogram_augmentations = self.transforms.spectrogram_augmentations,
         )
+
         return train_transform(examples)
 
     def _valid_test_predict_transform(self, examples):
-        valid_test_predict_transform = TransformsWrapper(
+        valid_test_predict_transform = hydra.utils.instantiate(
+            self.transforms,
             mode="test",
             sample_rate=self.feature_extractor.sampling_rate,
-            normalize=self.transforms.normalize,
-            use_spectrogram=self.transforms.use_spectrogram,
-            n_fft = self.transforms.n_fft,
-            hop_length = self.transforms.hop_length,
-            n_mels = self.transforms.n_mels,
-            db_scale = self.transforms.db_scale,
-            target_height=self.transforms.target_height,
-            target_width=self.transforms.target_width,
-            waveform_augmentations = None,
-            spectrogram_augmentations = None,
+            waveform_augmentations=None,
+            spectrogram_augmentations=None,
         )
+
         return valid_test_predict_transform(examples)
 
     def train_dataloader(self):

@@ -37,12 +37,16 @@ loaders:
     pin_memory: False
 
 transforms:
-  use_spectrogram: False
-  n_fft: null
-  hop_length: null
-  n_mels: null
-  db_scale: null
-  normalize: False
+  _target_: src.datamodule.components.transforms.TransformsWrapper
+  _partial_: True
+  normalize: True
+  use_spectrogram: True
+  n_fft: 1024
+  hop_length: 79
+  n_mels: 128
+  db_scale: True
+  target_height: null
+  target_width: 1024
   waveform_augmentations:
     colored_noise:
       prob: 0.5
