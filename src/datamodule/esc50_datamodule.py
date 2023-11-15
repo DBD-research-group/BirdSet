@@ -1,7 +1,7 @@
 from omegaconf import DictConfig
 from .base_datamodule import BaseDataModuleHF
 from torch.utils.data import DataLoader
-from src.utils.preprocess import collate_batch
+
 
 class ESC50(BaseDataModuleHF):
     def __init__(
