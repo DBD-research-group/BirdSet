@@ -4,33 +4,36 @@ import numpy as np
 from omegaconf import DictConfig
 import torch
 
-from src.datamodule.components.augmentations import AudioAugmentor, WaveAugmentations, SpecAugmentations
+from src.datamodule.components.augmentations import (
+    AudioAugmentor,
+    WaveAugmentations,
+    SpecAugmentations,
+)
 from src.datamodule.components.resize import Resizer
 
 
 class TransformsWrapper:
-    def __init__(self,
-                 mode: str,
-                 sample_rate: int,
-                 normalize: bool = False,
-                 use_channel_dim: bool = False,
-                 use_spectrogram: bool = False,
-                 n_fft: Optional[int] = 2048,
-                 hop_length: Optional[int] = 1024,
-                 n_mels: Optional[int] = None,
-                 db_scale: Optional[bool] = False,
-                 target_height: Optional[int] = None,
-                 target_width: Optional[int] = None,
-                 waveform_augmentations: Optional[WaveAugmentations] = None,
-                 spectrogram_augmentations: Optional[SpecAugmentations] = None,
-                 ) -> None:
+    def __init__(
+        self,
+        mode: str,
+        sample_rate: int,
+        normalize: bool = False,
+        use_spectrogram: bool = False,
+        n_fft: Optional[int] = 2048,
+        hop_length: Optional[int] = 1024,
+        n_mels: Optional[int] = None,
+        db_scale: Optional[bool] = False,
+        target_height: Optional[int] = None,
+        target_width: Optional[int] = None,
+        waveform_augmentations: Optional[WaveAugmentations] = None,
+        spectrogram_augmentations: Optional[SpecAugmentations] = None,
+    ) -> None:
         """TransformsWrapper module.
 
         Args:
             transforms_config (DictConfig): Transforms config.
         """
 
-        self.use_channel_dim = use_channel_dim
         self.normalize = normalize
         self.sample_rate = sample_rate
 
@@ -96,16 +99,15 @@ class TransformsWrapper:
         audio_augmented = audio_augmentor.combined_augmentations(waveform)
 
         # resize the data
-        audio_augmented = self.resizer.resize(audio_augmented, target_height=self.target_height, target_width=self.target_width)
-
+        audio_augmented = self.resizer.resize(
+            audio_augmented,
+            target_height=self.target_height,
+            target_width=self.target_width,
+        )
 
         if self.normalize:
             # TODO: currently hardcoded, here we need a normalization module!
             audio_augmented = (audio_augmented - (-4.268)) / (4.569 * 2)
-
-        # add channel dimension so that the tensor has shape [1, target_width, target_height]
-        if self.use_channel_dim:
-            audio_augmented = audio_augmented.unsqueeze(0)
 
         return audio_augmented
 

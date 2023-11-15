@@ -43,7 +43,6 @@ loaders:
     pin_memory: False
 
 transforms:
-  use_channel_dim: False
   normalize: True
   use_spectrogram: True
   n_fft: 1024

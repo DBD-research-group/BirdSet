@@ -18,6 +18,10 @@ class ASTSequenceClassifier(nn.Module):
         
     def forward(self, input_values, attention_mask=None, labels=None, return_hidden_state=False):
 
+        # Squeeze the channel dimension so that the tensor has shape (height, width)
+        input_values = input_values.squeeze(1)
+
+        # Swap the height and width dimensions so that the tensor has shape (width, height)
         input_values = input_values.transpose(1, 2)
 
         outputs = self.model(
