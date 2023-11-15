@@ -98,12 +98,14 @@ class TransformsWrapper:
         # resize the data
         audio_augmented = self.resizer.resize(audio_augmented, target_height=self.target_height, target_width=self.target_width)
 
-        if not self.use_channel_dim:
-            audio_augmented = audio_augmented.squeeze(0)
 
         if self.normalize:
             # TODO: currently hardcoded, here we need a normalization module!
             audio_augmented = (audio_augmented - (-4.268)) / (4.569 * 2)
+
+        # add channel dimension so that the tensor has shape [1, target_width, target_height]
+        if self.use_channel_dim:
+            audio_augmented = audio_augmented.unsqueeze(0)
 
         return audio_augmented
 
