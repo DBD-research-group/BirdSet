@@ -22,9 +22,6 @@ def main(cfg):
     L.seed_everything(cfg.seed)
     log.info(f"Instantiate logger {[loggers for loggers in cfg['logger']]}")
 
-    # TODO: This line throws an error in .fit which has to be fixed
-    #logger = instantiate_wandb(args)
-
     # Setup data
     log.info(f"Instantiate datamodule <{cfg.datamodule._target_}>")
     datamodule = hydra.utils.instantiate(cfg.datamodule)
