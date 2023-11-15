@@ -25,7 +25,7 @@ class ESC50(BaseDataModuleHF):
             self.dataset.val_split, shuffle=True, seed=self.dataset.seed)
         split_2 = split_1["test"].train_test_split(
             0.5, shuffle=False, seed=self.dataset.seed)
-        train_dataset = split_2["train"]
+        train_dataset = split_1["train"]
         val_dataset = split_2["train"]
         test_dataset = split_2["test"]
         return train_dataset, val_dataset, test_dataset
@@ -33,15 +33,16 @@ class ESC50(BaseDataModuleHF):
     def train_dataloader(self):
         return DataLoader(
             self.train_dataset,
-            collate_fn = lambda x: collate_batch(x, return_category=False),**self.loaders.get("train")
+            **self.loaders.get("train")
         )
+        
     def val_dataloader(self):
         return DataLoader(
             self.val_dataset,
-            collate_fn = lambda x: collate_batch(x, return_category=False),**self.loaders.get("valid")
+            **self.loaders.get("valid")
         )
     def test_dataloader(self):
         return DataLoader(
             self.test_dataset,
-            collate_fn = lambda x: collate_batch(x, return_category=False),**self.loaders.get("test")
+            **self.loaders.get("test")
         )
