@@ -9,6 +9,8 @@ from torch.utils.data import DataLoader
 
 from omegaconf import DictConfig
 
+from src.datamodule.components.transforms import TransformsWrapper
+
 
 class BaseDataModuleHF(L.LightningDataModule):
     def __init__(
@@ -149,7 +151,8 @@ class BaseDataModuleHF(L.LightningDataModule):
 
     def _train_transform(self, examples):
         train_transform = hydra.utils.instantiate(
-            self.transforms,
+            config=self.transforms,
+            _target_=TransformsWrapper,
             mode="train",
             sample_rate=self.feature_extractor.sampling_rate,
         )
@@ -158,11 +161,10 @@ class BaseDataModuleHF(L.LightningDataModule):
 
     def _valid_test_predict_transform(self, examples):
         valid_test_predict_transform = hydra.utils.instantiate(
-            self.transforms,
+            config=self.transforms,
+            _target_=TransformsWrapper,
             mode="test",
             sample_rate=self.feature_extractor.sampling_rate,
-            waveform_augmentations=None,
-            spectrogram_augmentations=None,
         )
 
         return valid_test_predict_transform(examples)

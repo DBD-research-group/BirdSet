@@ -37,8 +37,7 @@ loaders:
     drop_last: False
     pin_memory: False
 
-  _target_: src.datamodule.components.transforms.TransformsWrapper
-  _partial_: True
+transforms:
   normalize: True
   use_spectrogram: True
   n_fft: 1024
