@@ -2,7 +2,6 @@ import logging
 import os
 
 import lightning as L
-import hydra
 
 from datasets import load_dataset, load_from_disk, Audio, DatasetDict
 from torch.utils.data import DataLoader
