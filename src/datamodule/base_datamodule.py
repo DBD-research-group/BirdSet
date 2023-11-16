@@ -168,7 +168,22 @@ class BaseDataModuleHF(L.LightningDataModule):
             truncation=True,
             return_tensors="pt",
         )
+        #check if y is a label list. if so: one-hot encode for multilabel
+        label_list = [y for y in batch[self.dataset.column_list[1]]]
+
+        if isinstance(label_list[0], list):
+            labels = self._classes_one_hot(label_list)
+            return inputs, labels
+        
         return inputs
+
+    def _classes_one_hot(self, class_indices):
+        class_one_hot_matrix = torch.zeros(
+            (len(class_indices), self.dataset.n_classes), dtype=torch.float
+        )
+        for class_idx, idx in enumerate(class_indices):
+            class_one_hot_matrix[class_idx, idx] = 1
+        return class_one_hot_matrix        
 
     def _eval_transform(self):
         pass
