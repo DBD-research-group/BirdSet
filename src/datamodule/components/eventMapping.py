@@ -6,7 +6,7 @@ class EventMapping:
     """extracts all event_cluster into individual rows, should be used as mapping
      used on a hf dataset with batched=True (does not save the audio array, only filepath)
 
-     with_no_call: weather to include cluster that are marker as noise from event detection
+     with_noise_cluster: weather to include cluster that are marker as noise from event detection
             IF True: when all cluster are noise cluster, cluster will be deleted and audio will be included once
      biggest_cluster: use only samples from the biggest cluster, which might be the primary bird
      only_one: choose one of the events at random per audio"""
