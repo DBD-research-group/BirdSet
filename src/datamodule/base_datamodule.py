@@ -9,6 +9,8 @@ import torch_audiomentations
 from datasets import load_dataset, load_from_disk, Audio, DatasetDict
 from torch.utils.data import DataLoader
 from omegaconf import DictConfig
+from src.datamodule.components.eventMapping import EventSegmenting, EventMapping
+
 
 class BaseDataModuleHF(L.LightningDataModule):
 
@@ -85,6 +87,15 @@ class BaseDataModuleHF(L.LightningDataModule):
             load_from_cache_file=True,
             num_proc=self.dataset.n_workers,
         )
+
+        # dataset = dataset.map(
+        #     EventMapping(),
+        #     batch_size=64,
+        #     batched=True,
+        #     load_from_cache_file=True,
+        #     num_proc=self.dataset.n_workers
+        # )
+
         if self.feature_extractor.return_attention_mask:
             self.dataset.column_list.append("attention_mask")
 
@@ -131,7 +142,7 @@ class BaseDataModuleHF(L.LightningDataModule):
             if stage == "test":
                 logging.info("test")
                 self.test_dataset = load_from_disk(
-                    os.path.join(self.data_path,"test")
+                    os.path.join(self.data_path, "test")
                 )
 
         if self.transforms:
