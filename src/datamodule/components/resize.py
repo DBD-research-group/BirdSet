@@ -118,7 +118,11 @@ class Resizer:
         Raises:
             NotImplementedError: This method is not implemented yet.
         """
-        raise NotImplementedError("Resizing for waveforms is not implemented yet.")
+
+        #raise NotImplementedError("Resizing for waveforms is not implemented yet.")
+
+        #TODO: Implement resizing for waveforms
+        return waveform
 
     def resize(self, data: Tensor, target_height: int = None, target_width: int = None) -> Tensor:
         """
