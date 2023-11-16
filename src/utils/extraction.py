@@ -7,11 +7,11 @@ from transformers import SequenceFeatureExtractor
 from transformers.utils import logging, PaddingStrategy, TensorType
 
 
-logger = logging.getLogger(__name__)
+logger = logging.get_logger(__name__)
 
 
 class DefaultFeatureExtractor(SequenceFeatureExtractor):
-    r"""
+    """
     Constructs a default feature extractor for general sequence processing.
 
     This general-purpose feature extractor inherits from
