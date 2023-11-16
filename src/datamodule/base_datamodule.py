@@ -88,13 +88,13 @@ class BaseDataModuleHF(L.LightningDataModule):
             num_proc=self.dataset.n_workers,
         )
 
-        dataset = dataset.map(
-            EventMapping(),
-            batch_size=64,
-            batched=True,
-            load_from_cache_file=True,
-            num_proc=self.dataset.n_workers
-        )
+        # dataset = dataset.map(
+        #     EventMapping(),
+        #     batch_size=64,
+        #     batched=True,
+        #     load_from_cache_file=True,
+        #     num_proc=self.dataset.n_workers
+        # )
 
         if self.feature_extractor.return_attention_mask:
             self.dataset.column_list.append("attention_mask")
