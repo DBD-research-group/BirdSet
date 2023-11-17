@@ -3,6 +3,8 @@ _target_: src.modules.base_module.BaseModule
 defaults:
   - _self_
   - network: ast.yaml
+  
+task: multiclass
 
 optimizer:
   _target_: torch.optim.AdamW
