@@ -62,9 +62,10 @@ class EventSegmenting:
 
     def __call__(self, batch):
         for b_idx in range(len(batch["audio"])):
-            start, stop = batch["detected_events"][b_idx]
-            sr = batch["audio"][b_idx]["sampling_rate"]
-            batch["audio"][b_idx]["array"] = batch["audio"][b_idx]["array"][int(start * sr):int(stop * sr)]
+            if batch["detected_events"][b_idx]:
+                start, stop = batch["detected_events"][b_idx]
+                sr = batch["audio"][b_idx]["sampling_rate"]
+                batch["audio"][b_idx]["array"] = batch["audio"][b_idx]["array"][int(start * sr):int(stop * sr)]
         return batch
 
 
