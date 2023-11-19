@@ -87,30 +87,30 @@ class BaseDataModuleHF(L.LightningDataModule):
         )
 
         if self.dataset.task == "multilabel":
-            dataset["test_5s"] = dataset["test_5s"].select(range(10))
+            dataset["test_5s"] = dataset["test_5s"].select(range(1000))
             dataset["test"] = dataset["test_5s"].map(
                 preprocessor.preprocess_multilabel,
                 remove_columns=["audio"],
                 batched=True,
-                batch_size=5,
+                batch_size=100,
                 load_from_cache_file=True,
                 num_proc=1,
                 #num_proc=self.dataset.n_workers,
             )       
             dataset["test"] = dataset["test"].select_columns(["input_values", "labels"])
 
-            dataset["train"] = dataset["train"].select(range(10))
+            dataset["train"] = dataset["train"].select(range(1000))
             dataset["train"] = dataset["train"].map(
-                preprocessor.preprocess_train,
+                preprocessor.preprocess_multilabel,
                 remove_columns=["audio"],
                 batched=True,
-                batch_size=20,
+                batch_size=100,
                 load_from_cache_file=True,
                 num_proc=1
                #num_proc=self.dataset.n_workers,
             )         
-            dataset["train"]=dataset["train"].select_columns(["input_values", "ebird_code"])
-            dataset["train"]=dataset["train"].rename_column("ebird_code", "labels")  
+            dataset["train"]=dataset["train"].select_columns(["input_values", "labels"])
+            #dataset["train"]=dataset["train"].rename_column("ebird_code", "labels")  
 
             dataset = DatasetDict(dict(list(dataset.items())[:2]))
 
