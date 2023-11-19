@@ -27,7 +27,8 @@ class BaseModule(L.LightningModule):
         metrics,
         logging_params,
         num_epochs,
-        len_trainset):
+        len_trainset,
+        task):
 
         super(BaseModule, self).__init__()
 
@@ -62,6 +63,7 @@ class BaseModule(L.LightningModule):
         # partial
         self.num_epochs = num_epochs
         self.len_trainset = len_trainset
+        self.task = task 
 
         self.save_hyperparameters()
         
