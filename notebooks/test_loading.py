@@ -2,7 +2,11 @@
 from datasets import load_dataset
 
 if __name__ == "__main__":    
+<<<<<<< HEAD
     ds_name = "high_sierras"
+=======
+    ds_name = "columbia_costa_rica"
+>>>>>>> 0031fbb25ab32d4220fd29616af92adad66c8945
     print(f"start {ds_name}")
     ds = load_dataset(
         "dbd-research-group/gadme_v1", 
@@ -27,6 +31,7 @@ ds["train"][0]
 # %%
 
 from huggingface_hub import hf_hub_download
+<<<<<<< HEAD
 import pandas as pd 
 
 folder = "data/xenocanto"
@@ -91,6 +96,16 @@ df.head()
 from datasets import load_dataset
 ds = load_dataset("dbd-research-group/gadme_v1", "iit")
 
+=======
+
+meta = hf_hub_download(
+    repo_id="dbd-research-group/gadme_v1",
+    filename="test.parquet",
+    revision="data",
+    subfolder="data/amazon_basin",
+    repo_type="dataset"
+)
+>>>>>>> 0031fbb25ab32d4220fd29616af92adad66c8945
 #%%
 import pandas as pd 
 

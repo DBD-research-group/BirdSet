@@ -194,6 +194,7 @@ class BaseDataModuleHF(L.LightningDataModule):
             self.transforms.set_transforms(self.augmentation, 
                 output_all_columns=False
             )
+<<<<<<< HEAD
     
     # def _preprocess_function(self, batch, task):
     #     audio_arrays = [x["array"] for x in batch["audio"]]
@@ -213,6 +214,35 @@ class BaseDataModuleHF(L.LightningDataModule):
         
     #     return inputs
 
+=======
+            
+    def _preprocess_function(self, batch):
+        audio_arrays = [x["array"] for x in batch["audio"]]
+        inputs = self.feature_extractor(
+            audio_arrays,
+            sampling_rate=self.feature_extractor.sampling_rate,
+            padding=True,
+            max_length=self.feature_extractor.sampling_rate*5,
+            truncation=True,
+            return_tensors="pt",
+        )
+        #check if y is a label list. if so: one-hot encode for multilabel
+        label_list = [y for y in batch[self.dataset.column_list[1]]]
+
+        if isinstance(label_list[0], list):
+            labels = self._classes_one_hot(label_list)
+            return inputs, labels
+        
+        return inputs
+>>>>>>> 0031fbb25ab32d4220fd29616af92adad66c8945
+
+    def _classes_one_hot(self, class_indices):
+        class_one_hot_matrix = torch.zeros(
+            (len(class_indices), self.dataset.n_classes), dtype=torch.float
+        )
+        for class_idx, idx in enumerate(class_indices):
+            class_one_hot_matrix[class_idx, idx] = 1
+        return class_one_hot_matrix        
 
     def _eval_transform(self):
         pass
