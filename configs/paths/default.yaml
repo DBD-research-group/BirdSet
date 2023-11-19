@@ -1,6 +1,6 @@
 root_dir: ${oc.env:PROJECT_ROOT}
 work_dir: ${hydra:runtime.cwd}
 output_dir: ${hydra:runtime.output_dir}
-dataset_path: ${paths.root_dir}/../data_gadme
+dataset_path: ${paths.root_dir}/data_gadme
 log_dir: ${paths.output_dir}/logs/
 
