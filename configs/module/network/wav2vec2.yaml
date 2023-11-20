@@ -1,5 +1,5 @@
 model:
-  _target_: src.modules.models.w2v2.Wav2vec2SequenceClassifier
+  _target_: src.modules.models.wav2vec2.Wav2vec2SequenceClassifier
   checkpoint: facebook/wav2vec2-base-960h
   num_classes: ${datamodule.dataset.n_classes}
 
