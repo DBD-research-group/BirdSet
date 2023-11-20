@@ -17,6 +17,28 @@ class ASTSequenceClassifier(nn.Module):
         #TODO! problem type not really used, only bcewithlogits on logits
         
     def forward(self, input_values, attention_mask=None, labels=None, return_hidden_state=False):
+        """
+        This method processes the input tensor, primarily by adjusting its dimensions to match the expected
+        format of the model. It first squeezes out the channel dimension, assuming it's of size one, and then
+        transposes the height and width dimensions. The processed tensor is then passed through the model to
+        generate outputs.
+
+        Parameters:
+        - input_values (Tensor): The main input tensor of shape (channel, height, width).
+        - attention_mask (Tensor, optional): An optional mask applied to the input, used in models that
+          focus on specific parts of the input like transformers. Defaults to None.
+        - labels (Tensor, optional): Labels used for supervised learning, typically for computing loss.
+          Defaults to None.
+        - return_hidden_state (bool, optional): A flag to determine whether to return hidden states of the
+          model. Defaults to False.
+        """
+
+        # Squeeze the channel dimension so that the tensor has shape (height, width)
+        input_values = input_values.squeeze(1)
+
+        # Swap the height and width dimensions so that the tensor has shape (width, height)
+        input_values = input_values.transpose(1, 2)
+
         outputs = self.model(
             input_values, 
             attention_mask,

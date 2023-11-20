@@ -1,8 +1,8 @@
 # @package _global_
 defaults:
   - _self_
-  - datamodule: high_sierras
-  - module: mutlilabel
+  - datamodule: esc50
+  - module: multiclass
   - callbacks: default
   - paths: default
   - trainer: single_gpu

@@ -121,7 +121,6 @@ class BaseModule(L.LightningModule):
 
     def training_step(self, batch, batch_idx):
         train_loss, preds, targets = self.model_step(batch, batch_idx)
-        print("LEARNING RATE", self.trainer.optimizers[0].param_groups[0]['lr'])
         self.log(
             f"train_loss",
             train_loss,
