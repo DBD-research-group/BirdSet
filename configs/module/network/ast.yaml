@@ -2,7 +2,6 @@ model:
   _target_: src.modules.models.ast.ASTSequenceClassifier
   checkpoint: MIT/ast-finetuned-audioset-10-10-0.4593
   num_classes: ${datamodule.dataset.n_classes}
-  #problem_type: "single-label-classification"
 
 model_name: ast
 torch_compile: false

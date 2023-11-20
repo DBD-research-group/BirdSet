@@ -9,6 +9,8 @@ import torch_audiomentations
 from datasets import load_dataset, load_from_disk, Audio, DatasetDict
 from torch.utils.data import DataLoader
 from omegaconf import DictConfig
+from src.datamodule.components.eventMapping import EventSegmenting, EventMapping
+from src.datamodule.components.bird_premapping import AudioPreprocessor
 
 class BaseDataModuleHF(L.LightningDataModule):
 
@@ -82,24 +84,70 @@ class BaseDataModuleHF(L.LightningDataModule):
                 decode=True
             )
         )
-        #os.cpu_count() = 32 # num proc only works when prepare is called manually?
+
         logging.info("> Mapping data set.")
-        dataset = dataset.map(
-            self._preprocess_function,
-            remove_columns=["audio"],
-            batched=True,
-            batch_size=100,
-            load_from_cache_file=True,
-            num_proc=self.dataset.n_workers,
+
+        preprocessor = AudioPreprocessor(
+            feature_extractor=self.feature_extractor,
+            n_classes=self.dataset.n_classes,
+            window_length=5
         )
+
+        if self.dataset.task == "multilabel":
+            dataset["test_5s"] = dataset["test_5s"].select(range(1000))
+            dataset["test"] = dataset["test_5s"].map(
+                preprocessor.preprocess_multilabel,
+                remove_columns=["audio"],
+                batched=True,
+                batch_size=100,
+                load_from_cache_file=True,
+                num_proc=1,
+                #num_proc=self.dataset.n_workers,
+            )       
+            dataset["test"] = dataset["test"].select_columns(["input_values", "labels"])
+
+            dataset["train"] = dataset["train"].select(range(1000))
+            dataset["train"] = dataset["train"].map(
+                preprocessor.preprocess_multilabel,
+                remove_columns=["audio"],
+                batched=True,
+                batch_size=100,
+                load_from_cache_file=True,
+                num_proc=1
+               #num_proc=self.dataset.n_workers,
+            )         
+            dataset["train"]=dataset["train"].select_columns(["input_values", "labels"])
+            #dataset["train"]=dataset["train"].rename_column("ebird_code", "labels")  
+
+            dataset = DatasetDict(dict(list(dataset.items())[:2]))
+
+        elif self.dataset.task == "multiclass":
+            dataset = DatasetDict(dict(list(dataset.items())[:2]))
+            dataset = dataset.map(
+                preprocessor.preprocess_train,
+                remove_columns=["audio"],
+                batched=True,
+                batch_size=100,
+                load_from_cache_file=True,
+                num_proc=self.dataset.n_workers,
+            )             
+            if self.dataset.column_list[1] != "labels":
+                dataset = dataset.rename_column(self.dataset.column_list[1], "labels")
+   
+        # dataset["train"] = dataset["train"].map(
+        #     EventMapping(),
+        #     batch_size=64,
+        #     batched=True,
+        #     load_from_cache_file=True,
+        #     num_proc=self.dataset.n_workers
+        # )
+        #dataset = dataset.select_columns(self.dataset.column_list)
+        # if self.dataset.column_list[1] != "labels":
+        #     dataset = dataset.rename_column(self.dataset.column_list[1], "labels")
+
         if self.feature_extractor.return_attention_mask:
             self.dataset.column_list.append("attention_mask")
-
-        dataset = dataset.select_columns(self.dataset.column_list)
         
-        if self.dataset.column_list[1] != "labels":
-            dataset = dataset.rename_column(self.dataset.column_list[1], "labels")
-
         dataset.set_format("np")
         train_dataset, val_dataset, test_dataset = self._create_splits(dataset)
         complete = DatasetDict({
@@ -138,7 +186,7 @@ class BaseDataModuleHF(L.LightningDataModule):
             if stage == "test":
                 logging.info("test")
                 self.test_dataset = load_from_disk(
-                    os.path.join(self.data_path,"test")
+                    os.path.join(self.data_path, "test")
                 )
 
         if self.transforms:
@@ -153,18 +201,24 @@ class BaseDataModuleHF(L.LightningDataModule):
             self.transforms.set_transforms(self.augmentation, 
                 output_all_columns=False
             )
-            
-    def _preprocess_function(self, batch):
-        audio_arrays = [x["array"] for x in batch["audio"]]
-        inputs = self.feature_extractor(
-            audio_arrays,
-            sampling_rate=self.feature_extractor.sampling_rate,
-            padding=True,
-            max_length=self.feature_extractor.sampling_rate*5,
-            truncation=True,
-            return_tensors="pt",
-        )
-        return inputs
+    
+    # def _preprocess_function(self, batch, task):
+    #     audio_arrays = [x["array"] for x in batch["audio"]]
+    #     inputs = self.feature_extractor(
+    #         audio_arrays,
+    #         sampling_rate=self.feature_extractor.sampling_rate,
+    #         padding=True,
+    #         max_length=self.feature_extractor.sampling_rate*5,
+    #         truncation=True,
+    #         return_tensors="pt",
+    #     )
+    #     #check if y is a label list. if so: one-hot encode for multilabel
+ 
+    #     if isinstance(label_list[0], list):
+    #         labels = self._classes_one_hot(label_list)
+    #         return inputs, labels
+        
+    #     return inputs
 
     def _eval_transform(self):
         pass

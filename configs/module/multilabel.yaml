@@ -4,6 +4,8 @@ defaults:
   - _self_
   - network: ast.yaml
 
+task: multilabel
+
 optimizer:
   _target_: torch.optim.AdamW
   lr: 1e-5
@@ -21,9 +23,8 @@ lr_scheduler:
 
 metrics: 
   main: 
-    _target_: "torchmetrics.classification.Accuracy"
-    task: "multilabel"
-    num_classes: ${datamodule.dataset.n_classes}
+    _target_: "torchmetrics.classification.MulticlassAccuracy"
+    num_classes: 22
     top_k: 1
   val_best: 
     _target_: "torchmetrics.MaxMetric"
@@ -45,3 +46,4 @@ logging_params:
   on_epoch: True
   sync_dist: False
   prog_bar: True  
+
