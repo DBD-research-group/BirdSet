@@ -4,9 +4,6 @@ task_name: "debug"
 train: True
 # callbacks: null
 #logger: null
-module:
-  model:
-    problem_type: "multi-label-classification"
     
 extras: 
   ignore_warnings: False

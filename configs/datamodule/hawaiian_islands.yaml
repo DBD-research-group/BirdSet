@@ -10,9 +10,9 @@ dataset:
   feature_extractor:
     _target_: transformers.AutoFeatureExtractor.from_pretrained
     pretrained_model_name_or_path: ${module.network.model.checkpoint}
-  n_classes: 21
+  n_classes: 28
   n_workers: 3
-  column_list: ["input_values", "ebird_code"]
+  column_list: ["input_values", "ebird_code", "ebird_code_multiclass"]
   val_split: 0.2
 
 loaders:
