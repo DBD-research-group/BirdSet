@@ -52,6 +52,13 @@ class BaseDataModuleHF(L.LightningDataModule):
     
     # prepare data is 
     def prepare_data(self):
+        """
+        Prepares the data for use.
+        This method loads the dataset, applies transformations, creates
+        train, validation, and test splits,
+        and saves the processed data to disk. If the data has already been
+        prepared, this method does nothing.
+        """
         logging.info("Check if preparing has already been done.")
 
         if self._prepare_done:
