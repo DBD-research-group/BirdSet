@@ -119,6 +119,9 @@ class BaseDataModuleHF(L.LightningDataModule):
                 load_from_cache_file=True,
                 num_proc=self.dataset.n_workers,
             )
+
+            dataset = dataset.select_columns(self.dataset.column_list)
+
             if self.dataset.column_list[1] != "labels":
                 dataset = dataset.rename_column(self.dataset.column_list[1], "labels")
 

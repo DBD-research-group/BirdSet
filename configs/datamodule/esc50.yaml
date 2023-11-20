@@ -17,6 +17,7 @@ dataset:
   n_workers: 1
   column_list: ["input_values", "target"]
   val_split: 0.2
+  task: ${module.task}
 
 loaders:
   train:
