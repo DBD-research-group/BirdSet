@@ -6,13 +6,18 @@ dataset:
   hf_path: ashraq/esc50
   hf_name: None
   seed: ${seed}
-  feature_extractor: 
-    _target_: transformers.AutoFeatureExtractor.from_pretrained
-    pretrained_model_name_or_path: ${module.network.model.checkpoint}
+  feature_extractor:
+    _target_: src.utils.extraction.DefaultFeatureExtractor
+    n_classes: 50
+    n_workers: 1
+    column_list: ["input_values", "target"]
+    sampling_rate: 32000
+    return_tensor: 'pt'
   n_classes: 50
   n_workers: 1
   column_list: ["input_values", "target"]
   val_split: 0.2
+  task: ${module.task}
 
 loaders:
   train:
@@ -20,6 +25,7 @@ loaders:
     shuffle: True
     num_workers: 4
     drop_last: False
+    persistent_workers: True
     pin_memory: False
   
   valid:
@@ -27,6 +33,7 @@ loaders:
     shuffle: False
     num_workers: 4
     drop_last: False
+    persistent_workers: True
     pin_memory: False
   
   test:
@@ -37,4 +44,36 @@ loaders:
     pin_memory: False
 
 transforms:
-  null
+  normalize: True
+  use_spectrogram: True
+  n_fft: 1024
+  hop_length: 79
+  n_mels: 128
+  db_scale: True
+  target_height: null
+  target_width: 1024
+  waveform_augmentations:
+    colored_noise:
+      prob: 0.5
+      min_snr_in_db: 3.0
+      max_snr_in_db: 30.0
+      min_f_decay: -2.0
+      max_f_decay: 2.0
+    #background_noise:
+    #    background_paths: "/mnt/home/rheinrich/deep_bird_detect/datapipeline/speech_command_dataset"
+    #    prob: 0.5
+    #    min_snr_in_db: 3.0
+    #    max_snr_in_db: 30.0
+
+  spectrogram_augmentations:
+    time_masking:
+      time_mask_param: 100
+      prob: 0.5
+    frequency_masking:
+      freq_mask_param: 100
+      prob: 0.5
+    time_stretch:
+      prob: 0.5
+      min_rate: 0.8
+      max_rate: 1.2
+
