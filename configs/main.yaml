@@ -2,7 +2,7 @@
 defaults:
   - _self_
   - datamodule: high_sierras
-  - module: multilabel
+  - module: mutlilabel
   - callbacks: default
   - paths: default
   - trainer: single_gpu
