@@ -23,6 +23,7 @@ module:
 logger:
   wandb:
     mode: online
+
 train: True
 test: True
 save_state_dict: True

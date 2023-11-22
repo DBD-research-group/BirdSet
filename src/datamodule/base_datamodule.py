@@ -9,18 +9,25 @@ from torch.utils.data import DataLoader
 from omegaconf import DictConfig
 
 from src.datamodule.components.bird_premapping import AudioPreprocessor
+from src.datamodule.components.transforms import TransformsWrapperN
 from src.datamodule.components.transforms import TransformsWrapper
 
 
 class BaseDataModuleHF(L.LightningDataModule):
     def __init__(
-        self, dataset: DictConfig, loaders: DictConfig, transforms: DictConfig
+        self, 
+        dataset: DictConfig, 
+        loaders: DictConfig, 
+        transforms: DictConfig,
+        extractors: DictConfig,
+        transforms_rene: DictConfig
     ):
         super().__init__()
         self.dataset = dataset
         self.loaders = loaders
-        self.transforms = transforms
-        self.feature_extractor = self.dataset.feature_extractor
+        self.transforms = TransformsWrapperN(transforms)
+        self.transforms_rene = transforms_rene
+        self.feature_extractor = hydra.utils.instantiate(extractors)
 
         self.data_path = None
         self.train_dataset = None
@@ -177,16 +184,16 @@ class BaseDataModuleHF(L.LightningDataModule):
         if self.transforms:
             if stage == "fit":
                 self.train_dataset.set_transform(
-                    self._train_transform, output_all_columns=False
+                    self.transforms, output_all_columns=False
                 )
                 self.val_dataset.set_transform(
                     self._valid_test_predict_transform, output_all_columns=False
                 )
 
-            if stage == "test":
-                self.test_dataset.set_transform(
-                    self._valid_test_predict_transform, output_all_columns=False
-                )
+            # if stage == "test":
+            #     self.test_dataset.set_transform(
+            #         self._valid_test_predict_transform, output_all_columns=False
+            #     )
 
     # def _preprocess_function(self, batch, task):
     #     audio_arrays = [x["array"] for x in batch["audio"]]
@@ -218,7 +225,7 @@ class BaseDataModuleHF(L.LightningDataModule):
 
     def _valid_test_predict_transform(self, examples):
         valid_test_predict_transform = hydra.utils.instantiate(
-            config=self.transforms,
+            config=self.transforms_rene,
             _target_=TransformsWrapper,
             mode="test",
             sample_rate=self.feature_extractor.sampling_rate,

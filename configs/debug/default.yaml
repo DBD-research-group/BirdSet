@@ -1,5 +1,4 @@
 # @package _global_
-
 task_name: "debug"
 train: True
 # callbacks: null
@@ -23,11 +22,16 @@ trainer:
 datamodule: 
   loaders:
     train: 
-      num_workers: 0
+      batch_size: 6
+      num_workers: 1
       pin_memory: False
     valid: 
-      num_workers: 0 
+      batch_size: 6
+      num_workers: 1 
       pin_memory: False
     test:
-      num_workers: 0 
+      batch_size: 6
+      num_workers: 1 
       pin_memory: False
+
+  #transforms: bird_default.yaml

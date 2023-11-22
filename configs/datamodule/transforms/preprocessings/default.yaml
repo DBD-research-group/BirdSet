@@ -1,0 +1,8 @@
+normalize: True
+use_spectrogram: True
+n_fft: 1024
+hop_length: 79
+n_mels: 128
+db_scale: True
+target_height: null
+target_width: 1024

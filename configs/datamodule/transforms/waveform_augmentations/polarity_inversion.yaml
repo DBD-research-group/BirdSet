@@ -1,0 +1,3 @@
+polarity_inversion:
+  _target_: torch_audiomentations.PolarityInversion
+  p: 0.3
