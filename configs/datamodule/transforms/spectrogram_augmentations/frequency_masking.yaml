@@ -1,0 +1,6 @@
+frequency_masking:
+  _target_: torchvision.transforms.RandomApply
+  p: 0.5
+  transforms: # - _ --> list!
+    - _target_: torchaudio.transforms.FrequencyMasking
+      freq_mask_param: 100

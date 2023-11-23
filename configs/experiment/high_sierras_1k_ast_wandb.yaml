@@ -23,11 +23,11 @@ datamodule:
     val_split: 0.2
   loaders:
     train:
-      batch_size: 5
+      batch_size: 12
     valid:
-      batch_size: 5
+      batch_size: 12
     test:
-      batch_size: 5
+      batch_size: 12
 
 logger:
   wandb:

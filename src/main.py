@@ -20,10 +20,11 @@ def main(cfg):
 
     log.info(f"Seed everything with <{cfg.seed}>")
     L.seed_everything(cfg.seed)
+    log.info(f"Instantiate logger {[loggers for loggers in cfg['logger']]}")
 
     # Setup data
     log.info(f"Instantiate datamodule <{cfg.datamodule._target_}>")
-    datamodule = hydra.utils.instantiate(cfg.datamodule)
+    datamodule = hydra.utils.instantiate(cfg.datamodule, _recursive_=False)
     datamodule.prepare_data()
 
     # Setup logger
