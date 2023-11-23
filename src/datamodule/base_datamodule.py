@@ -11,7 +11,7 @@ from omegaconf import DictConfig
 from src.datamodule.components.bird_premapping import AudioPreprocessor
 from src.datamodule.components.transforms import TransformsWrapperN
 from src.datamodule.components.transforms import TransformsWrapper
-
+import transformers
 
 class BaseDataModuleHF(L.LightningDataModule):
     def __init__(
@@ -195,7 +195,7 @@ class BaseDataModuleHF(L.LightningDataModule):
             #         self._valid_test_predict_transform, output_all_columns=False
             #     )
 
-    # def _preprocess_function(self, batch, task):
+    # def _preprocess_function(self, batch):
     #     audio_arrays = [x["array"] for x in batch["audio"]]
     #     inputs = self.feature_extractor(
     #         audio_arrays,
@@ -205,6 +205,7 @@ class BaseDataModuleHF(L.LightningDataModule):
     #         truncation=True,
     #         return_tensors="pt",
     #     )
+    #     return inputs
     #     #check if y is a label list. if so: one-hot encode for multilabel
 
     #     if isinstance(label_list[0], list):
