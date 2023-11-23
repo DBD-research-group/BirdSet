@@ -49,9 +49,6 @@ class BaseDataModuleHF(L.LightningDataModule):
         test_dataset = dataset["test"]
         return train_dataset, val_dataset, test_dataset
 
-    def _get_dataset_(self, split_name, dataset_name):
-        pass
-
     # prepare data is
     def prepare_data(self):
         logging.info("Check if preparing has already been done.")
@@ -167,28 +164,35 @@ class BaseDataModuleHF(L.LightningDataModule):
         logging.info(f"Saving to disk: {os.path.join(self.data_path)}")
         complete.save_to_disk(self.data_path)
 
+    def _get_dataset(self, split):
+        dataset = load_from_disk(
+            os.path.join(self.data_path, split)
+        )
+        self.transforms.set_mode(split)
+        dataset.set_transform(self.transforms, output_all_columns=False) 
+        
+        return dataset
+
     def setup(self, stage=None):
         if not self.train_dataset and not self.val_dataset:
             if stage == "fit":
                 logging.info("fit")
-                self.train_dataset = load_from_disk(
-                    os.path.join(self.data_path, "train")
-                )
-                self.val_dataset = load_from_disk(os.path.join(self.data_path, "valid"))
+                self.train_dataset = self._get_dataset("train")
+                self.val_dataset = self._get_dataset("valid")
 
         if not self.test_dataset:
             if stage == "test":
                 logging.info("test")
-                self.test_dataset = load_from_disk(os.path.join(self.data_path, "test"))
+                self.test_dataset = self._get_dataset("test")
 
-        if self.transforms:
-            if stage == "fit":
-                self.train_dataset.set_transform(
-                    self.transforms, output_all_columns=False
-                )
-                self.val_dataset.set_transform(
-                    self._valid_test_predict_transform, output_all_columns=False
-                )
+        # if self.transforms:
+        #     if stage == "fit":
+        #         self.train_dataset.set_transform(
+        #             self.transforms, output_all_columns=False
+        #         )
+        #         self.val_dataset.set_transform(
+        #             self._valid_test_predict_transform, output_all_columns=False
+        #         )
 
             # if stage == "test":
             #     self.test_dataset.set_transform(
@@ -214,25 +218,25 @@ class BaseDataModuleHF(L.LightningDataModule):
 
     #     return inputs
 
-    def _train_transform(self, examples):
-        train_transform = hydra.utils.instantiate(
-            config=self.transforms,
-            _target_=TransformsWrapper,
-            mode="train",
-            sample_rate=self.feature_extractor.sampling_rate,
-        )
+    # def _train_transform(self, examples):
+    #     train_transform = hydra.utils.instantiate(
+    #         config=self.transforms,
+    #         _target_=TransformsWrapper,
+    #         mode="train",
+    #         sample_rate=self.feature_extractor.sampling_rate,
+    #     )
 
-        return train_transform(examples)
+    #     return train_transform(examples)
 
-    def _valid_test_predict_transform(self, examples):
-        valid_test_predict_transform = hydra.utils.instantiate(
-            config=self.transforms_rene,
-            _target_=TransformsWrapper,
-            mode="test",
-            sample_rate=self.feature_extractor.sampling_rate,
-        )
+    # def _valid_test_predict_transform(self, examples):
+    #     valid_test_predict_transform = hydra.utils.instantiate(
+    #         config=self.transforms_rene,
+    #         _target_=TransformsWrapper,
+    #         mode="test",
+    #         sample_rate=self.feature_extractor.sampling_rate,
+    #     )
 
-        return valid_test_predict_transform(examples)
+    #     return valid_test_predict_transform(examples)
 
     def train_dataloader(self):
         # TODO: nontype objects in hf dataset

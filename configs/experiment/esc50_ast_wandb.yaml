@@ -26,6 +26,11 @@ datamodule:
   loaders:
     train:
       batch_size: 12
+      shuffle: True
+      num_workers: 6
+      drop_last: False
+      prefetch_factor: 4
+
     valid:
       batch_size: 12
     test:
@@ -36,4 +41,6 @@ logger:
     tags: ${tags}
     group: "esc50_aug"
     mode: online
+
+
 
