@@ -11,9 +11,12 @@ from omegaconf import DictConfig
 from src.datamodule.components.bird_premapping import AudioPreprocessor
 from src.datamodule.components.transforms import TransformsWrapperN
 from src.datamodule.components.transforms import TransformsWrapper
-import transformers
 
 class BaseDataModuleHF(L.LightningDataModule):
+    """
+    A base data module for handling datasets using Hugging Face's datasets library.
+    """
+
     def __init__(
         self, 
         dataset: DictConfig, 
@@ -22,6 +25,22 @@ class BaseDataModuleHF(L.LightningDataModule):
         extractors: DictConfig,
         transforms_rene: DictConfig
     ):
+        """
+        Constructs all the necessary attributes for the BaseDataModuleHF object.
+
+        Parameters
+        ----------
+            dataset : DictConfig
+                The configuration for the dataset.
+            loaders : DictConfig
+                The configuration for the data loaders.
+            transforms : DictConfig
+                The configuration for the data transformations.
+            extractors : DictConfig
+                The configuration for the feature extractors.
+            transforms_rene : DictConfig
+                The configuration for the Rene's transformations.
+        """
         super().__init__()
         self.dataset = dataset
         self.loaders = loaders
@@ -53,11 +72,25 @@ class BaseDataModuleHF(L.LightningDataModule):
     def prepare_data(self):
         """
         Prepares the data for use.
-        This method loads the dataset, applies transformations, creates
-        train, validation, and test splits,
-        and saves the processed data to disk. If the data has already been
-        prepared, this method does nothing.
+
+        This method checks if the data preparation has already been done. If not, it loads the dataset, applies transformations,
+        creates train, validation, and test splits, and saves the processed data to disk. If the data has already been prepared,
+        this method does nothing.
+
+        The method supports both multilabel and multiclass tasks. For multilabel tasks, it selects a subset of the data,
+        applies preprocessing, and selects the necessary columns. For multiclass tasks, it applies preprocessing and selects
+        the necessary columns.
+
+        If the feature extractor is configured to return an attention mask, this method adds 'attention_mask' to the list of
+        columns to select from the dataset.
+
+        The method saves the processed dataset to disk in the directory specified by the 'data_dir' attribute of the 'dataset'
+        configuration, under a subdirectory named after the dataset and the fingerprint of the training data.
+
+        After the data is prepared, this method sets the '_prepare_done' attribute to True and the 'len_trainset' attribute
+        to the length of the training dataset.
         """
+
         logging.info("Check if preparing has already been done.")
 
         if self._prepare_done:
@@ -91,33 +124,9 @@ class BaseDataModuleHF(L.LightningDataModule):
         )
 
         if self.dataset.task == "multilabel":
-            dataset["test_5s"] = dataset["test_5s"].select(range(1000))
-            dataset["test"] = dataset["test_5s"].map(
-                preprocessor.preprocess_multilabel,
-                remove_columns=["audio"],
-                batched=True,
-                batch_size=100,
-                load_from_cache_file=True,
-                num_proc=1,
-                # num_proc=self.dataset.n_workers,
-            )
-            dataset["test"] = dataset["test"].select_columns(["input_values", "labels"])
-
-            dataset["train"] = dataset["train"].select(range(1000))
-            dataset["train"] = dataset["train"].map(
-                preprocessor.preprocess_multilabel,
-                remove_columns=["audio"],
-                batched=True,
-                batch_size=100,
-                load_from_cache_file=True,
-                num_proc=1
-                # num_proc=self.dataset.n_workers,
-            )
-            dataset["train"] = dataset["train"].select_columns(
-                ["input_values", "labels"]
-            )
-            # dataset["train"]=dataset["train"].rename_column("ebird_code", "labels")
-
+            # TODO: remove this
+            dataset["test_5s"] = self._preprocess_multilabel(dataset, "test_5s", preprocessor, range(1000))
+            dataset["train"] = self._preprocess_multilabel(dataset, "train", preprocessor, range(1000))
             dataset = DatasetDict(dict(list(dataset.items())[:2]))
 
         elif self.dataset.task == "multiclass":
@@ -170,6 +179,40 @@ class BaseDataModuleHF(L.LightningDataModule):
 
         logging.info(f"Saving to disk: {os.path.join(self.data_path)}")
         complete.save_to_disk(self.data_path)
+
+    def _preprocess_multilabel(self, dataset, split, preprocessor, select_range=None):
+        """
+        Preprocesses a multilabel dataset.
+
+        Parameters
+        ----------
+        dataset : DatasetDict
+            The dataset to preprocess.
+        split : str
+            The split of the dataset to preprocess.
+        preprocessor : Preprocessor
+            The preprocessor to use.
+        select_range : range, optional
+            A range of indices to select from the dataset before preprocessing.
+
+        Returns
+        -------
+        Dataset
+            The preprocessed dataset.
+        """
+        if select_range is not None:
+            dataset[split] = dataset[split].select(select_range)
+        dataset[split] = dataset[split].map(
+            preprocessor.preprocess_multilabel,
+            remove_columns=["audio"],
+            batched=True,
+            batch_size=100,
+            load_from_cache_file=True,
+            num_proc=1,
+            # TODO: make num_proc configurable num_proc=self.dataset.n_workers,
+        )
+        dataset[split] = dataset[split].select_columns(["input_values", "labels"])
+        return dataset[split]
 
     def _get_dataset(self, split):
         dataset = load_from_disk(
