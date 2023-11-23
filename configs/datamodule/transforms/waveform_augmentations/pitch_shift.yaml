@@ -1,0 +1,6 @@
+  pitch_shift:
+    _target_: torch_audiomentations.PitchShift
+    p: 0.5
+    sample_rate: ${datamodule.extractors.sampling_rate}
+    min_transpose_semitones: -4
+    max_transpose_semitones: 4

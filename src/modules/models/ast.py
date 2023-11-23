@@ -37,6 +37,7 @@ class ASTSequenceClassifier(nn.Module):
         input_values = input_values.squeeze(1)
 
         # Swap the height and width dimensions so that the tensor has shape (width, height)
+        #6,1,128,1024
         input_values = input_values.transpose(1, 2)
 
         outputs = self.model(

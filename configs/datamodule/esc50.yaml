@@ -1,18 +1,23 @@
 _target_: src.datamodule.esc50_datamodule.ESC50
 
+defaults:
+  - _self_
+  - transforms: bird_default.yaml
+  - extractors: default_aug.yaml
+
 dataset:
   data_dir: ${paths.dataset_path}
   dataset_name: esc50
   hf_path: ashraq/esc50
   hf_name: None
   seed: ${seed}
-  feature_extractor:
-    _target_: src.utils.extraction.DefaultFeatureExtractor
-    n_classes: 50
-    n_workers: 1
-    column_list: ["input_values", "target"]
-    sampling_rate: 32000
-    return_tensor: 'pt'
+  # feature_extractor:
+  #   _target_: src.utils.extraction.DefaultFeatureExtractor
+  #   n_classes: 50
+  #   n_workers: 1
+  #   column_list: ["input_values", "target"]
+  #   sampling_rate: 32_000
+  #   return_tensor: 'pt'
   n_classes: 50
   n_workers: 1
   column_list: ["input_values", "target"]
@@ -21,7 +26,7 @@ dataset:
 
 loaders:
   train:
-    batch_size: 6
+    batch_size: 8
     shuffle: True
     num_workers: 4
     drop_last: False
@@ -29,7 +34,7 @@ loaders:
     pin_memory: False
   
   valid:
-    batch_size: 6
+    batch_size: 8
     shuffle: False
     num_workers: 4
     drop_last: False
@@ -37,13 +42,13 @@ loaders:
     pin_memory: False
   
   test:
-    batch_size: 6
+    batch_size: 8
     shuffle: False
     num_workers: 4
     drop_last: False
     pin_memory: False
 
-transforms:
+transforms_rene:
   normalize: True
   use_spectrogram: True
   n_fft: 1024

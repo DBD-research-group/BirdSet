@@ -1,0 +1,6 @@
+_target_: src.utils.extraction.DefaultFeatureExtractor
+n_classes: 50
+n_workers: 1
+column_list: ["input_values", "target"]
+sampling_rate: 32_000
+return_tensor: 'pt'

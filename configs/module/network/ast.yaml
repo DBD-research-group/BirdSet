@@ -4,7 +4,9 @@ model:
   num_classes: ${datamodule.dataset.n_classes}
 
 model_name: ast
+model_type: vision
 torch_compile: false
+
 
 
 

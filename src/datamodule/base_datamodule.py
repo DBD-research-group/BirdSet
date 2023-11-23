@@ -9,18 +9,25 @@ from torch.utils.data import DataLoader
 from omegaconf import DictConfig
 
 from src.datamodule.components.bird_premapping import AudioPreprocessor
+from src.datamodule.components.transforms import TransformsWrapperN
 from src.datamodule.components.transforms import TransformsWrapper
-
+import transformers
 
 class BaseDataModuleHF(L.LightningDataModule):
     def __init__(
-        self, dataset: DictConfig, loaders: DictConfig, transforms: DictConfig
+        self, 
+        dataset: DictConfig, 
+        loaders: DictConfig, 
+        transforms: DictConfig,
+        extractors: DictConfig,
+        transforms_rene: DictConfig
     ):
         super().__init__()
         self.dataset = dataset
         self.loaders = loaders
-        self.transforms = transforms
-        self.feature_extractor = self.dataset.feature_extractor
+        self.transforms = TransformsWrapperN(transforms)
+        self.transforms_rene = transforms_rene
+        self.feature_extractor = hydra.utils.instantiate(extractors)
 
         self.data_path = None
         self.train_dataset = None
@@ -41,9 +48,6 @@ class BaseDataModuleHF(L.LightningDataModule):
         val_dataset = split["test"]
         test_dataset = dataset["test"]
         return train_dataset, val_dataset, test_dataset
-
-    def _get_dataset_(self, split_name, dataset_name):
-        pass
 
     # prepare data is
     def prepare_data(self):
@@ -160,35 +164,42 @@ class BaseDataModuleHF(L.LightningDataModule):
         logging.info(f"Saving to disk: {os.path.join(self.data_path)}")
         complete.save_to_disk(self.data_path)
 
+    def _get_dataset(self, split):
+        dataset = load_from_disk(
+            os.path.join(self.data_path, split)
+        )
+        self.transforms.set_mode(split)
+        dataset.set_transform(self.transforms, output_all_columns=False) 
+        
+        return dataset
+
     def setup(self, stage=None):
         if not self.train_dataset and not self.val_dataset:
             if stage == "fit":
                 logging.info("fit")
-                self.train_dataset = load_from_disk(
-                    os.path.join(self.data_path, "train")
-                )
-                self.val_dataset = load_from_disk(os.path.join(self.data_path, "valid"))
+                self.train_dataset = self._get_dataset("train")
+                self.val_dataset = self._get_dataset("valid")
 
         if not self.test_dataset:
             if stage == "test":
                 logging.info("test")
-                self.test_dataset = load_from_disk(os.path.join(self.data_path, "test"))
+                self.test_dataset = self._get_dataset("test")
 
-        if self.transforms:
-            if stage == "fit":
-                self.train_dataset.set_transform(
-                    self._train_transform, output_all_columns=False
-                )
-                self.val_dataset.set_transform(
-                    self._valid_test_predict_transform, output_all_columns=False
-                )
+        # if self.transforms:
+        #     if stage == "fit":
+        #         self.train_dataset.set_transform(
+        #             self.transforms, output_all_columns=False
+        #         )
+        #         self.val_dataset.set_transform(
+        #             self._valid_test_predict_transform, output_all_columns=False
+        #         )
 
-            if stage == "test":
-                self.test_dataset.set_transform(
-                    self._valid_test_predict_transform, output_all_columns=False
-                )
+            # if stage == "test":
+            #     self.test_dataset.set_transform(
+            #         self._valid_test_predict_transform, output_all_columns=False
+            #     )
 
-    # def _preprocess_function(self, batch, task):
+    # def _preprocess_function(self, batch):
     #     audio_arrays = [x["array"] for x in batch["audio"]]
     #     inputs = self.feature_extractor(
     #         audio_arrays,
@@ -198,6 +209,7 @@ class BaseDataModuleHF(L.LightningDataModule):
     #         truncation=True,
     #         return_tensors="pt",
     #     )
+    #     return inputs
     #     #check if y is a label list. if so: one-hot encode for multilabel
 
     #     if isinstance(label_list[0], list):
@@ -206,25 +218,25 @@ class BaseDataModuleHF(L.LightningDataModule):
 
     #     return inputs
 
-    def _train_transform(self, examples):
-        train_transform = hydra.utils.instantiate(
-            config=self.transforms,
-            _target_=TransformsWrapper,
-            mode="train",
-            sample_rate=self.feature_extractor.sampling_rate,
-        )
+    # def _train_transform(self, examples):
+    #     train_transform = hydra.utils.instantiate(
+    #         config=self.transforms,
+    #         _target_=TransformsWrapper,
+    #         mode="train",
+    #         sample_rate=self.feature_extractor.sampling_rate,
+    #     )
 
-        return train_transform(examples)
+    #     return train_transform(examples)
 
-    def _valid_test_predict_transform(self, examples):
-        valid_test_predict_transform = hydra.utils.instantiate(
-            config=self.transforms,
-            _target_=TransformsWrapper,
-            mode="test",
-            sample_rate=self.feature_extractor.sampling_rate,
-        )
+    # def _valid_test_predict_transform(self, examples):
+    #     valid_test_predict_transform = hydra.utils.instantiate(
+    #         config=self.transforms_rene,
+    #         _target_=TransformsWrapper,
+    #         mode="test",
+    #         sample_rate=self.feature_extractor.sampling_rate,
+    #     )
 
-        return valid_test_predict_transform(examples)
+    #     return valid_test_predict_transform(examples)
 
     def train_dataloader(self):
         # TODO: nontype objects in hf dataset

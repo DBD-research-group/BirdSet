@@ -1,0 +1,46 @@
+sampling_rate: ${datamodule.extractors.sampling_rate}
+model_type: ${module.network.model_type}
+
+defaults:
+  - _self_
+  - preprocessing: default.yaml 
+  - waveform_augmentations: default.yaml
+  - spectrogram_augmentations: default.yaml
+  - event_extractions: null
+  
+  # waveform: defaults.yaml
+  #   defaults:
+  #   - _self_
+  #   - augmentations/gain.yaml
+#     resize:
+#       _target_: albumentations.Resize
+#       height: 256
+#       width: 256
+#       p: 1.0
+#     ColoredNoise:
+#       _target_: torch_audiomentations.AddColoredNoise
+#       p: 0.5
+#       min_snr_in_db: 3.0 
+#       max_snr_in_db: 30.0
+#       min_f_decay: -2.0
+#       max_f_decay: 2.0
+# #     PitchShift:
+#       _target_: torch_audiomentations.PitchShift
+#       p: 0.5
+#       sample_rate: ${datamodule.dataset.feature_extractor.sampling_rate}
+#       min_transpose_semitones: -4
+#       max_transpose_semitones: 4
+#     Gain:
+#       _target_: torch_audiomentations.Gain
+#       p: 0.5
+#       min_gain_in_db: -15.0
+#       max_gain_in_db: 5.0
+#     PolarityInversion:
+#       _target_: torch_audiomentations.PolarityInversion
+#       p: 0.3
+
+# event_extractions: null
+# preprocessing: default.yaml
+
+
+

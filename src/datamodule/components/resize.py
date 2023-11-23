@@ -82,6 +82,20 @@ class Resizer:
         """
         return spectrogram[:, :, :target_width]
 
+    @staticmethod
+    def truncate_spectrogram_width_batch(spectrogram: Tensor, target_width: int) -> Tensor:
+        """
+        Truncates the width of a 3D spectrogram to a given target width.
+
+        Args:
+            spectrogram (Tensor): The input 3D spectrogram to be truncated.
+            target_width (int): The desired width for the truncated 3D spectrogram.
+
+        Returns:
+            Tensor: The truncated 3D spectrogram.
+        """
+        return spectrogram[:, :, :, :target_width]
+
     def resize_spectrogram(self, spectrogram: Tensor, target_height: int = None, target_width: int = None) -> Tensor:
         """
         Resizes a 3D spectrogram to a given maximum height and width by either padding or truncating.
@@ -105,6 +119,31 @@ class Resizer:
                 spectrogram = self.pad_spectrogram_width(spectrogram, target_width)
             elif spectrogram.shape[2] > target_width:
                 spectrogram = self.truncate_spectrogram_width(spectrogram, target_width)
+
+        return spectrogram
+    def resize_spectrogram_batch(self, spectrogram: Tensor, target_height: int = None, target_width: int = None) -> Tensor:
+        """
+        Resizes a 3D spectrogram to a given maximum height and width by either padding or truncating.
+
+        Args:
+            spectrogram (Tensor): The input 3D spectrogram to be resized.
+            target_height (int, optional): The maximum height for the 3D spectrogram. If None, the height will not be changed.
+            target_width (int, optional): The maximum width for the 3D spectrogram. If None, the width will not be changed.
+
+        Returns:
+            Tensor: The resized 3D spectrogram.
+        """
+        if target_height:
+            if spectrogram.shape[1] < target_height:
+                spectrogram = self.pad_spectrogram_height(spectrogram, target_height)
+            elif spectrogram.shape[1] > target_height:
+                spectrogram = self.truncate_spectrogram_height(spectrogram, target_height)
+
+        if target_width:
+            if spectrogram.shape[3] < target_width:
+                spectrogram = self.pad_spectrogram_width(spectrogram, target_width)
+            elif spectrogram.shape[3] > target_width:
+                spectrogram = self.truncate_spectrogram_width_batch(spectrogram, target_width)
 
         return spectrogram
 
