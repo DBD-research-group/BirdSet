@@ -8,12 +8,17 @@ class ESC50(BaseDataModuleHF):
             self,
             dataset: DictConfig,
             loaders: DictConfig,
-            transforms: DictConfig
+            transforms: DictConfig,
+            extractors: DictConfig,
+            transforms_rene: DictConfig
     ):
         super().__init__(
             dataset=dataset,
             loaders=loaders,
-            transforms=transforms
+            transforms=transforms,
+            extractors=extractors,
+            transforms_rene=transforms_rene
+
         )
 
     @property
@@ -30,19 +35,19 @@ class ESC50(BaseDataModuleHF):
         test_dataset = split_2["test"]
         return train_dataset, val_dataset, test_dataset
     
-    def train_dataloader(self):
-        return DataLoader(
-            self.train_dataset,
-            **self.loaders.get("train")
-        )
+    # def train_dataloader(self):
+    #     return DataLoader(
+    #         self.train_dataset,
+    #         **self.loaders.get("train")
+    #     )
         
-    def val_dataloader(self):
-        return DataLoader(
-            self.val_dataset,
-            **self.loaders.get("valid")
-        )
-    def test_dataloader(self):
-        return DataLoader(
-            self.test_dataset,
-            **self.loaders.get("test")
-        )
+    # def val_dataloader(self):
+    #     return DataLoader(
+    #         self.val_dataset,
+    #         **self.loaders.get("valid")
+    #     )
+    # def test_dataloader(self):
+    #     return DataLoader(
+    #         self.test_dataset,
+    #         **self.loaders.get("test")
+    #     )
