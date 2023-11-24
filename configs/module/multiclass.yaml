@@ -2,7 +2,7 @@ _target_: src.modules.base_module.BaseModule
 
 defaults:
   - _self_
-  - network: ast.yaml
+  - network: wav2vec2.yaml
   
 task: multiclass
 
