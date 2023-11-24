@@ -13,7 +13,7 @@ seed: 2
 
 module:
   optimizer:
-    lr: 5e-3
+    lr: 5e-4
 
 trainer:
   min_epochs: 1
