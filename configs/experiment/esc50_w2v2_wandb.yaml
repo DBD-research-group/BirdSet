@@ -2,32 +2,33 @@
 #package global is neccessary!
 defaults:
   - override /datamodule: esc50.yaml
-  - override /module: wav2vec2.yaml
+  - override /module: multiclass.yaml
+  - override /module/network: wav2vec2.yaml
   - override /callbacks: default.yaml 
   - override /trainer: single_gpu.yaml
 
 
-tags: ["wav2vec2", "ast"]
+tags: ["wav2vec2", "ast", "augment"]
 seed: 2
 
 module:
   optimizer:
-    lr: 2e-5
+    lr: 5e-4
 
 trainer:
   min_epochs: 1
-  max_epochs: 5
+  max_epochs: 10
 
 datamodule:
   dataset:
     val_split: 0.2
   loaders:
     train:
-      batch_size: 1
+      batch_size: 12
     valid:
-      batch_size: 1
+      batch_size: 12
     test:
-      batch_size: 1
+      batch_size: 12
 
 logger:
   wandb:
