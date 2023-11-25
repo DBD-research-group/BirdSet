@@ -57,10 +57,18 @@ class NormalizationWrapper:
 
     def get_mean_std(self) -> Tuple[float, float]:
         """
-        Retrieves or calculates the mean and standard deviation for normalization.
+        Retrieves the mean and standard deviation for normalization.
 
-        Tries to fetch the mean and std from the config, then from the dataset, and
-        if still not found, calculates them using the dataloader.
+        This function attempts to fetch the mean and standard deviation in the following order:
+        1. From the configuration (using `get_mean_std_from_config`).
+        2. From the dataset (using `get_mean_std_from_dataset`).
+        3. If both values are still undefined, it raises an error.
+
+        Raises:
+            ValueError: If both mean and standard deviation are undefined in the configuration
+                        and dataset.
+            ValueError: If only the mean is undefined in the configuration and dataset.
+            ValueError: If only the standard deviation is undefined in the configuration and dataset.
 
         Returns:
             Tuple[float, float]: A tuple containing the mean and standard deviation.
@@ -73,9 +81,17 @@ class NormalizationWrapper:
         if mean is None or std is None:
             mean, std = self.get_mean_std_from_dataset(self.dataset)
 
-        # If still not found, calculate from the dataloader
-        if mean is None or std is None and self.dataloader:
-            mean, std = self.calculate_mean_std_from_dataloader(self.dataloader)
+        # Separate checks for mean and standard deviation
+        if mean is None and std is None:
+            raise ValueError(
+                "Both mean and standard deviation are undefined in the configuration and dataset."
+            )
+        if mean is None:
+            raise ValueError("Mean is undefined in the configuration and dataset.")
+        if std is None:
+            raise ValueError(
+                "Standard deviation is undefined in the configuration and dataset."
+            )
 
         return mean, std
 
@@ -93,8 +109,8 @@ class NormalizationWrapper:
             Returns (None, None) if they are not specified in the config.
         """
 
-        mean = config.get("normalization", {}).get("mean")
-        std = config.get("normalization", {}).get("std")
+        mean = config.get("mean")
+        std = config.get("std")
 
         return mean, std
 
@@ -124,7 +140,6 @@ class NormalizationWrapper:
 
         return mean, std
 
-    # TODO: Check if its smarter to caclucate the mean and std from a PyTorch dataloader or Hugging Face dataset
     def calculate_mean_std_from_dataloader(
         self, dataloader: DataLoader
     ) -> Tuple[float, float]:

@@ -1,4 +1,6 @@
 normalize: True
+mean: -4.268 # Mean of log-scaled Mel spectrograms from AuioSet
+std: 4.569 # Standard deviation of log-scaled Mel spectrograms from AuioSet
 use_spectrogram: True
 n_fft: 1024
 hop_length: 79

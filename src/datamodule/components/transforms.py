@@ -1,24 +1,25 @@
 from typing import Dict, List, Optional
 
+import hydra
+import librosa
 import numpy as np
-from omegaconf import DictConfig
 import torch
+import torch_audiomentations
+import torchaudio
+import torchvision
+from omegaconf import DictConfig
 
 from src.datamodule.components.augmentations import (
     AudioAugmentor,
-    WaveAugmentations,
     SpecAugmentations,
+    WaveAugmentations,
 )
+from src.datamodule.components.normalization import NormalizationWrapper
 from src.datamodule.components.resize import Resizer
-import hydra
-import torch_audiomentations
-import torchaudio
-import librosa
-from transformers import AutoFeatureExtractor
-import torchvision
+
 
 class TransformsWrapperN:
-    def __init__(self, transforms_cfg: DictConfig):
+    def __init__(self, transforms_cfg: DictConfig, normalizer: NormalizationWrapper):
         """TransformsWrapper module.
 
         Args:
@@ -29,13 +30,15 @@ class TransformsWrapperN:
         self.sampling_rate = transforms_cfg.get("sampling_rate")
         self.model_type = transforms_cfg.get("model_type")
 
+        self.normalizer = normalizer
+
         self.preprocessing = transforms_cfg.get("preprocessing")
         self.waveform_augmentations = transforms_cfg.get("waveform_augmentations")
         self.spectrogram_augmentations = transforms_cfg.get("spectrogram_augmentations")
         self.event_extractions = transforms_cfg.get("event_extractions")
         self.resizer = Resizer(
             use_spectrogram=self.preprocessing.use_spectrogram,
-            db_scale=self.preprocessing.db_scale
+            db_scale=self.preprocessing.db_scale,
         )
 
         if self.mode == "train":
@@ -48,49 +51,48 @@ class TransformsWrapperN:
                 wave_aug.append(aug)
 
             self.wave_aug = torch_audiomentations.Compose(
-                transforms=wave_aug,
-                output_type="tensor")
+                transforms=wave_aug, output_type="tensor"
+            )
 
             # spectrogram augmentations
             spec_aug = []
             for spec_aug_name in self.spectrogram_augmentations:
                 aug = hydra.utils.instantiate(
-                    self.spectrogram_augmentations.get(spec_aug_name), _convert_="object"
+                    self.spectrogram_augmentations.get(spec_aug_name),
+                    _convert_="object",
                 )
                 spec_aug.append(aug)
-            
-            self.spec_aug = torchvision.transforms.Compose(
-                transforms=spec_aug)
-            
+
+            self.spec_aug = torchvision.transforms.Compose(transforms=spec_aug)
+
         elif self.mode in ("valid", "test", "predict"):
             self.wave_aug = None
             self.spec_aug = None
-        
+
     def set_mode(self, mode):
         self.mode = mode
 
     def _spectrogram_conversion(self, waveform):
-
         if "time_stretch" in self.spectrogram_augmentations:
             spectrogram_transform = torchaudio.transforms.Spectrogram(
                 n_fft=self.preprocessing.n_fft,
                 hop_length=self.preprocessing.hop_length,
-                power=0.0
-                )     
+                power=0.0,
+            )
         else:
             spectrogram_transform = torchaudio.transforms.Spectrogram(
                 n_fft=self.preprocessing.n_fft,
                 hop_length=self.preprocessing.hop_length,
-                power=2.0 # hard coded?
-                )     
-        
+                power=2.0,  # hard coded?
+            )
+
         spectrograms = [spectrogram_transform(waveform) for waveform in waveform]
 
         return spectrograms
 
     def _transform_function(self, waveform: Dict[str, torch.Tensor]):
         # !TODO: event decoding
-        #waveform = np.array(waveform)
+        # waveform = np.array(waveform)
         waveform = torch.Tensor(waveform)
         waveform = waveform.unsqueeze(1)
         audio_augmented = self.wave_aug(
@@ -99,39 +101,47 @@ class TransformsWrapperN:
 
         if self.model_type == "vision":
             spectrograms = self._spectrogram_conversion(audio_augmented)
-            #spectrograms_augmented = self.spec_aug(spectrograms)
-            spectrograms_augmented = [self.spec_aug(spectrogram) for spectrogram in spectrograms]
+            # spectrograms_augmented = self.spec_aug(spectrograms)
+            spectrograms_augmented = [
+                self.spec_aug(spectrogram) for spectrogram in spectrograms
+            ]
 
             if self.preprocessing.n_mels:
                 melscale_transform = torchaudio.transforms.MelScale(
                     n_mels=self.preprocessing.n_mels,
                     sample_rate=self.sampling_rate,
-                    n_stft=self.preprocessing.n_fft//2+1
+                    n_stft=self.preprocessing.n_fft // 2 + 1,
                 )
-                spectrograms_augmented = [melscale_transform(spectrograms) for spectrograms in spectrograms_augmented]
-        
+                spectrograms_augmented = [
+                    melscale_transform(spectrograms)
+                    for spectrograms in spectrograms_augmented
+                ]
+
             if self.preprocessing.db_scale:
                 # list with 1 x 128 x 2026
-                spectrograms_augmented = [spectrogram.numpy() for spectrogram in spectrograms_augmented]
-                spectrograms_augmented = torch.from_numpy(librosa.power_to_db(spectrograms_augmented))
+                spectrograms_augmented = [
+                    spectrogram.numpy() for spectrogram in spectrograms_augmented
+                ]
+                spectrograms_augmented = torch.from_numpy(
+                    librosa.power_to_db(spectrograms_augmented)
+                )
 
             audio_augmented = self.resizer.resize_spectrogram_batch(
                 spectrograms_augmented,
                 target_height=self.preprocessing.target_height,
-                target_width=self.preprocessing.target_width
+                target_width=self.preprocessing.target_width,
             )
 
-            # batch_size x 1 x height x width
-            if self.preprocessing.normalize:
-                audio_augmented = (audio_augmented - (-4.268)) / (4.569 * 2)
-            
+        # batch_size x 1 x height x width
+        if self.preprocessing.normalize:
+            audio_augmented = self.normalizer.standardize_tensor(tensor=audio_augmented)
+
         if self.model_type == "hf":
             pass
             # waveform_augmented_list = waveform_augmented.unsqueeze(1)
             # waveform_augmented_list = [waveform.numpy() for waveform in waveform_augmented_list]
             # extracted = extractor(waveform_augmented_list)
-            
-        
+
         return audio_augmented
 
     def _transform_valid_test_predict(self, waveform):
@@ -143,6 +153,7 @@ class TransformsWrapperN:
         )
 
         return audio_samples
+
 
 class TransformsWrapper:
     def __init__(
@@ -239,7 +250,7 @@ class TransformsWrapper:
 
         if self.normalize:
             # TODO: currently hardcoded, here we need a normalization module!
-            audio_augmented = (audio_augmented - (-4.268)) / (4.569 * 2)
+            audio_augmented = (audio_augmented - (-4.268)) / (4.569)
 
         return audio_augmented
 

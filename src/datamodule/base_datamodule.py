@@ -10,22 +10,24 @@ from omegaconf import DictConfig
 
 from src.datamodule.components.bird_premapping import AudioPreprocessor
 from src.datamodule.components.transforms import TransformsWrapperN
-from src.datamodule.components.transforms import TransformsWrapper
-import transformers
+from src.datamodule.components.normalization import NormalizationWrapper
+
 
 class BaseDataModuleHF(L.LightningDataModule):
     def __init__(
-        self, 
-        dataset: DictConfig, 
-        loaders: DictConfig, 
+        self,
+        dataset: DictConfig,
+        loaders: DictConfig,
         transforms: DictConfig,
         extractors: DictConfig,
-        transforms_rene: DictConfig
+        transforms_rene: DictConfig,
     ):
         super().__init__()
         self.dataset = dataset
         self.loaders = loaders
-        self.transforms = TransformsWrapperN(transforms)
+
+        self.transforms_config = transforms
+        self.transforms = None
         self.transforms_rene = transforms_rene
         self.feature_extractor = hydra.utils.instantiate(extractors)
 
@@ -76,6 +78,14 @@ class BaseDataModuleHF(L.LightningDataModule):
         )
 
         logging.info("> Mapping data set.")
+
+        normalizer = NormalizationWrapper(
+            config=self.transforms_config, dataset=dataset
+        )
+
+        self.transforms = TransformsWrapperN(
+            transforms_cfg=self.transforms_config, normalizer=normalizer
+        )
 
         preprocessor = AudioPreprocessor(
             feature_extractor=self.feature_extractor,
@@ -165,12 +175,10 @@ class BaseDataModuleHF(L.LightningDataModule):
         complete.save_to_disk(self.data_path)
 
     def _get_dataset(self, split):
-        dataset = load_from_disk(
-            os.path.join(self.data_path, split)
-        )
+        dataset = load_from_disk(os.path.join(self.data_path, split))
         self.transforms.set_mode(split)
-        dataset.set_transform(self.transforms, output_all_columns=False) 
-        
+        dataset.set_transform(self.transforms, output_all_columns=False)
+
         return dataset
 
     def setup(self, stage=None):
@@ -194,10 +202,10 @@ class BaseDataModuleHF(L.LightningDataModule):
         #             self._valid_test_predict_transform, output_all_columns=False
         #         )
 
-            # if stage == "test":
-            #     self.test_dataset.set_transform(
-            #         self._valid_test_predict_transform, output_all_columns=False
-            #     )
+        # if stage == "test":
+        #     self.test_dataset.set_transform(
+        #         self._valid_test_predict_transform, output_all_columns=False
+        #     )
 
     # def _preprocess_function(self, batch):
     #     audio_arrays = [x["array"] for x in batch["audio"]]
