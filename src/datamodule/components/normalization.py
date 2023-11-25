@@ -28,15 +28,16 @@ class NormalizationWrapper:
             std (float): Standard deviation for standardization.
         """
 
-        self.config = config
+        self.config = config.get("preprocessing")
         self.dataset = dataset
         self.dataloader = None  # Set as None initially; can be assigned later
 
         # Extract the use_spectrogram flag from config; ensure it's a boolean
         self.use_spectrogram = config.get("use_spectrogram", False)
 
-        # Retrieve or calculate mean and standard deviation
-        self.mean, self.std = self.get_mean_std()
+        if self.config.normalize:
+            # Retrieve or calculate mean and standard deviation
+            self.mean, self.std = self.get_mean_std()
 
     def standardize_tensor(self, tensor: torch.Tensor) -> torch.Tensor:
         """
