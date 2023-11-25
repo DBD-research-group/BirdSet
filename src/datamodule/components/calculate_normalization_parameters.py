@@ -9,7 +9,7 @@ from src.datamodule.components.normalization import NormalizationWrapper
 log = utils.get_pylogger(__name__)
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
 
-@hydra.main(version_base=None, config_path="../configs", config_name="main")
+@hydra.main(version_base=None, config_path="../../../configs", config_name="main")
 def calculate_normalization_parameters(cfg):
     log.info('Using config: \n%s', OmegaConf.to_yaml(cfg))
 
