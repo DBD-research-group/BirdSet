@@ -59,7 +59,7 @@ class TransformsWrapperN:
                 self.wave_aug = None
 
             # spectrogram augmentations
-            if self.waveform_augmentations:
+            if self.spectrogram_augmentations:
                 spec_aug = []
                 for spec_aug_name in self.spectrogram_augmentations:
                     aug = hydra.utils.instantiate(
@@ -80,7 +80,7 @@ class TransformsWrapperN:
         self.mode = mode
 
     def _spectrogram_conversion(self, waveform):
-        if "time_stretch" in self.spectrogram_augmentations:
+        if self.spectrogram_augmentations and "time_stretch" in self.spectrogram_augmentations:
             spectrogram_transform = torchaudio.transforms.Spectrogram(
                 n_fft=self.preprocessing.n_fft,
                 hop_length=self.preprocessing.hop_length,
