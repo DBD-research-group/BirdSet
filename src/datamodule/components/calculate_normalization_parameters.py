@@ -51,7 +51,7 @@ def calculate_normalization_parameters(cfg):
 
     normalizer = NormalizationWrapper(config=datamodule.transforms_config)
 
-    mean, std = normalizer.calculate_mean_std_from_dataloader(dataloader=datamodule.train_dataloader)
+    mean, std = normalizer.calculate_mean_std_from_dataloader(dataloader=datamodule.train_dataloader())
 
     log.info(f"Mean: {mean} | Standard deviation: {std}")
 
