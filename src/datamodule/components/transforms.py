@@ -1,6 +1,8 @@
 from typing import Dict, List, Optional
 
+import datasets
 import numpy as np
+import transformers
 from omegaconf import DictConfig
 import torch
 
@@ -9,13 +11,15 @@ from src.datamodule.components.augmentations import (
     WaveAugmentations,
     SpecAugmentations,
 )
+from src.datamodule.components.event_decoding import EventDecoding
 from src.datamodule.components.resize import Resizer
 import hydra
 import torch_audiomentations
 import torchaudio
 import librosa
-from transformers import AutoFeatureExtractor
+from transformers import AutoFeatureExtractor, BatchFeature
 import torchvision
+
 
 class TransformsWrapperN:
     def __init__(self, transforms_cfg: DictConfig):
@@ -36,6 +40,13 @@ class TransformsWrapperN:
         self.resizer = Resizer(
             use_spectrogram=self.preprocessing.use_spectrogram,
             db_scale=self.preprocessing.db_scale
+        )
+        self.event_decoder = EventDecoding(min_len=0.1, max_len=10, sampling_rate=self.sampling_rate)
+        self.sequence_feature_extractor = transformers.SequenceFeatureExtractor(
+            feature_size=1,
+            sampling_rate=self.sampling_rate,
+            padding_value=0.0,
+            model_input_names=["input_values"]
         )
 
         if self.mode == "train":
@@ -88,10 +99,16 @@ class TransformsWrapperN:
 
         return spectrograms
 
-    def _transform_function(self, waveform: Dict[str, torch.Tensor]):
-        # !TODO: event decoding
-        #waveform = np.array(waveform)
-        waveform = torch.Tensor(waveform)
+    def _transform_function(self, batch):
+        # event decoding
+        batch = self.event_decoder(batch)
+
+        # audio collating and padding
+        waveform = [audio["array"] for audio in batch["audio"]]
+        waveform = transformers.BatchFeature({"input_values": waveform})
+        waveform = self.sequence_feature_extractor.pad(waveform, padding=True, return_tensors="pt")
+        waveform = waveform["input_values"]
+
         waveform = waveform.unsqueeze(1)
         audio_augmented = self.wave_aug(
             samples=waveform, sample_rate=self.sampling_rate
@@ -130,19 +147,15 @@ class TransformsWrapperN:
             # waveform_augmented_list = waveform_augmented.unsqueeze(1)
             # waveform_augmented_list = [waveform.numpy() for waveform in waveform_augmented_list]
             # extracted = extractor(waveform_augmented_list)
-            
-        
-        return audio_augmented
+        return {"input_values": audio_augmented, "labels": batch["labels"]}
 
     def _transform_valid_test_predict(self, waveform):
         pass
 
-    def __call__(self, audio_samples, **kwargs):
-        audio_samples["input_values"] = self._transform_function(
-            audio_samples["input_values"]
-        )
+    def __call__(self, batch, **kwargs):
+        batch = self._transform_function(batch)
 
-        return audio_samples
+        return batch
 
 class TransformsWrapper:
     def __init__(

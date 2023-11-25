@@ -18,7 +18,7 @@ class EventMapping:
     def __call__(self, batch):
         new_batch = {key: [] for key in batch.keys()}
 
-        for b_idx in range(len(batch['filepath'])):
+        for b_idx in range(len(batch.get('filepath', []))):
             if not self.with_noise_cluster:
                 events = np.array(batch["detected_events"][b_idx])
                 cluster = np.array(batch["event_cluster"][b_idx])
@@ -32,7 +32,7 @@ class EventMapping:
                     batch["detected_events"][b_idx] = events[cluster == values[count.argmax()]].tolist()
                     batch["event_cluster"][b_idx] = cluster[cluster == values[count.argmax()]].tolist()
                 if self.only_one:
-                    r = random.randint(0, len(batch["event_cluster"][b_idx]) -1)
+                    r = random.randint(0, len(batch["event_cluster"][b_idx]) - 1)
                     batch["detected_events"][b_idx] = [batch["detected_events"][b_idx][r]]
                     batch["event_cluster"][b_idx] = [batch["event_cluster"][b_idx][r]]
 

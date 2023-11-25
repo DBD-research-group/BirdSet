@@ -9,6 +9,7 @@ from torch.utils.data import DataLoader
 from omegaconf import DictConfig
 
 from src.datamodule.components.bird_premapping import AudioPreprocessor
+from src.datamodule.components.event_mapping import EventMapping
 from src.datamodule.components.transforms import TransformsWrapperN
 from src.datamodule.components.transforms import TransformsWrapper
 import transformers
@@ -113,21 +114,26 @@ class BaseDataModuleHF(L.LightningDataModule):
 
             dataset = DatasetDict(dict(list(dataset.items())[:2]))
 
-        elif self.dataset.task == "multiclass":
+        elif self.dataset.task == "multiclass" and self.dataset.dataset_name != "esc50":
             dataset = DatasetDict(dict(list(dataset.items())[:2]))
-            dataset = dataset.map(
-                preprocessor.preprocess_train,
+            dataset["train"] = dataset["train"].map(
+                # TODO add to hydra
+                EventMapping(with_noise_cluster=False, biggest_cluster=True, only_one=True),
                 remove_columns=["audio"],
                 batched=True,
                 batch_size=100,
                 load_from_cache_file=True,
                 num_proc=self.dataset.n_workers,
             )
+            dataset = dataset.cast_column("audio", Audio(self.transforms.sampling_rate, mono=True, decode=False))
+            #dataset = dataset.select_columns(self.dataset.column_list)
 
-            dataset = dataset.select_columns(self.dataset.column_list)
+            if self.dataset.column_list[1] != "labels" and self.dataset.dataset_name != "esc50":
+                dataset = dataset.rename_column("ebird_code", "labels")
 
-            if self.dataset.column_list[1] != "labels":
-                dataset = dataset.rename_column(self.dataset.column_list[1], "labels")
+        # TODO: esc50 specific
+        if self.dataset.dataset_name == "esc50":
+            dataset = dataset.rename_column("target", "labels")
 
         # dataset["train"] = dataset["train"].map(
         #     EventMapping(),
