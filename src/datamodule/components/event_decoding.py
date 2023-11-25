@@ -31,7 +31,7 @@ class EventDecoding:
 
     def __call__(self, batch):
         audios, srs = [], []
-        for b_idx in range(len(batch["filepath"])):
+        for b_idx in range(len(batch.get("filepath", []))):
             if batch["detected_events"][b_idx]:
                 start, end = batch["detected_events"][b_idx]
             else:
@@ -39,5 +39,8 @@ class EventDecoding:
             audio, sr = self._load_audio(batch["filepath"][b_idx], start, end)
             audios.append(audio)
             srs.append(sr)
+        else:
+            return batch
         batch["audio"] = [{"path": path, "array": audio, "samplerate": sr} for audio, path, sr in zip(audios, batch["filepath"], srs)]
+
         return batch

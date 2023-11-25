@@ -114,7 +114,7 @@ class BaseDataModuleHF(L.LightningDataModule):
 
             dataset = DatasetDict(dict(list(dataset.items())[:2]))
 
-        elif self.dataset.task == "multiclass" and self.dataset.name != "esc50":
+        elif self.dataset.task == "multiclass" and self.dataset.dataset_name != "esc50":
             dataset = DatasetDict(dict(list(dataset.items())[:2]))
             dataset["train"] = dataset["train"].map(
                 # TODO add to hydra
@@ -128,8 +128,12 @@ class BaseDataModuleHF(L.LightningDataModule):
             dataset = dataset.cast_column("audio", Audio(self.transforms.sampling_rate, mono=True, decode=False))
             #dataset = dataset.select_columns(self.dataset.column_list)
 
-            if self.dataset.column_list[1] != "labels":
+            if self.dataset.column_list[1] != "labels" and self.dataset.dataset_name != "esc50":
                 dataset = dataset.rename_column("ebird_code", "labels")
+
+        # TODO: esc50 specific
+        if self.dataset.dataset_name == "esc50":
+            dataset = dataset.rename_column("target", "labels")
 
         # dataset["train"] = dataset["train"].map(
         #     EventMapping(),

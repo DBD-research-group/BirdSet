@@ -102,10 +102,10 @@ class TransformsWrapperN:
     def _transform_function(self, batch):
         # event decoding
         batch = self.event_decoder(batch)
-        # TODO: audio collating and padding
+
+        # audio collating and padding
         waveform = [audio["array"] for audio in batch["audio"]]
         waveform = transformers.BatchFeature({"input_values": waveform})
-
         waveform = self.sequence_feature_extractor.pad(waveform, padding=True, return_tensors="pt")
         waveform = waveform["input_values"]
 
@@ -147,7 +147,6 @@ class TransformsWrapperN:
             # waveform_augmented_list = waveform_augmented.unsqueeze(1)
             # waveform_augmented_list = [waveform.numpy() for waveform in waveform_augmented_list]
             # extracted = extractor(waveform_augmented_list)
-
         return {"input_values": audio_augmented, "labels": batch["labels"]}
 
     def _transform_valid_test_predict(self, waveform):
