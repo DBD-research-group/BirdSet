@@ -43,9 +43,8 @@ class TransformsWrapperN:
 
         if self.mode == "train":
             # waveform augmentations
-
-            wave_aug = []
             if self.waveform_augmentations:
+                wave_aug = []
                 for wave_aug_name in self.waveform_augmentations:
                     aug = hydra.utils.instantiate(
                         self.waveform_augmentations.get(wave_aug_name),
@@ -56,11 +55,12 @@ class TransformsWrapperN:
                 self.wave_aug = torch_audiomentations.Compose(
                     transforms=wave_aug, output_type="tensor"
                 )
+            else:
+                self.wave_aug = None
 
             # spectrogram augmentations
-
-            spec_aug = []
             if self.waveform_augmentations:
+                spec_aug = []
                 for spec_aug_name in self.spectrogram_augmentations:
                     aug = hydra.utils.instantiate(
                         self.spectrogram_augmentations.get(spec_aug_name),
@@ -69,6 +69,8 @@ class TransformsWrapperN:
                     spec_aug.append(aug)
 
                 self.spec_aug = torchvision.transforms.Compose(transforms=spec_aug)
+            else:
+                self.spec_aug = None
 
         elif self.mode in ("valid", "test", "predict"):
             self.wave_aug = None
@@ -100,16 +102,24 @@ class TransformsWrapperN:
         # waveform = np.array(waveform)
         waveform = torch.Tensor(waveform)
         waveform = waveform.unsqueeze(1)
-        audio_augmented = self.wave_aug(
-            samples=waveform, sample_rate=self.sampling_rate
-        )
+
+        if self.wave_aug:
+            audio_augmented = self.wave_aug(
+                samples=waveform, sample_rate=self.sampling_rate
+            )
+        else:
+            audio_augmented = waveform
 
         if self.model_type == "vision":
             spectrograms = self._spectrogram_conversion(audio_augmented)
             # spectrograms_augmented = self.spec_aug(spectrograms)
-            spectrograms_augmented = [
-                self.spec_aug(spectrogram) for spectrogram in spectrograms
-            ]
+
+            if self.spec_aug:
+                spectrograms_augmented = [
+                    self.spec_aug(spectrogram) for spectrogram in spectrograms
+                ]
+            else:
+                spectrograms_augmented = spectrograms
 
             if self.preprocessing.n_mels:
                 melscale_transform = torchaudio.transforms.MelScale(
