@@ -43,8 +43,9 @@ class TransformsWrapperN:
 
         if self.mode == "train":
             # waveform augmentations
+
+            wave_aug = []
             if self.waveform_augmentations:
-                wave_aug = []
                 for wave_aug_name in self.waveform_augmentations:
                     aug = hydra.utils.instantiate(
                         self.waveform_augmentations.get(wave_aug_name),
@@ -55,12 +56,11 @@ class TransformsWrapperN:
                 self.wave_aug = torch_audiomentations.Compose(
                     transforms=wave_aug, output_type="tensor"
                 )
-            else:
-                self.wave_aug = None
 
             # spectrogram augmentations
+
+            spec_aug = []
             if self.waveform_augmentations:
-                spec_aug = []
                 for spec_aug_name in self.spectrogram_augmentations:
                     aug = hydra.utils.instantiate(
                         self.spectrogram_augmentations.get(spec_aug_name),
@@ -69,8 +69,6 @@ class TransformsWrapperN:
                     spec_aug.append(aug)
 
                 self.spec_aug = torchvision.transforms.Compose(transforms=spec_aug)
-            else:
-                self.spec_aug = None
 
         elif self.mode in ("valid", "test", "predict"):
             self.wave_aug = None
