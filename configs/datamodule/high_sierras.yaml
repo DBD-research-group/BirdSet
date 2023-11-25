@@ -1,15 +1,20 @@
 #HSN
 _target_: src.datamodule.gadme_datamodule.GADMEDataModule
 
+defaults:
+  - _self_
+  - transforms: bird_default.yaml
+  - extractors: default_aug.yaml
+
 dataset:
   data_dir: ${paths.dataset_path}
   dataset_name: high_sierras
   hf_path: DBD-research-group/gadme_v1
   hf_name: high_sierras
   seed: ${seed}
-  feature_extractor:
-    _target_: transformers.AutoFeatureExtractor.from_pretrained
-    pretrained_model_name_or_path: ${module.network.model.checkpoint}
+  #feature_extractor:
+  #  _target_: transformers.AutoFeatureExtractor.from_pretrained
+  #  pretrained_model_name_or_path: ${module.network.model.checkpoint}
   n_classes: 22
   n_workers: 3
   column_list: ["input_values", "ebird_code", "ebird_code_multiclass"]
@@ -37,9 +42,6 @@ loaders:
     num_workers: 4
     drop_last: False
     pin_memory: False
-
-transforms:
-  null
 
 
 
