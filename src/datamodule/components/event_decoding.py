@@ -39,8 +39,6 @@ class EventDecoding:
             audio, sr = self._load_audio(batch["filepath"][b_idx], start, end)
             audios.append(audio)
             srs.append(sr)
-        else:
-            return batch
-        batch["audio"] = [{"path": path, "array": audio, "samplerate": sr} for audio, path, sr in zip(audios, batch["filepath"], srs)]
-
+        if batch.get("filepath", None):
+            batch["audio"] = [{"path": path, "array": audio, "samplerate": sr} for audio, path, sr in zip(audios, batch["filepath"], srs)]
         return batch
