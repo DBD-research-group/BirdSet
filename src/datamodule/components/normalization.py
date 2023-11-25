@@ -22,7 +22,6 @@ class NormalizationWrapper:
         Attributes:
             config (DictConfig): Configuration dictionary.
             dataset (Optional[datasets.Dataset]): Dataset for normalization.
-            dataloader (DataLoader): DataLoader, initialized as None and can be set later for mean and std calculation.
             use_spectrogram (bool): Flag to determine if spectrogram or waveform data should be used.
             mean (float): Mean value for standardization.
             std (float): Standard deviation for standardization.
@@ -30,7 +29,6 @@ class NormalizationWrapper:
 
         self.config = config.get("preprocessing")
         self.dataset = dataset
-        self.dataloader = None  # Set as None initially; can be assigned later
 
         # Extract the use_spectrogram flag from config; ensure it's a boolean
         self.use_spectrogram = config.get("use_spectrogram", False)
@@ -164,4 +162,5 @@ class NormalizationWrapper:
 
         mean = sum_ / num_elements
         std = (sum_of_squares / num_elements - mean**2) ** 0.5
+
         return mean, std
