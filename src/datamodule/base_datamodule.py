@@ -1,16 +1,42 @@
+from dataclasses import asdict, dataclass, field
 import logging
 import os
+from typing import List, Literal
 
-import hydra
 import lightning as L
 
 from datasets import load_dataset, load_from_disk, Audio, DatasetDict
+from src.utils.extraction import DefaultFeatureExtractor
 from torch.utils.data import DataLoader
-from omegaconf import DictConfig
 
 from src.datamodule.components.bird_premapping import AudioPreprocessor
 from src.datamodule.components.transforms import TransformsWrapperN
-from src.datamodule.components.transforms import TransformsWrapper
+
+@dataclass
+class DatasetConfig:
+    data_dir: str = "/workspace/data_gadme"
+    dataset_name: str = "esc50"
+    hf_path: str = "ashraq/esc50"
+    hf_name: str = None
+    seed: int = 42
+    n_classes: int = 50
+    n_workers: int = 1
+    column_list: List[str] = field(default_factory=lambda: ["input_values", "target"])
+    val_split: float = 0.2
+    task: Literal["multiclass", "multilabel"] = "multiclass"
+
+@dataclass
+class LoaderConfig:
+    batch_size: int = 32
+    shuffle: bool = True
+    num_workers: int = 1
+    pin_memory: bool = True
+
+@dataclass
+class LoadersConfig:
+    train: LoaderConfig = LoaderConfig()
+    valid: LoaderConfig = LoaderConfig(shuffle=False)
+    test: LoaderConfig = LoaderConfig(shuffle=False)
 
 class BaseDataModuleHF(L.LightningDataModule):
     """
@@ -19,32 +45,16 @@ class BaseDataModuleHF(L.LightningDataModule):
 
     def __init__(
         self, 
-        dataset: DictConfig, 
-        loaders: DictConfig, 
-        transforms: DictConfig,
-        extractors: DictConfig,
-    ):
-        """
-        Constructs all the necessary attributes for the BaseDataModuleHF object.
-
-        Parameters
-        ----------
-            dataset : DictConfig
-                The configuration for the dataset.
-            loaders : DictConfig
-                The configuration for the data loaders.
-            transforms : DictConfig
-                The configuration for the data transformations.
-            extractors : DictConfig
-                The configuration for the feature extractors.
-            transforms_rene : DictConfig
-                The configuration for the Rene's transformations.
-        """
+        dataset: DatasetConfig = DatasetConfig(),
+        loaders: LoadersConfig = LoadersConfig(),
+        transforms: TransformsWrapperN = TransformsWrapperN(),
+        extractors: DefaultFeatureExtractor = DefaultFeatureExtractor()
+        ):
         super().__init__()
         self.dataset = dataset
         self.loaders = loaders
-        self.transforms = TransformsWrapperN(transforms)
-        self.feature_extractor = hydra.utils.instantiate(extractors)
+        self.transforms = transforms
+        self.feature_extractor = extractors
 
         self.data_path = None
         self.train_dataset = None
@@ -224,10 +234,10 @@ class BaseDataModuleHF(L.LightningDataModule):
 
     def train_dataloader(self):
         # TODO: nontype objects in hf dataset
-        return DataLoader(self.train_dataset, **self.loaders.get("train"))
+        return DataLoader(self.train_dataset, **asdict(self.loaders.train))
 
     def val_dataloader(self):
-        return DataLoader(self.val_dataset, **self.loaders.get("valid"))
+        return DataLoader(self.val_dataset, **asdict(self.loaders.valid))
 
     def test_dataloader(self):
-        return DataLoader(self.test_dataset, **self.loaders.get("test"))
+        return DataLoader(self.test_dataset, **asdict(self.loaders.test))

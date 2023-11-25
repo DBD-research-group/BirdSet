@@ -1,7 +1,9 @@
-from typing import Dict, List, Optional
+from dataclasses import dataclass
+from typing import Dict, List, Literal, Optional, TypedDict
 
 import numpy as np
-from omegaconf import DictConfig
+from omegaconf import DictConfig, OmegaConf
+from src.utils.extraction import DefaultFeatureExtractor
 import torch
 
 from src.datamodule.components.augmentations import (
@@ -14,11 +16,50 @@ import hydra
 import torch_audiomentations
 import torchaudio
 import librosa
-from transformers import AutoFeatureExtractor
 import torchvision
 
+@dataclass
+class PreprocessingConfig:
+    use_spectrogram: bool = True
+    n_fft: int = 1024
+    hop_length: int = 79
+    n_mels: int = 128
+    db_scale: bool = True
+    target_height: int = 128
+    target_width: int = 1024
+    normalize: bool = True
+
 class TransformsWrapperN:
-    def __init__(self, transforms_cfg: DictConfig):
+    """
+    A class used to wrap transformations for audio data.
+
+    Attributes:
+        mode (str): The mode of operation, can be "train", "valid", "test", or "predict".
+        sampling_rate (int): The sampling rate of the audio data.
+        model_type (str): The type of model to be used.
+        preprocessing (DictConfig): The configuration for preprocessing.
+        waveform_augmentations (DictConfig): The configuration for waveform augmentations.
+        spectrogram_augmentations (DictConfig): The configuration for spectrogram augmentations.
+        event_extractions (DictConfig): The configuration for event extractions.
+        resizer (Resizer): An instance of the Resizer class.
+        wave_aug (torch_audiomentations.Compose): A composition of waveform augmentations.
+        spec_aug (torchvision.transforms.Compose): A composition of spectrogram augmentations.
+
+    Methods:
+        set_mode(mode: str): Sets the mode of operation.
+        _spectrogram_conversion(waveform: torch.Tensor): Converts a waveform to a spectrogram.
+        _transform_function(waveform: Dict[str, torch.Tensor]): Transforms a waveform based on the set configurations.
+        _transform_valid_test_predict(waveform: torch.Tensor): Placeholder method for transforming data in valid, test, or predict mode.
+        __call__(audio_samples: Dict[str, torch.Tensor], **kwargs): Transforms the input audio samples.
+    """
+    def __init__(self,
+                sampling_rate: int = 32000,
+                model_type: Literal['vision', 'waveform'] = "vision",
+                preprocessing: PreprocessingConfig = PreprocessingConfig(),
+                spectrogram_augmentations: List = [],
+                waveform_augmentations: List = [],
+                event_extractions: DefaultFeatureExtractor = DefaultFeatureExtractor()
+):
         """TransformsWrapper module.
 
         Args:
@@ -26,13 +67,13 @@ class TransformsWrapperN:
         """
 
         self.mode = "train"
-        self.sampling_rate = transforms_cfg.get("sampling_rate")
-        self.model_type = transforms_cfg.get("model_type")
+        self.sampling_rate = sampling_rate 
+        self.model_type = model_type
 
-        self.preprocessing = transforms_cfg.get("preprocessing")
-        self.waveform_augmentations = transforms_cfg.get("waveform_augmentations")
-        self.spectrogram_augmentations = transforms_cfg.get("spectrogram_augmentations")
-        self.event_extractions = transforms_cfg.get("event_extractions")
+        self.preprocessing = preprocessing
+        self.waveform_augmentations = waveform_augmentations
+        self.spectrogram_augmentations = spectrogram_augmentations
+        self.event_extractions = event_extractions
         self.resizer = Resizer(
             use_spectrogram=self.preprocessing.use_spectrogram,
             db_scale=self.preprocessing.db_scale

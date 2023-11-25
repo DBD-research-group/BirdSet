@@ -36,10 +36,10 @@ class DefaultFeatureExtractor(SequenceFeatureExtractor):
 
     def __init__(
         self,
-        feature_size=1,
-        sampling_rate=16000,
-        padding_value=0.0,
-        return_attention_mask=False,
+        feature_size: int = 1,
+        sampling_rate: int = 16000,
+        padding_value: float = 0.0,
+        return_attention_mask: bool = False,
         **kwargs,
     ):
         super().__init__(
