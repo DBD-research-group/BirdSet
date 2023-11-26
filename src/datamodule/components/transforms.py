@@ -1,10 +1,19 @@
 from dataclasses import dataclass
 from typing import Dict, Literal
 
+import datasets
+import numpy as np
+import transformers
 from omegaconf import DictConfig
 from src.utils.extraction import DefaultFeatureExtractor
 import torch
 
+from src.datamodule.components.augmentations import (
+    AudioAugmentor,
+    WaveAugmentations,
+    SpecAugmentations,
+)
+from src.datamodule.components.event_decoding import EventDecoding
 from src.datamodule.components.resize import Resizer
 import torch_audiomentations
 import torchaudio
@@ -56,6 +65,13 @@ class TransformsWrapperN:
         self.resizer = Resizer(
             use_spectrogram=self.preprocessing.use_spectrogram,
             db_scale=self.preprocessing.db_scale
+        )
+        self.event_decoder = EventDecoding(min_len=0.1, max_len=10, sampling_rate=self.sampling_rate)
+        self.sequence_feature_extractor = transformers.SequenceFeatureExtractor(
+            feature_size=1,
+            sampling_rate=self.sampling_rate,
+            padding_value=0.0,
+            model_input_names=["input_values"]
         )
 
         if self.mode == "train":
@@ -117,11 +133,11 @@ class TransformsWrapperN:
 
         return spectrograms
 
-    def _transform_function(self, waveform: Dict[str, torch.Tensor]):
+    def _transform_function(self, batch):
         """
-        Applies transformations to a waveform.
+        Applies transformations to a batch.
 
-        This method applies a series of transformations to a waveform, including waveform augmentations,
+        This method applies a series of transformations to a batch, including waveform augmentations,
         spectrogram conversion, Mel scale transformation, decibel scaling, resizing, and normalization.
         The specific transformations applied depend on the `model_type` and `preprocessing` attributes.
 
@@ -133,9 +149,14 @@ class TransformsWrapperN:
             torch.Tensor: The transformed waveform. If `model_type` is "vision", the waveform is transformed
             into a spectrogram and further processed. If `model_type` is "waveform", the waveform is returned as is.
         """
-        # !TODO: event decoding
-        #waveform = np.array(waveform)
-        waveform = torch.Tensor(waveform)
+        batch = self.event_decoder(batch)
+
+        # audio collating and padding
+        waveform = [audio["array"] for audio in batch["audio"]]
+        waveform = transformers.BatchFeature({"input_values": waveform})
+        waveform = self.sequence_feature_extractor.pad(waveform, padding=True, return_tensors="pt")
+        waveform = waveform["input_values"]
+
         waveform = waveform.unsqueeze(1)
         audio_augmented = self.wave_aug(
             samples=waveform, sample_rate=self.sampling_rate
@@ -174,19 +195,15 @@ class TransformsWrapperN:
             # waveform_augmented_list = waveform_augmented.unsqueeze(1)
             # waveform_augmented_list = [waveform.numpy() for waveform in waveform_augmented_list]
             # extracted = extractor(waveform_augmented_list)
-            
-        
-        return audio_augmented
+        return {"input_values": audio_augmented, "labels": batch["labels"]}
 
     def _transform_valid_test_predict(self, waveform):
         pass
 
-    def __call__(self, audio_samples, **kwargs):
-        audio_samples["input_values"] = self._transform_function(
-            audio_samples["input_values"]
-        )
+    def __call__(self, batch, **kwargs):
+        batch = self._transform_function(batch)
 
-        return audio_samples
+        return batch
 
 # class TransformsWrapper:
 #     def __init__(
