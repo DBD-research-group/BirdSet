@@ -10,15 +10,12 @@ class ESC50(BaseDataModuleHF):
             loaders: DictConfig,
             transforms: DictConfig,
             extractors: DictConfig,
-            transforms_rene: DictConfig
     ):
         super().__init__(
             dataset=dataset,
             loaders=loaders,
             transforms=transforms,
             extractors=extractors,
-            transforms_rene=transforms_rene
-
         )
 
     @property

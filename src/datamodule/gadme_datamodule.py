@@ -7,15 +7,13 @@ class GADMEDataModule(BaseDataModuleHF):
             dataset: DictConfig,
             loaders: DictConfig,
             transforms: DictConfig,
-            extractors: DictConfig,
-            transforms_rene=None
+            extractors: DictConfig
     ):
         super().__init__(
             dataset=dataset,
             loaders=loaders,
             transforms=transforms,
-            extractors=extractors,
-            transforms_rene=transforms_rene
+            extractors=extractors
         )
 
     @property

@@ -21,13 +21,11 @@ class BaseDataModuleHF(L.LightningDataModule):
         loaders: DictConfig, 
         transforms: DictConfig,
         extractors: DictConfig,
-        transforms_rene: DictConfig
     ):
         super().__init__()
         self.dataset = dataset
         self.loaders = loaders
         self.transforms = TransformsWrapperN(transforms)
-        self.transforms_rene = transforms_rene
         self.feature_extractor = hydra.utils.instantiate(extractors)
 
         self.data_path = None
@@ -85,24 +83,26 @@ class BaseDataModuleHF(L.LightningDataModule):
         )
 
         if self.dataset.task == "multilabel":
-            dataset["test_5s"] = dataset["test_5s"].select(range(1000))
-            dataset["test"] = dataset["test_5s"].map(
-                preprocessor.preprocess_multilabel,
-                remove_columns=["audio"],
-                batched=True,
-                batch_size=100,
-                load_from_cache_file=True,
-                num_proc=1,
-                # num_proc=self.dataset.n_workers,
-            )
+            dataset["test"] = dataset["test_5s"].select(range(50))
+            # dataset["test"] = dataset["test_5s"].map(
+            #     preprocessor.preprocess_multilabel,
+            #     remove_columns=["audio"],
+            #     batched=True,
+            #     batch_size=10,
+            #     load_from_cache_file=True,
+            #     num_proc=1,
+            #     # num_proc=self.dataset.n_workers,
+            # )
+
+            #dataset["test"]["input_values"]
             dataset["test"] = dataset["test"].select_columns(["input_values", "labels"])
 
-            dataset["train"] = dataset["train"].select(range(1000))
+            dataset["train"] = dataset["train"].select(range(50))
             dataset["train"] = dataset["train"].map(
                 preprocessor.preprocess_multilabel,
                 remove_columns=["audio"],
                 batched=True,
-                batch_size=100,
+                batch_size=50,
                 load_from_cache_file=True,
                 num_proc=1
                 # num_proc=self.dataset.n_workers,
