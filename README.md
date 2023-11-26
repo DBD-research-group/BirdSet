@@ -5,7 +5,7 @@
 
 ### Install dependencies
 
-Eather with [conda](https://docs.conda.io/en/latest/) and [pip](https://pip.pypa.io/en/stable/).
+Either with [conda](https://docs.conda.io/en/latest/) and [pip](https://pip.pypa.io/en/stable/).
 ```
 conda create -n gadme python=3.9
 pip install -e .
