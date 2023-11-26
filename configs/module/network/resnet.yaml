@@ -6,3 +6,4 @@ model:
   num_channels: 1
   pretrained: True
 torch_compile: False
+model_type: 'vision'

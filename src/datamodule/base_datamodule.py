@@ -31,6 +31,9 @@ class LoaderConfig:
     shuffle: bool = True
     num_workers: int = 1
     pin_memory: bool = True
+    drop_last: bool = False
+    persistent_workers: bool = True
+    prefetch_factor: int = 2 
 
 @dataclass
 class LoadersConfig:
@@ -41,6 +44,15 @@ class LoadersConfig:
 class BaseDataModuleHF(L.LightningDataModule):
     """
     A base data module for handling datasets using Hugging Face's datasets library.
+
+    Attributes:
+        dataset (DatasetConfig): Configuration for the dataset. Defaults to an instance of `DatasetConfig`.
+        loaders (LoadersConfig): Configuration for the data loaders. Defaults to an instance of `LoadersConfig`.
+        transforms (TransformsWrapperN): Configuration for the data transformations. Defaults to an instance of `TransformsWrapperN`.
+        extractors (DefaultFeatureExtractor): Configuration for the feature extraction. Defaults to an instance of `DefaultFeatureExtractor`.
+
+    Methods:
+        __init__(dataset, loaders, transforms, extractors): Initializes the `BaseDataModuleHF` instance.
     """
 
     def __init__(

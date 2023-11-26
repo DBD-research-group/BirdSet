@@ -1,20 +1,26 @@
+_target_: src.datamodule.base_datamodule.LoadersConfig
 train:
-  batch_size: 12
+  _target_: src.datamodule.base_datamodule.LoaderConfig
+  batch_size: 8
   shuffle: True
   num_workers: 4
   drop_last: False
-  pin_memory: True
+  persistent_workers: True
+  pin_memory: False
 
 valid:
-  batch_size: 48
+  _target_: src.datamodule.base_datamodule.LoaderConfig
+  batch_size: 8
   shuffle: False
   num_workers: 4
   drop_last: False
-  pin_memory: True
+  persistent_workers: True
+  pin_memory: False
 
 test:
-  batch_size: 48
+  _target_: src.datamodule.base_datamodule.LoaderConfig
+  batch_size: 8
   shuffle: False
   num_workers: 4
   drop_last: False
-  pin_memory: True
+  pin_memory: False
