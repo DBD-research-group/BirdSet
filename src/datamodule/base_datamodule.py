@@ -24,6 +24,7 @@ class DatasetConfig:
     column_list: List[str] = field(default_factory=lambda: ["input_values", "target"])
     val_split: float = 0.2
     task: Literal["multiclass", "multilabel"] = "multiclass"
+    fast_testrun: bool = False
 
 @dataclass
 class LoaderConfig:
@@ -144,9 +145,12 @@ class BaseDataModuleHF(L.LightningDataModule):
         )
 
         if self.dataset.task == "multilabel":
-            # TODO: remove this
-            dataset["test_5s"] = self._preprocess_multilabel(dataset, "test_5s", preprocessor, range(1000))
-            dataset["train"] = self._preprocess_multilabel(dataset, "train", preprocessor, range(1000))
+            if self.dataset.fast_testrun:
+                dataset["test_5s"] = self._preprocess_multilabel(dataset, "test_5s", preprocessor, range(1000))
+                dataset["train"] = self._preprocess_multilabel(dataset, "train", preprocessor, range(1000))
+            else:
+                dataset["test"] = self._preprocess_multilabel(dataset, "test", preprocessor)
+                dataset["train"] = self._preprocess_multilabel(dataset, "train", preprocessor)
             dataset = DatasetDict(dict(list(dataset.items())[:2]))
 
         elif self.dataset.task == "multiclass":
@@ -217,8 +221,7 @@ class BaseDataModuleHF(L.LightningDataModule):
             batched=True,
             batch_size=100,
             load_from_cache_file=True,
-            num_proc=1,
-            # TODO: make num_proc configurable num_proc=self.dataset.n_workers,
+            num_proc=self.dataset.n_workers,
         )
         dataset[split] = dataset[split].select_columns(["input_values", "labels"])
         return dataset[split]
