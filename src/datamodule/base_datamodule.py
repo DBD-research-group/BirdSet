@@ -10,8 +10,8 @@ from src.utils.extraction import DefaultFeatureExtractor
 from torch.utils.data import DataLoader
 
 from src.datamodule.components.bird_premapping import AudioPreprocessor
-from src.datamodule.components.event_mapping import EventMapping
-from src.datamodule.components.transforms import TransformsWrapperN
+#from src.datamodule.components.event_mapping import EventMapping
+from src.datamodule.components.transforms import TransformsWrapper
 
 @dataclass
 class DatasetConfig:
@@ -50,7 +50,7 @@ class BaseDataModuleHF(L.LightningDataModule):
     Attributes:
         dataset (DatasetConfig): Configuration for the dataset. Defaults to an instance of `DatasetConfig`.
         loaders (LoadersConfig): Configuration for the data loaders. Defaults to an instance of `LoadersConfig`.
-        transforms (TransformsWrapperN): Configuration for the data transformations. Defaults to an instance of `TransformsWrapperN`.
+        transforms (TransformsWrapper): Configuration for the data transformations. Defaults to an instance of `TransformsWrapper`.
         extractors (DefaultFeatureExtractor): Configuration for the feature extraction. Defaults to an instance of `DefaultFeatureExtractor`.
 
     Methods:
@@ -59,16 +59,18 @@ class BaseDataModuleHF(L.LightningDataModule):
 
     def __init__(
         self, 
+        mapper,
         dataset: DatasetConfig = DatasetConfig(),
         loaders: LoadersConfig = LoadersConfig(),
-        transforms: TransformsWrapperN = TransformsWrapperN(),
-        extractors: DefaultFeatureExtractor = DefaultFeatureExtractor()
+        transforms: TransformsWrapper = TransformsWrapper(),
+        extractors: DefaultFeatureExtractor = DefaultFeatureExtractor(),
         ):
         super().__init__()
         self.dataset = dataset
         self.loaders = loaders
         self.transforms = transforms
         self.feature_extractor = extractors
+        self.event_mapper = mapper
 
         self.data_path = None
         self.train_dataset = None
@@ -148,7 +150,29 @@ class BaseDataModuleHF(L.LightningDataModule):
             window_length=5,
         )
 
-        if self.dataset.task == "multilabel":
+        if self.dataset.task == "multiclass": #and self.dataset.dataset_name != "esc50":
+            dataset = DatasetDict({split: dataset[split] for split in ["train", "test"]})
+
+            dataset["train"] = dataset["train"].map(
+                self.event_mapper,
+                remove_columns=["audio"],
+                batched=True,
+                batch_size=300,
+                load_from_cache_file=True,
+                num_proc=self.dataset.n_workers,
+            )
+            dataset = dataset.cast_column("audio", Audio(self.transforms.sampling_rate, mono=True, decode=False))
+            dataset = dataset.select_columns(
+                ["filepath", "ebird_code", "detected_events", "start_time", "end_time"]
+            )
+            #dataset = dataset.select_columns(self.dataset.column_list)
+
+            dataset = dataset.rename_column("ebird_code", "labels")
+
+            # if self.dataset.column_list[1] != "labels" and self.dataset.dataset_name != "esc50":
+            #     dataset = dataset.rename_column("ebird_code", "labels")
+
+        elif self.dataset.task == "multilabel":
             if self.dataset.fast_testrun:
                 dataset["test_5s"] = self._preprocess_multilabel(dataset, "test_5s", preprocessor, range(1000))
                 dataset["train"] = self._preprocess_multilabel(dataset, "train", preprocessor, range(1000))
@@ -157,32 +181,16 @@ class BaseDataModuleHF(L.LightningDataModule):
                 dataset["train"] = self._preprocess_multilabel(dataset, "train", preprocessor)
             dataset = DatasetDict(dict(list(dataset.items())[:2]))
 
-        elif self.dataset.task == "multiclass" and self.dataset.dataset_name != "esc50":
-            dataset = DatasetDict(dict(list(dataset.items())[:2]))
-            dataset["train"] = dataset["train"].map(
-                # TODO add to hydra
-                EventMapping(with_noise_cluster=False, biggest_cluster=True, only_one=True),
-                remove_columns=["audio"],
-                batched=True,
-                batch_size=100,
-                load_from_cache_file=True,
-                num_proc=self.dataset.n_workers,
-            )
-            dataset = dataset.cast_column("audio", Audio(self.transforms.sampling_rate, mono=True, decode=False))
-            #dataset = dataset.select_columns(self.dataset.column_list)
+        # # TODO: esc50 specific
+        # if self.dataset.dataset_name == "esc50":
+        #     dataset = dataset.rename_column("target", "labels")
 
-            if self.dataset.column_list[1] != "labels" and self.dataset.dataset_name != "esc50":
-                dataset = dataset.rename_column("ebird_code", "labels")
-
-        # TODO: esc50 specific
-        if self.dataset.dataset_name == "esc50":
-            dataset = dataset.rename_column("target", "labels")
-
-        if self.feature_extractor.return_attention_mask:
-            self.dataset.column_list.append("attention_mask")
+        # if self.feature_extractor.return_attention_mask:
+        #     self.dataset.column_list.append("attention_mask")
 
         dataset.set_format("np")
         train_dataset, val_dataset, test_dataset = self._create_splits(dataset)
+
         complete = DatasetDict(
             {"train": train_dataset, "valid": val_dataset, "test": test_dataset}
         )
@@ -206,7 +214,6 @@ class BaseDataModuleHF(L.LightningDataModule):
         for split in dataset.keys():
             dataset[split] = dataset[split].select(range(size))
         return dataset
-
 
 
     def _preprocess_multilabel(self, dataset, split, preprocessor, select_range=None):

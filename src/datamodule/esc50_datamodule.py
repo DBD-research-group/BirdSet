@@ -1,4 +1,4 @@
-from src.datamodule.components.transforms import TransformsWrapperN
+from src.datamodule.components.transforms import TransformsWrapper
 from src.utils.extraction import DefaultFeatureExtractor
 from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
 
@@ -7,7 +7,7 @@ class ESC50(BaseDataModuleHF):
             self,
             dataset: DatasetConfig = DatasetConfig(),
             loaders: LoadersConfig = LoadersConfig(),
-            transforms: TransformsWrapperN = TransformsWrapperN(),
+            transforms: TransformsWrapper = TransformsWrapper(),
             extractors: DefaultFeatureExtractor = DefaultFeatureExtractor()
     ):
         super().__init__(

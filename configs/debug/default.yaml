@@ -25,15 +25,15 @@ trainer:
 datamodule: 
   loaders:
     train: 
-      batch_size: 6
+      batch_size: 12
       num_workers: 1
       pin_memory: False
     valid: 
-      batch_size: 6
+      batch_size: 12
       num_workers: 1 
       pin_memory: False
     test:
-      batch_size: 6
+      batch_size: 12
       num_workers: 1 
       pin_memory: False
   dataset:

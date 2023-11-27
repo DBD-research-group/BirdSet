@@ -31,7 +31,7 @@ class PreprocessingConfig:
     target_width: int = 1024
     normalize: bool = True
 
-class TransformsWrapperN:
+class TransformsWrapper:
     """
     A class to handle audio transformations for different model types and modes.
 
@@ -51,7 +51,7 @@ class TransformsWrapperN:
                 preprocessing: PreprocessingConfig = PreprocessingConfig(),
                 spectrogram_augmentations: DictConfig = {},
                 waveform_augmentations: DictConfig = {},
-                event_extractions: DefaultFeatureExtractor = DefaultFeatureExtractor()
+                decoding: DefaultFeatureExtractor = DefaultFeatureExtractor()
 ):
 
         self.mode = "train"
@@ -61,18 +61,12 @@ class TransformsWrapperN:
         self.preprocessing = preprocessing
         self.waveform_augmentations = waveform_augmentations
         self.spectrogram_augmentations = spectrogram_augmentations
-        self.event_extractions = event_extractions
+        #self.event_extractions = event_extractions
         self.resizer = Resizer(
             use_spectrogram=self.preprocessing.use_spectrogram,
             db_scale=self.preprocessing.db_scale
         )
-        self.event_decoder = EventDecoding(min_len=0.1, max_len=10, sampling_rate=self.sampling_rate)
-        self.sequence_feature_extractor = transformers.SequenceFeatureExtractor(
-            feature_size=1,
-            sampling_rate=self.sampling_rate,
-            padding_value=0.0,
-            model_input_names=["input_values"]
-        )
+        self.event_decoder = decoding
 
         if self.mode == "train":
             # waveform augmentations
@@ -152,14 +146,27 @@ class TransformsWrapperN:
         batch = self.event_decoder(batch)
 
         # audio collating and padding
-        waveform = [audio["array"] for audio in batch["audio"]]
-        waveform = transformers.BatchFeature({"input_values": waveform})
-        waveform = self.sequence_feature_extractor.pad(waveform, padding=True, return_tensors="pt")
-        waveform = waveform["input_values"]
+        waveform_batch = [audio["array"] for audio in batch["audio"]]
+        waveform_batch = transformers.BatchFeature({"input_values": waveform_batch})
 
-        waveform = waveform.unsqueeze(1)
+        sequence_feature_extractor = transformers.SequenceFeatureExtractor(
+            feature_size=1,
+            sampling_rate=self.sampling_rate,
+            padding_value=0.0,
+            model_input_names=["input_values"]
+        )
+        #!TODO: what about the attention mask and padding values?!
+        waveform_batch = sequence_feature_extractor.pad(
+            waveform_batch, 
+            padding="max_length", 
+            max_length=self.sampling_rate*5,
+            truncation=True,
+            return_tensors="pt",
+            return_attention_mask=False)
+        
+        waveform_batch = waveform_batch["input_values"].unsqueeze(1)
         audio_augmented = self.wave_aug(
-            samples=waveform, sample_rate=self.sampling_rate
+            samples=waveform_batch, sample_rate=self.sampling_rate
         )
 
         if self.model_type == "vision":
@@ -179,13 +186,15 @@ class TransformsWrapperN:
                 # list with 1 x 128 x 2026
                 spectrograms_augmented = [spectrogram.numpy() for spectrogram in spectrograms_augmented]
                 spectrograms_augmented = torch.from_numpy(librosa.power_to_db(spectrograms_augmented))
+            
+            #print(np.array([spec.shape for spec in spectrograms_augmented]))
 
             audio_augmented = self.resizer.resize_spectrogram_batch(
                 spectrograms_augmented,
                 target_height=self.preprocessing.target_height,
                 target_width=self.preprocessing.target_width
             )
-
+            #print(np.array([spec.shape for spec in audio_augmented]))
             # batch_size x 1 x height x width
             if self.preprocessing.normalize:
                 audio_augmented = (audio_augmented - (-4.268)) / (4.569 * 2)

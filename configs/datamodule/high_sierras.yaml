@@ -6,6 +6,7 @@ defaults:
   - transforms: bird_default.yaml
   - extractors: default_aug.yaml
   - loaders: default.yaml
+  - mapper: xc_bambird_mapper.yaml
 
 dataset:
   data_dir: ${paths.dataset_path}

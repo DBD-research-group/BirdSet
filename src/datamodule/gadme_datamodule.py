@@ -1,13 +1,14 @@
-from src.datamodule.components.transforms import TransformsWrapperN
+from src.datamodule.components.transforms import TransformsWrapper
 from src.utils.extraction import DefaultFeatureExtractor
 from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
 
 class GADMEDataModule(BaseDataModuleHF):
     def __init__(
             self,
+            mapper,
             dataset: DatasetConfig = DatasetConfig(),
             loaders: LoadersConfig = LoadersConfig(),
-            transforms: TransformsWrapperN = TransformsWrapperN(),
+            transforms: TransformsWrapper = TransformsWrapper(),
             extractors: DefaultFeatureExtractor = DefaultFeatureExtractor()
     ):
         super().__init__(
@@ -15,7 +16,7 @@ class GADMEDataModule(BaseDataModuleHF):
             loaders=loaders,
             transforms=transforms,
             extractors=extractors,
-
+            mapper=mapper
         )
 
     @property
