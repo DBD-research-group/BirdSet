@@ -15,7 +15,6 @@ class ESC50(BaseDataModuleHF):
             loaders=loaders,
             transforms=transforms,
             extractors=extractors,
-
         )
 
     @property

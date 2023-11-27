@@ -128,12 +128,15 @@ class BaseDataModuleHF(L.LightningDataModule):
             num_proc=3,
         )
 
+        if self.dataset.subset:
+            dataset = self._fast_dev_subset(dataset, self.dataset.subset)
+
         dataset = dataset.cast_column(
             column="audio",
             feature=Audio(
                 sampling_rate=self.feature_extractor.sampling_rate,
                 mono=True,
-                decode=True,
+                decode=False,
             ),
         )
 
@@ -198,6 +201,13 @@ class BaseDataModuleHF(L.LightningDataModule):
 
         logging.info(f"Saving to disk: {os.path.join(self.data_path)}")
         complete.save_to_disk(self.data_path)
+    
+    def _fast_dev_subset(self, dataset, size=500):
+        for split in dataset.keys():
+            dataset[split] = dataset[split].select(range(size))
+        return dataset
+
+
 
     def _preprocess_multilabel(self, dataset, split, preprocessor, select_range=None):
         """

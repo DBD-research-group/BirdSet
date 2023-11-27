@@ -4,7 +4,9 @@ model:
   num_classes: ${datamodule.dataset.n_classes}
 
 model_name: wav2vec2
+model_type: raw
 torch_compile: false
+sampling_rate: 16_000
 
 
 

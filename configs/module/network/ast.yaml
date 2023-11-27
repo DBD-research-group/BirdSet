@@ -6,6 +6,7 @@ model:
 model_name: ast
 model_type: vision
 torch_compile: false
+sampling_rate: 32_000
 
 
 
