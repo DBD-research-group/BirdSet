@@ -5,6 +5,7 @@ defaults:
   - _self_
   - transforms: bird_default.yaml
   - extractors: default_aug.yaml
+  - loaders: default.yaml
 
 dataset:
   data_dir: ${paths.dataset_path}
@@ -21,27 +22,6 @@ dataset:
   val_split: 0.2
   task: ${module.task}
 
-loaders:
-  train:
-    batch_size: 6
-    shuffle: True
-    num_workers: 4
-    drop_last: False
-    pin_memory: False
-  
-  valid:
-    batch_size: 6
-    shuffle: False
-    num_workers: 4
-    drop_last: False
-    pin_memory: False
-  
-  test:
-    batch_size: 6
-    shuffle: False
-    num_workers: 4
-    drop_last: False
-    pin_memory: False
 
 
 

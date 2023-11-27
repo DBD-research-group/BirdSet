@@ -37,9 +37,6 @@ datamodule:
       num_workers: 16
     test:
       batch_size: 6
-  transforms:
-    target_height: 32
-    target_width: 32
 
 logger:
   wandb:

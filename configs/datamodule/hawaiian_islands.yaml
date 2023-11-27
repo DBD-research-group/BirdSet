@@ -1,6 +1,12 @@
 #UHH
 _target_: src.datamodule.gadme_datamodule.GADMEDataModule
 
+defaults:
+  - _self_
+  - transforms: bird_default.yaml
+  - extractors: default_aug.yaml
+  - loaders: default.yaml
+
 dataset:
   data_dir: ${paths.dataset_path}
   dataset_name: hawaiian_islands
@@ -14,33 +20,6 @@ dataset:
   n_workers: 3
   column_list: ["input_values", "ebird_code", "ebird_code_multiclass"]
   val_split: 0.2
-
-loaders:
-  train:
-    batch_size: 6
-    shuffle: True
-    num_workers: 4
-    drop_last: False
-    pin_memory: False
-  
-  valid:
-    batch_size: 6
-    shuffle: False
-    num_workers: 4
-    drop_last: False
-    pin_memory: False
-  
-  test:
-    batch_size: 6
-    shuffle: False
-    num_workers: 4
-    drop_last: False
-    pin_memory: False
-
-transforms:
-  null
-
-
 
 
 
