@@ -1,6 +1,12 @@
 #SSW
 _target_: src.datamodule.gadme_datamodule.GADMEDataModule
 
+defaults:
+  - _self_
+  - transforms: bird_default.yaml
+  - extractors: default_aug.yaml
+  - loaders: default.yaml
+
 dataset:
   data_dir: ${paths.dataset_path}
   dataset_name: sapsucker_woods
@@ -15,52 +21,6 @@ dataset:
   column_list: ["input_values", "ebird_code", "ebird_code_multiclass"]
   val_split: 0.2
 
-loaders:
-  train:
-    batch_size: 6
-    shuffle: True
-    num_workers: 4
-    drop_last: False
-    pin_memory: False
-  
-  valid:
-    batch_size: 6
-    shuffle: False
-    num_workers: 4
-    drop_last: False
-    pin_memory: False
-  
-  test:
-    batch_size: 6
-    shuffle: False
-    num_workers: 4
-    drop_last: False
-    pin_memory: False
-
-transforms:
-  normalize: True
-  use_spectrogram: True
-  n_fft: 1024
-  hop_length: 79
-  n_mels: 128
-  db_scale: True
-  target_height: null
-  target_width: 1024
-  waveform_augmentations:
-    colored_noise:
-      prob: 0.5
-      min_snr_in_db: 3.0
-      max_snr_in_db: 30.0
-      min_f_decay: -2.0
-      max_f_decay: 2.0
-    #background_noise:
-    #    background_paths: "/mnt/home/rheinrich/deep_bird_detect/datapipeline/speech_command_dataset"
-    #    prob: 0.5
-    #    min_snr_in_db: 3.0
-    #    max_snr_in_db: 30.0
-
-  spectrogram_augmentations:
-    null
 
 
 
