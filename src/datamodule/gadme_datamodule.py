@@ -1,21 +1,21 @@
-from omegaconf import DictConfig
-from .base_datamodule import BaseDataModuleHF
+from src.datamodule.components.transforms import TransformsWrapperN
+from src.utils.extraction import DefaultFeatureExtractor
+from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
 
 class GADMEDataModule(BaseDataModuleHF):
     def __init__(
             self,
-            dataset: DictConfig,
-            loaders: DictConfig,
-            transforms: DictConfig,
-            extractors: DictConfig,
-            transforms_rene=None
+            dataset: DatasetConfig = DatasetConfig(),
+            loaders: LoadersConfig = LoadersConfig(),
+            transforms: TransformsWrapperN = TransformsWrapperN(),
+            extractors: DefaultFeatureExtractor = DefaultFeatureExtractor()
     ):
         super().__init__(
             dataset=dataset,
             loaders=loaders,
             transforms=transforms,
             extractors=extractors,
-            transforms_rene=transforms_rene
+
         )
 
     @property

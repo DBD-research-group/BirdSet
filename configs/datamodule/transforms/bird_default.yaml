@@ -1,3 +1,4 @@
+_target_: src.datamodule.components.transforms.TransformsWrapperN
 sampling_rate: ${datamodule.extractors.sampling_rate}
 model_type: ${module.network.model_type}
 

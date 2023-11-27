@@ -1,23 +1,20 @@
-from omegaconf import DictConfig
-from .base_datamodule import BaseDataModuleHF
-from torch.utils.data import DataLoader
-
+from src.datamodule.components.transforms import TransformsWrapperN
+from src.utils.extraction import DefaultFeatureExtractor
+from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
 
 class ESC50(BaseDataModuleHF):
     def __init__(
             self,
-            dataset: DictConfig,
-            loaders: DictConfig,
-            transforms: DictConfig,
-            extractors: DictConfig,
-            transforms_rene: DictConfig
+            dataset: DatasetConfig = DatasetConfig(),
+            loaders: LoadersConfig = LoadersConfig(),
+            transforms: TransformsWrapperN = TransformsWrapperN(),
+            extractors: DefaultFeatureExtractor = DefaultFeatureExtractor()
     ):
         super().__init__(
             dataset=dataset,
             loaders=loaders,
             transforms=transforms,
             extractors=extractors,
-            transforms_rene=transforms_rene
 
         )
 
@@ -34,20 +31,3 @@ class ESC50(BaseDataModuleHF):
         val_dataset = split_2["train"]
         test_dataset = split_2["test"]
         return train_dataset, val_dataset, test_dataset
-    
-    # def train_dataloader(self):
-    #     return DataLoader(
-    #         self.train_dataset,
-    #         **self.loaders.get("train")
-    #     )
-        
-    # def val_dataloader(self):
-    #     return DataLoader(
-    #         self.val_dataset,
-    #         **self.loaders.get("valid")
-    #     )
-    # def test_dataloader(self):
-    #     return DataLoader(
-    #         self.test_dataset,
-    #         **self.loaders.get("test")
-    #     )

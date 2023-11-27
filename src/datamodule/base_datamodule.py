@@ -1,34 +1,74 @@
+from dataclasses import asdict, dataclass, field
 import logging
 import os
+from typing import List, Literal
 
-import hydra
 import lightning as L
 
 from datasets import load_dataset, load_from_disk, Audio, DatasetDict
+from src.utils.extraction import DefaultFeatureExtractor
 from torch.utils.data import DataLoader
-from omegaconf import DictConfig
 
 from src.datamodule.components.bird_premapping import AudioPreprocessor
 from src.datamodule.components.event_mapping import EventMapping
 from src.datamodule.components.transforms import TransformsWrapperN
-from src.datamodule.components.transforms import TransformsWrapper
-import transformers
+
+@dataclass
+class DatasetConfig:
+    data_dir: str = "/workspace/data_gadme"
+    dataset_name: str = "esc50"
+    hf_path: str = "ashraq/esc50"
+    hf_name: str = None
+    seed: int = 42
+    n_classes: int = 50
+    n_workers: int = 1
+    column_list: List[str] = field(default_factory=lambda: ["input_values", "target"])
+    val_split: float = 0.2
+    task: Literal["multiclass", "multilabel"] = "multiclass"
+    fast_testrun: bool = False
+
+@dataclass
+class LoaderConfig:
+    batch_size: int = 32
+    shuffle: bool = True
+    num_workers: int = 1
+    pin_memory: bool = True
+    drop_last: bool = False
+    persistent_workers: bool = True
+    prefetch_factor: int = 2 
+
+@dataclass
+class LoadersConfig:
+    train: LoaderConfig = LoaderConfig()
+    valid: LoaderConfig = LoaderConfig(shuffle=False)
+    test: LoaderConfig = LoaderConfig(shuffle=False)
 
 class BaseDataModuleHF(L.LightningDataModule):
+    """
+    A base data module for handling datasets using Hugging Face's datasets library.
+
+    Attributes:
+        dataset (DatasetConfig): Configuration for the dataset. Defaults to an instance of `DatasetConfig`.
+        loaders (LoadersConfig): Configuration for the data loaders. Defaults to an instance of `LoadersConfig`.
+        transforms (TransformsWrapperN): Configuration for the data transformations. Defaults to an instance of `TransformsWrapperN`.
+        extractors (DefaultFeatureExtractor): Configuration for the feature extraction. Defaults to an instance of `DefaultFeatureExtractor`.
+
+    Methods:
+        __init__(dataset, loaders, transforms, extractors): Initializes the `BaseDataModuleHF` instance.
+    """
+
     def __init__(
         self, 
-        dataset: DictConfig, 
-        loaders: DictConfig, 
-        transforms: DictConfig,
-        extractors: DictConfig,
-        transforms_rene: DictConfig
-    ):
+        dataset: DatasetConfig = DatasetConfig(),
+        loaders: LoadersConfig = LoadersConfig(),
+        transforms: TransformsWrapperN = TransformsWrapperN(),
+        extractors: DefaultFeatureExtractor = DefaultFeatureExtractor()
+        ):
         super().__init__()
         self.dataset = dataset
         self.loaders = loaders
-        self.transforms = TransformsWrapperN(transforms)
-        self.transforms_rene = transforms_rene
-        self.feature_extractor = hydra.utils.instantiate(extractors)
+        self.transforms = transforms
+        self.feature_extractor = extractors
 
         self.data_path = None
         self.train_dataset = None
@@ -52,6 +92,27 @@ class BaseDataModuleHF(L.LightningDataModule):
 
     # prepare data is
     def prepare_data(self):
+        """
+        Prepares the data for use.
+
+        This method checks if the data preparation has already been done. If not, it loads the dataset, applies transformations,
+        creates train, validation, and test splits, and saves the processed data to disk. If the data has already been prepared,
+        this method does nothing.
+
+        The method supports both multilabel and multiclass tasks. For multilabel tasks, it selects a subset of the data,
+        applies preprocessing, and selects the necessary columns. For multiclass tasks, it applies preprocessing and selects
+        the necessary columns.
+
+        If the feature extractor is configured to return an attention mask, this method adds 'attention_mask' to the list of
+        columns to select from the dataset.
+
+        The method saves the processed dataset to disk in the directory specified by the 'data_dir' attribute of the 'dataset'
+        configuration, under a subdirectory named after the dataset and the fingerprint of the training data.
+
+        After the data is prepared, this method sets the '_prepare_done' attribute to True and the 'len_trainset' attribute
+        to the length of the training dataset.
+        """
+
         logging.info("Check if preparing has already been done.")
 
         if self._prepare_done:
@@ -85,33 +146,12 @@ class BaseDataModuleHF(L.LightningDataModule):
         )
 
         if self.dataset.task == "multilabel":
-            dataset["test_5s"] = dataset["test_5s"].select(range(1000))
-            dataset["test"] = dataset["test_5s"].map(
-                preprocessor.preprocess_multilabel,
-                remove_columns=["audio"],
-                batched=True,
-                batch_size=100,
-                load_from_cache_file=True,
-                num_proc=1,
-                # num_proc=self.dataset.n_workers,
-            )
-            dataset["test"] = dataset["test"].select_columns(["input_values", "labels"])
-
-            dataset["train"] = dataset["train"].select(range(1000))
-            dataset["train"] = dataset["train"].map(
-                preprocessor.preprocess_multilabel,
-                remove_columns=["audio"],
-                batched=True,
-                batch_size=100,
-                load_from_cache_file=True,
-                num_proc=1
-                # num_proc=self.dataset.n_workers,
-            )
-            dataset["train"] = dataset["train"].select_columns(
-                ["input_values", "labels"]
-            )
-            # dataset["train"]=dataset["train"].rename_column("ebird_code", "labels")
-
+            if self.dataset.fast_testrun:
+                dataset["test_5s"] = self._preprocess_multilabel(dataset, "test_5s", preprocessor, range(1000))
+                dataset["train"] = self._preprocess_multilabel(dataset, "train", preprocessor, range(1000))
+            else:
+                dataset["test"] = self._preprocess_multilabel(dataset, "test", preprocessor)
+                dataset["train"] = self._preprocess_multilabel(dataset, "train", preprocessor)
             dataset = DatasetDict(dict(list(dataset.items())[:2]))
 
         elif self.dataset.task == "multiclass" and self.dataset.dataset_name != "esc50":
@@ -134,17 +174,6 @@ class BaseDataModuleHF(L.LightningDataModule):
         # TODO: esc50 specific
         if self.dataset.dataset_name == "esc50":
             dataset = dataset.rename_column("target", "labels")
-
-        # dataset["train"] = dataset["train"].map(
-        #     EventMapping(),
-        #     batch_size=64,
-        #     batched=True,
-        #     load_from_cache_file=True,
-        #     num_proc=self.dataset.n_workers
-        # )
-        # dataset = dataset.select_columns(self.dataset.column_list)
-        # if self.dataset.column_list[1] != "labels":
-        #     dataset = dataset.rename_column(self.dataset.column_list[1], "labels")
 
         if self.feature_extractor.return_attention_mask:
             self.dataset.column_list.append("attention_mask")
@@ -170,6 +199,39 @@ class BaseDataModuleHF(L.LightningDataModule):
         logging.info(f"Saving to disk: {os.path.join(self.data_path)}")
         complete.save_to_disk(self.data_path)
 
+    def _preprocess_multilabel(self, dataset, split, preprocessor, select_range=None):
+        """
+        Preprocesses a multilabel dataset.
+
+        Parameters
+        ----------
+        dataset : DatasetDict
+            The dataset to preprocess.
+        split : str
+            The split of the dataset to preprocess.
+        preprocessor : Preprocessor
+            The preprocessor to use.
+        select_range : range, optional
+            A range of indices to select from the dataset before preprocessing.
+
+        Returns
+        -------
+        Dataset
+            The preprocessed dataset.
+        """
+        if select_range is not None:
+            dataset[split] = dataset[split].select(select_range)
+        dataset[split] = dataset[split].map(
+            preprocessor.preprocess_multilabel,
+            remove_columns=["audio"],
+            batched=True,
+            batch_size=100,
+            load_from_cache_file=True,
+            num_proc=self.dataset.n_workers,
+        )
+        dataset[split] = dataset[split].select_columns(["input_values", "labels"])
+        return dataset[split]
+
     def _get_dataset(self, split):
         dataset = load_from_disk(
             os.path.join(self.data_path, split)
@@ -191,65 +253,12 @@ class BaseDataModuleHF(L.LightningDataModule):
                 logging.info("test")
                 self.test_dataset = self._get_dataset("test")
 
-        # if self.transforms:
-        #     if stage == "fit":
-        #         self.train_dataset.set_transform(
-        #             self.transforms, output_all_columns=False
-        #         )
-        #         self.val_dataset.set_transform(
-        #             self._valid_test_predict_transform, output_all_columns=False
-        #         )
-
-            # if stage == "test":
-            #     self.test_dataset.set_transform(
-            #         self._valid_test_predict_transform, output_all_columns=False
-            #     )
-
-    # def _preprocess_function(self, batch):
-    #     audio_arrays = [x["array"] for x in batch["audio"]]
-    #     inputs = self.feature_extractor(
-    #         audio_arrays,
-    #         sampling_rate=self.feature_extractor.sampling_rate,
-    #         padding=True,
-    #         max_length=self.feature_extractor.sampling_rate*5,
-    #         truncation=True,
-    #         return_tensors="pt",
-    #     )
-    #     return inputs
-    #     #check if y is a label list. if so: one-hot encode for multilabel
-
-    #     if isinstance(label_list[0], list):
-    #         labels = self._classes_one_hot(label_list)
-    #         return inputs, labels
-
-    #     return inputs
-
-    # def _train_transform(self, examples):
-    #     train_transform = hydra.utils.instantiate(
-    #         config=self.transforms,
-    #         _target_=TransformsWrapper,
-    #         mode="train",
-    #         sample_rate=self.feature_extractor.sampling_rate,
-    #     )
-
-    #     return train_transform(examples)
-
-    # def _valid_test_predict_transform(self, examples):
-    #     valid_test_predict_transform = hydra.utils.instantiate(
-    #         config=self.transforms_rene,
-    #         _target_=TransformsWrapper,
-    #         mode="test",
-    #         sample_rate=self.feature_extractor.sampling_rate,
-    #     )
-
-    #     return valid_test_predict_transform(examples)
-
     def train_dataloader(self):
         # TODO: nontype objects in hf dataset
-        return DataLoader(self.train_dataset, **self.loaders.get("train"))
+        return DataLoader(self.train_dataset, **asdict(self.loaders.train))
 
     def val_dataloader(self):
-        return DataLoader(self.val_dataset, **self.loaders.get("valid"))
+        return DataLoader(self.val_dataset, **asdict(self.loaders.valid))
 
     def test_dataloader(self):
-        return DataLoader(self.test_dataset, **self.loaders.get("test"))
+        return DataLoader(self.test_dataset, **asdict(self.loaders.test))
