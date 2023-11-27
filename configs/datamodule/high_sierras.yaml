@@ -21,6 +21,7 @@ dataset:
   column_list: ["input_values", "ebird_code", "ebird_code_multiclass"]
   val_split: 0.2
   task: ${module.task}
+  subset: null
 
 
 

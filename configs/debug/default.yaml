@@ -36,5 +36,7 @@ datamodule:
       batch_size: 6
       num_workers: 1 
       pin_memory: False
+  dataset:
+    subset: 500
 
   #transforms: bird_default.yaml
