@@ -135,17 +135,6 @@ class BaseDataModuleHF(L.LightningDataModule):
         if self.dataset.dataset_name == "esc50":
             dataset = dataset.rename_column("target", "labels")
 
-        # dataset["train"] = dataset["train"].map(
-        #     EventMapping(),
-        #     batch_size=64,
-        #     batched=True,
-        #     load_from_cache_file=True,
-        #     num_proc=self.dataset.n_workers
-        # )
-        # dataset = dataset.select_columns(self.dataset.column_list)
-        # if self.dataset.column_list[1] != "labels":
-        #     dataset = dataset.rename_column(self.dataset.column_list[1], "labels")
-
         if self.feature_extractor.return_attention_mask:
             self.dataset.column_list.append("attention_mask")
 
@@ -190,59 +179,6 @@ class BaseDataModuleHF(L.LightningDataModule):
             if stage == "test":
                 logging.info("test")
                 self.test_dataset = self._get_dataset("test")
-
-        # if self.transforms:
-        #     if stage == "fit":
-        #         self.train_dataset.set_transform(
-        #             self.transforms, output_all_columns=False
-        #         )
-        #         self.val_dataset.set_transform(
-        #             self._valid_test_predict_transform, output_all_columns=False
-        #         )
-
-            # if stage == "test":
-            #     self.test_dataset.set_transform(
-            #         self._valid_test_predict_transform, output_all_columns=False
-            #     )
-
-    # def _preprocess_function(self, batch):
-    #     audio_arrays = [x["array"] for x in batch["audio"]]
-    #     inputs = self.feature_extractor(
-    #         audio_arrays,
-    #         sampling_rate=self.feature_extractor.sampling_rate,
-    #         padding=True,
-    #         max_length=self.feature_extractor.sampling_rate*5,
-    #         truncation=True,
-    #         return_tensors="pt",
-    #     )
-    #     return inputs
-    #     #check if y is a label list. if so: one-hot encode for multilabel
-
-    #     if isinstance(label_list[0], list):
-    #         labels = self._classes_one_hot(label_list)
-    #         return inputs, labels
-
-    #     return inputs
-
-    # def _train_transform(self, examples):
-    #     train_transform = hydra.utils.instantiate(
-    #         config=self.transforms,
-    #         _target_=TransformsWrapper,
-    #         mode="train",
-    #         sample_rate=self.feature_extractor.sampling_rate,
-    #     )
-
-    #     return train_transform(examples)
-
-    # def _valid_test_predict_transform(self, examples):
-    #     valid_test_predict_transform = hydra.utils.instantiate(
-    #         config=self.transforms_rene,
-    #         _target_=TransformsWrapper,
-    #         mode="test",
-    #         sample_rate=self.feature_extractor.sampling_rate,
-    #     )
-
-    #     return valid_test_predict_transform(examples)
 
     def train_dataloader(self):
         # TODO: nontype objects in hf dataset

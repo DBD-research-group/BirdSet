@@ -3,7 +3,10 @@ task_name: "debug"
 train: True
 # callbacks: null
 #logger: null
-    
+defaults:
+  - override /module: multiclass.yaml
+  - override /module/network: ast.yaml
+
 extras: 
   ignore_warnings: False
 
