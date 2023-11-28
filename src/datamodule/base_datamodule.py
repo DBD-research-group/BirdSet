@@ -139,7 +139,7 @@ class BaseDataModuleHF(L.LightningDataModule):
             feature=Audio(
                 sampling_rate=self.feature_extractor.sampling_rate,
                 mono=True,
-                decode=False,
+                decode=True,
             ),
         )
 
@@ -175,7 +175,7 @@ class BaseDataModuleHF(L.LightningDataModule):
 
         elif self.dataset.task == "multilabel":
             dataset = DatasetDict({split: dataset[split] for split in ["train", "test_5s"]})
-
+            
             dataset["train"] = dataset["train"].map(
                 self.event_mapper,
                 remove_columns=["audio"],
@@ -185,18 +185,21 @@ class BaseDataModuleHF(L.LightningDataModule):
                 num_proc=self.dataset.n_workers,
             )
 
-            dataset["test"] = dataset["test_5s"].map(
+            dataset = dataset.map(
                 self._classes_one_hot,
                 batched=True,
                 batch_size=300,
-                load_from_cache_file=True,
+                load_from_cache_file=False,
                 num_proc=self.dataset.n_workers,
             )
+
+            dataset["test"] = dataset["test_5s"]
             dataset = dataset.select_columns(
                 ["filepath", "ebird_code_multilabel", "detected_events", "start_time", "end_time"]
             )
 
-            #dataset = dataset.rename_column("ebird_code_multilabel", "labels")
+            dataset = dataset.rename_column("ebird_code_multilabel", "labels")
+            dataset.set_format("pt", columns=["labels"])
 
         # # TODO: esc50 specific
         # if self.dataset.dataset_name == "esc50":
@@ -240,7 +243,9 @@ class BaseDataModuleHF(L.LightningDataModule):
 
         for class_idx, idx in enumerate(label_list):
             class_one_hot_matrix[class_idx, idx] = 1
-        return {"labels": class_one_hot_matrix}   
+
+        class_one_hot_matrix = torch.tensor(class_one_hot_matrix, dtype=torch.float32)
+        return {"ebird_code_multilabel": class_one_hot_matrix}   
 
     def _preprocess_multilabel(self, dataset, split, preprocessor, select_range=None):
         """
