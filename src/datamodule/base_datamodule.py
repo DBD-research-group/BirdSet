@@ -1,5 +1,6 @@
 from dataclasses import asdict, dataclass, field
 import logging
+import torch
 import os
 from typing import List, Literal
 
@@ -161,7 +162,7 @@ class BaseDataModuleHF(L.LightningDataModule):
                 load_from_cache_file=True,
                 num_proc=self.dataset.n_workers,
             )
-            dataset = dataset.cast_column("audio", Audio(self.transforms.sampling_rate, mono=True, decode=False))
+           #dataset = dataset.cast_column("audio", Audio(self.transforms.sampling_rate, mono=True, decode=False))
             dataset = dataset.select_columns(
                 ["filepath", "ebird_code", "detected_events", "start_time", "end_time"]
             )
@@ -173,13 +174,29 @@ class BaseDataModuleHF(L.LightningDataModule):
             #     dataset = dataset.rename_column("ebird_code", "labels")
 
         elif self.dataset.task == "multilabel":
-            if self.dataset.fast_testrun:
-                dataset["test_5s"] = self._preprocess_multilabel(dataset, "test_5s", preprocessor, range(1000))
-                dataset["train"] = self._preprocess_multilabel(dataset, "train", preprocessor, range(1000))
-            else:
-                dataset["test"] = self._preprocess_multilabel(dataset, "test", preprocessor)
-                dataset["train"] = self._preprocess_multilabel(dataset, "train", preprocessor)
-            dataset = DatasetDict(dict(list(dataset.items())[:2]))
+            dataset = DatasetDict({split: dataset[split] for split in ["train", "test_5s"]})
+
+            dataset["train"] = dataset["train"].map(
+                self.event_mapper,
+                remove_columns=["audio"],
+                batched=True,
+                batch_size=300,
+                load_from_cache_file=True,
+                num_proc=self.dataset.n_workers,
+            )
+
+            dataset["test"] = dataset["test_5s"].map(
+                self._classes_one_hot,
+                batched=True,
+                batch_size=300,
+                load_from_cache_file=True,
+                num_proc=self.dataset.n_workers,
+            )
+            dataset = dataset.select_columns(
+                ["filepath", "ebird_code_multilabel", "detected_events", "start_time", "end_time"]
+            )
+
+            #dataset = dataset.rename_column("ebird_code_multilabel", "labels")
 
         # # TODO: esc50 specific
         # if self.dataset.dataset_name == "esc50":
@@ -214,7 +231,16 @@ class BaseDataModuleHF(L.LightningDataModule):
         for split in dataset.keys():
             dataset[split] = dataset[split].select(range(size))
         return dataset
+    
+    def _classes_one_hot(self, batch):
+        label_list = [y for y in batch["ebird_code_multilabel"]]
+        class_one_hot_matrix = torch.zeros(
+            (len(label_list), self.dataset.n_classes), dtype=torch.float
+        )
 
+        for class_idx, idx in enumerate(label_list):
+            class_one_hot_matrix[class_idx, idx] = 1
+        return {"labels": class_one_hot_matrix}   
 
     def _preprocess_multilabel(self, dataset, split, preprocessor, select_range=None):
         """
