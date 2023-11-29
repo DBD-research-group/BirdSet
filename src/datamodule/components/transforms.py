@@ -46,15 +46,17 @@ class TransformsWrapper:
         resizer (Resizer): An instance of the Resizer class for resizing the spectrogram.
     """
     def __init__(self,
+                task: str = "multiclass",
                 sampling_rate: int = 32000,
                 model_type: Literal['vision', 'waveform'] = "vision",
                 preprocessing: PreprocessingConfig = PreprocessingConfig(),
                 spectrogram_augmentations: DictConfig = {},
                 waveform_augmentations: DictConfig = {},
-                decoding: DefaultFeatureExtractor = DefaultFeatureExtractor()
+                decoding=None #@raphael
 ):
 
         self.mode = "train"
+        self.task = task
         self.sampling_rate = sampling_rate 
         self.model_type = model_type
 
@@ -143,7 +145,10 @@ class TransformsWrapper:
             torch.Tensor: The transformed waveform. If `model_type` is "vision", the waveform is transformed
             into a spectrogram and further processed. If `model_type` is "waveform", the waveform is returned as is.
         """
-        batch = self.event_decoder(batch)
+        # we overwrite the feature extractor with None because we can do this here manually 
+        # this is quite complicated if we want to make adjustments to non bird methods
+        if self.event_decoder is not None: 
+            batch = self.event_decoder(batch)
 
         # audio collating and padding
         waveform_batch = [audio["array"] for audio in batch["audio"]]
@@ -204,8 +209,15 @@ class TransformsWrapper:
             # waveform_augmented_list = waveform_augmented.unsqueeze(1)
             # waveform_augmented_list = [waveform.numpy() for waveform in waveform_augmented_list]
             # extracted = extractor(waveform_augmented_list)
-        return {"input_values": audio_augmented, "labels": batch["labels"]}
+        
+        if self.task == "multiclass":
+            labels = batch["labels"]
+        
+        elif self.task == "multilabel":
+            labels = torch.tensor(batch["labels"], dtype=torch.float32)
 
+        return {"input_values": audio_augmented, "labels": labels}
+    
     def _transform_valid_test_predict(self, waveform):
         pass
 

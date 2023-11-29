@@ -4,8 +4,9 @@ train: True
 # callbacks: null
 #logger: null
 defaults:
-  - override /module: multilabel.yaml
+  - override /module: multiclass.yaml
   - override /module/network: ast.yaml
+  - override /datamodule: esc50.yaml
 
 extras: 
   ignore_warnings: False

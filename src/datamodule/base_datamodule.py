@@ -139,17 +139,11 @@ class BaseDataModuleHF(L.LightningDataModule):
             feature=Audio(
                 sampling_rate=self.feature_extractor.sampling_rate,
                 mono=True,
-                decode=True,
+                decode=False,
             ),
         )
 
         logging.info("> Mapping data set.")
-
-        preprocessor = AudioPreprocessor(
-            feature_extractor=self.feature_extractor,
-            n_classes=self.dataset.n_classes,
-            window_length=5,
-        )
 
         if self.dataset.task == "multiclass": #and self.dataset.dataset_name != "esc50":
             dataset = DatasetDict({split: dataset[split] for split in ["train", "test"]})
@@ -162,11 +156,10 @@ class BaseDataModuleHF(L.LightningDataModule):
                 load_from_cache_file=True,
                 num_proc=self.dataset.n_workers,
             )
-           #dataset = dataset.cast_column("audio", Audio(self.transforms.sampling_rate, mono=True, decode=False))
+
             dataset = dataset.select_columns(
                 ["filepath", "ebird_code", "detected_events", "start_time", "end_time"]
             )
-            #dataset = dataset.select_columns(self.dataset.column_list)
 
             dataset = dataset.rename_column("ebird_code", "labels")
 
@@ -199,8 +192,7 @@ class BaseDataModuleHF(L.LightningDataModule):
             )
 
             dataset = dataset.rename_column("ebird_code_multilabel", "labels")
-            dataset.set_format("pt", columns=["labels"])
-
+            
         # # TODO: esc50 specific
         # if self.dataset.dataset_name == "esc50":
         #     dataset = dataset.rename_column("target", "labels")
