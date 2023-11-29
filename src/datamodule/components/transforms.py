@@ -47,10 +47,10 @@ class TransformsWrapperN:
     """
     def __init__(self,
                 sampling_rate: int = 32000,
-                model_type: Literal['vision', 'waveform'] = "vision",
+                model_type: Literal['vision', 'waveform'] = "waveform",
                 preprocessing: PreprocessingConfig = PreprocessingConfig(),
-                spectrogram_augmentations: DictConfig = {},
-                waveform_augmentations: DictConfig = {},
+                spectrogram_augmentations: DictConfig = DictConfig({}),
+                waveform_augmentations: DictConfig = DictConfig({}),
                 event_extractions: DefaultFeatureExtractor = DefaultFeatureExtractor()
 ):
 
@@ -158,9 +158,12 @@ class TransformsWrapperN:
         waveform = waveform["input_values"]
 
         waveform = waveform.unsqueeze(1)
-        audio_augmented = self.wave_aug(
+        if self.wave_aug is not None:
+            audio_augmented = self.wave_aug(
             samples=waveform, sample_rate=self.sampling_rate
-        )
+            )
+        else:
+            audio_augmented = waveform
 
         if self.model_type == "vision":
             spectrograms = self._spectrogram_conversion(audio_augmented)
