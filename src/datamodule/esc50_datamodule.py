@@ -1,3 +1,4 @@
+from datasets import DatasetDict, Audio
 from src.datamodule.components.transforms import TransformsWrapper
 from src.utils.extraction import DefaultFeatureExtractor
 from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
@@ -22,9 +23,6 @@ class ESC50(BaseDataModuleHF):
             mapper=None
         )
 
-    @property
-    def num_classes(self):
-        return self.dataset.n_classes
 
     def _create_splits(self, dataset):
         split_1 = dataset["train"].train_test_split(

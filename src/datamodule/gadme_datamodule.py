@@ -18,7 +18,3 @@ class GADMEDataModule(BaseDataModuleHF):
             extractors=extractors,
             mapper=mapper
         )
-
-    @property
-    def num_classes(self):
-        return self.dataset.n_classes

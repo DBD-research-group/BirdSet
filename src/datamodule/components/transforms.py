@@ -48,10 +48,10 @@ class TransformsWrapper:
     def __init__(self,
                 task: str = "multiclass",
                 sampling_rate: int = 32000,
-                model_type: Literal['vision', 'waveform'] = "vision",
+                model_type: Literal['vision', 'waveform'] = "waveform",
                 preprocessing: PreprocessingConfig = PreprocessingConfig(),
-                spectrogram_augmentations: DictConfig = {},
-                waveform_augmentations: DictConfig = {},
+                spectrogram_augmentations: DictConfig = DictConfig({}),
+                waveform_augmentations: DictConfig = DictConfig({}),
                 decoding=None #@raphael
 ):
 
@@ -170,9 +170,16 @@ class TransformsWrapper:
             return_attention_mask=False)
         
         waveform_batch = waveform_batch["input_values"].unsqueeze(1)
+        if self.wave_aug is not None:
+
         audio_augmented = self.wave_aug(
             samples=waveform_batch, sample_rate=self.sampling_rate
         )
+            audio_augmented = self.wave_aug(
+            samples=waveform, sample_rate=self.sampling_rate
+            )
+        else:
+            audio_augmented = waveform
 
         if self.model_type == "vision":
             spectrograms = self._spectrogram_conversion(audio_augmented)
