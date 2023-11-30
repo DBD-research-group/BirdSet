@@ -170,16 +170,14 @@ class TransformsWrapper:
             return_attention_mask=False)
         
         waveform_batch = waveform_batch["input_values"].unsqueeze(1)
-        if self.wave_aug is not None:
 
-        audio_augmented = self.wave_aug(
-            samples=waveform_batch, sample_rate=self.sampling_rate
-        )
+        if self.wave_aug is not None:
             audio_augmented = self.wave_aug(
-            samples=waveform, sample_rate=self.sampling_rate
+                samples=waveform_batch, sample_rate=self.sampling_rate
             )
+
         else:
-            audio_augmented = waveform
+            audio_augmented = waveform_batch
 
         if self.model_type == "vision":
             spectrograms = self._spectrogram_conversion(audio_augmented)

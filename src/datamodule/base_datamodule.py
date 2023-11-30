@@ -27,7 +27,8 @@ class DatasetConfig:
     column_list: List[str] = field(default_factory=lambda: ["audio", "target"])
     val_split: float = 0.2
     task: Literal["multiclass", "multilabel"] = "multiclass"
-    subset: int|None = None
+    subset: int = None
+    sampling_rate: int = 32_000
 
 @dataclass
 class LoaderConfig:
@@ -137,36 +138,29 @@ class BaseDataModuleHF(L.LightningDataModule):
             num_proc=3,
         )
 
-        if isinstance(dataset, DatasetDict | Dataset):
-            dataset = self._create_splits(dataset)
-        else:
-            logging.error("Dataset is not a DatasetDict or Dataset, Iterabel Dataset not supported yet.")
-            return
-
         if self.dataset_config.subset:
             dataset = self._fast_dev_subset(dataset, self.dataset_config.subset)
 
         dataset = dataset.cast_column(
             column="audio",
             feature=Audio(
-                sampling_rate=self.feature_extractor.sampling_rate,
+                sampling_rate=self.dataset_config.sampling_rate,
                 mono=True,
-                decode=True,
+                decode=False,
             ),
         )
 
-        logging.info("> Mapping data set.")
-
-        if self.dataset.task == "multiclass": #and self.dataset.dataset_name != "esc50":
+        if self.dataset_config.task == "multiclass": #and self.dataset.dataset_name != "esc50":
             dataset = DatasetDict({split: dataset[split] for split in ["train", "test"]})
 
+            logging.info("> Mapping data set.")
             dataset["train"] = dataset["train"].map(
                 self.event_mapper,
                 remove_columns=["audio"],
                 batched=True,
                 batch_size=300,
                 load_from_cache_file=True,
-                num_proc=self.dataset.n_workers,
+                num_proc=self.dataset_config.n_workers,
             )
 
             dataset = dataset.select_columns(
@@ -178,24 +172,25 @@ class BaseDataModuleHF(L.LightningDataModule):
             # if self.dataset.column_list[1] != "labels" and self.dataset.dataset_name != "esc50":
             #     dataset = dataset.rename_column("ebird_code", "labels")
 
-        elif self.dataset.task == "multilabel":
+        elif self.dataset_config.task == "multilabel":
             dataset = DatasetDict({split: dataset[split] for split in ["train", "test_5s"]})
-            
+
+            logging.info("> Mapping data set.")
             dataset["train"] = dataset["train"].map(
                 self.event_mapper,
                 remove_columns=["audio"],
                 batched=True,
                 batch_size=300,
                 load_from_cache_file=True,
-                num_proc=self.dataset.n_workers,
+                num_proc=self.dataset_config.n_workers,
             )
 
             dataset = dataset.map(
                 self._classes_one_hot,
                 batched=True,
                 batch_size=300,
-                load_from_cache_file=False,
-                num_proc=self.dataset.n_workers,
+                load_from_cache_file=True,
+                num_proc=self.dataset_config.n_workers,
             )
 
             dataset["test"] = dataset["test_5s"]
@@ -204,14 +199,17 @@ class BaseDataModuleHF(L.LightningDataModule):
             )
 
             dataset = dataset.rename_column("ebird_code_multilabel", "labels")
-            
-        # # TODO: esc50 specific
-        # if self.dataset.dataset_name == "esc50":
-        #     dataset = dataset.rename_column("target", "labels")
 
         # if self.feature_extractor.return_attention_mask:
         #     self.dataset.column_list.append("attention_mask")
+        if isinstance(dataset, DatasetDict | Dataset):
+            dataset = self._create_splits(dataset)
+        else:
+            logging.error("Dataset is not a DatasetDict or Dataset, Iterabel Dataset not supported yet.")
+            return
 
+        # set the length of the training set to be accessed by the model
+        self.len_trainset = len(dataset["train"])        
         self._save_dataset_to_disk(dataset)
        
 
@@ -229,6 +227,7 @@ class BaseDataModuleHF(L.LightningDataModule):
             None
         """
         dataset.set_format("np")
+        
         data_path = os.path.join(
             self.dataset_config.data_dir,
             f"{self.dataset_config.dataset_name}_processed",
@@ -271,9 +270,10 @@ class BaseDataModuleHF(L.LightningDataModule):
         """
         if isinstance(dataset, Dataset):
             split_1 = dataset.train_test_split(
-            self.dataset_config.val_split, shuffle=True, seed=self.dataset_config.seed)
+                self.dataset_config.val_split, shuffle=True, seed=self.dataset_config.seed
+            )
             split_2 = split_1["test"].train_test_split(
-                0.5, shuffle=False, seed=self.dataset_config.seed)
+                0.2, shuffle=False, seed=self.dataset_config.seed)
             return DatasetDict({"train": split_1["train"], "valid": split_2["train"], "test": split_2["test"]})
         elif isinstance(dataset, DatasetDict):
             # check if dataset has train, valid, test splits
@@ -311,7 +311,7 @@ class BaseDataModuleHF(L.LightningDataModule):
     def _classes_one_hot(self, batch):
         label_list = [y for y in batch["ebird_code_multilabel"]]
         class_one_hot_matrix = torch.zeros(
-            (len(label_list), self.dataset.n_classes), dtype=torch.float
+            (len(label_list), self.dataset_config.n_classes), dtype=torch.float
         )
 
         for class_idx, idx in enumerate(label_list):
