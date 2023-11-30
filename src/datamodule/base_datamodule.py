@@ -1,5 +1,6 @@
 from dataclasses import asdict, dataclass, field
 import logging
+import torch
 import os
 from typing import List, Literal
 
@@ -10,8 +11,8 @@ from src.utils.extraction import DefaultFeatureExtractor
 from torch.utils.data import DataLoader
 
 from src.datamodule.components.bird_premapping import AudioPreprocessor
-from src.datamodule.components.event_mapping import EventMapping
-from src.datamodule.components.transforms import TransformsWrapperN
+#from src.datamodule.components.event_mapping import EventMapping
+from src.datamodule.components.transforms import TransformsWrapper
 
 @dataclass
 class DatasetConfig:
@@ -26,7 +27,8 @@ class DatasetConfig:
     column_list: List[str] = field(default_factory=lambda: ["audio", "target"])
     val_split: float = 0.2
     task: Literal["multiclass", "multilabel"] = "multiclass"
-    subset: int|None = None
+    subset: int = None
+    sampling_rate: int = 32_000
 
 @dataclass
 class LoaderConfig:
@@ -51,7 +53,7 @@ class BaseDataModuleHF(L.LightningDataModule):
     Attributes:
         dataset (DatasetConfig): Configuration for the dataset. Defaults to an instance of `DatasetConfig`.
         loaders (LoadersConfig): Configuration for the data loaders. Defaults to an instance of `LoadersConfig`.
-        transforms (TransformsWrapperN): Configuration for the data transformations. Defaults to an instance of `TransformsWrapperN`.
+        transforms (TransformsWrapper): Configuration for the data transformations. Defaults to an instance of `TransformsWrapper`.
         extractors (DefaultFeatureExtractor): Configuration for the feature extraction. Defaults to an instance of `DefaultFeatureExtractor`.
 
     Methods:
@@ -65,16 +67,18 @@ class BaseDataModuleHF(L.LightningDataModule):
 
     def __init__(
         self, 
+        mapper,
         dataset: DatasetConfig = DatasetConfig(),
         loaders: LoadersConfig = LoadersConfig(),
-        transforms: TransformsWrapperN = TransformsWrapperN(),
-        extractors: DefaultFeatureExtractor = DefaultFeatureExtractor()
+        transforms: TransformsWrapper = TransformsWrapper(),
+        extractors: DefaultFeatureExtractor = DefaultFeatureExtractor(),
         ):
         super().__init__()
         self.dataset_config = dataset
         self.loaders_config = loaders
         self.transforms = transforms
         self.feature_extractor = extractors
+        self.event_mapper = mapper
 
         self.data_path = None
         self.train_dataset = None
@@ -134,40 +138,78 @@ class BaseDataModuleHF(L.LightningDataModule):
             num_proc=3,
         )
 
-        if isinstance(dataset, DatasetDict | Dataset):
-            dataset = self._create_splits(dataset)
-        else:
-            logging.error("Dataset is not a DatasetDict or Dataset, Iterabel Dataset not supported yet.")
-            return
-
         if self.dataset_config.subset:
             dataset = self._fast_dev_subset(dataset, self.dataset_config.subset)
 
         dataset = dataset.cast_column(
             column="audio",
             feature=Audio(
-                sampling_rate=self.feature_extractor.sampling_rate,
+                sampling_rate=self.dataset_config.sampling_rate,
                 mono=True,
-                decode=True,
+                decode=False,
             ),
         )
 
-        logging.info("> Mapping data set.")
+        if self.dataset_config.task == "multiclass": #and self.dataset.dataset_name != "esc50":
+            dataset = DatasetDict({split: dataset[split] for split in ["train", "test"]})
 
-        if self.dataset_config.task == "multilabel":
-            dataset = self._preprocess_multilabel(dataset)
+            logging.info("> Mapping data set.")
+            dataset["train"] = dataset["train"].map(
+                self.event_mapper,
+                remove_columns=["audio"],
+                batched=True,
+                batch_size=300,
+                load_from_cache_file=True,
+                num_proc=self.dataset_config.n_workers,
+            )
 
-        elif self.dataset_config.task == "multiclass":
-            dataset = self._preprocess_multiclass(dataset)
+            dataset = dataset.select_columns(
+                ["filepath", "ebird_code", "detected_events", "start_time", "end_time"]
+            )
 
-        dataset = self._select_and_rename_columns(dataset)
+            dataset = dataset.rename_column("ebird_code", "labels")
 
-        if self.feature_extractor.return_attention_mask:
-            self.dataset_config.column_list.append("attention_mask")
-        
+            # if self.dataset.column_list[1] != "labels" and self.dataset.dataset_name != "esc50":
+            #     dataset = dataset.rename_column("ebird_code", "labels")
+
+        elif self.dataset_config.task == "multilabel":
+            dataset = DatasetDict({split: dataset[split] for split in ["train", "test_5s"]})
+
+            logging.info("> Mapping data set.")
+            dataset["train"] = dataset["train"].map(
+                self.event_mapper,
+                remove_columns=["audio"],
+                batched=True,
+                batch_size=300,
+                load_from_cache_file=True,
+                num_proc=self.dataset_config.n_workers,
+            )
+
+            dataset = dataset.map(
+                self._classes_one_hot,
+                batched=True,
+                batch_size=300,
+                load_from_cache_file=True,
+                num_proc=self.dataset_config.n_workers,
+            )
+
+            dataset["test"] = dataset["test_5s"]
+            dataset = dataset.select_columns(
+                ["filepath", "ebird_code_multilabel", "detected_events", "start_time", "end_time"]
+            )
+
+            dataset = dataset.rename_column("ebird_code_multilabel", "labels")
+
+        # if self.feature_extractor.return_attention_mask:
+        #     self.dataset.column_list.append("attention_mask")
+        if isinstance(dataset, DatasetDict | Dataset):
+            dataset = self._create_splits(dataset)
+        else:
+            logging.error("Dataset is not a DatasetDict or Dataset, Iterabel Dataset not supported yet.")
+            return
+
         # set the length of the training set to be accessed by the model
-        self.len_trainset = len(dataset["train"])
-
+        self.len_trainset = len(dataset["train"])        
         self._save_dataset_to_disk(dataset)
        
 
@@ -185,7 +227,7 @@ class BaseDataModuleHF(L.LightningDataModule):
             None
         """
         dataset.set_format("np")
-
+        
         data_path = os.path.join(
             self.dataset_config.data_dir,
             f"{self.dataset_config.dataset_name}_processed",
@@ -228,9 +270,10 @@ class BaseDataModuleHF(L.LightningDataModule):
         """
         if isinstance(dataset, Dataset):
             split_1 = dataset.train_test_split(
-            self.dataset_config.val_split, shuffle=True, seed=self.dataset_config.seed)
+                self.dataset_config.val_split, shuffle=True, seed=self.dataset_config.seed
+            )
             split_2 = split_1["test"].train_test_split(
-                0.5, shuffle=False, seed=self.dataset_config.seed)
+                0.2, shuffle=False, seed=self.dataset_config.seed)
             return DatasetDict({"train": split_1["train"], "valid": split_2["train"], "test": split_2["test"]})
         elif isinstance(dataset, DatasetDict):
             # check if dataset has train, valid, test splits
@@ -264,9 +307,20 @@ class BaseDataModuleHF(L.LightningDataModule):
         for split in dataset.keys():
             dataset[split] = dataset[split].select(range(size))
         return dataset
+    
+    def _classes_one_hot(self, batch):
+        label_list = [y for y in batch["ebird_code_multilabel"]]
+        class_one_hot_matrix = torch.zeros(
+            (len(label_list), self.dataset_config.n_classes), dtype=torch.float
+        )
 
+        for class_idx, idx in enumerate(label_list):
+            class_one_hot_matrix[class_idx, idx] = 1
 
-    def _preprocess_multilabel(self, dataset):
+        class_one_hot_matrix = torch.tensor(class_one_hot_matrix, dtype=torch.float32)
+        return {"ebird_code_multilabel": class_one_hot_matrix}   
+
+    def _preprocess_multilabel(self, dataset, split, preprocessor, select_range=None):
         """
         Preprocesses a multilabel dataset.
 

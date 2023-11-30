@@ -1,0 +1,4 @@
+_target_: src.datamodule.components.EventDecoding
+min_len: 0.0 #?
+max_len: 10.0
+sampling_rate: ${module.network.sampling_rate}

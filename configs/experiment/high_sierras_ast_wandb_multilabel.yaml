@@ -1,14 +1,14 @@
 # @package _global_
 #package global is neccessary!
 defaults:
-  - override /datamodule: esc50.yaml
-  - override /module: multiclass.yaml
+  - override /datamodule: high_sierras.yaml
+  - override /module: multilabel.yaml
   - override /module/network: ast.yaml
   - override /callbacks: default.yaml 
   - override /trainer: single_gpu.yaml
 
 
-tags: ["esc50", "ast", "augment"]
+tags: ["high_sierras", "ast", "augment"]
 seed: 2
 
 module:
@@ -18,11 +18,11 @@ module:
 
 trainer:
   min_epochs: 1
-  max_epochs: 20
+  max_epochs: 15
 
 datamodule:
   dataset:
-    val_split: 0.2
+    val_split: 0.1
   loaders:
     train:
       batch_size: 12
@@ -39,7 +39,7 @@ datamodule:
 logger:
   wandb:
     tags: ${tags}
-    group: "esc50_aug"
+    group: "high_sierras_aug"
     mode: online
 
 

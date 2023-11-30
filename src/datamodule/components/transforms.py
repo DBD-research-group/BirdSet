@@ -31,7 +31,7 @@ class PreprocessingConfig:
     target_width: int = 1024
     normalize: bool = True
 
-class TransformsWrapperN:
+class TransformsWrapper:
     """
     A class to handle audio transformations for different model types and modes.
 
@@ -46,33 +46,29 @@ class TransformsWrapperN:
         resizer (Resizer): An instance of the Resizer class for resizing the spectrogram.
     """
     def __init__(self,
+                task: str = "multiclass",
                 sampling_rate: int = 32000,
                 model_type: Literal['vision', 'waveform'] = "waveform",
                 preprocessing: PreprocessingConfig = PreprocessingConfig(),
                 spectrogram_augmentations: DictConfig = DictConfig({}),
                 waveform_augmentations: DictConfig = DictConfig({}),
-                event_extractions: DefaultFeatureExtractor = DefaultFeatureExtractor()
+                decoding=None #@raphael
 ):
 
         self.mode = "train"
+        self.task = task
         self.sampling_rate = sampling_rate 
         self.model_type = model_type
 
         self.preprocessing = preprocessing
         self.waveform_augmentations = waveform_augmentations
         self.spectrogram_augmentations = spectrogram_augmentations
-        self.event_extractions = event_extractions
+        #self.event_extractions = event_extractions
         self.resizer = Resizer(
             use_spectrogram=self.preprocessing.use_spectrogram,
             db_scale=self.preprocessing.db_scale
         )
-        self.event_decoder = EventDecoding(min_len=0.1, max_len=10, sampling_rate=self.sampling_rate)
-        self.sequence_feature_extractor = transformers.SequenceFeatureExtractor(
-            feature_size=1,
-            sampling_rate=self.sampling_rate,
-            padding_value=0.0,
-            model_input_names=["input_values"]
-        )
+        self.event_decoder = decoding
 
         if self.mode == "train":
             # waveform augmentations
@@ -149,21 +145,39 @@ class TransformsWrapperN:
             torch.Tensor: The transformed waveform. If `model_type` is "vision", the waveform is transformed
             into a spectrogram and further processed. If `model_type` is "waveform", the waveform is returned as is.
         """
-        batch = self.event_decoder(batch)
+        # we overwrite the feature extractor with None because we can do this here manually 
+        # this is quite complicated if we want to make adjustments to non bird methods
+        if self.event_decoder is not None: 
+            batch = self.event_decoder(batch)
 
         # audio collating and padding
-        waveform = [audio["array"] for audio in batch["audio"]]
-        waveform = transformers.BatchFeature({"input_values": waveform})
-        waveform = self.sequence_feature_extractor.pad(waveform, padding=True, return_tensors="pt")
-        waveform = waveform["input_values"]
+        waveform_batch = [audio["array"] for audio in batch["audio"]]
+        waveform_batch = transformers.BatchFeature({"input_values": waveform_batch})
 
-        waveform = waveform.unsqueeze(1)
+        sequence_feature_extractor = transformers.SequenceFeatureExtractor(
+            feature_size=1,
+            sampling_rate=self.sampling_rate,
+            padding_value=0.0,
+            model_input_names=["input_values"]
+        )
+        #!TODO: what about the attention mask and padding values?!
+        waveform_batch = sequence_feature_extractor.pad(
+            waveform_batch, 
+            padding="max_length", 
+            max_length=self.sampling_rate*5,
+            truncation=True,
+            return_tensors="pt",
+            return_attention_mask=False)
+        
+        waveform_batch = waveform_batch["input_values"].unsqueeze(1)
+
         if self.wave_aug is not None:
             audio_augmented = self.wave_aug(
-            samples=waveform, sample_rate=self.sampling_rate
+                samples=waveform_batch, sample_rate=self.sampling_rate
             )
+
         else:
-            audio_augmented = waveform
+            audio_augmented = waveform_batch
 
         if self.model_type == "vision":
             spectrograms = self._spectrogram_conversion(audio_augmented)
@@ -182,13 +196,15 @@ class TransformsWrapperN:
                 # list with 1 x 128 x 2026
                 spectrograms_augmented = [spectrogram.numpy() for spectrogram in spectrograms_augmented]
                 spectrograms_augmented = torch.from_numpy(librosa.power_to_db(spectrograms_augmented))
+            
+            #print(np.array([spec.shape for spec in spectrograms_augmented]))
 
             audio_augmented = self.resizer.resize_spectrogram_batch(
                 spectrograms_augmented,
                 target_height=self.preprocessing.target_height,
                 target_width=self.preprocessing.target_width
             )
-
+            #print(np.array([spec.shape for spec in audio_augmented]))
             # batch_size x 1 x height x width
             if self.preprocessing.normalize:
                 audio_augmented = (audio_augmented - (-4.268)) / (4.569 * 2)
@@ -198,8 +214,15 @@ class TransformsWrapperN:
             # waveform_augmented_list = waveform_augmented.unsqueeze(1)
             # waveform_augmented_list = [waveform.numpy() for waveform in waveform_augmented_list]
             # extracted = extractor(waveform_augmented_list)
-        return {"input_values": audio_augmented, "labels": batch["labels"]}
+        
+        if self.task == "multiclass":
+            labels = batch["labels"]
+        
+        elif self.task == "multilabel":
+            labels = torch.tensor(batch["labels"], dtype=torch.float32)
 
+        return {"input_values": audio_augmented, "labels": labels}
+    
     def _transform_valid_test_predict(self, waveform):
         pass
 

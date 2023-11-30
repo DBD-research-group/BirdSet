@@ -22,7 +22,7 @@ class AudioPreprocessor:
     def preprocess_multilabel(self, batch):
         audio_arrays = [x["array"] for x in batch["audio"]]
         label_list = [y for y in batch["ebird_code_multilabel"]]
-
+        
         output_dict = self.feature_extractor(
             audio_arrays, 
             sampling_rate=self.feature_extractor.sampling_rate,

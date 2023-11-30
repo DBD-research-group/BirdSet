@@ -19,5 +19,8 @@ tqdm>=4.65.0
 Pillow>=8.4.0
 transformers>=4.29.1
 datasets>=2.12.0
-hydra == 1.3.2
+hydra-core == 1.3.2
 hydra_colorlog == 1.2.0
+rootuils == 1.0.7
+wandb ==  0.16.0
+rich==13.7.0

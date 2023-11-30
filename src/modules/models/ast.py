@@ -46,7 +46,7 @@ class ASTSequenceClassifier(nn.Module):
             output_attentions=False,
             output_hidden_states=True,
             return_dict=True,
-            labels=labels
+            labels=None
         )
 
         logits = outputs["logits"]

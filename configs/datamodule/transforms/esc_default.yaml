@@ -6,9 +6,9 @@ task: ${datamodule.dataset.task}
 defaults:
   - _self_
   - preprocessing: default.yaml 
-  - waveform_augmentations: default.yaml
+  - waveform_augmentations: null
   - spectrogram_augmentations: default.yaml
-  - decoding: bird_event_decoder.yaml
+  - decoding: null
   
 
 

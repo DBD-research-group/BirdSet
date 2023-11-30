@@ -13,16 +13,16 @@ seed: 2
 
 module:
   optimizer:
-    lr: 2e-5
+    lr: 1e-5
 
 
 trainer:
   min_epochs: 1
-  max_epochs: 10
+  max_epochs: 15
 
 datamodule:
   dataset:
-    val_split: 0.2
+    val_split: 0.1
   loaders:
     train:
       batch_size: 12

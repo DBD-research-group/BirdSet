@@ -67,11 +67,6 @@ class BaseModule(L.LightningModule):
 
         self.save_hyperparameters()
         
-        # if not self.hparams: # throws copy errors! 
-        #     # we get an error here otherwise for specific models, something with deepcopy, 
-        #     # this is called more than once with initiate
-        #     self.save_hyperparameters(ignore="graph_queue") 
-
     def forward(self, *args, **kwargs):
         return self.model.forward(*args, **kwargs)
 
