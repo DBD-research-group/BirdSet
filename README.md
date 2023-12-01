@@ -7,7 +7,7 @@
 
 Either with [conda](https://docs.conda.io/en/latest/) and [pip](https://pip.pypa.io/en/stable/).
 ```
-conda create -n gadme python=3.9
+conda create -n gadme python=3.10
 pip install -e .
 ```
 
