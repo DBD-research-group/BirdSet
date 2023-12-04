@@ -6,7 +6,7 @@ from typing import List, Literal
 
 import lightning as L
 
-from datasets import load_dataset, load_from_disk, Audio, DatasetDict, Dataset
+from datasets import load_dataset, load_from_disk, Audio, DatasetDict, Dataset, IterableDataset, IterableDatasetDict
 from src.utils.extraction import DefaultFeatureExtractor
 from torch.utils.data import DataLoader
 
@@ -128,90 +128,24 @@ class BaseDataModuleHF(L.LightningDataModule):
         if self._prepare_done:
             logging.info("Skip preparing.")
             return
+        
+        dataset = self._load_data()
 
-        logging.info("> Loading data set.")
+        dataset = self._preprocess_data(dataset, self.dataset_config.task)
+        dataset = self._create_splits(dataset)
 
-        dataset = load_dataset(
-            name=self.dataset_config.hf_name,
-            path=self.dataset_config.hf_path,
-            cache_dir=self.dataset_config.data_dir,
-            num_proc=3,
-        )
-
-        if self.dataset_config.subset:
-            dataset = self._fast_dev_subset(dataset, self.dataset_config.subset)
-
-        dataset = dataset.cast_column(
-            column="audio",
-            feature=Audio(
-                sampling_rate=self.dataset_config.sampling_rate,
-                mono=True,
-                decode=False,
-            ),
-        )
-
-        if self.dataset_config.task == "multiclass": #and self.dataset.dataset_name != "esc50":
-            dataset = DatasetDict({split: dataset[split] for split in ["train", "test"]})
-
-            logging.info("> Mapping data set.")
-            dataset["train"] = dataset["train"].map(
-                self.event_mapper,
-                remove_columns=["audio"],
-                batched=True,
-                batch_size=300,
-                load_from_cache_file=True,
-                num_proc=self.dataset_config.n_workers,
-            )
-
-            dataset = dataset.select_columns(
-                ["filepath", "ebird_code", "detected_events", "start_time", "end_time"]
-            )
-
-            dataset = dataset.rename_column("ebird_code", "labels")
-
-            # if self.dataset.column_list[1] != "labels" and self.dataset.dataset_name != "esc50":
-            #     dataset = dataset.rename_column("ebird_code", "labels")
-
-        elif self.dataset_config.task == "multilabel":
-            dataset = DatasetDict({split: dataset[split] for split in ["train", "test_5s"]})
-
-            logging.info("> Mapping data set.")
-            dataset["train"] = dataset["train"].map(
-                self.event_mapper,
-                remove_columns=["audio"],
-                batched=True,
-                batch_size=300,
-                load_from_cache_file=True,
-                num_proc=self.dataset_config.n_workers,
-            )
-
-            dataset = dataset.map(
-                self._classes_one_hot,
-                batched=True,
-                batch_size=300,
-                load_from_cache_file=True,
-                num_proc=self.dataset_config.n_workers,
-            )
-
-            dataset["test"] = dataset["test_5s"]
-            dataset = dataset.select_columns(
-                ["filepath", "ebird_code_multilabel", "detected_events", "start_time", "end_time"]
-            )
-
-            dataset = dataset.rename_column("ebird_code_multilabel", "labels")
-
-        # if self.feature_extractor.return_attention_mask:
-        #     self.dataset.column_list.append("attention_mask")
-        if isinstance(dataset, DatasetDict | Dataset):
-            dataset = self._create_splits(dataset)
-        else:
-            logging.error("Dataset is not a DatasetDict or Dataset, Iterabel Dataset not supported yet.")
-            return
 
         # set the length of the training set to be accessed by the model
         self.len_trainset = len(dataset["train"])        
         self._save_dataset_to_disk(dataset)
        
+    def _preprocess_data(self, dataset, task_type: Literal["multiclass", "multilabel"]):
+        """
+        Preprocesses the dataset.
+        This includes stuff that only needs to be done once.
+        """
+          
+        return dataset
 
     def _save_dataset_to_disk(self, dataset):
         """
@@ -242,16 +176,6 @@ class BaseDataModuleHF(L.LightningDataModule):
 
         logging.info(f"Saving to disk: {os.path.join(self.data_path)}")
         dataset.save_to_disk(self.data_path)
-
-    def _select_and_rename_columns(self, dataset):
-
-        dataset = dataset.select_columns(self.dataset_config.column_list)
-        # if audio not in dataset
-        if "audio" not in dataset['train'].column_names:
-            dataset = dataset.rename_column(self.dataset_config.column_list[0], "audio")
-        if 'labels' not in dataset['train'].column_names:
-            dataset = dataset.rename_column(self.dataset_config.column_list[1], "labels")
-        return dataset
 
     
     def _create_splits(self, dataset: DatasetDict | Dataset):
@@ -288,7 +212,41 @@ class BaseDataModuleHF(L.LightningDataModule):
             else:
                 return self._create_splits(dataset[list(dataset.keys())[0]])
 
+    def _load_data(self,decode: bool = True ):
+        """
+        Load audio dataset from Hugging Face Datasets.
 
+        Returns HF dataset with audio column casted to Audio feature, containing audio data as numpy array and sampling rate.
+        """
+        logging.info("> Loading data set.")
+
+        dataset = load_dataset(
+            name=self.dataset_config.hf_name,
+            path=self.dataset_config.hf_path,
+            cache_dir=self.dataset_config.data_dir,
+            num_proc=3,
+        )
+
+        if isinstance(dataset, IterableDataset |IterableDatasetDict):
+            logging.error("Iterable datasets not supported yet.")
+            return
+
+
+        if self.dataset_config.subset:
+            dataset = self._fast_dev_subset(dataset, self.dataset_config.subset)
+
+        dataset = dataset.cast_column(
+            column="audio",
+            feature=Audio(
+                sampling_rate=self.dataset_config.sampling_rate,
+                mono=True,
+                decode=decode,
+            ),
+        )
+        # TODO: check that train and test splits are present
+        if isinstance(dataset, Dataset):
+            dataset = self._create_splits(dataset)
+        return dataset
     
     def _fast_dev_subset(self, dataset: DatasetDict, size: int=500):
         """
@@ -304,62 +262,18 @@ class BaseDataModuleHF(L.LightningDataModule):
         Returns:
             DatasetDict: The subsetted dataset. The keys are the names of the dataset splits and the values are the subsetted datasets.
         """
+        # TODO: get random subset?!
         for split in dataset.keys():
             dataset[split] = dataset[split].select(range(size))
         return dataset
     
-    def _classes_one_hot(self, batch):
-        label_list = [y for y in batch["ebird_code_multilabel"]]
-        class_one_hot_matrix = torch.zeros(
-            (len(label_list), self.dataset_config.n_classes), dtype=torch.float
-        )
-
-        for class_idx, idx in enumerate(label_list):
-            class_one_hot_matrix[class_idx, idx] = 1
-
-        class_one_hot_matrix = torch.tensor(class_one_hot_matrix, dtype=torch.float32)
-        return {"ebird_code_multilabel": class_one_hot_matrix}   
-
-    def _preprocess_multilabel(self, dataset, split, preprocessor, select_range=None):
-        """
-        Preprocesses a multilabel dataset.
-
-        This method applies preprocessing to each split in the dataset. The preprocessing includes feature extraction,
-        selection of a range of data, and mapping of the preprocessing function to the data. The "audio" column is removed
-        from the dataset, and only the "input_values" and "labels" columns are kept.
-
-        Args:
-            dataset (dict): A dictionary where the keys are the names of the dataset splits and the values are the datasets.
-            select_range (list, optional): A list specifying the range of data to select from each dataset split. If None,
-                all data is selected. Default is None.
-
-        Returns:
-            dict: The preprocessed dataset. The keys are the names of the dataset splits and the values are the preprocessed datasets.
-        """
-        preprocessor = AudioPreprocessor(
-            feature_extractor=self.feature_extractor,
-            n_classes=self.dataset_config.n_classes,
-            window_length=5,
-        )
-        for split in dataset.keys():
-            # map through dataset split and apply preprocessing
-            dataset[split] = dataset[split].map(
-                preprocessor.preprocess_multilabel,
-                remove_columns=["audio"],
-                batched=True,
-                batch_size=100,
-                load_from_cache_file=True,
-                num_proc=self.dataset_config.n_workers,
-            )
-            dataset[split] = dataset[split].select_columns(["input_values", "labels"])  
-        return dataset
-    
-    def _preprocess_multiclass(self, dataset):
-        return dataset
-
+ 
     def _get_dataset(self, split):
+        """
+        Get Dataset from disk and add run-time transforms to a specified split.
+        """
         dataset = load_from_disk(
-            os.path.join(self.data_path, split)
+            os.path.join(self.data_path, split) # type: ignore
         )
         self.transforms.set_mode(split)
         # add run-time transforms to dataset
