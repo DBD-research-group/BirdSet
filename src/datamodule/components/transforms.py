@@ -52,10 +52,12 @@ class TransformsWrapper:
                 preprocessing: PreprocessingConfig = PreprocessingConfig(),
                 spectrogram_augmentations: DictConfig = DictConfig({}),
                 waveform_augmentations: DictConfig = DictConfig({}),
-                decoding=None #@raphael
+                decoding=None, #@raphael
+                feature_extractor=None #@raphael
 ):
 
         self.mode = "train"
+        self.feature_extractor = feature_extractor
         self.task = task
         self.sampling_rate = sampling_rate 
         self.model_type = model_type
@@ -64,6 +66,12 @@ class TransformsWrapper:
         self.waveform_augmentations = waveform_augmentations
         self.spectrogram_augmentations = spectrogram_augmentations
         #self.event_extractions = event_extractions
+        self.feature_extractor = feature_extractor
+        
+        # if self.feature_extractor is not None: 
+        #     self.feature_extractor = transformers.AutoFeatureExtractor.from_pretrained(
+        #         self.feature_extractor
+        #     )
         self.resizer = Resizer(
             use_spectrogram=self.preprocessing.use_spectrogram,
             db_scale=self.preprocessing.db_scale
@@ -149,25 +157,42 @@ class TransformsWrapper:
         # this is quite complicated if we want to make adjustments to non bird methods
         if self.event_decoder is not None: 
             batch = self.event_decoder(batch)
-
-        # audio collating and padding
         waveform_batch = [audio["array"] for audio in batch["audio"]]
-        waveform_batch = transformers.BatchFeature({"input_values": waveform_batch})
 
-        sequence_feature_extractor = transformers.SequenceFeatureExtractor(
-            feature_size=1,
-            sampling_rate=self.sampling_rate,
-            padding_value=0.0,
-            model_input_names=["input_values"]
-        )
-        #!TODO: what about the attention mask and padding values?!
-        waveform_batch = sequence_feature_extractor.pad(
-            waveform_batch, 
-            padding="max_length", 
+        # extract/pad/truncate
+        waveform_batch = self.feature_extractor(
+            waveform_batch,
+            padding="max_length",
             max_length=self.sampling_rate*5,
             truncation=True,
-            return_tensors="pt",
-            return_attention_mask=False)
+            return_attention_mask=False
+        )
+
+        # if self.feature_extractor is not None:
+        #     waveform_batch = self.feature_extractor(
+        #         waveform_batch,
+        #         padding="max_length",
+        #         max_length=self.sampling_rate*5,
+        #         truncation=True,
+        #         return_tensors="pt",
+        #         return_attention_mask=False)
+        # else:
+        #     # audio collating and padding
+        #     waveform_batch = transformers.BatchFeature({"input_values": waveform_batch})
+        #     sequence_feature_extractor = transformers.SequenceFeatureExtractor(
+        #         feature_size=1,
+        #         sampling_rate=self.sampling_rate,
+        #         padding_value=0.0,
+        #         model_input_names=["input_values"]
+        #     )
+        #     #!TODO: what about the attention mask and padding values?!
+        #     waveform_batch = sequence_feature_extractor.pad(
+        #         waveform_batch, 
+        #         padding="max_length", 
+        #         max_length=self.sampling_rate*5,
+        #         truncation=True,
+        #         return_tensors="pt",
+        #         return_attention_mask=False)
         
         waveform_batch = waveform_batch["input_values"].unsqueeze(1)
 
@@ -177,9 +202,16 @@ class TransformsWrapper:
             )
 
         else:
-            audio_augmented = waveform_batch
+            audio_augmented = waveform_batch#
+        
+        if self.model_type == "raw":
+            # normalize 
+            audio_augmented = self._zero_mean_unit_var_norm(
+                input_values=audio_augmented,
+                attention_mask=None
+            )
 
-        if self.model_type == "vision":
+        elif self.model_type == "vision":
             spectrograms = self._spectrogram_conversion(audio_augmented)
             #spectrograms_augmented = self.spec_aug(spectrograms)
             spectrograms_augmented = [self.spec_aug(spectrogram) for spectrogram in spectrograms]
@@ -225,6 +257,25 @@ class TransformsWrapper:
     
     def _transform_valid_test_predict(self, waveform):
         pass
+    
+    def _zero_mean_unit_var_norm(
+            self, input_values, attention_mask, padding_value=0.0
+    ):
+        if attention_mask is not None:
+            attention_mask = np.array(attention_mask, np.int32)
+            normed_input_values = []
+
+            for vector, length in zip(input_values, attention_mask.sum(-1)):
+                normed_slice = (vector - vector[:length].mean()) / np.sqrt(vector[:length].var() + 1e-7)
+                if length < normed_slice.shape[0]:
+                    normed_slice[length:] = padding_value
+
+                normed_input_values.append(normed_slice)
+        else:
+            normed_input_values = [(x - x.mean()) / np.sqrt(x.var() + 1e-7) for x in input_values]
+
+        return torch.stack(normed_input_values)
+        
 
     def __call__(self, batch, **kwargs):
         batch = self._transform_function(batch)

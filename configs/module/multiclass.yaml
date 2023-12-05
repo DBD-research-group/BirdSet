@@ -29,15 +29,21 @@ metrics:
     top_k: 1
   val_best: 
     _target_: "torchmetrics.MaxMetric"
-  # additional: 
-  #   f1:
-  #     _target_: "torchmetrics.classification.MulticlassF1Score"
-  #     num_classes: ${datamodule.dataset.n_classes}  
-  #   recall:
-  #     _target_: "torchmetrics.classification.Recall"
-  #     task: "multiclass"
-  #     average: "macro"
-  #     num_classes: ${datamodule.dataset.n_classes} 
+  additional: 
+    f1:
+      _target_: "torchmetrics.classification.MulticlassF1Score"
+      num_classes: ${datamodule.dataset.n_classes}  
+    recall:
+      _target_: "torchmetrics.classification.Recall"
+      task: "multiclass"
+      average: "macro"
+      num_classes: ${datamodule.dataset.n_classes} 
+    precision: 
+      _target_: "torchmetrics.classification.Precision"
+      task: "multiclass"
+      average: "macro"
+      num_classes: ${datamodule.dataset.n_classes} 
+
 
 output_activation: 
   _target_: "torch.softmax"

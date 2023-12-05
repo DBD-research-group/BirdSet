@@ -71,13 +71,13 @@ class BaseDataModuleHF(L.LightningDataModule):
         dataset: DatasetConfig = DatasetConfig(),
         loaders: LoadersConfig = LoadersConfig(),
         transforms: TransformsWrapper = TransformsWrapper(),
-        extractors: DefaultFeatureExtractor = DefaultFeatureExtractor(),
+        #extractors: DefaultFeatureExtractor = DefaultFeatureExtractor(),
         ):
         super().__init__()
         self.dataset_config = dataset
         self.loaders_config = loaders
         self.transforms = transforms
-        self.feature_extractor = extractors
+        #self.feature_extractor = extractors
         self.event_mapper = mapper
 
         self.data_path = None
@@ -320,39 +320,39 @@ class BaseDataModuleHF(L.LightningDataModule):
         class_one_hot_matrix = torch.tensor(class_one_hot_matrix, dtype=torch.float32)
         return {"ebird_code_multilabel": class_one_hot_matrix}   
 
-    def _preprocess_multilabel(self, dataset, split, preprocessor, select_range=None):
-        """
-        Preprocesses a multilabel dataset.
+    # def _preprocess_multilabel(self, dataset, split, preprocessor, select_range=None):
+    #     """
+    #     Preprocesses a multilabel dataset.
 
-        This method applies preprocessing to each split in the dataset. The preprocessing includes feature extraction,
-        selection of a range of data, and mapping of the preprocessing function to the data. The "audio" column is removed
-        from the dataset, and only the "input_values" and "labels" columns are kept.
+    #     This method applies preprocessing to each split in the dataset. The preprocessing includes feature extraction,
+    #     selection of a range of data, and mapping of the preprocessing function to the data. The "audio" column is removed
+    #     from the dataset, and only the "input_values" and "labels" columns are kept.
 
-        Args:
-            dataset (dict): A dictionary where the keys are the names of the dataset splits and the values are the datasets.
-            select_range (list, optional): A list specifying the range of data to select from each dataset split. If None,
-                all data is selected. Default is None.
+    #     Args:
+    #         dataset (dict): A dictionary where the keys are the names of the dataset splits and the values are the datasets.
+    #         select_range (list, optional): A list specifying the range of data to select from each dataset split. If None,
+    #             all data is selected. Default is None.
 
-        Returns:
-            dict: The preprocessed dataset. The keys are the names of the dataset splits and the values are the preprocessed datasets.
-        """
-        preprocessor = AudioPreprocessor(
-            feature_extractor=self.feature_extractor,
-            n_classes=self.dataset_config.n_classes,
-            window_length=5,
-        )
-        for split in dataset.keys():
-            # map through dataset split and apply preprocessing
-            dataset[split] = dataset[split].map(
-                preprocessor.preprocess_multilabel,
-                remove_columns=["audio"],
-                batched=True,
-                batch_size=100,
-                load_from_cache_file=True,
-                num_proc=self.dataset_config.n_workers,
-            )
-            dataset[split] = dataset[split].select_columns(["input_values", "labels"])  
-        return dataset
+    #     Returns:
+    #         dict: The preprocessed dataset. The keys are the names of the dataset splits and the values are the preprocessed datasets.
+    #     """
+    #     preprocessor = AudioPreprocessor(
+    #         feature_extractor=self.feature_extractor,
+    #         n_classes=self.dataset_config.n_classes,
+    #         window_length=5,
+    #     )
+    #     for split in dataset.keys():
+    #         # map through dataset split and apply preprocessing
+    #         dataset[split] = dataset[split].map(
+    #             preprocessor.preprocess_multilabel,
+    #             remove_columns=["audio"],
+    #             batched=True,
+    #             batch_size=100,
+    #             load_from_cache_file=True,
+    #             num_proc=self.dataset_config.n_workers,
+    #         )
+    #         dataset[split] = dataset[split].select_columns(["input_values", "labels"])  
+    #     return dataset
     
     def _preprocess_multiclass(self, dataset):
         return dataset

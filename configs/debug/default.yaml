@@ -5,7 +5,7 @@ train: True
 #logger: null
 defaults:
   - override /module: multiclass.yaml
-  - override /module/network: ast.yaml
+  - override /module/network: wav2vec2.yaml
   - override /datamodule: high_sierras.yaml
 
 extras: 

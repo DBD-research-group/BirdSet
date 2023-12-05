@@ -11,27 +11,6 @@ logger = logging.get_logger(__name__)
 
 
 class DefaultFeatureExtractor(SequenceFeatureExtractor):
-    """
-    Constructs a default feature extractor for general sequence processing.
-
-    This general-purpose feature extractor inherits from
-    [`~feature_extraction_sequence_utils.SequenceFeatureExtractor`], which contains most of the essential methods.
-    Users should refer to this superclass for more information regarding those methods.
-
-    This class is versatile and can be adapted for various sequence processing tasks. It supports basic operations
-    such as batching sequences.
-
-    Args:
-        feature_size (int, optional, defaults to 1):
-            The dimension of the extracted features.
-        sampling_rate (int, optional, defaults to 16000):
-            The sampling rate for audio processing, expressed in hertz (Hz).
-        padding_value (float, optional, defaults to 0.0):
-            Value used for padding shorter sequences.
-        return_attention_mask (bool, optional, defaults to False):
-            Whether to return an attention mask along with the processed features.
-    """
-
     model_input_names = ["input_values", "attention_mask"]
 
     def __init__(
@@ -52,84 +31,31 @@ class DefaultFeatureExtractor(SequenceFeatureExtractor):
 
     def __call__(
         self,
-        sequences: Union[np.ndarray, List[float], List[np.ndarray], List[List[float]]],
-        sampling_rate: Optional[int] = None,
-        return_tensors: Optional[Union[str, TensorType]] = None,
-        **kwargs,
-    ) -> BatchFeature:
-        """
-        Main method to featurize and prepare for the model one or several sequence(s).
+        waveform: Union[np.ndarray, List[float], List[np.ndarray], List[List[float]]],
+        padding: bool = False,
+        max_length: int = None,
+        truncation: bool = False,
+        return_attention_mask: bool = False,
+        return_tensors: str = "pt"):
 
-        Args:
-            sequences (`np.ndarray`, `List[float]`, `List[np.ndarray]`, `List[List[float]]`):
-                The sequence or batch of sequences to be processed. Each sequence can be a numpy array, a list of float
-                values, a list of numpy arrays or a list of list of float values. Must be mono channel audio, not
-                stereo, i.e. single float per timestep.
-            sampling_rate (int, optional):
-                The sampling rate at which the `raw_speech` input was sampled. It is strongly recommended to pass
-                `sampling_rate` at the forward call to prevent silent errors.
-            return_tensors (`str` or [`~utils.TensorType`], optional):
-                If set, will return tensors instead of list of python integers. Acceptable values are:
+        waveform_encoded = BatchFeature({"input_values": waveform})
 
-                - `'tf'`: Return TensorFlow `tf.constant` objects.
-                - `'pt'`: Return PyTorch `torch.Tensor` objects.
-                - `'np'`: Return Numpy `np.ndarray` objects.
-        """
-
-        if sampling_rate is not None and sampling_rate != self.sampling_rate:
-            raise ValueError(
-                f"The model corresponding to this feature extractor: {self} was trained using a sampling rate of"
-                f" {self.sampling_rate}. Please make sure that the provided `raw_speech` input was sampled with"
-                f" {self.sampling_rate} and not {sampling_rate}."
-            )
-        else:
-            logger.warning(
-                "It is strongly recommended to pass the `sampling_rate` argument to this function. "
-                "Failing to do so can result in silent errors that might be hard to debug."
-            )
-
-        is_batched_numpy = (
-            isinstance(sequences, np.ndarray) and len(sequences.shape) > 1
+        padded_inputs = self.pad(
+            waveform_encoded,
+            padding=padding,
+            max_length=max_length,
+            truncation=truncation,
+            return_attention_mask=return_attention_mask
         )
-        if is_batched_numpy and len(sequences.shape) > 2:
-            raise ValueError(
-                f"Only mono-channel audio is supported for input to {self}"
-            )
-        is_batched = is_batched_numpy or (
-            isinstance(sequences, (list, tuple))
-            and (isinstance(sequences[0], (np.ndarray, tuple, list)))
-        )
-
-        if is_batched:
-            sequences = [np.asarray(speech, dtype=np.float32) for speech in sequences]
-        elif not is_batched and not isinstance(sequences, np.ndarray):
-            sequences = np.asarray(sequences, dtype=np.float32)
-        elif isinstance(sequences, np.ndarray) and sequences.dtype is np.dtype(
-            np.float64
-        ):
-            sequences = sequences.astype(np.float32)
-
-        # always return batch
-        if not is_batched:
-            sequences = [sequences]
-
-        # convert into BatchFeature
-        raw_inputs = BatchFeature({"input_values": sequences})
 
         # make sure list is in array format
-        input_values = raw_inputs.get("input_values")
-        if isinstance(input_values[0], list):
-            raw_inputs["input_values"] = [
-                np.asarray(feature, dtype=np.float32) for feature in input_values
-            ]
+        padded_inputs = padded_inputs.get("input_values")
 
         if return_tensors is not None:
-            raw_inputs = raw_inputs.convert_to_tensors(return_tensors)
+            padded_inputs = padded_inputs.convert_to_tensors(return_tensors)
 
-        return raw_inputs
+        return padded_inputs
 
-
-# we could incorporate some kind of event detector in the customfeatureextractor
 
 
 class CustomFeatureExtractor(SequenceFeatureExtractor):

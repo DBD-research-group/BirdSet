@@ -1,0 +1,5 @@
+_target_: src.datamodule.components.DefaultFeatureExtractor
+feature_size: 1
+sampling_rate: ${module.network.sampling_rate}
+padding_value: 0.0
+return_attention_mask: False

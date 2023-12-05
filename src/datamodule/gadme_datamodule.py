@@ -9,12 +9,10 @@ class GADMEDataModule(BaseDataModuleHF):
             dataset: DatasetConfig = DatasetConfig(),
             loaders: LoadersConfig = LoadersConfig(),
             transforms: TransformsWrapper = TransformsWrapper(),
-            extractors: DefaultFeatureExtractor = DefaultFeatureExtractor()
     ):
         super().__init__(
             dataset=dataset,
             loaders=loaders,
             transforms=transforms,
-            extractors=extractors,
             mapper=mapper
         )

@@ -4,7 +4,6 @@ _target_: src.datamodule.gadme_datamodule.GADMEDataModule
 defaults: 
   - _self_
   - transforms: bird_default.yaml
-  - extractors: default_aug.yaml
   - loaders: default.yaml
   - mapper: xc_bambird_mapper.yaml
 
