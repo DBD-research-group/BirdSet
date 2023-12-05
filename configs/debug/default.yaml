@@ -5,8 +5,10 @@ train: True
 #logger: null
 defaults:
   - override /module: multiclass.yaml
-  - override /module/network: wav2vec2.yaml
-  - override /datamodule: high_sierras.yaml
+  - override /module/network: ast.yaml
+  - override /datamodule: esc50.yaml
+#  - override /datamodule/transforms/waveform_augmentations: none.yaml
+#  - override /datamodule/transforms/spectrogram_augmentations: none.yaml
 
 extras: 
   ignore_warnings: False
