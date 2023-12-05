@@ -23,6 +23,8 @@ module:
     _target_: torch.optim.Adam
     lr: 1e-4
     weight_decay: 0.01
+  network:
+    sampling_rate: 32000
 trainer:
   min_epochs: 1
   max_epochs: 100

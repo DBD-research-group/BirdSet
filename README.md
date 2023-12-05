@@ -7,7 +7,7 @@
 
 Either with [conda](https://docs.conda.io/en/latest/) and [pip](https://pip.pypa.io/en/stable/).
 ```
-conda create -n gadme python=3.9
+conda create -n gadme python=3.10
 pip install -e .
 ```
 
@@ -72,7 +72,7 @@ This repository is inspired by the [Yet Another Lightning Hydra Template](https:
 └── README.md
 ```
 
-## Data pipeline
+# Data pipeline
 
 Our datasets are shared via HuggingFace Datasets in our [GADME repository](https://huggingface.co/datasets/DBD-research-group/gadme_v1).
 First log in to HuggingFace with:
@@ -80,16 +80,23 @@ First log in to HuggingFace with:
 huggingface-cli login
 ```
 
-### Datamodule
+## Datamodule
 
 The datamodules are defined in `src/datamodule` and configurations are stored under `configs/datamodule`.
 `base_datamodule` is the main class that can be inherited for specific datasets. It is responsible for preparing the data in the function `prepare_data` and loading the data in the function `setup`. `prepare_data` downloads the dataset, applies preprocessing, creates validation splits and saves the data to disk. `setup` initiates the dataloaders and configures data transformations.
 
-### Preprocessing
+The following steps are performed in `prepare_data`:
 
-Preprocessing is referred to data transformations that can be applied to the data before training and are therefore done only once. The `feature_extractor` is responsible for this.
+1. Data is downloaded from HuggingFace Datasets `_load_data`
+2. Data gets preprocessed with `_preprocess_data`
+3. Data is split into train validation and test sets with `_create_splits`
+4. Length of the dataset gets saved to access later
+5. Data is saved to disk with `_save_dataset_to_disk`
 
-### Transformations
+The following steps are performed in `setup`:
+1. Data is loaded from disk with `_get_dataset` in which the transforms are applied
+
+## Transformations
 
 Data transformations are referred to data transformations that are applied to the data during training. They include e.g. augmentations. The transformations are added to the huggingface dataset with [`set_transform`](https://huggingface.co/docs/datasets/main/en/package_reference/main_classes#datasets.Dataset.set_transform).
 
