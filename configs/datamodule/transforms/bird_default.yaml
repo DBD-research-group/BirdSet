@@ -2,7 +2,6 @@ _target_: src.datamodule.components.transforms.TransformsWrapper
 sampling_rate: ${module.network.sampling_rate}
 model_type: ${module.network.model_type}
 task: ${datamodule.dataset.task}
-feature_extractor: ${module.network.feature_extractor}
 
 defaults:
   - _self_

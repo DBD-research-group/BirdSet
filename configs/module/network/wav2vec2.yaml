@@ -5,9 +5,8 @@ model:
 
 model_name: wav2vec2
 model_type: raw
-torch_compile: false
+torch_compile: False
 sampling_rate: 16_000
-feature_extractor: facebook/wav2vec2-base
 
 
 
