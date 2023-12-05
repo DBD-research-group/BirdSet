@@ -71,13 +71,11 @@ class BaseDataModuleHF(L.LightningDataModule):
         dataset: DatasetConfig = DatasetConfig(),
         loaders: LoadersConfig = LoadersConfig(),
         transforms: TransformsWrapper = TransformsWrapper(),
-        #extractors: DefaultFeatureExtractor = DefaultFeatureExtractor(),
         ):
         super().__init__()
         self.dataset_config = dataset
         self.loaders_config = loaders
         self.transforms = transforms
-        #self.feature_extractor = extractors
         self.event_mapper = mapper
 
         self.data_path = None
@@ -150,7 +148,7 @@ class BaseDataModuleHF(L.LightningDataModule):
             ),
         )
 
-        if self.dataset_config.task == "multiclass": #and self.dataset.dataset_name != "esc50":
+        if self.dataset_config.task == "multiclass": 
             dataset = DatasetDict({split: dataset[split] for split in ["train", "test"]})
 
             logging.info("> Mapping data set.")
