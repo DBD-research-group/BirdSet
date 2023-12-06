@@ -180,6 +180,8 @@ class TransformsWrapper:
                     input_values=audio_augmented,
                     attention_mask=attention_mask
                 )
+                #RuntimeError: min(): Expected reduction dim to be specified for input.numel() == 0. Specify the reduction dim with the 'dim' argument.
+                # in test data: there seems to be an empty tensor with length=0? and everathing is filtered out
 
         if self.model_type == "vision":
             # spectrogram conversion and augmentation 
@@ -225,7 +227,13 @@ class TransformsWrapper:
             attention_mask = np.array(attention_mask, np.int32)
 
             for vector, mask in zip(input_values, attention_mask):
+                # 0 vector! 
                 masked_vector = vector[mask==1]
+
+                # check if masked vector is empty
+                if masked_vector.size == 0:
+                    normed_vector = np.full(vector.shape, padding_value)
+                    #!TODO: check 0 length soundscape files
 
                 min_val = masked_vector.min()
                 max_val = masked_vector.max()
