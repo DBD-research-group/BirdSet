@@ -1,3 +1,4 @@
+normalize_waveform: "instance_min_max"
 normalize: True
 use_spectrogram: True
 n_fft: 1024

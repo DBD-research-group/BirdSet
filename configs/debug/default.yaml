@@ -6,7 +6,7 @@ train: True
 defaults:
   - override /module: multiclass.yaml
   - override /module/network: hubert.yaml
-  - override /datamodule: esc50.yaml
+  - override /datamodule: high_sierras.yaml
 #  - override /datamodule/transforms/waveform_augmentations: none.yaml
 #  - override /datamodule/transforms/spectrogram_augmentations: none.yaml
 
