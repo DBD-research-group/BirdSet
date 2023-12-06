@@ -4,7 +4,6 @@ _target_: src.datamodule.gadme_datamodule.GADMEDataModule
 defaults: 
   - _self_
   - transforms: bird_default.yaml
-  - extractors: default_aug.yaml
   - loaders: default.yaml
   - mapper: xc_bambird_mapper.yaml
 
@@ -19,7 +18,6 @@ dataset:
   #   pretrained_model_name_or_path: ${module.network.model.checkpoint}
   n_classes: 22
   n_workers: 3
-  column_list: ["input_values", "ebird_code", "ebird_code_multiclass"]
   val_split: 0.2
   task: ${module.task}
   subset: null

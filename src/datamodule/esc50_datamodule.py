@@ -1,6 +1,5 @@
 from datasets import DatasetDict, Audio
 from src.datamodule.components.transforms import TransformsWrapper
-from src.utils.extraction import DefaultFeatureExtractor
 from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
 import logging
 from datasets import load_dataset, Audio, DatasetDict
@@ -9,18 +8,16 @@ import os
 class ESC50(BaseDataModuleHF):
     def __init__(
             self,
-            mapper = None,
             dataset: DatasetConfig = DatasetConfig(),
             loaders: LoadersConfig = LoadersConfig(),
             transforms: TransformsWrapper = TransformsWrapper(),
-            extractors: DefaultFeatureExtractor = DefaultFeatureExtractor()
+            mapper: None = None
     ):
         super().__init__(
             dataset=dataset,
             loaders=loaders,
             transforms=transforms,
-            extractors=extractors,
-            mapper=None
+            mapper=mapper
         )
 
     # def _create_splits(self, dataset):

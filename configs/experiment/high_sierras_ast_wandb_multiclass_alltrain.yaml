@@ -18,7 +18,7 @@ module:
 
 trainer:
   min_epochs: 1
-  max_epochs: 15
+  max_epochs: 12
 
 datamodule:
   dataset:
@@ -35,6 +35,11 @@ datamodule:
       batch_size: 12
     test:
       batch_size: 12
+  mapper: 
+    with_noise_cluster: False
+    biggest_cluster: True
+    only_one: False
+    
 
 logger:
   wandb:

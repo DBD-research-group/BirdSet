@@ -1,5 +1,5 @@
 _target_: src.datamodule.components.transforms.TransformsWrapper
-sampling_rate: ${datamodule.extractors.sampling_rate}
+sampling_rate: ${module.network.sampling_rate}
 model_type: ${module.network.model_type}
 task: ${datamodule.dataset.task}
 

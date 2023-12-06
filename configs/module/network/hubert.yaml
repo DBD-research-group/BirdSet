@@ -4,11 +4,11 @@ model:
   num_classes: ${datamodule.dataset.n_classes}
 
 model_name: hubert
-torch_compile: false
+model_type: raw
+torch_compile: False
+sampling_rate: 16_000
 
-
-
-
+# hubert uses the w2v2 featue extractor 
 
 
 

@@ -7,11 +7,7 @@ from typing import List, Literal
 import lightning as L
 
 from datasets import load_dataset, load_from_disk, Audio, DatasetDict, Dataset, IterableDataset, IterableDatasetDict
-from src.utils.extraction import DefaultFeatureExtractor
 from torch.utils.data import DataLoader
-
-from src.datamodule.components.bird_premapping import AudioPreprocessor
-#from src.datamodule.components.event_mapping import EventMapping
 from src.datamodule.components.transforms import TransformsWrapper
 
 @dataclass
@@ -23,8 +19,6 @@ class DatasetConfig:
     seed: int = 42
     n_classes: int = 50
     n_workers: int = 1
-    # the columns of the dataset that should be used
-    column_list: List[str] = field(default_factory=lambda: ["audio", "target"])
     val_split: float = 0.2
     task: Literal["multiclass", "multilabel"] = "multiclass"
     subset: int = None
@@ -71,13 +65,11 @@ class BaseDataModuleHF(L.LightningDataModule):
         dataset: DatasetConfig = DatasetConfig(),
         loaders: LoadersConfig = LoadersConfig(),
         transforms: TransformsWrapper = TransformsWrapper(),
-        extractors: DefaultFeatureExtractor = DefaultFeatureExtractor(),
         ):
         super().__init__()
         self.dataset_config = dataset
         self.loaders_config = loaders
         self.transforms = transforms
-        self.feature_extractor = extractors
         self.event_mapper = mapper
 
         self.data_path = None
@@ -133,7 +125,6 @@ class BaseDataModuleHF(L.LightningDataModule):
 
         dataset = self._preprocess_data(dataset, self.dataset_config.task)
         dataset = self._create_splits(dataset)
-
 
         # set the length of the training set to be accessed by the model
         self.len_trainset = len(dataset["train"])        

@@ -1,6 +1,6 @@
 from typing import Literal
 from src.datamodule.components.transforms import TransformsWrapper
-from src.utils.extraction import DefaultFeatureExtractor
+from src.datamodule.components.event_mapping import XCEventMapping
 from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
 from datasets import DatasetDict
 import logging
@@ -10,17 +10,15 @@ import torch
 class GADMEDataModule(BaseDataModuleHF):
     def __init__(
             self,
-            mapper,
             dataset: DatasetConfig = DatasetConfig(),
             loaders: LoadersConfig = LoadersConfig(),
             transforms: TransformsWrapper = TransformsWrapper(),
-            extractors: DefaultFeatureExtractor = DefaultFeatureExtractor()
+            mapper: XCEventMapping = XCEventMapping()
     ):
         super().__init__(
             dataset=dataset,
             loaders=loaders,
             transforms=transforms,
-            extractors=extractors,
             mapper=mapper
         
         )

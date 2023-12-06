@@ -3,7 +3,6 @@ _target_: src.datamodule.esc50_datamodule.ESC50
 defaults:
   - _self_
   - transforms: esc_default.yaml
-  - extractors: default_aug.yaml
   - loaders: default.yaml
   - mapper: null
 
@@ -13,13 +12,6 @@ dataset:
   hf_path: ashraq/esc50
   hf_name: None
   seed: ${seed}
-  # feature_extractor:
-  #   _target_: src.utils.extraction.DefaultFeatureExtractor
-  #   n_classes: 50
-  #   n_workers: 1
-  #   column_list: ["input_values", "target"]
-  #   sampling_rate: 32_000
-  #   return_tensor: 'pt'
   n_classes: 50
   n_workers: 1
   column_list: ["input_values", "target"]

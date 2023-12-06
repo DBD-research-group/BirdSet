@@ -3,12 +3,12 @@
 defaults:
   - override /datamodule: high_sierras.yaml
   - override /module: multiclass.yaml
-  - override /module/network: ast.yaml
+  - override /module/network: wav2vec2.yaml
   - override /callbacks: default.yaml 
   - override /trainer: single_gpu.yaml
 
 
-tags: ["high_sierras", "ast", "augment"]
+tags: ["high_sierras", "w2v2", "augment"]
 seed: 2
 
 module:
@@ -25,16 +25,16 @@ datamodule:
     val_split: 0.1
   loaders:
     train:
-      batch_size: 12
+      batch_size: 20
       shuffle: True
       num_workers: 6
       drop_last: False
       prefetch_factor: 4
 
     valid:
-      batch_size: 12
+      batch_size: 20
     test:
-      batch_size: 12
+      batch_size: 20
 
 logger:
   wandb:
