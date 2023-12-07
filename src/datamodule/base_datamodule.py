@@ -9,6 +9,7 @@ import lightning as L
 from datasets import load_dataset, load_from_disk, Audio, DatasetDict, Dataset, IterableDataset, IterableDatasetDict
 from torch.utils.data import DataLoader
 from src.datamodule.components.transforms import TransformsWrapper
+from src.datamodule.components.event_mapping import XCEventMapping
 
 @dataclass
 class DatasetConfig:
@@ -21,7 +22,7 @@ class DatasetConfig:
     n_workers: int = 1
     val_split: float = 0.2
     task: Literal["multiclass", "multilabel"] = "multiclass"
-    subset: int = None
+    subset: int| None = None
     sampling_rate: int = 32_000
 
 @dataclass
@@ -61,7 +62,7 @@ class BaseDataModuleHF(L.LightningDataModule):
 
     def __init__(
         self, 
-        mapper,
+        mapper: XCEventMapping | None = None ,
         dataset: DatasetConfig = DatasetConfig(),
         loaders: LoadersConfig = LoadersConfig(),
         transforms: TransformsWrapper = TransformsWrapper(),

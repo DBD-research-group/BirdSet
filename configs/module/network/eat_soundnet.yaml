@@ -1,0 +1,14 @@
+model_name: "eat"
+model:
+  _target_: src.modules.models.eat_soundnet.SoundNet
+  nf: 32
+  seq_len: 90112
+  embed_dim: 128
+  n_layers: 4
+  nhead: 8
+  factors: [4, 4, 4, 4]
+  n_classes: 50
+  dim_feedforward: 512
+torch_compile: False
+model_type: 'waveform'
+sampling_rate: 22050
