@@ -124,7 +124,7 @@ class BaseModule(L.LightningModule):
             prog_bar=True
         )
 
-        self.train_metric(preds, targets)
+        self.train_metric(preds, targets.int())
         self.log(
             f"train_{self.train_metric.__class__.__name__}",
             self.train_metric,
@@ -147,14 +147,14 @@ class BaseModule(L.LightningModule):
             prog_bar=True
         )
 
-        self.valid_metric(preds, targets)
+        self.valid_metric(preds, targets.int())
         self.log(
             f"val_{self.valid_metric.__class__.__name__}",
             self.valid_metric,
             **self.logging_params,
         )
 
-        self.valid_add_metrics(preds, targets)
+        self.valid_add_metrics(preds, targets.int())
         self.log_dict(self.valid_add_metrics, **self.logging_params)
         return {"loss": val_loss, "preds": preds, "targets": targets}
     
@@ -177,14 +177,14 @@ class BaseModule(L.LightningModule):
             prog_bar=True
         )
 
-        self.test_metric(preds, targets)
+        self.test_metric(preds, targets.int())
         self.log(
             f"test_{self.test_metric.__class__.__name__}",
             self.test_metric,
             **self.logging_params,
         )
 
-        self.test_add_metrics(preds, targets)
+        self.test_add_metrics(preds, targets.int())
         self.log_dict(self.test_add_metrics, **self.logging_params)
         return {"loss": test_loss, "preds": preds, "targets": targets}
         

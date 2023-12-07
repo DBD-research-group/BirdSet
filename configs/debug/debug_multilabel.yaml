@@ -1,0 +1,53 @@
+# @package _global_
+task_name: debug
+
+
+
+defaults:
+  - override /module: multilabel.yaml
+  - override /module/network: hubert.yaml
+  - override /datamodule: high_sierras.yaml
+  - override /callbacks: default.yaml 
+  - override /trainer: single_gpu.yaml
+
+extras: 
+  ignore_warnings: False
+
+hydra: 
+  job_logging: 
+    root:
+      level: DEBUG
+
+seed: 2
+
+module:
+  optimizer:
+    lr: 1e-5
+
+
+trainer: 
+  max_epochs: 1
+  accelerator: gpu
+  devices: 1
+  detect_anomaly: True
+  fast_dev_run: False
+
+datamodule:
+  dataset:
+    val_split: 0.1
+    subset: 300
+    n_workers: 1
+  loaders:
+    train: 
+      batch_size: 8
+      num_workers: 1
+      pin_memory: False
+    valid: 
+      batch_size: 8
+      num_workers: 1 
+      pin_memory: False
+    test:
+      batch_size: 8
+      num_workers: 1 
+      pin_memory: False
+
