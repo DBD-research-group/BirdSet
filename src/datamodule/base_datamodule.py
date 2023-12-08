@@ -77,9 +77,7 @@ class BaseDataModuleHF(L.LightningDataModule):
         self.val_dataset = None
         self.test_dataset = None
 
-        #self._prepare_done = False
-        #self._setup_done = False
-        #self.data_path = None
+        self._prepare_done = False
         self.len_trainset = None
     
     @property
@@ -115,11 +113,10 @@ class BaseDataModuleHF(L.LightningDataModule):
 
         """
 
-        # logging.info("Check if preparing has already been done.")
-
-        # if self._prepare_done:
-        #     logging.info("Skip preparing.")
-        #     return
+        logging.info("Check if preparing has already been done.")
+        if self._prepare_done:
+            logging.info("Skip preparing.")
+            return
 
         logging.info("Prepare Data")
         
@@ -130,6 +127,9 @@ class BaseDataModuleHF(L.LightningDataModule):
         # set the length of the training set to be accessed by the model
         self.len_trainset = len(dataset["train"])        
         self._save_dataset_to_disk(dataset)
+
+        # set to done so that lightning does not call it again
+        self._prepare_done = True
        
     def _preprocess_data(self, dataset, task_type: Literal["multiclass", "multilabel"]):
         """
@@ -259,9 +259,11 @@ class BaseDataModuleHF(L.LightningDataModule):
         dataset_path = os.path.join(
             self.dataset_config.data_dir,
             f"{self.dataset_config.dataset_name}_processed", 
+            split
         )
 
-        dataset = load_dataset(dataset_path, split=split)
+        dataset = load_from_disk(dataset_path)
+
         self.transforms.set_mode(split)
         # add run-time transforms to dataset
         dataset.set_transform(self.transforms, output_all_columns=False) 
