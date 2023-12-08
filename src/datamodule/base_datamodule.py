@@ -77,9 +77,9 @@ class BaseDataModuleHF(L.LightningDataModule):
         self.val_dataset = None
         self.test_dataset = None
 
-        self._prepare_done = False
-        self._setup_done = False
-        self.data_path = None
+        #self._prepare_done = False
+        #self._setup_done = False
+        #self.data_path = None
         self.len_trainset = None
     
     @property
@@ -115,14 +115,15 @@ class BaseDataModuleHF(L.LightningDataModule):
 
         """
 
-        logging.info("Check if preparing has already been done.")
+        # logging.info("Check if preparing has already been done.")
 
-        if self._prepare_done:
-            logging.info("Skip preparing.")
-            return
+        # if self._prepare_done:
+        #     logging.info("Skip preparing.")
+        #     return
+
+        logging.info("Prepare Data")
         
         dataset = self._load_data()
-
         dataset = self._preprocess_data(dataset, self.dataset_config.task)
         dataset = self._create_splits(dataset)
 
@@ -152,22 +153,13 @@ class BaseDataModuleHF(L.LightningDataModule):
             None
         """
         dataset.set_format("np")
-        
+
         data_path = os.path.join(
             self.dataset_config.data_dir,
-            f"{self.dataset_config.dataset_name}_processed",
-            dataset['train']._fingerprint,
+            f"{self.dataset_config.dataset_name}_processed",    
         )
-        self.data_path = data_path
-        self._prepare_done = True
-
-        if os.path.exists(data_path):
-            logging.warn("Dataset exists on disk.")
-            return
-
-        logging.info(f"Saving to disk: {os.path.join(self.data_path)}")
-        dataset.save_to_disk(self.data_path)
-
+        logging.info(f"Saving to disk: {data_path}")
+        dataset.save_to_disk(data_path)
     
     def _create_splits(self, dataset: DatasetDict | Dataset):
         """
@@ -263,9 +255,13 @@ class BaseDataModuleHF(L.LightningDataModule):
         """
         Get Dataset from disk and add run-time transforms to a specified split.
         """
-        dataset = load_from_disk(
-            os.path.join(self.data_path, split) # type: ignore
+        
+        dataset_path = os.path.join(
+            self.dataset_config.data_dir,
+            f"{self.dataset_config.dataset_name}_processed", 
         )
+
+        dataset = load_dataset(dataset_path, split=split)
         self.transforms.set_mode(split)
         # add run-time transforms to dataset
         dataset.set_transform(self.transforms, output_all_columns=False) 

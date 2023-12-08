@@ -25,7 +25,7 @@ def main(cfg):
     # Setup data
     log.info(f"Instantiate datamodule <{cfg.datamodule._target_}>")
     datamodule = hydra.utils.instantiate(cfg.datamodule)
-    datamodule.prepare_data()
+    #datamodule.prepare_data()
 
     # Setup logger
     log.info(f"Instantiate logger")

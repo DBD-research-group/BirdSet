@@ -201,7 +201,6 @@ class BaseModule(L.LightningModule):
         if self.torch_compile and stage=="fit":
             self.model = torch.compile(self.model)
 
-
     def on_train_batch_start(self, batch: Any, batch_idx: int):
         pass
 
