@@ -1,14 +1,14 @@
 # @package _global_
-task_name: "debug"
-train: True
-# callbacks: null
-#logger: null
+task_name: debug
+
+
+
 defaults:
-  - override /module: multiclass.yaml
+  - override /module: multilabel.yaml
   - override /module/network: hubert.yaml
   - override /datamodule: high_sierras.yaml
-#  - override /datamodule/transforms/waveform_augmentations: none.yaml
-#  - override /datamodule/transforms/spectrogram_augmentations: none.yaml
+  - override /callbacks: default.yaml 
+  - override /trainer: single_gpu.yaml
 
 extras: 
   ignore_warnings: False
@@ -18,6 +18,13 @@ hydra:
     root:
       level: DEBUG
 
+seed: 2
+
+module:
+  optimizer:
+    lr: 1e-5
+
+
 trainer: 
   max_epochs: 1
   accelerator: gpu
@@ -25,22 +32,22 @@ trainer:
   detect_anomaly: True
   fast_dev_run: False
 
-datamodule: 
+datamodule:
+  dataset:
+    val_split: 0.1
+    subset: 300
+    n_workers: 1
   loaders:
     train: 
-      batch_size: 12
+      batch_size: 8
       num_workers: 1
       pin_memory: False
     valid: 
-      batch_size: 12
+      batch_size: 8
       num_workers: 1 
       pin_memory: False
     test:
-      batch_size: 12
+      batch_size: 8
       num_workers: 1 
       pin_memory: False
-  dataset:
-    subset: null
-    n_workers: 1
 
-  #transforms: bird_default.yaml

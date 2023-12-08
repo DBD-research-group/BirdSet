@@ -23,20 +23,25 @@ lr_scheduler:
 
 metrics: 
   main: 
-    _target_: "torchmetrics.classification.MulticlassAccuracy"
-    num_classes: 22
-    top_k: 1
+    _target_: "torchmetrics.classification.AveragePrecision"
+    task: "multilabel"
+    num_labels: ${datamodule.dataset.n_classes}
+    average: macro
+    thresholds: null
   val_best: 
     _target_: "torchmetrics.MaxMetric"
-  # additional: 
-  #   f1:
-  #     _target_: "torchmetrics.classification.MulticlassF1Score"
-  #     num_classes: ${datamodule.dataset.n_classes}  
-  #   recall:
-  #     _target_: "torchmetrics.classification.Recall"
-  #     task: "multiclass"
-  #     average: "macro"
-  #     num_classes: ${datamodule.dataset.n_classes} 
+  additional: 
+    f1:
+      _target_: "torchmetrics.classification.F1Score"
+      num_labels: ${datamodule.dataset.n_classes}  
+      average: macro
+      task: "multilabel"
+    auroc:
+      _target_: "torchmetrics.classification.AUROC"
+      task: "multilabel"
+      num_labels: ${datamodule.dataset.n_classes} 
+      average: "macro"
+      thresholds: null
 
 output_activation: 
   _target_: "torch.sigmoid"

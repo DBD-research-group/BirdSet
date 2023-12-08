@@ -154,9 +154,10 @@ class TransformsWrapper:
             padding="max_length",
             max_length=self.sampling_rate*5, #!TODO: how to determine 5s
             truncation=True,
-            return_attention_mask=False
+            return_attention_mask=True
         )
         
+        attention_mask = waveform_batch["attention_mask"]
         waveform_batch = waveform_batch["input_values"].unsqueeze(1)
 
         if self.wave_aug is not None:
@@ -166,12 +167,21 @@ class TransformsWrapper:
         else:
             audio_augmented = waveform_batch
         
-        if self.model_type == "raw":
-            # normalize 
-            audio_augmented = self._zero_mean_unit_var_norm(
-                input_values=audio_augmented,
-                attention_mask=None
-            )
+        if self.model_type == "wavefrom":
+            #TODO vectorize this
+            if self.preprocessing.normalize_waveform == "instance_normalization":
+                # normalize #!TODO: do we have to normalize before spectrogram? '#TODO Implement normalizaton module
+                audio_augmented = self._zero_mean_unit_var_norm(
+                    input_values=audio_augmented,
+                    attention_mask=attention_mask
+                )
+            elif self.preprocessing.normalize_waveform == "instance_min_max":
+                audio_augmented = self._min_max_scaling(
+                    input_values=audio_augmented,
+                    attention_mask=attention_mask
+                )
+                #RuntimeError: min(): Expected reduction dim to be specified for input.numel() == 0. Specify the reduction dim with the 'dim' argument.
+                # in test data: there seems to be an empty tensor with length=0? and everathing is filtered out
 
         if self.model_type == "vision":
             # spectrogram conversion and augmentation 
@@ -190,6 +200,7 @@ class TransformsWrapper:
     def _zero_mean_unit_var_norm(
             self, input_values, attention_mask, padding_value=0.0
     ):
+        # instance normalization taken from huggingface
         if attention_mask is not None:
             attention_mask = np.array(attention_mask, np.int32)
             normed_input_values = []
@@ -204,6 +215,42 @@ class TransformsWrapper:
             normed_input_values = [(x - x.mean()) / np.sqrt(x.var() + 1e-7) for x in input_values]
 
         return torch.stack(normed_input_values)
+
+    def _min_max_scaling(
+            self, input_values, attention_mask=None, padding_value=0.0
+    ):
+        input_values = input_values.squeeze(1) #?
+        # instance normalization to [-1,1]
+        normed_input_values = []
+
+        if attention_mask is not None: 
+            attention_mask = np.array(attention_mask, np.int32)
+
+            for vector, mask in zip(input_values, attention_mask):
+                # 0 vector! 
+                masked_vector = vector[mask==1]
+
+                # check if masked vector is empty
+                if masked_vector.size == 0:
+                    normed_vector = np.full(vector.shape, padding_value)
+                    #!TODO: check 0 length soundscape files
+
+                min_val = masked_vector.min()
+                max_val = masked_vector.max()
+
+                normed_vector = 2 * ((vector - min_val) / (max_val - min_val + 1e-7)) - 1
+                normed_vector[mask==0] = padding_value
+
+                normed_input_values.append(normed_vector)
+        else:
+            for x in input_values:
+                min_val = x.min()
+                max_val = x.max()
+                normed_vector = 2 * ((x - min_val) / (max_val - min_val + 1e-7)) - 1
+                
+                normed_input_values.append(normed_vector)
+        return torch.stack(normed_input_values)
+
         
     def _vision_augmentations(self, audio_augmented):
         spectrograms = self._spectrogram_conversion(audio_augmented)

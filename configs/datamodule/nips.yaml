@@ -13,9 +13,6 @@ dataset:
   hf_path: DBD-research-group/gadme_v1
   hf_name: nips
   seed: ${seed}
-  feature_extractor:
-    _target_: transformers.AutoFeatureExtractor.from_pretrained
-    pretrained_model_name_or_path: ${module.network.model.checkpoint}
   n_classes: 53
   n_workers: 3
   val_split: 0.2

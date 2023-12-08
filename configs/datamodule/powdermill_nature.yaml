@@ -6,7 +6,6 @@ defaults:
   - loaders: default.yaml
   - mapper: xc_bambird_mapper.yaml
 
-
 dataset:
   data_dir: ${paths.dataset_path}
   dataset_name: powdermill_nature
