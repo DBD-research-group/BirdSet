@@ -41,6 +41,7 @@ datamodule:
     train: 
       batch_size: 8
       num_workers: 1
+      shuffle: True
       pin_memory: False
     valid: 
       batch_size: 8

@@ -42,6 +42,14 @@ metrics:
       num_labels: ${datamodule.dataset.n_classes} 
       average: "macro"
       thresholds: null
+    cmap:
+      _target_: src.modules.metrics.cMAP
+      num_labels: ${datamodule.dataset.n_classes}
+      sample_threshold: 0
+    cmap5:
+      _target_: src.modules.metrics.cMAP5
+      num_labels: ${datamodule.dataset.n_classes}
+      padding_factor: 5
 
 output_activation: 
   _target_: "torch.sigmoid"

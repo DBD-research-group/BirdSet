@@ -1,6 +1,7 @@
 from dataclasses import asdict, dataclass, field
 import logging
 import torch
+import random
 import os
 from typing import List, Literal
 
@@ -245,9 +246,10 @@ class BaseDataModuleHF(L.LightningDataModule):
         Returns:
             DatasetDict: The subsetted dataset. The keys are the names of the dataset splits and the values are the subsetted datasets.
         """
-        # TODO: get random subset?!
+        # TODO: get random subset?! done
         for split in dataset.keys():
-            dataset[split] = dataset[split].select(range(size))
+            random_indices = random.sample(range(len(dataset[split])), size)
+            dataset[split] = dataset[split].select(random_indices)
         return dataset
     
  
