@@ -167,7 +167,7 @@ class TransformsWrapper:
         else:
             audio_augmented = waveform_batch
         
-        if self.model_type == "wavefrom":
+        if self.model_type == "waveform":
             #TODO vectorize this
             if self.preprocessing.normalize_waveform == "instance_normalization":
                 # normalize #!TODO: do we have to normalize before spectrogram? '#TODO Implement normalizaton module

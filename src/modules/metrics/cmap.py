@@ -17,9 +17,9 @@ class cMAP(MultilabelAveragePrecision):
         self.sample_threshold = sample_threshold
 
     def __call__(self, logits, labels, **kwargs):
-        ap = super().__call__(logits, labels, **kwargs)
+        class_ap = super().__call__(logits, labels, **kwargs)
         mask = labels.sum(axis=0) > self.sample_threshold
-        cmap = ap.where(mask, torch.nan)
+        cmap = class_ap.where(mask, torch.nan)
         cmap = cmap.nanmean()
         return cmap
 
