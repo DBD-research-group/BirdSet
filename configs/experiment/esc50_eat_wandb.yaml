@@ -26,6 +26,7 @@ module:
   network:
     model:
       n_classes: 50
+      seq_len: 110250
 trainer:
   min_epochs: 1
   max_epochs: 100
@@ -40,6 +41,10 @@ datamodule:
       num_workers: 16
     test:
       batch_size: 6
+  transforms:
+    preprocessing:
+      use_spectrogram: False
+    spectrogram_augmentations: null
 
 logger:
   wandb:

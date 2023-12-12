@@ -28,7 +28,7 @@ class ResBlock1dTF(nn.Module):
 class TAggregate(nn.Module):
     def __init__(self, clip_length=None, embed_dim=64, n_layers=6, nhead=6, n_classes=None, dim_feedforward=512):
         super(TAggregate, self).__init__()
-        self.num_tokens = 1
+        self.num_tokens = 2 # TODO: changed this from 1 to 2
         drop_rate = 0.1
         enc_layer = nn.TransformerEncoderLayer(d_model=embed_dim, nhead=nhead, activation="gelu", dim_feedforward=dim_feedforward, dropout=drop_rate)
         self.transformer_enc = nn.TransformerEncoder(enc_layer, num_layers=n_layers, norm=nn.LayerNorm(embed_dim))

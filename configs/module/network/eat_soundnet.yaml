@@ -2,7 +2,7 @@ model_name: "eat"
 model:
   _target_: src.modules.models.eat_soundnet.SoundNet
   nf: 32
-  seq_len: 90112
+  seq_len: 110250
   embed_dim: 128
   n_layers: 4
   nhead: 8
