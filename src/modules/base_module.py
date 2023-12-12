@@ -53,10 +53,8 @@ class BaseModule(L.LightningModule):
 
         self.test_metric = self.metrics["main_metric"].clone()
         self.test_add_metrics = self.metrics["add_metrics"].clone(postfix="/test")
+        self.test_complete_metrics = self.metrics["eval_complete"].clone(postfix="/test")
 
-
-        # self.train_metrics = nn.ModuleDict(train_metrics)
-        # self.eval_metrics = nn.ModuleDict(eval_metrics)
         self.torch_compile = network.torch_compile
         self.model_name = network.model_name
 
@@ -66,6 +64,9 @@ class BaseModule(L.LightningModule):
         self.task = task 
 
         self.save_hyperparameters()
+
+        self.test_targets = []
+        self.test_preds = []
         
     def forward(self, *args, **kwargs):
         return self.model.forward(*args, **kwargs)
@@ -169,6 +170,9 @@ class BaseModule(L.LightningModule):
     
     def test_step(self, batch, batch_idx):
         test_loss, preds, targets = self.model_step(batch, batch_idx)
+        self.test_targets.append(targets.detach().cpu())
+        self.test_preds.append(preds.detach().cpu())
+
         self.log(
             f"test_loss",
             test_loss, 
@@ -186,16 +190,8 @@ class BaseModule(L.LightningModule):
 
         self.test_add_metrics(preds, targets.int())
         self.log_dict(self.test_add_metrics, **self.logging_params)
+
         return {"loss": test_loss, "preds": preds, "targets": targets}
-        
-
-    # def log_train_metrics(self, logits, targets):
-    #     metrics = {metric_name: metric(logits, targets) for metric_name, metric in self.train_metrics.items()}
-    #     self.log_dict(metrics, prog_bar=True)
-
-    # def log_eval_metrics(self, logits, targets):
-    #     metrics = {metric_name: metric(logits, targets) for metric_name, metric in self.eval_metrics.items()}
-    #     self.log_dict(metrics, prog_bar=True, on_epoch=True)
 
     def setup(self, stage):
         if self.torch_compile and stage=="fit":
@@ -205,8 +201,17 @@ class BaseModule(L.LightningModule):
         pass
 
     def on_test_epoch_end(self):
-        pass
-
+        test_targets = torch.cat(self.test_targets).int()
+        test_preds = torch.cat(self.test_preds)
+        self.test_complete_metrics(test_preds, test_targets)
+        self.log_dict(self.test_complete_metrics, **self.logging_params)
+        # self.log(
+        #     f"test_{self.test_complete_metric.__class__.__name__}",
+        #     self.test_complete_metric,
+        #     on_step=False,
+        #     on_epoch=True,
+        #     prog_bar=True
+        # )
 
 
 

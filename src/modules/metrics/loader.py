@@ -13,10 +13,16 @@ def load_metrics(metrics_cfg: DictConfig):
         for _, metric in metrics_cfg.additional.items():
             additional_metrics.append(hydra.utils.instantiate(metric))
     
+    eval_metrics_complete = []
+    if metrics_cfg.get("eval_complete"):
+        for _, metric in metrics_cfg.eval_complete.items():
+            eval_metrics_complete.append(hydra.utils.instantiate(metric))
+    
     metrics = {
         "main_metric": main_metric, 
         "val_metric_best": val_metric_best,
-        "add_metrics": MetricCollection(additional_metrics)
+        "add_metrics": MetricCollection(additional_metrics),
+        "eval_complete": MetricCollection(eval_metrics_complete)
     }
 
     return metrics

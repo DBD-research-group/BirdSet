@@ -23,33 +23,35 @@ lr_scheduler:
 
 metrics: 
   main: 
-    _target_: "torchmetrics.classification.AveragePrecision"
-    task: "multilabel"
+    _target_: src.modules.metrics.cMAP
     num_labels: ${datamodule.dataset.n_classes}
+    sample_threshold: 0
     average: macro
     thresholds: null
   val_best: 
     _target_: "torchmetrics.MaxMetric"
   additional: 
-    f1:
-      _target_: "torchmetrics.classification.F1Score"
-      num_labels: ${datamodule.dataset.n_classes}  
-      average: macro
-      task: "multilabel"
     auroc:
       _target_: "torchmetrics.classification.AUROC"
       task: "multilabel"
       num_labels: ${datamodule.dataset.n_classes} 
       average: "macro"
       thresholds: null
-    cmap:
-      _target_: src.modules.metrics.cMAP
-      num_labels: ${datamodule.dataset.n_classes}
-      sample_threshold: 0
-    cmap5:
-      _target_: src.modules.metrics.cMAP5
+    t1acc:
+      _target_: src.modules.metrics.T1Accuracy
+  eval_complete:
+    pcmap:
+      _target_: src.modules.metrics.pcMAP
       num_labels: ${datamodule.dataset.n_classes}
       padding_factor: 5
+      average: macro
+      thresholds: null
+    cmap5:
+      _target_: src.modules.metrics.cMAP
+      num_labels: ${datamodule.dataset.n_classes}
+      sample_threshold: 5
+      average: macro
+      thresholds: null
 
 output_activation: 
   _target_: "torch.sigmoid"
