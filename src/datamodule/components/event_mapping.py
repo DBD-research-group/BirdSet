@@ -1,7 +1,35 @@
 import numpy as np
 import random
 
-class XCEventMapping:
+class Mapper:
+    def __call__(self, batch):
+        return batch
+
+class FixedSizeMapper(Mapper):
+    def __init__(self, sequence_length: int = 90112 ) -> None:
+        self.sequence_length = sequence_length
+    
+    def __call__(self, batch):
+        '''
+        sets the size of the audio array to a fixed size
+        '''
+        for b_idx in range(len(batch["audio"])):
+            if batch["audio"][b_idx]["array"].shape[0] > self.sequence_length:
+                # select random part of the audio array
+                start = random.randint(0, batch["audio"][b_idx]["array"].shape[0] - self.sequence_length)
+                batch["audio"][b_idx]["array"] = batch["audio"][b_idx]["array"][start:start + self.sequence_length]
+            else:
+                batch["audio"][b_idx]["array"] = np.pad(
+                    batch["audio"][b_idx]["array"],
+                    (0, self.sequence_length - batch["audio"][b_idx]["array"].shape[0]),
+                    mode="constant",
+                )
+        return batch
+
+
+
+
+class XCEventMapping(Mapper):
     """extracts all event_cluster into individual rows, should be used as mapping
      used on a hf dataset with batched=True (does not save the audio array, only filepath)
 

@@ -9,7 +9,7 @@ import lightning as L
 from datasets import load_dataset, load_from_disk, Audio, DatasetDict, Dataset, IterableDataset, IterableDatasetDict
 from torch.utils.data import DataLoader
 from src.datamodule.components.transforms import TransformsWrapper
-from src.datamodule.components.event_mapping import XCEventMapping
+from src.datamodule.components.event_mapping import Mapper
 
 @dataclass
 class DatasetConfig:
@@ -62,7 +62,7 @@ class BaseDataModuleHF(L.LightningDataModule):
 
     def __init__(
         self, 
-        mapper: XCEventMapping | None = None ,
+        mapper: Mapper | None = None ,
         dataset: DatasetConfig = DatasetConfig(),
         loaders: LoadersConfig = LoadersConfig(),
         transforms: TransformsWrapper = TransformsWrapper(),
@@ -170,7 +170,7 @@ class BaseDataModuleHF(L.LightningDataModule):
         dataset.save_to_disk(self.data_path)
 
     
-    def _create_splits(self, dataset: DatasetDict | Dataset):
+    def _create_splits(self, dataset: DatasetDict | Dataset) -> DatasetDict:
         """
         Creates train, validation, and test splits for the dataset.
 
@@ -203,6 +203,8 @@ class BaseDataModuleHF(L.LightningDataModule):
             # if dataset has only one key, split it into train, valid, test
             else:
                 return self._create_splits(dataset[list(dataset.keys())[0]])
+            
+        
 
     def _load_data(self,decode: bool = True ):
         """
@@ -220,8 +222,7 @@ class BaseDataModuleHF(L.LightningDataModule):
         )
 
         if isinstance(dataset, IterableDataset |IterableDatasetDict):
-            logging.error("Iterable datasets not supported yet.")
-            return
+            raise Exception("Iterable datasets not supported yet.")
 
 
         if self.dataset_config.subset:
