@@ -1,13 +1,6 @@
-from typing import Any, Optional
-import lightning.pytorch as pl
 import torch
-import torch.nn as nn
-import torch.distributed as dist
-import functools
-import logging
 import math 
 import hydra
-from pytorch_lightning import Callback, LightningModule, Trainer
 
 from src.modules.losses import load_loss
 from src.modules.metrics import load_metrics
@@ -53,7 +46,7 @@ class BaseModule(L.LightningModule):
 
         self.test_metric = self.metrics["main_metric"].clone()
         self.test_add_metrics = self.metrics["add_metrics"].clone(postfix="/test")
-        self.test_complete_metrics = self.metrics["eval_complete"].clone(postfix="/test")
+        self.test_complete_metrics = self.metrics["eval_complete"].clone(postfix="/test_complete")
 
         self.torch_compile = network.torch_compile
         self.model_name = network.model_name
@@ -118,7 +111,7 @@ class BaseModule(L.LightningModule):
     def training_step(self, batch, batch_idx):
         train_loss, preds, targets = self.model_step(batch, batch_idx)
         self.log(
-            f"train_loss",
+            f"loss/train",
             train_loss,
             on_step=True,
             on_epoch=True,
@@ -127,7 +120,7 @@ class BaseModule(L.LightningModule):
 
         self.train_metric(preds, targets.int())
         self.log(
-            f"train_{self.train_metric.__class__.__name__}",
+            f"{self.train_metric.__class__.__name__}/train",
             self.train_metric,
             **self.logging_params
         )
@@ -141,7 +134,7 @@ class BaseModule(L.LightningModule):
         val_loss, preds, targets = self.model_step(batch, batch_idx)
 
         self.log(
-            f"val_loss",
+            f"loss/val",
             val_loss,
             on_step=True,
             on_epoch=True,
@@ -150,7 +143,7 @@ class BaseModule(L.LightningModule):
 
         self.valid_metric(preds, targets.int())
         self.log(
-            f"val_{self.valid_metric.__class__.__name__}",
+            f"{self.valid_metric.__class__.__name__}/val",
             self.valid_metric,
             **self.logging_params,
         )
@@ -164,17 +157,15 @@ class BaseModule(L.LightningModule):
         self.valid_metric_best(valid_metric)  # update best so far valid metric
 
         self.log(
-            f"val_best_{self.valid_metric.__class__.__name__}",
+            f"{self.valid_metric.__class__.__name__}/val_best",
             self.valid_metric_best.compute(),
         )
     
     def test_step(self, batch, batch_idx):
         test_loss, preds, targets = self.model_step(batch, batch_idx)
-        self.test_targets.append(targets.detach().cpu())
-        self.test_preds.append(preds.detach().cpu())
 
         self.log(
-            f"test_loss",
+            f"loss/test",
             test_loss, 
             on_step=False,
             on_epoch=True,
@@ -183,7 +174,7 @@ class BaseModule(L.LightningModule):
 
         self.test_metric(preds, targets.int())
         self.log(
-            f"test_{self.test_metric.__class__.__name__}",
+            f"{self.test_metric.__class__.__name__}/test",
             self.test_metric,
             **self.logging_params,
         )
@@ -197,22 +188,8 @@ class BaseModule(L.LightningModule):
         if self.torch_compile and stage=="fit":
             self.model = torch.compile(self.model)
 
-    def on_train_batch_start(self, batch: Any, batch_idx: int):
-        pass
-
     def on_test_epoch_end(self):
-        test_targets = torch.cat(self.test_targets).int()
-        test_preds = torch.cat(self.test_preds)
-        self.test_complete_metrics(test_preds, test_targets)
-        self.log_dict(self.test_complete_metrics, **self.logging_params)
-        # self.log(
-        #     f"test_{self.test_complete_metric.__class__.__name__}",
-        #     self.test_complete_metric,
-        #     on_step=False,
-        #     on_epoch=True,
-        #     prog_bar=True
-        # )
-
+        pass
 
 
 

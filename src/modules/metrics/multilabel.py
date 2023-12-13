@@ -2,7 +2,7 @@ import torch
 import torchmetrics
 from torchmetrics.classification.average_precision import MultilabelAveragePrecision
 
-class cMAP(MultilabelAveragePrecision):
+class cmAP(MultilabelAveragePrecision):
     # implementation from:
     # https://github.com/google-research/perch/blob/b71e1d65989c2b359a473b0f0476c08c1fbce528/chirp/models/metrics.py#L39C10-L39C10
     # sample_threshold: Only classes with at least this many samples will be used
@@ -32,7 +32,7 @@ class cMAP(MultilabelAveragePrecision):
         return cmap
 
 
-class pcMAP(MultilabelAveragePrecision):
+class pcmAP(MultilabelAveragePrecision):
     # https://www.kaggle.com/competitions/birdclef-2023/overview/evaluation
     def __init__(
             self, 

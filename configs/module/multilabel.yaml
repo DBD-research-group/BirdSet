@@ -1,4 +1,4 @@
-_target_: src.modules.base_module.BaseModule
+_target_: src.modules.multilabel_module.MultilabelModule
 
 defaults:
   - _self_
@@ -23,7 +23,7 @@ lr_scheduler:
 
 metrics: 
   main: 
-    _target_: src.modules.metrics.cMAP
+    _target_: src.modules.metrics.cmAP
     num_labels: ${datamodule.dataset.n_classes}
     sample_threshold: 0
     average: macro
@@ -41,13 +41,13 @@ metrics:
       _target_: src.modules.metrics.T1Accuracy
   eval_complete:
     pcmap:
-      _target_: src.modules.metrics.pcMAP
+      _target_: src.modules.metrics.pcmAP
       num_labels: ${datamodule.dataset.n_classes}
       padding_factor: 5
       average: macro
       thresholds: null
     cmap5:
-      _target_: src.modules.metrics.cMAP
+      _target_: src.modules.metrics.cmAP
       num_labels: ${datamodule.dataset.n_classes}
       sample_threshold: 5
       average: macro
