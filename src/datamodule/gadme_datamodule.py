@@ -57,7 +57,7 @@ class GADMEDataModule(BaseDataModuleHF):
                 remove_columns=["audio"],
                 batched=True,
                 batch_size=300,
-                load_from_cache_file=True,
+                load_from_cache_file=False,
                 num_proc=self.dataset_config.n_workers,
             )
 
