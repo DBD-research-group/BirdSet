@@ -12,7 +12,7 @@ optimizer:
   weight_decay: 0.01
 
 loss:
-  _target_: torch.nn.BCEWithLogitsLoss
+  _target_: src.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
   
 lr_scheduler:
   scheduler:

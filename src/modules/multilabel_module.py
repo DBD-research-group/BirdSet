@@ -13,7 +13,8 @@ class MultilabelModule(BaseModule):
             logging_params,
             num_epochs,
             len_trainset,
-            task
+            task,
+            label_counts
     ):
         super().__init__(
             network = network,
@@ -25,7 +26,8 @@ class MultilabelModule(BaseModule):
             logging_params=logging_params,
             num_epochs=num_epochs,
             len_trainset=len_trainset,
-            task=task
+            task=task,
+            label_counts=label_counts
         )
 
     def test_step(self, batch, batch_idx):
@@ -65,7 +67,7 @@ class MultilabelModule(BaseModule):
         # Rename cmap to cmap5!
         for metric_name, metric in self.test_complete_metrics.named_children():
             # Check for padding_factor attribute
-            if hasattr(metric, 'padding_factor') and metric.padding_factor == 5:
+            if hasattr(metric, 'sample_threshold') and metric.sample_threshold == 5:
                 modified_name = 'cmAP5'
             else:
                 modified_name = metric_name

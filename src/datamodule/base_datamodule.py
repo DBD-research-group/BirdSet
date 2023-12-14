@@ -24,6 +24,7 @@ class DatasetConfig:
     task: Literal["multiclass", "multilabel"] = "multiclass"
     subset: int = None
     sampling_rate: int = 32_000
+    class_weights = False
 
 @dataclass
 class LoaderConfig:
@@ -80,7 +81,8 @@ class BaseDataModuleHF(L.LightningDataModule):
 
         self._prepare_done = False
         self.len_trainset = None
-    
+        self.num_train_labels = None    
+
     @property
     def num_classes(self):
         return self.dataset_config.n_classes
@@ -122,7 +124,7 @@ class BaseDataModuleHF(L.LightningDataModule):
         logging.info("Prepare Data")
         
         dataset = self._load_data()
-        dataset = self._preprocess_data(dataset, self.dataset_config.task)
+        dataset = self._preprocess_data(dataset)
         dataset = self._create_splits(dataset)
 
         # set the length of the training set to be accessed by the model
@@ -132,7 +134,7 @@ class BaseDataModuleHF(L.LightningDataModule):
         # set to done so that lightning does not call it again
         self._prepare_done = True
        
-    def _preprocess_data(self, dataset, task_type: Literal["multiclass", "multilabel"]):
+    def _preprocess_data(self, dataset):
         """
         Preprocesses the dataset.
         This includes stuff that only needs to be done once.

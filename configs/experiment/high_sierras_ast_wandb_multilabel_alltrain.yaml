@@ -2,7 +2,7 @@
 #package global is neccessary!
 defaults:
   - override /datamodule: high_sierras.yaml
-  - override /module: multiclass.yaml
+  - override /module: multilabel.yaml
   - override /module/network: ast.yaml
   - override /callbacks: default.yaml 
   - override /trainer: single_gpu.yaml
@@ -39,7 +39,6 @@ datamodule:
     with_noise_cluster: False
     biggest_cluster: True
     only_one: False
-    
 
 logger:
   wandb:

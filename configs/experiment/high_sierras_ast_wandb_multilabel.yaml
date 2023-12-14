@@ -35,7 +35,7 @@ datamodule:
       batch_size: 12
     test:
       batch_size: 12
-
+      
 logger:
   wandb:
     tags: ${tags}
