@@ -212,7 +212,6 @@ class BaseDataModuleHF(L.LightningDataModule):
             cache_dir=self.dataset_config.data_dir,
             num_proc=3,
         )
-
         if isinstance(dataset, IterableDataset |IterableDatasetDict):
             logging.error("Iterable datasets not supported yet.")
             return
