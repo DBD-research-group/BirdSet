@@ -1,4 +1,5 @@
 from typing import Literal
+from collections import Counter
 from src.datamodule.components.transforms import TransformsWrapper
 from src.datamodule.components.event_mapping import XCEventMapping
 from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
@@ -20,13 +21,12 @@ class GADMEDataModule(BaseDataModuleHF):
             loaders=loaders,
             transforms=transforms,
             mapper=mapper
-        
         )
 
     def _load_data(self, decode: bool = False):
         return super()._load_data(decode=decode)
 
-    def _preprocess_data(self, dataset, task_type: Literal['multiclass', 'multilabel']):
+    def _preprocess_data(self, dataset):
         if self.dataset_config.task == "multiclass":
             # pick only train and test dataset
             dataset = DatasetDict({split: dataset[split] for split in ["train", "test"]})
@@ -57,7 +57,7 @@ class GADMEDataModule(BaseDataModuleHF):
                 remove_columns=["audio"],
                 batched=True,
                 batch_size=300,
-                load_from_cache_file=True,
+                load_from_cache_file=False,
                 num_proc=self.dataset_config.n_workers,
             )
 
@@ -68,6 +68,9 @@ class GADMEDataModule(BaseDataModuleHF):
                 load_from_cache_file=True,
                 num_proc=self.dataset_config.n_workers,
             )
+            
+            if self.dataset_config.get("class_weights"):
+                self.num_train_labels = self._count_labels((dataset["train"]["ebird_code"]))
 
             dataset["test"] = dataset["test_5s"]
             dataset = dataset.select_columns(
@@ -77,6 +80,17 @@ class GADMEDataModule(BaseDataModuleHF):
             dataset = dataset.rename_column("ebird_code_multilabel", "labels")
         return dataset
     
+    def _count_labels(self,labels):
+        # frequency
+        label_counts = Counter(labels)
+
+        if 0 not in label_counts:
+            label_counts[0] = 0
+        
+        num_labels = max(label_counts)
+        counts = [label_counts[i] for i in range(num_labels+1)]
+        return counts
+        
     def _classes_one_hot(self, batch):
         """
         Converts class labels to one-hot encoding.

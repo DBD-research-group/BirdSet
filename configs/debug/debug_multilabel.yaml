@@ -37,10 +37,13 @@ datamodule:
     val_split: 0.1
     subset: 300
     n_workers: 1
+    class_weights: True
+
   loaders:
     train: 
       batch_size: 8
       num_workers: 1
+      shuffle: True
       pin_memory: False
     valid: 
       batch_size: 8

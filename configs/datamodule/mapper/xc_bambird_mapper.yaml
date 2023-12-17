@@ -1,4 +1,4 @@
 _target_: src.datamodule.components.XCEventMapping
-with_noise_cluster: False
+event_limit: 5
 biggest_cluster: True
-only_one: True
+no_call: True   
