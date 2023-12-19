@@ -30,19 +30,21 @@ metrics:
   val_best: 
     _target_: "torchmetrics.MaxMetric"
   additional: 
-    f1:
-      _target_: "torchmetrics.classification.MulticlassF1Score"
+    cmap:
+      _target_: "torchmetrics.classification.AveragePrecision"
       num_classes: ${datamodule.dataset.n_classes}  
-    recall:
-      _target_: "torchmetrics.classification.Recall"
       task: "multiclass"
-      average: "macro"
-      num_classes: ${datamodule.dataset.n_classes} 
-    precision: 
-      _target_: "torchmetrics.classification.Precision"
-      task: "multiclass"
-      average: "macro"
-      num_classes: ${datamodule.dataset.n_classes} 
+      average: macro
+      thresholds: null
+    balanced_acc: 
+      _target_: src.modules.metrics.BalancedAccuracy
+      num_classes: ${datamodule.dataset.n_classes}  
+    # auroc:
+    #   _target_: "torchmetrics.classification.AUROC"
+    #   task: "multiclass"
+    #   num_labels: ${datamodule.dataset.n_classes} 
+    #   average: "macro"
+    #   thresholds: null
 
 
 output_activation: 

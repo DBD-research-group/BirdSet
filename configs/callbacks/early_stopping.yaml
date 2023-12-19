@@ -1,7 +1,7 @@
 early_stopping:
   _target_: lightning.pytorch.callbacks.EarlyStopping
-  monitor: "loss/val"
-  patience: 5
+  monitor: ${replace:"__metric__/val"}
+  patience: 4
   min_delta: 5e-5
   verbose: False
   check_finite: True
