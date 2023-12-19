@@ -38,7 +38,7 @@ class MultilabelModule(BaseModule):
         self.test_preds.append(preds.detach().cpu())
 
         self.log(
-            f"loss/test",
+            f"test/{self.loss.__class__.__name__}",
             test_loss, 
             on_step=False,
             on_epoch=True,
@@ -47,7 +47,7 @@ class MultilabelModule(BaseModule):
 
         self.test_metric(preds, targets.int())
         self.log(
-            f"{self.test_metric.__class__.__name__}/test",
+            f"test/{self.test_metric.__class__.__name__}",
             self.test_metric,
             **self.logging_params,
         )
@@ -71,7 +71,7 @@ class MultilabelModule(BaseModule):
                 modified_name = 'cmAP5'
             else:
                 modified_name = metric_name
-            log_dict[f"{modified_name}/test_complete"] = metric
+            log_dict[f"test/{modified_name}"] = metric
 
         self.log_dict(log_dict, **self.logging_params)
 

@@ -40,6 +40,8 @@ class GADMEDataModule(BaseDataModuleHF):
                 load_from_cache_file=True,
                 num_proc=self.dataset_config.n_workers,
             )
+            if self.dataset_config.get("class_weights"):
+                self.num_train_labels = self._count_labels((dataset["train"]["ebird_code"]))
 
             dataset = dataset.select_columns(
                 ["filepath", "ebird_code", "detected_events", "start_time", "end_time"]

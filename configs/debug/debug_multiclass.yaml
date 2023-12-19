@@ -2,7 +2,7 @@
 task_name: debug
 
 defaults:
-  - override /module: multilabel.yaml
+  - override /module: multiclass.yaml
   - override /module/network: ast.yaml
   - override /datamodule: high_sierras.yaml
   - override /callbacks: default.yaml 
@@ -33,10 +33,13 @@ trainer:
 datamodule:
   dataset:
     val_split: 0.1
-    subset: 300
+    subset: null
     n_workers: 1
     class_weights: True
-
+  mapper: 
+    event_limit: 5
+    biggest_cluster: True
+    no_call: False
   loaders:
     train: 
       batch_size: 8

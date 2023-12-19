@@ -2,23 +2,23 @@
 #package global is neccessary!
 defaults:
   - override /datamodule: high_sierras.yaml
-  - override /module: multilabel.yaml
-  - override /module/network: ast.yaml
+  - override /module: multiclass.yaml
+  - override /module/network: wav2vec2.yaml
   - override /callbacks: default.yaml 
   - override /trainer: single_gpu.yaml
 
 
-tags: ["high_sierras", "ast", "augment"]
+tags: ["high_sierras", "wandb", "augment"]
 seed: 2
 
 module:
   optimizer:
-    lr: 1e-5
+    lr: 2e-5
 
 
 trainer:
   min_epochs: 1
-  max_epochs: 5
+  max_epochs: 25
 
 datamodule:
   dataset:
@@ -27,20 +27,20 @@ datamodule:
 
   loaders:
     train:
-      batch_size: 12
+      batch_size: 20
       shuffle: True
       num_workers: 6
       drop_last: False
       prefetch_factor: 4
 
     valid:
-      batch_size: 12
+      batch_size: 20
     test:
-      batch_size: 12
+      batch_size: 20
   mapper: 
     event_limit: 5
     biggest_cluster: True
-    no_call: True
+    no_call: False
 
 logger:
   wandb:

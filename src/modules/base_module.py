@@ -113,7 +113,7 @@ class BaseModule(L.LightningModule):
     def training_step(self, batch, batch_idx):
         train_loss, preds, targets = self.model_step(batch, batch_idx)
         self.log(
-            f"loss/train",
+            f"train/{self.loss.__class__.__name__}",
             train_loss,
             on_step=True,
             on_epoch=True,
@@ -122,7 +122,7 @@ class BaseModule(L.LightningModule):
 
         self.train_metric(preds, targets.int())
         self.log(
-            f"{self.train_metric.__class__.__name__}/train",
+            f"train/{self.train_metric.__class__.__name__}",
             self.train_metric,
             **self.logging_params
         )
@@ -136,7 +136,7 @@ class BaseModule(L.LightningModule):
         val_loss, preds, targets = self.model_step(batch, batch_idx)
 
         self.log(
-            f"loss/val",
+            f"val/{self.loss.__class__.__name__}",
             val_loss,
             on_step=True,
             on_epoch=True,
@@ -145,7 +145,7 @@ class BaseModule(L.LightningModule):
 
         self.valid_metric(preds, targets.int())
         self.log(
-            f"{self.valid_metric.__class__.__name__}/val",
+            f"val/{self.valid_metric.__class__.__name__}",
             self.valid_metric,
             **self.logging_params,
         )
@@ -159,7 +159,7 @@ class BaseModule(L.LightningModule):
         self.valid_metric_best(valid_metric)  # update best so far valid metric
 
         self.log(
-            f"{self.valid_metric.__class__.__name__}/val_best",
+            f"val/{self.valid_metric.__class__.__name__}_best",
             self.valid_metric_best.compute(),
         )
     
@@ -167,7 +167,7 @@ class BaseModule(L.LightningModule):
         test_loss, preds, targets = self.model_step(batch, batch_idx)
 
         self.log(
-            f"loss/test",
+            f"test{self.loss.__class__.__name__}",
             test_loss, 
             on_step=False,
             on_epoch=True,
@@ -176,7 +176,7 @@ class BaseModule(L.LightningModule):
 
         self.test_metric(preds, targets.int())
         self.log(
-            f"{self.test_metric.__class__.__name__}/test",
+            f"test/{self.test_metric.__class__.__name__}",
             self.test_metric,
             **self.logging_params,
         )
