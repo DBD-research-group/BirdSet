@@ -22,7 +22,6 @@ _HYDRA_PARAMS = {
     "config_name": "main.yaml"
 }
 
-
 @utils.register_custom_resolvers(**_HYDRA_PARAMS)
 @hydra.main(**_HYDRA_PARAMS)
 def main(cfg):

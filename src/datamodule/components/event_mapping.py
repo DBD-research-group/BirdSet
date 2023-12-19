@@ -136,7 +136,6 @@ class XCEventMapping:
                         v = batch[key][b_idx]
                         new_batch[key].append(v if v != [] else None) 
 
-
         return new_batch
     
     def _no_call_detection(self, detected_events, file_length):

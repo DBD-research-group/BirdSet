@@ -5,11 +5,13 @@ import audiomentations
 import librosa
 import numpy as np
 import torch
+import torchaudio
 import torchvision
 import torch_audiomentations
+import torch.nn.functional as F
 
 from torchaudio import transforms
-
+import soundfile as sf 
 
 def pad_spectrogram_width(
     spectrogram: torch.Tensor, target_width: int, value: float
@@ -469,3 +471,141 @@ class AudioAugmentor:
             return spectrogram_augmented
 
         return waveform_augmented
+    
+class AddBackgroundNoiseHf(torch_audiomentations.AddBackgroundNoise):
+    def __init__(
+            self, 
+            noise_data,
+            min_snr_in_db: float = 3.0, 
+            max_snr_in_db: float = 30.0, 
+            p: float = 0.5):
+        
+        self.noise_data = noise_data 
+        self.min_snr_in_db = min_snr_in_db
+        self.max_snr_in_db = max_snr_in_db
+        self.p = p 
+
+    
+    # def random_background(self, noise_data, target_num_samples):
+    #     pieces = []
+    #     while missing_num_samples > 0:
+    #         background_path = random.choice(self.background_paths)
+    #         background_num_samples = audio.get_num_samples(background_path)
+
+    #         if background_num_samples > missing_num_samples:
+    #             sample_offset = random.randint(
+    #                 0, background_num_samples - missing_num_samples
+    #             )
+    #             num_samples = missing_num_samples
+    #             background_samples = audio(
+    #                 background_path, sample_offset=sample_offset, num_samples=num_samples
+    #             )
+    #             missing_num_samples = 0
+    #         else:
+    #             background_samples = audio(background_path)
+    #             missing_num_samples -= background_num_samples
+
+    #         pieces.append(background_samples)
+
+    #     # the inner call to rms_normalize ensures concatenated pieces share the same RMS (1)
+    #     # the outer call to rms_normalize ensures that the resulting background has an RMS of 1
+    #     # (this simplifies "apply_transform" logic)
+    #     return audio.rms_normalize(
+    #         torch.cat([audio.rms_normalize(piece) for piece in pieces], dim=1)
+    #     )
+
+from torchaudio.functional import add_noise
+
+class Compose:
+    def __init__(self, transforms):
+        self.transforms = transforms
+    
+    def __call__(self, inputs, *args, **kwargs):
+        for transforms in self.transforms: 
+            inputs = transforms(inputs, *args, **kwargs)
+        return inputs 
+
+class AudioTransforms:
+    def __init__(self, p=0.5):
+        self.p = p 
+
+    def __call__(self, inputs,):
+        if np.random.rand() < self.p:
+            return self.apply(inputs)
+        else:
+            return inputs
+            
+
+class BackgroundNoise(AudioTransforms):
+    def __init__(self, noise_events=None, p=0.5):
+        super().__init__(p=p)
+        
+        self.noise_events = noise_events
+        self.p = p 
+        self.max_length = 5
+        self.min_length = 1
+    
+    def _decode(self, path, start, end):
+        sr = sf.info(path).samplerate
+        if start is not None and end is not None:
+            if end - start < self.min_length:  # TODO: improve, eg. edge cases, more dynamic loading
+                end = start + self.min_length
+            if self.max_length and end - start > self.max_length:
+                end = start + self.max_length
+            start, end = int(start * sr), int(end * sr)
+        if not end:
+            end = int(self.max_length * sr)
+
+        audio, _ = sf.read(path, start=start, stop=end)
+
+        if audio.ndim != 1:
+            audio = audio.swapaxes(1, 0) ###!TODO: why??
+            audio = librosa.to_mono(audio)
+
+        return audio
+
+         
+    def apply(self, inputs):
+
+        augmented_audio = []
+        for i, sample in enumerate(inputs):
+            random_idx = random.randint(0, len(self.noise_events["filepath"])) # exclude the file itself? 
+            noise_path = self.noise_events["filepath"][random_idx]
+            noise_event = random.choice(self.noise_events["no_call_events"][random_idx])
+
+            noise = self._decode(
+                path = noise_path, 
+                start = noise_event[0],
+                end = noise_event[1]
+            )
+            
+            noise = torch.Tensor(noise).unsqueeze(0)
+
+            if sample.size(1) != noise.size(1):
+                padding_length = sample.size(1) - noise.size(1)
+                noise = F.pad(noise, (0,padding_length), "constant", 0)
+            
+            augmented = torchaudio.functional.add_noise(
+                waveform = sample,
+                noise = noise,
+                snr = torch.Tensor([20,10,3]) # should also work on a batch?? 
+                #expects no_samples x length
+            )
+            augmented_audio.append(augmented)
+
+        augmented_audio = torch.stack(augmented_audio)
+
+        return augmented_audio
+
+
+
+            
+        
+        
+            
+        
+        
+
+
+
+

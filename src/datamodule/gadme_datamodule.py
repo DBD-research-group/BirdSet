@@ -43,7 +43,14 @@ class GADMEDataModule(BaseDataModuleHF):
             if self.dataset_config.get("class_weights"):
                 self.num_train_labels = self._count_labels((dataset["train"]["ebird_code"]))
 
-            dataset = dataset.select_columns(
+            # dataset["train"] = dataset["train"].select_columns(
+            #     ["filepath", "ebird_code", "detected_events", "start_time", "end_time", "no_call_events", "noise_events"]
+            # )
+            dataset["train"] = dataset["train"].select_columns(
+                ["filepath", "ebird_code", "detected_events", "start_time", "end_time", "no_call_events"]
+            )
+            # maybe has to be added to test data to avoid two selections
+            dataset["test"]= dataset["test"].select_columns(
                 ["filepath", "ebird_code", "detected_events", "start_time", "end_time"]
             )
 
@@ -59,7 +66,7 @@ class GADMEDataModule(BaseDataModuleHF):
                 remove_columns=["audio"],
                 batched=True,
                 batch_size=300,
-                load_from_cache_file=False,
+                load_from_cache_file=True,
                 num_proc=self.dataset_config.n_workers,
             )
 
@@ -67,7 +74,7 @@ class GADMEDataModule(BaseDataModuleHF):
                 self._classes_one_hot,
                 batched=True,
                 batch_size=300,
-                load_from_cache_file=True,
+                load_from_cache_file=False,
                 num_proc=self.dataset_config.n_workers,
             )
             
@@ -76,7 +83,7 @@ class GADMEDataModule(BaseDataModuleHF):
 
             dataset["test"] = dataset["test_5s"]
             dataset = dataset.select_columns(
-                ["filepath", "ebird_code_multilabel", "detected_events", "start_time", "end_time"]
+                ["filepath", "ebird_code_multilabel", "detected_events", "start_time", "end_time","no_call_events", "noise_events"]
             )
 
             dataset = dataset.rename_column("ebird_code_multilabel", "labels")

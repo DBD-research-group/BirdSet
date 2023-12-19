@@ -21,7 +21,7 @@ class EventDecoding:
         audio, sr = sf.read(path, start=start, stop=end)
 
         if audio.ndim != 1:
-            audio = audio.swapaxes(1, 0)
+            audio = audio.swapaxes(1, 0) ### why??
             audio = librosa.to_mono(audio)
         if sr != self.sampling_rate:
             audio = librosa.resample(audio, orig_sr=sr, target_sr=self.sampling_rate)

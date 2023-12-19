@@ -5,6 +5,9 @@ import numpy as np
 from omegaconf import DictConfig
 from src.datamodule.components.feature_extraction import DefaultFeatureExtractor
 from src.datamodule.components.event_decoding import EventDecoding
+from src.datamodule.components.augmentations import BackgroundNoise
+from src.datamodule.components.augmentations import Compose
+
 import torch
 
 from src.datamodule.components.resize import Resizer
@@ -76,6 +79,12 @@ class TransformsWrapper:
             self.wave_aug = torch_audiomentations.Compose(
                 transforms=wave_aug,
                 output_type="tensor")
+            
+            # self.wave_aug_background = Compose(
+            #     transforms=[BackgroundNoise(p=0.5)]
+            # )
+
+            self.background_noise = BackgroundNoise(p=0.5)
 
             # spectrogram augmentations
             spec_aug = []
@@ -167,6 +176,12 @@ class TransformsWrapper:
         else:
             audio_augmented = waveform_batch
         
+        # shape: batch x 1 x sample_rate
+        if self.background_noise:
+            noise_events = {key: batch[key] for key in ["filepath", "no_call_events"]}
+            self.background_noise.noise_events = noise_events
+            audio_augmented = self.background_noise(audio_augmented)
+                
         if self.model_type == "waveform":
             #TODO vectorize this
             if self.preprocessing.normalize_waveform == "instance_normalization":
