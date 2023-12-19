@@ -12,9 +12,9 @@ class BalancedAccuracy(torchmetrics.Metric):
     def update(self, y_pred: torch.Tensor, y_true: torch.Tensor):
         preds = torch.argmax(y_pred, dim=1)
         self.conf_matrix += torch.histc(
-            1 + self.num_classes * preds.float() + y_true.float(), 
-            bins=self.num_classes**2, 
-            min=0, 
+            self.num_classes * preds.float() + y_true.float(),
+            bins=self.num_classes**2,
+            min=0,
             max=self.num_classes**2-1
         ).view(self.num_classes, self.num_classes)
 
