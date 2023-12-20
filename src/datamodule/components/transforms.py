@@ -22,7 +22,8 @@ class PreprocessingConfig:
     db_scale: bool = True
     target_height: int | None = None
     target_width: int | None = 1024
-    normalize: bool = True
+    normalize_spectorgram: bool = True
+    normalize_waveform: Literal['instance_normalization', 'instance_min_max'] | None  = None
 
 class TransformsWrapper:
     """
@@ -275,7 +276,7 @@ class TransformsWrapper:
             target_width=self.preprocessing.target_width
         )
         # batch_size x 1 x height x width
-        if self.preprocessing.normalize:
+        if self.preprocessing.normalize_spectorgram:
             audio_augmented = (audio_augmented - (-4.268)) / (4.569 * 2)
         return audio_augmented
 

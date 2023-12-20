@@ -9,6 +9,7 @@ import lightning as L
 
 from datasets import load_dataset, load_from_disk, Audio, DatasetDict, Dataset, IterableDataset, IterableDatasetDict
 from torch.utils.data import DataLoader
+from src.datamodule.components.event_mapping import XCEventMapping
 from src.datamodule.components.transforms import TransformsWrapper
 
 @dataclass
@@ -22,7 +23,7 @@ class DatasetConfig:
     n_workers: int = 1
     val_split: float = 0.2
     task: Literal["multiclass", "multilabel"] = "multiclass"
-    subset: int = None
+    subset: int | None = None
     sampling_rate: int = 32_000
     class_weights = False
 
@@ -63,7 +64,7 @@ class BaseDataModuleHF(L.LightningDataModule):
 
     def __init__(
         self, 
-        mapper,
+        mapper: XCEventMapping | None = None,
         dataset: DatasetConfig = DatasetConfig(),
         loaders: LoadersConfig = LoadersConfig(),
         transforms: TransformsWrapper = TransformsWrapper(),
@@ -163,7 +164,7 @@ class BaseDataModuleHF(L.LightningDataModule):
         )
         logging.info(f"Saving to disk: {data_path}")
         dataset.save_to_disk(data_path)
-    
+
     def _ensure_train_test_splits(self, dataset: Dataset | DatasetDict) -> DatasetDict:
         if isinstance(dataset, Dataset):
             split_1 = dataset.train_test_split(
@@ -212,7 +213,7 @@ class BaseDataModuleHF(L.LightningDataModule):
             # if dataset has only one key, split it into train, valid, test
             elif "train" in dataset.keys() and "test" not in dataset.keys():
                 return self._create_splits(dataset["train"])
-            else:
+            else: 
                 return self._create_splits(dataset[list(dataset.keys())[0]])
 
     def _load_data(self,decode: bool = True ):
@@ -247,9 +248,6 @@ class BaseDataModuleHF(L.LightningDataModule):
                 decode=decode,
             ),
         )
-        # TODO: check that train and test splits are present
-        if isinstance(dataset, Dataset):
-            dataset = self._create_splits(dataset)
         return dataset
     
     def _fast_dev_subset(self, dataset: DatasetDict, size: int=500):

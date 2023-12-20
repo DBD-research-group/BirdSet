@@ -2,7 +2,12 @@ import soundfile as sf
 import librosa
 
 class EventDecoding:
-    def __init__(self, min_len, max_len=None, sampling_rate=None):
+    def __init__(
+            self,
+            min_len: int = 0,
+            max_len: int | None = 5,
+            sampling_rate: int = 32_000
+        ):
         self.min_len = min_len # in seconds
         self.max_len = max_len
         self.sampling_rate = sampling_rate
