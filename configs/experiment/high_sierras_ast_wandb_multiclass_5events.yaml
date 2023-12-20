@@ -8,7 +8,7 @@ defaults:
   - override /trainer: single_gpu.yaml
 
 
-tags: ["high_sierras", "ast", "augment"]
+tags: ["high_sierras", "ast", "multiclass"]
 seed: 2
 
 module:
@@ -45,7 +45,7 @@ datamodule:
 logger:
   wandb:
     tags: ${tags}
-    group: "high_sierras_aug"
+    group: "high_sierras_aug_ast"
     mode: online
 
 
