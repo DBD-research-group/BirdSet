@@ -8,7 +8,7 @@ defaults:
   - override /trainer: single_gpu.yaml
 
 
-tags: ["high_sierras", "wandb", "augment"]
+tags: ["high_sierras", "augment", "multiclass"]
 seed: 2
 
 module:

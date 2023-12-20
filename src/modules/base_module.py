@@ -49,11 +49,11 @@ class BaseModule(L.LightningModule):
 
         self.valid_metric = self.metrics["main_metric"].clone()
         self.valid_metric_best = self.metrics["val_metric_best"].clone()
-        self.valid_add_metrics = self.metrics["add_metrics"].clone(postfix="val/")
+        self.valid_add_metrics = self.metrics["add_metrics"].clone(prefix="val/")
 
         self.test_metric = self.metrics["main_metric"].clone()
-        self.test_add_metrics = self.metrics["add_metrics"].clone(postfix="test/")
-        self.test_complete_metrics = self.metrics["eval_complete"].clone(postfix="test/")
+        self.test_add_metrics = self.metrics["add_metrics"].clone(prefix="test/")
+        self.test_complete_metrics = self.metrics["eval_complete"].clone(prefix="test/")
 
         self.torch_compile = network.torch_compile
         self.model_name = network.model_name
