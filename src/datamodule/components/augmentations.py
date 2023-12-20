@@ -569,9 +569,12 @@ class BackgroundNoise(AudioTransforms):
 
         augmented_audio = []
         for i, sample in enumerate(inputs):
-            random_idx = random.randint(0, len(self.noise_events["filepath"])) # exclude the file itself? 
+            random_idx = random.randint(0, len(self.noise_events["filepath"])-1) # exclude the file itself? 
             noise_path = self.noise_events["filepath"][random_idx]
-            noise_event = random.choice(self.noise_events["no_call_events"][random_idx])
+            if self.noise_events["no_call_events"][random_idx]:
+                noise_event = random.choice(self.noise_events["no_call_events"][random_idx])
+            else: # can be empty! 16 times in training high sierras (how?)
+                noise_event = [0,0]
 
             noise = self._decode(
                 path = noise_path, 
@@ -588,7 +591,7 @@ class BackgroundNoise(AudioTransforms):
             augmented = torchaudio.functional.add_noise(
                 waveform = sample,
                 noise = noise,
-                snr = torch.Tensor([20,10,3]) # should also work on a batch?? 
+                snr = torch.Tensor([15]) # should also work on a batch?? 
                 #expects no_samples x length
             )
             augmented_audio.append(augmented)

@@ -72,7 +72,7 @@ class TransformsWrapper:
         if self.mode == "train":
             # waveform augmentations
             wave_aug = []
-            for wave_aug_name in self.waveform_augmentations:
+            for wave_aug_name in waveform_augmentations:
                 aug = self.waveform_augmentations.get(wave_aug_name)
                 wave_aug.append(aug)
 
@@ -95,9 +95,10 @@ class TransformsWrapper:
             self.spec_aug = torchvision.transforms.Compose(
                 transforms=spec_aug)
             
-        elif self.mode in ("valid", "test", "predict"):
-            self.wave_aug = None
-            self.spec_aug = None
+        # elif self.mode in ("valid", "test", "predict"):
+        #     self.wave_aug = None
+        #     self.spec_aug = None
+        #     self.background_noise = None
         
     def set_mode(self, mode):
         self.mode = mode
@@ -200,7 +201,7 @@ class TransformsWrapper:
 
         if self.model_type == "vision":
             # spectrogram conversion and augmentation 
-            audio_augmented = self._vision_augmentations(audio_augmented)
+            audio_augmented = self._vision_augmentations(audio_augmented) #!TODO: its conversion + augmentation
             
         if self.task == "multiclass":
             labels = batch["labels"]
@@ -269,7 +270,10 @@ class TransformsWrapper:
         
     def _vision_augmentations(self, audio_augmented):
         spectrograms = self._spectrogram_conversion(audio_augmented)
-        spectrograms_augmented = [self.spec_aug(spectrogram) for spectrogram in spectrograms]
+        if self.spec_aug is not None:
+            spectrograms_augmented = [self.spec_aug(spectrogram) for spectrogram in spectrograms]
+        else:
+            spectrograms_augmented = spectrograms
 
         if self.preprocessing.n_mels:
             melscale_transform = torchaudio.transforms.MelScale(
@@ -295,6 +299,11 @@ class TransformsWrapper:
         return audio_augmented
 
     def __call__(self, batch, **kwargs):
+        if self.mode in ("test", "predict"):
+            self.wave_aug = None
+            self.spec_aug = None
+            self.background_noise = None
+
         batch = self._transform_function(batch)
 
         return batch
