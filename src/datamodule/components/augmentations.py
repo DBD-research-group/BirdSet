@@ -514,8 +514,6 @@ class AddBackgroundNoiseHf(torch_audiomentations.AddBackgroundNoise):
     #         torch.cat([audio.rms_normalize(piece) for piece in pieces], dim=1)
     #     )
 
-from torchaudio.functional import add_noise
-
 class Compose:
     def __init__(self, transforms):
         self.transforms = transforms
@@ -533,8 +531,7 @@ class AudioTransforms:
         if np.random.rand() < self.p:
             return self.apply(inputs)
         else:
-            return inputs
-            
+            return inputs    
 
 class BackgroundNoise(AudioTransforms):
     def __init__(self, noise_events=None, p=0.5):
