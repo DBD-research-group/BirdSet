@@ -62,43 +62,32 @@ class TransformsWrapper:
         self.waveform_augmentations = waveform_augmentations
         self.spectrogram_augmentations = spectrogram_augmentations
         self.feature_extractor = feature_extractor
-
-        self.resizer = Resizer(
-            use_spectrogram=self.preprocessing.use_spectrogram,
-            db_scale=self.preprocessing.db_scale
-        )
         self.event_decoder = decoding
 
-        if self.mode == "train":
-            # waveform augmentations
-            wave_aug = []
-            for wave_aug_name in waveform_augmentations:
-                aug = self.waveform_augmentations.get(wave_aug_name)
-                wave_aug.append(aug)
+        # waveform augmentations
+        wave_aug = []
+        for wave_aug_name in waveform_augmentations:
+            aug = self.waveform_augmentations.get(wave_aug_name)
+            wave_aug.append(aug)
 
-            self.wave_aug = torch_audiomentations.Compose(
-                transforms=wave_aug,
-                output_type="tensor")
-            
-            # self.wave_aug_background = Compose(
-            #     transforms=[BackgroundNoise(p=0.5)]
-            # )
+        self.wave_aug = torch_audiomentations.Compose(
+            transforms=wave_aug,
+            output_type="tensor")
+        
+        # self.wave_aug_background = Compose(
+        #     transforms=[BackgroundNoise(p=0.5)]
+        # )
 
-            self.background_noise = BackgroundNoise(p=0.5)
+        self.background_noise = BackgroundNoise(p=0.5)
 
-            # spectrogram augmentations
-            spec_aug = []
-            for spec_aug_name in self.spectrogram_augmentations:
-                aug = self.spectrogram_augmentations.get(spec_aug_name)
-                spec_aug.append(aug)
-            
-            self.spec_aug = torchvision.transforms.Compose(
-                transforms=spec_aug)
-            
-        # elif self.mode in ("valid", "test", "predict"):
-        #     self.wave_aug = None
-        #     self.spec_aug = None
-        #     self.background_noise = None
+        # spectrogram augmentations
+        spec_aug = []
+        for spec_aug_name in self.spectrogram_augmentations:
+            aug = self.spectrogram_augmentations.get(spec_aug_name)
+            spec_aug.append(aug)
+        
+        self.spec_aug = torchvision.transforms.Compose(
+            transforms=spec_aug)
         
     def set_mode(self, mode):
         self.mode = mode
@@ -146,8 +135,6 @@ class TransformsWrapper:
 
         """
 
-        # we overwrite the feature extractor with None because we can do this here manually 
-        # this is quite complicated if we want to make adjustments to non bird methods
         if self.event_decoder is not None: 
             batch = self.event_decoder(batch)
 
@@ -196,8 +183,6 @@ class TransformsWrapper:
                     input_values=audio_augmented,
                     attention_mask=attention_mask
                 )
-                #RuntimeError: min(): Expected reduction dim to be specified for input.numel() == 0. Specify the reduction dim with the 'dim' argument.
-                # in test data: there seems to be an empty tensor with length=0? and everathing is filtered out
 
         if self.model_type == "vision":
             # spectrogram conversion and augmentation 
@@ -287,8 +272,13 @@ class TransformsWrapper:
             # list with 1 x 128 x 2026
             spectrograms_augmented = [spectrogram.numpy() for spectrogram in spectrograms_augmented]
             spectrograms_augmented = torch.from_numpy(librosa.power_to_db(spectrograms_augmented))
-        
-        audio_augmented = self.resizer.resize_spectrogram_batch(
+
+        resizer = Resizer(
+            use_spectrogram=self.preprocessing.use_spectrogram,
+            db_scale=self.preprocessing.db_scale
+        )
+
+        audio_augmented = resizer.resize_spectrogram_batch(
             spectrograms_augmented,
             target_height=self.preprocessing.target_height,
             target_width=self.preprocessing.target_width

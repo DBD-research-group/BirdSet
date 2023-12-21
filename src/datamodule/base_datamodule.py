@@ -81,7 +81,8 @@ class BaseDataModuleHF(L.LightningDataModule):
 
         self._prepare_done = False
         self.len_trainset = None
-        self.num_train_labels = None    
+        self.num_train_labels = None
+        self.train_label_list = None
 
     @property
     def num_classes(self):
@@ -267,11 +268,34 @@ class BaseDataModuleHF(L.LightningDataModule):
         dataset = load_from_disk(dataset_path)
 
         self.transforms.set_mode(split)
+
+        if split == "train": # we need this for sampler, cannot be done later because set_transform
+            self.train_label_list = dataset["labels"]
+
         # add run-time transforms to dataset
         dataset.set_transform(self.transforms, output_all_columns=False) 
         
         return dataset
+    
+    def _create_weighted_sampler(self):
+        if self.dataset_config.task == "multiclass":
+            label_counts = torch.tensor(self.num_train_labels)
+            #calculate sample weights
+            sample_weights = (label_counts / label_counts.sum())**(-0.5)    
+            #when no_call = 0 --> 0 probability 
+            sample_weights = torch.where(
+                condition=torch.isinf(sample_weights), 
+                input=torch.tensor(0), 
+                other=sample_weights
+            )
+            weight_list = [sample_weights[classes] for classes in self.train_label_list]
 
+            return weight_list
+        
+        elif self.dataset_config.task == "multilabel":
+            return
+
+    
     def setup(self, stage=None):
         if not self.train_dataset and not self.val_dataset:
             if stage == "fit":
@@ -285,8 +309,12 @@ class BaseDataModuleHF(L.LightningDataModule):
                 self.test_dataset = self._get_dataset("test")
 
     def train_dataloader(self):
-        # TODO: nontype objects in hf dataset
-        return DataLoader(self.train_dataset, **asdict(self.loaders_config.train)) # type: ignore
+        if self.num_train_labels is None: 
+            return DataLoader(self.train_dataset, **asdict(self.loaders_config.train)) # type: ignore
+        else: # change so that it works as a flag 
+            weighted_sampler = self._create_weighted_sampler()
+            self.loaders_config.train.shuffle = False # mutually exclusive!
+            return DataLoader(self.train_dataset, sampler=weighted_sampler, **asdict(self.loaders_config.train))
 
     def val_dataloader(self):
         return DataLoader(self.val_dataset, **asdict(self.loaders_config.valid)) # type: ignore
