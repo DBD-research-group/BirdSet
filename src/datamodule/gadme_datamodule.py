@@ -14,7 +14,7 @@ class GADMEDataModule(BaseDataModuleHF):
             self,
             dataset: DatasetConfig = DatasetConfig(),
             loaders: LoadersConfig = LoadersConfig(),
-            transforms: TransformsWrapper = TransformsWrapper(decoding=EventDecoding()),
+            transforms: TransformsWrapper = TransformsWrapper(),
             mapper: XCEventMapping = XCEventMapping()
     ):
         super().__init__(
