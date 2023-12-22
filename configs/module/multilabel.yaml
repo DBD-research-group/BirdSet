@@ -5,6 +5,7 @@ defaults:
   - network: ast.yaml
 
 task: multilabel
+class_weights_loss: ${datamodule.dataset.class_weights_loss}
 
 optimizer:
   _target_: torch.optim.AdamW

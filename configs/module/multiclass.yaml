@@ -5,6 +5,7 @@ defaults:
   - network: wav2vec2.yaml
   
 task: multiclass
+class_weights_loss: ${datamodule.dataset.class_weights_loss}
 
 optimizer:
   _target_: torch.optim.AdamW

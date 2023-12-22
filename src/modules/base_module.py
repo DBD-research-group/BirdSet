@@ -22,7 +22,8 @@ class BaseModule(L.LightningModule):
         num_epochs,
         len_trainset,
         task,
-        label_counts=False):
+        class_weights_loss,
+        label_counts):
 
         super(BaseModule, self).__init__()
         
@@ -30,13 +31,12 @@ class BaseModule(L.LightningModule):
         self.num_epochs = num_epochs
         self.len_trainset = len_trainset
         self.task = task 
-        self.label_counts = label_counts
 
         self.model = hydra.utils.instantiate(network.model)
         self.opt_params = optimizer
         self.lrs_params = lr_scheduler
 
-        self.loss = load_loss(loss, label_counts)
+        self.loss = load_loss(loss, class_weights_loss, label_counts)
         self.output_activation = hydra.utils.instantiate(
             output_activation,
             _partial_=True
