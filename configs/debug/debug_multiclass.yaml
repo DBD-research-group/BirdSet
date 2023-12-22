@@ -34,7 +34,8 @@ datamodule:
     val_split: 0.1
     subset: null
     n_workers: 1
-    class_weights: True
+    class_weights_loss: False
+    class_weights_sampler: True
   mapper: 
     event_limit: 5
     biggest_cluster: True

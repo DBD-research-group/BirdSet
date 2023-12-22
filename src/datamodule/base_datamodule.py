@@ -24,7 +24,9 @@ class DatasetConfig:
     task: Literal["multiclass", "multilabel"] = "multiclass"
     subset: int = None
     sampling_rate: int = 32_000
-    class_weights = False
+    class_weights_loss = False
+    class_weights_sampler = False
+
 
 @dataclass
 class LoaderConfig:
@@ -278,27 +280,27 @@ class BaseDataModuleHF(L.LightningDataModule):
         return dataset
     
     def _create_weighted_sampler(self):
+        label_counts = torch.tensor(self.num_train_labels)
+        #calculate sample weights
+        sample_weights = (label_counts / label_counts.sum())**(-0.5)    
+        #when no_call = 0 --> 0 probability 
+        sample_weights = torch.where(
+            condition=torch.isinf(sample_weights), 
+            input=torch.tensor(0), 
+            other=sample_weights
+        )
+
         if self.dataset_config.task == "multiclass":
-            label_counts = torch.tensor(self.num_train_labels)
-            #calculate sample weights
-            sample_weights = (label_counts / label_counts.sum())**(-0.5)    
-            #when no_call = 0 --> 0 probability 
-            sample_weights = torch.where(
-                condition=torch.isinf(sample_weights), 
-                input=torch.tensor(0), 
-                other=sample_weights
-            )
             weight_list = [sample_weights[classes] for classes in self.train_label_list]
+        elif self.dataset_config.task == "multilabel": # sum up weights if multilabel
+            weight_list = torch.matmul(torch.tensor(self.train_label_list, dtype=torch.float32), sample_weights)
 
-            weighted_sampler = torch.utils.data.WeightedRandomSampler(
-                weight_list, len(weight_list)
-            )
+        weighted_sampler = torch.utils.data.WeightedRandomSampler(
+            weight_list, len(weight_list)
+        )
 
-            return weighted_sampler
-        
-        elif self.dataset_config.task == "multilabel":
-            return
-
+        return weighted_sampler
+                
     
     def setup(self, stage=None):
         if not self.train_dataset and not self.val_dataset:
@@ -313,7 +315,7 @@ class BaseDataModuleHF(L.LightningDataModule):
                 self.test_dataset = self._get_dataset("test")
 
     def train_dataloader(self):
-        if self.num_train_labels is None: 
+        if self.dataset_config.class_weights_sampler is None: 
             return DataLoader(self.train_dataset, **asdict(self.loaders_config.train)) # type: ignore
         else: # change so that it works as a flag 
             weighted_sampler = self._create_weighted_sampler()
