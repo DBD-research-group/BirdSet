@@ -41,12 +41,9 @@ class GADMEDataModule(BaseDataModuleHF):
                 load_from_cache_file=True,
                 num_proc=self.dataset_config.n_workers,
             )
-            if self.dataset_config.get("class_weights"):
-                self.num_train_labels = self._count_labels((dataset["train"]["ebird_code"]))
 
-            dataset = dataset.select_columns(
-                ["filepath", "ebird_code", "detected_events", "start_time", "end_time"]
-            )
+            if self.dataset_config.class_weights_loss or self.dataset_config.class_weights_sampler:
+                self.num_train_labels = self._count_labels((dataset["train"]["ebird_code"]))
 
             dataset = dataset.rename_column("ebird_code", "labels")
 
@@ -60,7 +57,7 @@ class GADMEDataModule(BaseDataModuleHF):
                 remove_columns=["audio"],
                 batched=True,
                 batch_size=300,
-                load_from_cache_file=False,
+                load_from_cache_file=True,
                 num_proc=self.dataset_config.n_workers,
             )
 
@@ -68,19 +65,25 @@ class GADMEDataModule(BaseDataModuleHF):
                 self._classes_one_hot,
                 batched=True,
                 batch_size=300,
-                load_from_cache_file=True,
+                load_from_cache_file=False,
                 num_proc=self.dataset_config.n_workers,
             )
-            
-            if self.dataset_config.get("class_weights"):
+
+            if self.dataset_config.class_weights_loss or self.dataset_config.class_weights_sampler:
                 self.num_train_labels = self._count_labels((dataset["train"]["ebird_code"]))
 
             dataset["test"] = dataset["test_5s"]
-            dataset = dataset.select_columns(
-                ["filepath", "ebird_code_multilabel", "detected_events", "start_time", "end_time"]
-            )
-
             dataset = dataset.rename_column("ebird_code_multilabel", "labels")
+
+
+        dataset["train"] = dataset["train"].select_columns(
+            ["filepath", "labels", "detected_events", "start_time", "end_time", "no_call_events"]
+        )
+        # maybe has to be added to test data to avoid two selections
+        dataset["test"]= dataset["test"].select_columns(
+            ["filepath", "labels", "detected_events", "start_time", "end_time"]
+        )
+
         return dataset
     
     def _count_labels(self,labels):

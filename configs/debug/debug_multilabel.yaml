@@ -33,9 +33,10 @@ trainer:
 datamodule:
   dataset:
     val_split: 0.1
-    subset: 300
+    subset: Null
     n_workers: 1
-    class_weights: True
+    class_weights_loss: False
+    class_weights_sampler: True
 
   loaders:
     train: 

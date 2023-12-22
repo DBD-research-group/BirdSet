@@ -22,7 +22,6 @@ _HYDRA_PARAMS = {
     "config_name": "main.yaml"
 }
 
-
 @utils.register_custom_resolvers(**_HYDRA_PARAMS)
 @hydra.main(**_HYDRA_PARAMS)
 def main(cfg):
@@ -36,7 +35,7 @@ def main(cfg):
 
     log.info(f"Seed everything with <{cfg.seed}>")
     L.seed_everything(cfg.seed)
-    log.info(f"Instantiate logger {[loggers for loggers in cfg['logger']]}")
+    #log.info(f"Instantiate logger {[loggers for loggers in cfg['logger']]}")
 
     # Setup data
     log.info(f"Instantiate datamodule <{cfg.datamodule._target_}>")
@@ -61,7 +60,7 @@ def main(cfg):
     log.info(f"Instantiate model <{cfg.module.network.model._target_}>")     
     model = hydra.utils.instantiate(
         cfg.module,
-        num_epochs=cfg.trainer.max_epochs,
+        num_epochs=cfg.trainer.max_epochs, #?
         len_trainset=datamodule.len_trainset,
         label_counts=datamodule.num_train_labels,
         _recursive_=False # manually instantiate!

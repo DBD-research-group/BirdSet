@@ -22,7 +22,8 @@ class BaseModule(L.LightningModule):
         num_epochs,
         len_trainset,
         task,
-        label_counts=False):
+        class_weights_loss,
+        label_counts):
 
         super(BaseModule, self).__init__()
         
@@ -30,13 +31,12 @@ class BaseModule(L.LightningModule):
         self.num_epochs = num_epochs
         self.len_trainset = len_trainset
         self.task = task 
-        self.label_counts = label_counts
 
         self.model = hydra.utils.instantiate(network.model)
         self.opt_params = optimizer
         self.lrs_params = lr_scheduler
 
-        self.loss = load_loss(loss, label_counts)
+        self.loss = load_loss(loss, class_weights_loss, label_counts)
         self.output_activation = hydra.utils.instantiate(
             output_activation,
             _partial_=True
@@ -45,15 +45,15 @@ class BaseModule(L.LightningModule):
         
         self.metrics = load_metrics(metrics)
         self.train_metric = self.metrics["main_metric"].clone()
-        self.train_add_metrics = self.metrics["add_metrics"].clone(postfix="/train")
+        self.train_add_metrics = self.metrics["add_metrics"].clone(prefix="train/")
 
         self.valid_metric = self.metrics["main_metric"].clone()
         self.valid_metric_best = self.metrics["val_metric_best"].clone()
-        self.valid_add_metrics = self.metrics["add_metrics"].clone(postfix="/valid")
+        self.valid_add_metrics = self.metrics["add_metrics"].clone(prefix="val/")
 
         self.test_metric = self.metrics["main_metric"].clone()
-        self.test_add_metrics = self.metrics["add_metrics"].clone(postfix="/test")
-        self.test_complete_metrics = self.metrics["eval_complete"].clone(postfix="/test_complete")
+        self.test_add_metrics = self.metrics["add_metrics"].clone(prefix="test/")
+        self.test_complete_metrics = self.metrics["eval_complete"].clone(prefix="test/")
 
         self.torch_compile = network.torch_compile
         self.model_name = network.model_name
