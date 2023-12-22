@@ -1,5 +1,6 @@
 from typing import Literal
 from collections import Counter
+from src.datamodule.components.event_decoding import EventDecoding
 from src.datamodule.components.transforms import TransformsWrapper
 from src.datamodule.components.event_mapping import XCEventMapping
 from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
@@ -13,7 +14,7 @@ class GADMEDataModule(BaseDataModuleHF):
             self,
             dataset: DatasetConfig = DatasetConfig(),
             loaders: LoadersConfig = LoadersConfig(),
-            transforms: TransformsWrapper = TransformsWrapper(),
+            transforms: TransformsWrapper = TransformsWrapper(decoding=EventDecoding()),
             mapper: XCEventMapping = XCEventMapping()
     ):
         super().__init__(

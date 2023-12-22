@@ -9,6 +9,7 @@ import lightning as L
 
 from datasets import load_dataset, load_from_disk, Audio, DatasetDict, Dataset, IterableDataset, IterableDatasetDict
 from torch.utils.data import DataLoader
+from src.datamodule.components.event_mapping import XCEventMapping
 from src.datamodule.components.transforms import TransformsWrapper
 
 @dataclass
@@ -22,7 +23,7 @@ class DatasetConfig:
     n_workers: int = 1
     val_split: float = 0.2
     task: Literal["multiclass", "multilabel"] = "multiclass"
-    subset: int = None
+    subset: int | None = None
     sampling_rate: int = 32_000
     class_weights_loss = False
     class_weights_sampler = False
@@ -65,7 +66,7 @@ class BaseDataModuleHF(L.LightningDataModule):
 
     def __init__(
         self, 
-        mapper,
+        mapper: XCEventMapping | None = None,
         dataset: DatasetConfig = DatasetConfig(),
         loaders: LoadersConfig = LoadersConfig(),
         transforms: TransformsWrapper = TransformsWrapper(),
@@ -166,6 +167,21 @@ class BaseDataModuleHF(L.LightningDataModule):
         )
         logging.info(f"Saving to disk: {data_path}")
         dataset.save_to_disk(data_path)
+
+    def _ensure_train_test_splits(self, dataset: Dataset | DatasetDict) -> DatasetDict:
+        if isinstance(dataset, Dataset):
+            split_1 = dataset.train_test_split(
+                self.dataset_config.val_split, shuffle=True, seed=self.dataset_config.seed
+            )
+            return DatasetDict({"train": split_1["train"], "test": split_1["test"]})
+        else:
+            if "train" in dataset.keys() and "test" in dataset.keys():
+                return dataset
+            elif "train" in dataset.keys() and "test" not in dataset.keys():
+                return self._ensure_train_test_splits(dataset["train"])
+            else:
+                dataset = dataset[list(dataset.keys())[0]]
+                return self._ensure_train_test_splits(dataset)
     
     def _create_splits(self, dataset: DatasetDict | Dataset):
         """
@@ -198,7 +214,9 @@ class BaseDataModuleHF(L.LightningDataModule):
                 )
                 return DatasetDict({"train": split["train"], "valid": split["test"], "test": dataset["test"]})
             # if dataset has only one key, split it into train, valid, test
-            else:
+            elif "train" in dataset.keys() and "test" not in dataset.keys():
+                return self._create_splits(dataset["train"])
+            else: 
                 return self._create_splits(dataset[list(dataset.keys())[0]])
 
     def _load_data(self,decode: bool = True ):
@@ -218,6 +236,8 @@ class BaseDataModuleHF(L.LightningDataModule):
         if isinstance(dataset, IterableDataset |IterableDatasetDict):
             logging.error("Iterable datasets not supported yet.")
             return
+        assert isinstance(dataset, DatasetDict | Dataset)
+        dataset = self._ensure_train_test_splits(dataset)
 
 
         if self.dataset_config.subset:
@@ -231,9 +251,6 @@ class BaseDataModuleHF(L.LightningDataModule):
                 decode=decode,
             ),
         )
-        # TODO: check that train and test splits are present
-        if isinstance(dataset, Dataset):
-            dataset = self._create_splits(dataset)
         return dataset
     
     def _fast_dev_subset(self, dataset: DatasetDict, size: int=500):

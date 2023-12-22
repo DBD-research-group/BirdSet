@@ -1,8 +1,14 @@
 import soundfile as sf
 import librosa
+import random
 
 class EventDecoding:
-    def __init__(self, min_len, max_len=None, sampling_rate=None):
+    def __init__(
+            self,
+            min_len: int = 0,
+            max_len: int | None = 5,
+            sampling_rate: int = 32_000
+        ):
         self.min_len = min_len # in seconds
         self.max_len = max_len
         self.sampling_rate = sampling_rate
@@ -32,7 +38,12 @@ class EventDecoding:
         audios, srs = [], []
         for b_idx in range(len(batch.get("filepath", []))):
             if batch["detected_events"][b_idx]:
+                # select event at random, if only one event this one will be used
+                index = random.randint(0, len(batch["detected_events"][b_idx])-1)
+                print("selecting from", batch["detected_events"][b_idx])
+                batch["detected_events"][b_idx] = batch["detected_events"][b_idx][index]
                 start, end = batch["detected_events"][b_idx]
+                print("using", start, end)
             else:
                 start, end = batch["start_time"][b_idx], batch["end_time"][b_idx]
             audio, sr = self._load_audio(batch["filepath"][b_idx], start, end)
