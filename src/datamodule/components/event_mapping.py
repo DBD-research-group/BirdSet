@@ -43,7 +43,7 @@ class XCEventMapping:
                 detected_cluster = detected_cluster[mask]
 
             # check if an event was found 
-            if len(detected_events) >= 1: 
+            if len(detected_events) >= 1 and self.event_limit != 1:
                 if self.biggest_cluster:
                     values, count = np.unique(detected_cluster, return_counts=True) # count clusters!
                     detected_events = detected_events[detected_cluster == values[count.argmax()]]# take the events that are most frequent as primary label: if same --> first one (0)
@@ -54,9 +54,9 @@ class XCEventMapping:
                 n_detected_events = len(detected_events)
 
                 if self.event_limit == 1: # move to decoding
-                    index = random.randint(0, n_detected_events-1)
-                    detected_events = [(detected_events[index]).tolist()]
-                    detected_cluster = [detected_cluster[index]]
+                    #index = random.randint(0, n_detected_events-1)
+                    detected_events = [detected_events.tolist()]
+                    detected_cluster = [detected_cluster]
 
                 elif self.event_limit == None:
                     detected_events = detected_events.tolist()
@@ -71,7 +71,7 @@ class XCEventMapping:
                         detected_events = [detected_events[i].tolist() for i in indices]
                         detected_cluster = [detected_cluster[i].tolist() for i in indices]
 
-                # add data for all detected events, but limit it to self.event_limit! 
+                # add data for all detected events, but limit it to self.event_limit!
                 for i in range(len(detected_events)):
                     for key in new_batch.keys():
                         if key == "audio":
@@ -87,19 +87,18 @@ class XCEventMapping:
                         else:
                             new_batch[key].append(batch[key][b_idx])
                         
-            else: 
-                file_length = batch["length"][b_idx]
+            else:
                 for key in new_batch.keys():
                     if key == "audio":
                         new_batch[key].append(batch["filepath"][b_idx])      
-                        #double 5 seconds no_call vs new_batch!                    
+                        #double 5 seconds no_call vs new_batch!
                     # if no event cluster is found --> first 5 seconds of audio!
                     elif key == "detected_events": 
-                        if file_length >= 5:
+                        if len(batch[key][b_idx]):
                              ## 5 only if longer than 5!!
-                            new_batch[key].append([0,5])
+                            new_batch[key].append(batch[key][b_idx])
                         else:
-                            new_batch[key].append([0,file_length])
+                            new_batch[key].append([[0, 5]])
                     elif key == "no_call_events":
                         #start no_call @ 5 because we simulated the detected event! needs to be fixec
                         new_batch[key].append(no_call_events)
@@ -122,21 +121,20 @@ class XCEventMapping:
                         new_batch[key].append(batch["filepath"][b_idx])   
                     elif key == "detected_events": 
                         new_batch[key].append(no_call_event)
+                        print("appending", no_call_event)
                     elif key == "no_call_events":
                         new_batch[key].append(no_call_events)
                     elif key == "noise_events":
-                        new_batch[key].append(noise_events)    
+                        new_batch[key].append(noise_events)
                     elif key == "event_cluster":
                         new_batch[key].append([])
                     elif key == "ebird_code_multilabel":
-                        new_batch[key].append([0]) # add no_call = 0
+                        new_batch[key].append(0) # add no_call = 0
                     elif key == "ebird_code":
-                        new_batch[key].append(0) 
+                        new_batch[key].append(0)
                     else:
                         v = batch[key][b_idx]
-                        new_batch[key].append(v if v != [] else None) 
-
-
+                        new_batch[key].append(v if v != [] else None)
         return new_batch
     
     def _no_call_detection(self, detected_events, file_length):
