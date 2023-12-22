@@ -285,7 +285,7 @@ class TransformsWrapper:
             target_width=self.preprocessing.target_width
         )
         # batch_size x 1 x height x width
-        if self.preprocessing.normalize_spectorgram:
+        if self.preprocessing.normalize_spectrogram:
             audio_augmented = (audio_augmented - (-4.268)) / (4.569 * 2)
         return audio_augmented
 
