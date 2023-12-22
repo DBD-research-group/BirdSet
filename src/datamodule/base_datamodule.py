@@ -290,7 +290,11 @@ class BaseDataModuleHF(L.LightningDataModule):
             )
             weight_list = [sample_weights[classes] for classes in self.train_label_list]
 
-            return weight_list
+            weighted_sampler = torch.utils.data.WeightedRandomSampler(
+                weight_list, len(weight_list)
+            )
+
+            return weighted_sampler
         
         elif self.dataset_config.task == "multilabel":
             return

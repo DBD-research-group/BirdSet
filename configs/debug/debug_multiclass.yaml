@@ -22,7 +22,6 @@ module:
   optimizer:
     lr: 1e-5
 
-
 trainer: 
   max_epochs: 1
   accelerator: gpu

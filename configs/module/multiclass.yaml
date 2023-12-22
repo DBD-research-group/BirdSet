@@ -39,6 +39,9 @@ metrics:
     balanced_acc: 
       _target_: src.modules.metrics.BalancedAccuracy
       num_classes: ${datamodule.dataset.n_classes}  
+    balanced_acc_top5:
+      _target_: src.modules.metrics.BalancedAccuracyTop5
+      num_classes: ${datamodule.dataset.n_classes}  
     # auroc:
     #   _target_: "torchmetrics.classification.AUROC"
     #   task: "multiclass"
