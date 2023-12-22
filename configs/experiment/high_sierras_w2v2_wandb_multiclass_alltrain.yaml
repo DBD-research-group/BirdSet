@@ -18,28 +18,33 @@ module:
 
 trainer:
   min_epochs: 1
-  max_epochs: 15
+  max_epochs: 30
 
 datamodule:
   dataset:
     val_split: 0.1
   loaders:
     train:
-      batch_size: 20
+      batch_size: 22
       shuffle: True
       num_workers: 6
       drop_last: False
       prefetch_factor: 4
 
     valid:
-      batch_size: 20
+      batch_size: 22
     test:
-      batch_size: 20
+      batch_size: 22
+  mapper: 
+    event_limit: null
+    biggest_cluster: True
+    no_call: False
+
 
 logger:
   wandb:
     tags: ${tags}
-    group: "high_sierras_aug"
+    group: "high_sierras_aug_w2v2"
     mode: online
 
 

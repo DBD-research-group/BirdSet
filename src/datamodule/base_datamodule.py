@@ -25,8 +25,8 @@ class DatasetConfig:
     task: Literal["multiclass", "multilabel"] = "multiclass"
     subset: int | None = None
     sampling_rate: int = 32_000
-    class_weights_loss = False
-    class_weights_sampler = False
+    class_weights_loss = None
+    class_weights_sampler = None
 
 
 @dataclass
