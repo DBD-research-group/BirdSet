@@ -42,7 +42,7 @@ class XCEventMapping:
                 detected_events = detected_events[mask]
                 detected_cluster = detected_cluster[mask]
 
-            # check if an event was found 
+            # check if an event was found
             if len(detected_events) >= 1 and self.event_limit != 1:
                 if self.biggest_cluster:
                     values, count = np.unique(detected_cluster, return_counts=True) # count clusters!
@@ -86,6 +86,7 @@ class XCEventMapping:
                             new_batch[key].append(noise_events)
                         else:
                             new_batch[key].append(batch[key][b_idx])
+                #print("Done appending")
                         
             else:
                 for key in new_batch.keys():
@@ -93,12 +94,12 @@ class XCEventMapping:
                         new_batch[key].append(batch["filepath"][b_idx])      
                         #double 5 seconds no_call vs new_batch!
                     # if no event cluster is found --> first 5 seconds of audio!
-                    elif key == "detected_events": 
-                        if len(batch[key][b_idx]):
+                    elif key == "detected_events":
+                        if len(detected_events):
                              ## 5 only if longer than 5!!
                             new_batch[key].append(batch[key][b_idx])
                         else:
-                            new_batch[key].append([[0, 5]])
+                            new_batch[key].append([0, 5] if self.event_limit != 1 else [[0, 5]])
                     elif key == "no_call_events":
                         #start no_call @ 5 because we simulated the detected event! needs to be fixec
                         new_batch[key].append(no_call_events)
@@ -109,7 +110,7 @@ class XCEventMapping:
                     else:
                         v = batch[key][b_idx]
                         new_batch[key].append(v if v != [] else None) # could also be empty for secondary?
-            
+
             if self.no_call:
                 if len(no_call_events) == 0:
                     no_call_event = []
