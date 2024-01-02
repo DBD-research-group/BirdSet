@@ -1,15 +1,15 @@
-from typing import Literal
 from collections import Counter
 from src.datamodule.components.event_decoding import EventDecoding
 from src.datamodule.components.transforms import TransformsWrapper
 from src.datamodule.components.event_mapping import XCEventMapping
 from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
-from datasets import DatasetDict
+from datasets import DatasetDict, Dataset
+from datasets import load_dataset, Audio
 import logging
 import torch
 
 
-class GADMEDataModule(BaseDataModuleHF):
+class PretrainDataModule(BaseDataModuleHF):
     def __init__(
             self,
             dataset: DatasetConfig = DatasetConfig(),
@@ -25,13 +25,38 @@ class GADMEDataModule(BaseDataModuleHF):
         )
 
     def _load_data(self, decode: bool = False):
-        return super()._load_data(decode=decode)
+        """
+        Load audio dataset from Hugging Face Datasets.
 
+        Returns HF dataset with audio column casted to Audio feature, containing audio data as numpy array and sampling rate.
+        """
+        logging.info("> Loading data set.")
+
+        dataset = load_dataset(
+            name=self.dataset_config.hf_name,
+            path=self.dataset_config.hf_path,
+            cache_dir=self.dataset_config.data_dir,
+            num_proc=3,
+        )
+
+        if self.dataset_config.subset:
+            dataset = self._fast_dev_subset(dataset, self.dataset_config.subset)
+
+
+        dataset = dataset.cast_column(
+            column="audio",
+            feature=Audio(
+                sampling_rate=self.dataset_config.sampling_rate,
+                mono=True,
+                decode=decode,
+            ),
+        )
+
+        return dataset
+    
     def _preprocess_data(self, dataset):
         if self.dataset_config.task == "multiclass":
-            # pick only train and test dataset
-            dataset = DatasetDict({split: dataset[split] for split in ["train", "test"]})
-
+            # we only have train data
             logging.info("> Mapping data set.")
             dataset["train"] = dataset["train"].map(
                 self.event_mapper,
@@ -48,9 +73,8 @@ class GADMEDataModule(BaseDataModuleHF):
             dataset = dataset.rename_column("ebird_code", "labels")
 
         elif self.dataset_config.task == "multilabel":
-            # pick only train and test_5s dataset
-            dataset = DatasetDict({split: dataset[split] for split in ["train", "test_5s"]})
-
+            # only train data
+            
             logging.info("> Mapping data set.")
             dataset["train"] = dataset["train"].map(
                 self.event_mapper,
@@ -74,16 +98,22 @@ class GADMEDataModule(BaseDataModuleHF):
             if self.dataset_config.class_weights_loss or self.dataset_config.class_weights_sampler:
                 self.num_train_labels = self._count_labels((dataset["train"]["ebird_code"]))
 
-            dataset["test"] = dataset["test_5s"]
-            
 
         dataset["train"] = dataset["train"].select_columns(
             ["filepath", "labels", "detected_events", "start_time", "end_time", "no_call_events"]
         )
-        # maybe has to be added to test data to avoid two selections
-        dataset["test"]= dataset["test"].select_columns(
-            ["filepath", "labels", "detected_events", "start_time", "end_time"]
-        )
 
         return dataset
-        
+
+    def _create_splits(self, dataset: DatasetDict | Dataset):
+        # no test set 
+        split = dataset["train"].train_test_split(
+            self.dataset_config.val_split, shuffle=True, seed=self.dataset_config.seed
+        )
+
+        return DatasetDict({
+            "train": split["train"],
+            "valid": split["test"]
+        })
+
+    

@@ -85,7 +85,7 @@ def main(cfg):
             datamodule=datamodule,
             ckpt_path=cfg.get("ckpt_path"))
     
-    train_metrics = trainer.callback_metrics
+        train_metrics = trainer.callback_metrics
 
     if cfg.get("test"):
         log.info(f"Starting testing")
@@ -104,7 +104,7 @@ def main(cfg):
             )
         trainer.test(model=model, datamodule=datamodule, ckpt_path=ckpt_path)
 
-    test_metrics = trainer.callback_metrics
+        test_metrics = trainer.callback_metrics
 
     if cfg.get("save_state_dict"):
         log.info("Saving state dicts")
@@ -115,7 +115,8 @@ def main(cfg):
             **cfg.extras.state_dict_saving_params  
         )
 
-    metric_dict = {**train_metrics, **test_metrics}
+    
+    #metric_dict = {**train_metrics, **test_metrics}
     
     utils.close_loggers()
 

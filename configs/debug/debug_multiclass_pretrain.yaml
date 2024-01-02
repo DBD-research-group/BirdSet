@@ -1,0 +1,60 @@
+# @package _global_
+task_name: debug
+
+defaults:
+  - override /module: multiclass.yaml
+  - override /module/network: ast.yaml
+  - override /datamodule: xenocanto_m.yaml
+  - override /callbacks: default.yaml 
+  - override /trainer: single_gpu.yaml
+
+extras: 
+  ignore_warnings: False
+
+hydra: 
+  job_logging: 
+    root:
+      level: DEBUG
+
+seed: 2
+
+train: True
+test: False 
+
+module:
+  optimizer:
+    lr: 1e-5
+
+trainer: 
+  max_epochs: 1
+  accelerator: gpu
+  devices: 1
+  detect_anomaly: True
+  fast_dev_run: False
+
+datamodule:
+  dataset:
+    val_split: 0.1
+    subset: null
+    n_workers: 1
+    class_weights_loss: null
+    class_weights_sampler: null
+  mapper: 
+    event_limit: 1
+    biggest_cluster: True
+    no_call: False
+  loaders:
+    train: 
+      batch_size: 8
+      num_workers: 1
+      shuffle: True
+      pin_memory: False
+    valid: 
+      batch_size: 8
+      num_workers: 1 
+      pin_memory: False
+    test:
+      batch_size: 8
+      num_workers: 1 
+      pin_memory: False
+
