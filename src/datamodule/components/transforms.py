@@ -28,7 +28,7 @@ class PreprocessingConfig:
     normalize_spectorgram: bool = True
     normalize_waveform: Literal['instance_normalization', 'instance_min_max'] | None  = None
 
-class BaseTransformer:
+class BaseTransforms:
     """
     Base class to handle audio transformations for different model types and modes.
 
@@ -41,7 +41,7 @@ class BaseTransformer:
     """
     
     def __init__(self, 
-                 task: str = "multiclass", 
+                 task: Literal['multiclass', 'multilabel'] = "multiclass", 
                  sampling_rate:int = 3200, 
                  max_length:int = 5, 
                  decoding: EventDecoding | None = None,
@@ -137,7 +137,7 @@ class BaseTransformer:
 
         return batch
 
-class TransformsWrapper(BaseTransformer):
+class TransformsWrapper(BaseTransforms):
     """
     A class to handle audio transformations for different model types and modes.
 
