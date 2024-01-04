@@ -79,7 +79,8 @@ class TransformsWrapper:
         #     transforms=[BackgroundNoise(p=0.5)]
         # )
 
-        self.background_noise = BackgroundNoise(p=0.5)
+        #self.background_noise = BackgroundNoise(p=0.5)
+        self.background_noise = None
 
         # spectrogram augmentations
         spec_aug = []

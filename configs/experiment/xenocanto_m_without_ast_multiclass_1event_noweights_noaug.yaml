@@ -3,45 +3,45 @@
 defaults:
   - override /datamodule: xenocanto_m.yaml
   - override /module: multiclass.yaml
-  - override /module/network: wav2vec2.yaml
+  - override /module/network: ast.yaml
   - override /callbacks: default.yaml 
   - override /trainer: single_gpu.yaml
+  - override /datamodule/transforms/spectrogram_augmentations: none.yaml
+  - override /datamodule/transforms/waveform_augmentations: none.yaml
 
-
-tags: ["pretrain_xencanto_m", "w2v2", "multiclass", "alltrain"]
+tags: ["pretrain_xencanto_m", "ast", "multiclass", "1event"]
 seed: 2
 train: True
 test: False
 
 module:
   optimizer:
-    lr: 1e-5
+    lr: 2e-5
 
 
 trainer:
   min_epochs: 1
-  max_epochs: 20
+  max_epochs: 5
 
 datamodule:
   dataset:
-    val_split: 0.05
-    class_weights_loss: False
-    class_weights_sampler: True
+    val_split: 0.1
+    class_weights_loss: null
+    class_weights_sampler: null
   transforms:
     preprocessing:
       normalize_waveform: instance_normalization
 
   loaders:
     train:
-      batch_size: 30
+      batch_size: 10
       shuffle: True
       num_workers: 6
-      drop_last: False
+      drop_last: True
       prefetch_factor: 4
     valid:
-      batch_size: 28
-    test:
-      batch_size: 28
+      batch_size: 10
+
   mapper: 
     event_limit: 1
     biggest_cluster: True
