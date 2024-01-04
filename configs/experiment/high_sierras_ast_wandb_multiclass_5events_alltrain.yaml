@@ -8,7 +8,7 @@ defaults:
   - override /trainer: single_gpu.yaml
 
 
-tags: ["high_sierras", "ast", "augment"]
+tags: ["high_sierras", "ast", "multiclass", "alltrain"]
 seed: 2
 
 module:
@@ -18,11 +18,14 @@ module:
 
 trainer:
   min_epochs: 1
-  max_epochs: 5
+  max_epochs: 10
 
 datamodule:
   dataset:
     val_split: 0.1
+    class_weights_loss: False
+    class_weights_sampler: False
+
   loaders:
     train:
       batch_size: 12
@@ -36,15 +39,14 @@ datamodule:
     test:
       batch_size: 12
   mapper: 
-    with_noise_cluster: False
+    event_limit: null
     biggest_cluster: True
-    only_one: False
-    
+    no_call: False
 
 logger:
   wandb:
     tags: ${tags}
-    group: "high_sierras_aug"
+    group: "high_sierras_aug_ast"
     mode: online
 
 

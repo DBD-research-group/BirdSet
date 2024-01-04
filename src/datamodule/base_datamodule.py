@@ -1,6 +1,7 @@
 from dataclasses import asdict, dataclass, field
 import logging
 import torch
+import random
 import os
 from typing import List, Literal
 
@@ -8,8 +9,8 @@ import lightning as L
 
 from datasets import load_dataset, load_from_disk, Audio, DatasetDict, Dataset, IterableDataset, IterableDatasetDict
 from torch.utils.data import DataLoader
-from src.datamodule.components.transforms import TransformsWrapper
-from src.datamodule.components.event_mapping import Mapper
+from src.datamodule.components.event_mapping import XCEventMapping
+from src.datamodule.components.transforms import BaseTransforms
 
 @dataclass
 class DatasetConfig:
@@ -22,8 +23,11 @@ class DatasetConfig:
     n_workers: int = 1
     val_split: float = 0.2
     task: Literal["multiclass", "multilabel"] = "multiclass"
-    subset: int| None = None
+    subset: int | None = None
     sampling_rate: int = 32_000
+    class_weights_loss = None
+    class_weights_sampler = None
+
 
 @dataclass
 class LoaderConfig:
@@ -48,7 +52,7 @@ class BaseDataModuleHF(L.LightningDataModule):
     Attributes:
         dataset (DatasetConfig): Configuration for the dataset. Defaults to an instance of `DatasetConfig`.
         loaders (LoadersConfig): Configuration for the data loaders. Defaults to an instance of `LoadersConfig`.
-        transforms (TransformsWrapper): Configuration for the data transformations. Defaults to an instance of `TransformsWrapper`.
+        transforms (BaseTransforms): Configuration for the data transformations. Defaults to an instance of `BaseTransforms`.
         extractors (DefaultFeatureExtractor): Configuration for the feature extraction. Defaults to an instance of `DefaultFeatureExtractor`.
 
     Methods:
@@ -62,10 +66,10 @@ class BaseDataModuleHF(L.LightningDataModule):
 
     def __init__(
         self, 
-        mapper: Mapper | None = None ,
+        mapper: XCEventMapping | None = None,
         dataset: DatasetConfig = DatasetConfig(),
         loaders: LoadersConfig = LoadersConfig(),
-        transforms: TransformsWrapper = TransformsWrapper(),
+        transforms: BaseTransforms = (),
         ):
         super().__init__()
         self.dataset_config = dataset
@@ -79,10 +83,10 @@ class BaseDataModuleHF(L.LightningDataModule):
         self.test_dataset = None
 
         self._prepare_done = False
-        self._setup_done = False
-        self.data_path = None
         self.len_trainset = None
-    
+        self.num_train_labels = None
+        self.train_label_list = None
+
     @property
     def num_classes(self):
         return self.dataset_config.n_classes
@@ -117,21 +121,24 @@ class BaseDataModuleHF(L.LightningDataModule):
         """
 
         logging.info("Check if preparing has already been done.")
-
         if self._prepare_done:
             logging.info("Skip preparing.")
             return
+
+        logging.info("Prepare Data")
         
         dataset = self._load_data()
-
         dataset = self._preprocess_data(dataset, self.dataset_config.task)
         dataset = self._create_splits(dataset)
 
         # set the length of the training set to be accessed by the model
         self.len_trainset = len(dataset["train"])        
         self._save_dataset_to_disk(dataset)
+
+        # set to done so that lightning does not call it again
+        self._prepare_done = True
        
-    def _preprocess_data(self, dataset, task_type: Literal["multiclass", "multilabel"]):
+    def _preprocess_data(self, dataset, task_type: Literal['multiclass', 'multilabel']):
         """
         Preprocesses the dataset.
         This includes stuff that only needs to be done once.
@@ -153,22 +160,28 @@ class BaseDataModuleHF(L.LightningDataModule):
             None
         """
         dataset.set_format("np")
-        
+
         data_path = os.path.join(
             self.dataset_config.data_dir,
-            f"{self.dataset_config.dataset_name}_processed",
-            dataset['train']._fingerprint,
+            f"{self.dataset_config.dataset_name}_processed",    
         )
-        self.data_path = data_path
-        self._prepare_done = True
+        logging.info(f"Saving to disk: {data_path}")
+        dataset.save_to_disk(data_path)
 
-        if os.path.exists(data_path):
-            logging.warn("Dataset exists on disk.")
-            return
-
-        logging.info(f"Saving to disk: {os.path.join(self.data_path)}")
-        dataset.save_to_disk(self.data_path)
-
+    def _ensure_train_test_splits(self, dataset: Dataset | DatasetDict) -> DatasetDict:
+        if isinstance(dataset, Dataset):
+            split_1 = dataset.train_test_split(
+                self.dataset_config.val_split, shuffle=True, seed=self.dataset_config.seed
+            )
+            return DatasetDict({"train": split_1["train"], "test": split_1["test"]})
+        else:
+            if "train" in dataset.keys() and "test" in dataset.keys():
+                return dataset
+            elif "train" in dataset.keys() and "test" not in dataset.keys():
+                return self._ensure_train_test_splits(dataset["train"])
+            else:
+                dataset = dataset[list(dataset.keys())[0]]
+                return self._ensure_train_test_splits(dataset)
     
     def _create_splits(self, dataset: DatasetDict | Dataset) -> DatasetDict:
         """
@@ -201,7 +214,9 @@ class BaseDataModuleHF(L.LightningDataModule):
                 )
                 return DatasetDict({"train": split["train"], "valid": split["test"], "test": dataset["test"]})
             # if dataset has only one key, split it into train, valid, test
-            else:
+            elif "train" in dataset.keys() and "test" not in dataset.keys():
+                return self._create_splits(dataset["train"])
+            else: 
                 return self._create_splits(dataset[list(dataset.keys())[0]])
             
         
@@ -220,9 +235,11 @@ class BaseDataModuleHF(L.LightningDataModule):
             cache_dir=self.dataset_config.data_dir,
             num_proc=3,
         )
-
         if isinstance(dataset, IterableDataset |IterableDatasetDict):
-            raise Exception("Iterable datasets not supported yet.")
+            logging.error("Iterable datasets not supported yet.")
+            return
+        assert isinstance(dataset, DatasetDict | Dataset)
+        dataset = self._ensure_train_test_splits(dataset)
 
 
         if self.dataset_config.subset:
@@ -236,9 +253,6 @@ class BaseDataModuleHF(L.LightningDataModule):
                 decode=decode,
             ),
         )
-        # TODO: check that train and test splits are present
-        if isinstance(dataset, Dataset):
-            dataset = self._create_splits(dataset)
         return dataset
     
     def _fast_dev_subset(self, dataset: DatasetDict, size: int=500):
@@ -255,9 +269,9 @@ class BaseDataModuleHF(L.LightningDataModule):
         Returns:
             DatasetDict: The subsetted dataset. The keys are the names of the dataset splits and the values are the subsetted datasets.
         """
-        # TODO: get random subset?!
         for split in dataset.keys():
-            dataset[split] = dataset[split].select(range(size))
+            random_indices = random.sample(range(len(dataset[split])), size)
+            dataset[split] = dataset[split].select(random_indices)
         return dataset
     
  
@@ -265,15 +279,48 @@ class BaseDataModuleHF(L.LightningDataModule):
         """
         Get Dataset from disk and add run-time transforms to a specified split.
         """
-        dataset = load_from_disk(
-            os.path.join(self.data_path, split) # type: ignore
+        
+        dataset_path = os.path.join(
+            self.dataset_config.data_dir,
+            f"{self.dataset_config.dataset_name}_processed", 
+            split
         )
+
+        dataset = load_from_disk(dataset_path)
+
         self.transforms.set_mode(split)
+
+        if split == "train": # we need this for sampler, cannot be done later because set_transform
+            self.train_label_list = dataset["labels"]
+
         # add run-time transforms to dataset
         dataset.set_transform(self.transforms, output_all_columns=False) 
         
         return dataset
+    
+    def _create_weighted_sampler(self):
+        label_counts = torch.tensor(self.num_train_labels)
+        #calculate sample weights
+        sample_weights = (label_counts / label_counts.sum())**(-0.5)    
+        #when no_call = 0 --> 0 probability 
+        sample_weights = torch.where(
+            condition=torch.isinf(sample_weights), 
+            input=torch.tensor(0), 
+            other=sample_weights
+        )
 
+        if self.dataset_config.task == "multiclass":
+            weight_list = [sample_weights[classes] for classes in self.train_label_list]
+        elif self.dataset_config.task == "multilabel": # sum up weights if multilabel
+            weight_list = torch.matmul(torch.tensor(self.train_label_list, dtype=torch.float32), sample_weights)
+
+        weighted_sampler = torch.utils.data.WeightedRandomSampler(
+            weight_list, len(weight_list)
+        )
+
+        return weighted_sampler
+                
+    
     def setup(self, stage=None):
         if not self.train_dataset and not self.val_dataset:
             if stage == "fit":
@@ -287,8 +334,12 @@ class BaseDataModuleHF(L.LightningDataModule):
                 self.test_dataset = self._get_dataset("test")
 
     def train_dataloader(self):
-        # TODO: nontype objects in hf dataset
-        return DataLoader(self.train_dataset, **asdict(self.loaders_config.train)) # type: ignore
+        if self.dataset_config.class_weights_sampler is None: 
+            return DataLoader(self.train_dataset, **asdict(self.loaders_config.train)) # type: ignore
+        else: # change so that it works as a flag 
+            weighted_sampler = self._create_weighted_sampler()
+            self.loaders_config.train.shuffle = False # mutually exclusive!
+            return DataLoader(self.train_dataset, sampler=weighted_sampler, **asdict(self.loaders_config.train))
 
     def val_dataloader(self):
         return DataLoader(self.val_dataset, **asdict(self.loaders_config.valid)) # type: ignore

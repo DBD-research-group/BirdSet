@@ -1,4 +1,5 @@
-normalize: True
+normalize_waveform: "instance_min_max"
+normalize_spectrogram: True
 use_spectrogram: True
 n_fft: 1024
 hop_length: 79

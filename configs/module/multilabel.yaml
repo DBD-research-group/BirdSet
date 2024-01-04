@@ -1,10 +1,11 @@
-_target_: src.modules.base_module.BaseModule
+_target_: src.modules.multilabel_module.MultilabelModule
 
 defaults:
   - _self_
   - network: ast.yaml
 
 task: multilabel
+class_weights_loss: ${datamodule.dataset.class_weights_loss}
 
 optimizer:
   _target_: torch.optim.AdamW
@@ -12,7 +13,9 @@ optimizer:
   weight_decay: 0.01
 
 loss:
-  _target_: torch.nn.BCEWithLogitsLoss
+  #_target_: src.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
+  #_target_: torch.nn.BCEWithLogitsLoss
+  _target_: src.modules.losses.focal_loss.MultiLabelFocalLoss
   
 lr_scheduler:
   scheduler:
@@ -23,20 +26,35 @@ lr_scheduler:
 
 metrics: 
   main: 
-    _target_: "torchmetrics.classification.MulticlassAccuracy"
-    num_classes: 22
-    top_k: 1
+    _target_: src.modules.metrics.cmAP
+    num_labels: ${datamodule.dataset.n_classes}
+    sample_threshold: 0
+    average: macro
+    thresholds: null
   val_best: 
     _target_: "torchmetrics.MaxMetric"
-  # additional: 
-  #   f1:
-  #     _target_: "torchmetrics.classification.MulticlassF1Score"
-  #     num_classes: ${datamodule.dataset.n_classes}  
-  #   recall:
-  #     _target_: "torchmetrics.classification.Recall"
-  #     task: "multiclass"
-  #     average: "macro"
-  #     num_classes: ${datamodule.dataset.n_classes} 
+  additional: 
+    auroc:
+      _target_: "torchmetrics.classification.AUROC"
+      task: "multilabel"
+      num_labels: ${datamodule.dataset.n_classes} 
+      average: "macro"
+      thresholds: null
+    t1acc:
+      _target_: src.modules.metrics.T1Accuracy
+  eval_complete:
+    pcmap:
+      _target_: src.modules.metrics.pcmAP
+      num_labels: ${datamodule.dataset.n_classes}
+      padding_factor: 5
+      average: macro
+      thresholds: null
+    cmap5:
+      _target_: src.modules.metrics.cmAP
+      num_labels: ${datamodule.dataset.n_classes}
+      sample_threshold: 5
+      average: macro
+      thresholds: null
 
 output_activation: 
   _target_: "torch.sigmoid"

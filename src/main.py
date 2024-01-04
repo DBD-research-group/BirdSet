@@ -4,11 +4,26 @@ import hydra
 import lightning as L 
 from omegaconf import OmegaConf
 from src import utils
+import pyrootutils 
 
 log = utils.get_pylogger(__name__)
-rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
+#rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
+root = pyrootutils.setup_root(
+    search_from=__file__,
+    indicator=[".git"],
+    pythonpath=True,
+    dotenv=True,
+)
 
-@hydra.main(version_base=None, config_path="../configs", config_name="main")
+_HYDRA_PARAMS = {
+    "version_base":None,
+    #"config_path": "../configs",
+    "config_path": str(root / "configs"),
+    "config_name": "main.yaml"
+}
+
+@utils.register_custom_resolvers(**_HYDRA_PARAMS)
+@hydra.main(**_HYDRA_PARAMS)
 def main(cfg):
     log.info('Using config: \n%s', OmegaConf.to_yaml(cfg))
 
@@ -20,12 +35,12 @@ def main(cfg):
 
     log.info(f"Seed everything with <{cfg.seed}>")
     L.seed_everything(cfg.seed)
-    log.info(f"Instantiate logger {[loggers for loggers in cfg['logger']]}")
+    #log.info(f"Instantiate logger {[loggers for loggers in cfg['logger']]}")
 
     # Setup data
     log.info(f"Instantiate datamodule <{cfg.datamodule._target_}>")
     datamodule = hydra.utils.instantiate(cfg.datamodule)
-    datamodule.prepare_data()
+    datamodule.prepare_data() # has to be called before model for len_traindataset!
 
     # Setup logger
     log.info(f"Instantiate logger")
@@ -45,8 +60,9 @@ def main(cfg):
     log.info(f"Instantiate model <{cfg.module.network.model._target_}>")     
     model = hydra.utils.instantiate(
         cfg.module,
-        num_epochs=cfg.trainer.max_epochs,
+        num_epochs=cfg.trainer.max_epochs, #?
         len_trainset=datamodule.len_trainset,
+        label_counts=datamodule.num_train_labels,
         _recursive_=False # manually instantiate!
     )
 
