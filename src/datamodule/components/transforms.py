@@ -28,7 +28,116 @@ class PreprocessingConfig:
     normalize_spectorgram: bool = True
     normalize_waveform: Literal['instance_normalization', 'instance_min_max'] | None  = None
 
-class TransformsWrapper:
+class BaseTransforms:
+    """
+    Base class to handle audio transformations for different model types and modes.
+
+    Attributes:
+        mode (str): The mode in which the class is operating. Can be "train", "valid", "test", or "predict".
+        sampling_rate (int): The sampling rate of the audio data.
+        max_length (int): Maximum segment lenght in seconds
+        decoding (EventDecoding): Detecting events in sample (EventDecoding if None given)
+        feature_extractor (DefaultFeatureExtractor): Configuration for extracting events from the audio data (DefaultFeatureExtractor id None given)
+    """
+    
+    def __init__(self, 
+                 task: Literal['multiclass', 'multilabel'] = "multiclass", 
+                 sampling_rate:int = 3200, 
+                 max_length:int = 5, 
+                 decoding: EventDecoding | None = None,
+                 feature_extractor : DefaultFeatureExtractor | None = None) -> None:
+        self.mode = "train"
+        self.task = task
+        self.sampling_rate = sampling_rate
+        self.max_length = max_length
+        self.event_decoder = decoding
+        if self.event_decoder is None:
+            self.event_decoder = EventDecoding(min_len=0,
+                                          max_len=self.max_length,
+                                          sampling_rate=self.sampling_rate)
+        self.feature_extractor = feature_extractor
+        if self.feature_extractor is None:
+            self.feature_extractor = DefaultFeatureExtractor(feature_size=1,
+                                                             sampling_rate=self.sampling_rate,
+                                                             padding_value=0.0,
+                                                             return_attention_mask=False)
+    
+    def _transform(self, batch):
+        """
+        Called when tansformer is called
+        Applies transformations to a batch of data.
+        
+        1. Applies Event Decoding (almost always)
+        2. Applies feature extraction with FeatureExtractor
+        """
+        # we overwrite the feature extractor with None because we can do this here manually 
+        # this is quite complicated if we want to make adjustments to non bird methods
+        if self.event_decoder is not None: 
+            batch = self.event_decoder(batch)
+
+        #----
+        # Feature extractor
+        #----
+        
+        if not "audio" in batch.keys():
+            raise ValueError(f"There is no audio in batch {batch.keys()}")
+        
+        # audio collating and padding
+        waveform_batch = [audio["array"] for audio in batch["audio"]]
+
+        # extract/pad/truncate
+        # max_length determains the difference with input waveforms as factor 5 (embedding)
+        max_length = int(int(self.sampling_rate) * int(self.max_length)) #!TODO: how to determine 5s
+        waveform_batch = self.feature_extractor(
+            waveform_batch,
+            padding="max_length",
+            max_length=max_length, 
+            truncation=True,
+            return_attention_mask=True
+        )
+        # print(batch)
+        
+        attention_mask = waveform_batch["attention_mask"]
+        # i dont know why it was unsqueezed earlier, but this solves the problem of dimensionality (is now the same, if you augment further or not...)
+        # waveform_batch = waveform_batch["input_values"].unsqueeze(1)
+        waveform_batch = waveform_batch["input_values"]
+        
+        audio_augmented = self.augment_waveform_batch(waveform_batch, attention_mask, batch)
+        
+        if self.task == "multiclass":
+            labels = batch["labels"]
+        
+        else:
+            # self.task == "multilabel"
+            # datatype of labels must be float32 to support BCEWithLogitsLoss
+            labels = torch.tensor(batch["labels"], dtype=torch.float32)
+
+        return {"input_values": audio_augmented, "labels": labels}
+    
+    def augment_waveform_batch(self, waveform_batch, attention_mask, batch):
+        """
+        Do your augmentations in derived class here
+        """
+        
+        return waveform_batch
+    
+    def set_mode(self, mode):
+        self.mode = mode
+    
+    def _prepare_call(self):
+        """
+        Overwrite this to prepare the call
+        """
+        return
+    
+    
+    def __call__(self, batch, **kwargs):
+        self._prepare_call()
+        batch = self._transform(batch)
+
+        return batch
+
+class TransformsWrapper(BaseTransforms):
     """
     A class to handle audio transformations for different model types and modes.
 
@@ -52,18 +161,13 @@ class TransformsWrapper:
                 decoding: EventDecoding | None = None,
                 feature_extractor: DefaultFeatureExtractor = DefaultFeatureExtractor()
             ):
+        max_length = 5
+        super().__init__(task, sampling_rate, max_length, decoding, feature_extractor)
 
-        self.mode = "train"
-        self.feature_extractor = feature_extractor
-        self.task = task
-        self.sampling_rate = sampling_rate 
         self.model_type = model_type
-
         self.preprocessing = preprocessing
         self.waveform_augmentations = waveform_augmentations
         self.spectrogram_augmentations = spectrogram_augmentations
-        self.feature_extractor = feature_extractor
-        self.event_decoder = decoding
 
         # waveform augmentations
         wave_aug = []
@@ -90,9 +194,6 @@ class TransformsWrapper:
         
         self.spec_aug = torchvision.transforms.Compose(
             transforms=spec_aug)
-        
-    def set_mode(self, mode):
-        self.mode = mode
 
     def _spectrogram_conversion(self, waveform):
         """
@@ -126,7 +227,7 @@ class TransformsWrapper:
 
         return spectrograms
 
-    def _transform_function(self, batch):
+    def augment_waveform_batch(self, waveform_batch, attention_mask, batch):
         """
         Applies transformations to a batch of data.
         1. Applies Event Decoding if specified / needed
@@ -156,8 +257,7 @@ class TransformsWrapper:
             return_attention_mask=True
         )
         
-        attention_mask = waveform_batch["attention_mask"]
-        waveform_batch = waveform_batch["input_values"].unsqueeze(1)
+        waveform_batch = waveform_batch.unsqueeze(1)
 
         if self.wave_aug is not None:
             audio_augmented = self.wave_aug(
@@ -190,15 +290,7 @@ class TransformsWrapper:
             # spectrogram conversion and augmentation 
             audio_augmented = self._vision_augmentations(audio_augmented) #!TODO: its conversion + augmentation
             
-        if self.task == "multiclass":
-            labels = batch["labels"]
-        
-        else:
-            # self.task == "multilabel"
-            # datatype of labels must be float32 to support BCEWithLogitsLoss
-            labels = torch.tensor(batch["labels"], dtype=torch.float32)
-
-        return {"input_values": audio_augmented, "labels": labels}
+        return audio_augmented
     
     def _zero_mean_unit_var_norm(
             self, input_values, attention_mask, padding_value=0.0
@@ -253,8 +345,7 @@ class TransformsWrapper:
                 
                 normed_input_values.append(normed_vector)
         return torch.stack(normed_input_values)
-
-        
+   
     def _vision_augmentations(self, audio_augmented):
         spectrograms = self._spectrogram_conversion(audio_augmented)
         if self.spec_aug is not None:
@@ -289,13 +380,10 @@ class TransformsWrapper:
         if self.preprocessing.normalize_spectrogram:
             audio_augmented = (audio_augmented - (-4.268)) / (4.569 * 2)
         return audio_augmented
-
-    def __call__(self, batch, **kwargs):
+   
+    def _prepare_call(self):
         if self.mode in ("test", "predict"):
             self.wave_aug = None
             self.spec_aug = None
             self.background_noise = None
-
-        batch = self._transform_function(batch)
-
-        return batch
+        return
