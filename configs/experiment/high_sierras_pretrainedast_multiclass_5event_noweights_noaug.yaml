@@ -9,10 +9,10 @@ defaults:
   - override /datamodule/transforms/spectrogram_augmentations: none.yaml
   - override /datamodule/transforms/waveform_augmentations: none.yaml
 
-tags: ["finetune", "ast", "multiclass", "1event"]
+tags: ["finetune", "ast", "multiclass", "5event"]
 seed: 2
 train: True
-test: False
+test: True
 
 module:
   optimizer:
