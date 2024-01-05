@@ -1,0 +1,30 @@
+#HSN
+_target_: src.datamodule.pretrain_datamodule.PretrainDataModule
+
+defaults: 
+  - _self_
+  - transforms: bird_default.yaml
+  - loaders: default.yaml
+  - mapper: xc_bambird_mapper.yaml
+
+dataset:
+  data_dir: ${paths.dataset_path}
+  dataset_name: xenocanto_m_withoutnd
+  hf_path: DBD-research-group/gadme_v1
+  hf_name: xenocanto_M_withoutnd
+  seed: ${seed}
+  n_classes: 410
+  n_workers: 3
+  val_split: 0.05
+  task: ${module.task}
+  subset: null
+  sampling_rate: ${module.network.sampling_rate}
+  class_weights_loss: null
+  class_weights_sampler: null
+
+
+
+
+
+
+
