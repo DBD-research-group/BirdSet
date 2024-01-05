@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
-from transformers import AutoModelForAudioClassification
-
+from transformers import AutoModelForAudioClassification, AutoConfig
+from transformers import ASTForAudioClassification
 
 class ASTSequenceClassifier(nn.Module):
     def __init__(self, checkpoint, num_classes):
@@ -9,11 +9,16 @@ class ASTSequenceClassifier(nn.Module):
 
         self.checkpoint = checkpoint
         self.num_classes = num_classes
-        self.model = AutoModelForAudioClassification.from_pretrained(
-            self.checkpoint,
-            num_labels=self.num_classes,
-            ignore_mismatched_sizes=True
-        )
+
+        if self.checkpoint: 
+            self.model = AutoModelForAudioClassification.from_pretrained(
+                self.checkpoint,
+                num_labels=self.num_classes,
+                ignore_mismatched_sizes=True
+            )
+        else:
+            config = AutoConfig.from_pretrained("MIT/ast-finetuned-audioset-10-10-0.4593", num_labels=self.num_classes)
+            self.model = ASTForAudioClassification(config)
         
     def forward(self, input_values, attention_mask=None, labels=None, return_hidden_state=False):
         """

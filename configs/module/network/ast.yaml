@@ -1,6 +1,7 @@
 model:
   _target_: src.modules.models.ast.ASTSequenceClassifier
   checkpoint: MIT/ast-finetuned-audioset-10-10-0.4593
+  #checkpoint: null
   num_classes: ${datamodule.dataset.n_classes}
 
 model_name: ast
