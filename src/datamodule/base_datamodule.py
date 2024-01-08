@@ -5,8 +5,10 @@ import random
 import os
 from typing import List, Literal
 from collections import Counter
+from torch.utils.data import Subset
 
 import lightning as L
+import numpy as np 
 
 from datasets import load_dataset, load_from_disk, Audio, DatasetDict, Dataset, IterableDataset, IterableDatasetDict
 from torch.utils.data import DataLoader
@@ -332,7 +334,7 @@ class BaseDataModuleHF(L.LightningDataModule):
                 logging.info("test")
                 self.test_dataset = self._get_dataset("test")
 
-    def _count_labels(self,labels):
+    def _count_labels(self, labels):
         # frequency
         label_counts = Counter(labels)
 
@@ -344,6 +346,25 @@ class BaseDataModuleHF(L.LightningDataModule):
         
         return counts
 
+    def _limit_classes(self, dataset, label_name, limit):
+        # Count labels
+        label_counts = Counter(dataset[label_name])
+
+        # Gather indices for each class
+        all_indices = {label: [] for label in label_counts.keys()}
+        for idx, label in enumerate(dataset[label_name]):
+            all_indices[label].append(idx)
+
+        # Randomly select indices for classes exceeding the limit
+        limited_indices = []
+        for label, indices in all_indices.items():
+            if label_counts[label] > limit:
+                limited_indices.extend(random.sample(indices, limit))
+            else:
+                limited_indices.extend(indices)
+
+        # Subset the dataset
+        return dataset.select(limited_indices)
 
     def _classes_one_hot(self, batch):
         """

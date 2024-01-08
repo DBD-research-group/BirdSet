@@ -152,6 +152,8 @@ class XCEventMapping:
         
         return no_event_periods
 
+#class ClassLimitation():
+
         
 
 # class XCEventMapping:
