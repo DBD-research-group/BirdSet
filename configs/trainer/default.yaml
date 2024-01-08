@@ -12,3 +12,7 @@ fast_dev_run: false
 
 strategy: "auto"
 deterministic: false
+
+gradient_clip_val: 0.5
+#stochastic_weight_avg: True
+accumulate_grad_batches: 1

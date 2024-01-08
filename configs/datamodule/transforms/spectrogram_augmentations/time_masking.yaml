@@ -1,6 +1,6 @@
 time_masking:
   _target_: torchvision.transforms.RandomApply
-  p: 0.5
+  p: 0.3
   transforms: # - _ --> list!
     - _target_: torchaudio.transforms.TimeMasking
-      time_mask_param: 100
+      time_mask_param: 10020

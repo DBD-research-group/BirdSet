@@ -21,6 +21,7 @@ class BaseModule(L.LightningModule):
         logging_params,
         num_epochs,
         len_trainset,
+        batch_size,
         task,
         class_weights_loss,
         label_counts):
@@ -30,6 +31,7 @@ class BaseModule(L.LightningModule):
         # partial
         self.num_epochs = num_epochs
         self.len_trainset = len_trainset
+        self.batch_size = batch_size
         self.task = task 
 
         self.model = hydra.utils.instantiate(network.model)
@@ -74,14 +76,15 @@ class BaseModule(L.LightningModule):
         )
 
         if self.lrs_params.get("scheduler"):
+            num_training_steps = math.ceil((self.num_epochs * self.len_trainset) / self.batch_size) # !TODO: note that this is "wrong", when drop_last=True
             if self.lrs_params.scheduler._target_ == "transformers.get_linear_schedule_with_warmup":
                 scheduler = hydra.utils.instantiate(
                     self.lrs_params.scheduler,
                     optimizer=optimizer,
                     num_warmup_steps=math.ceil(
-                        self.num_epochs * self.len_trainset * self.lrs_params.extras.warmup_ratio
+                        num_training_steps * self.lrs_params.extras.warmup_ratio
                     ),
-                    num_training_steps=self.num_epochs * self.len_trainset,
+                    num_training_steps=num_training_steps,
                     _convert_="partial"
                 )
             else:
