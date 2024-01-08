@@ -101,7 +101,7 @@ class Down(nn.Module):
 class SoundNet(nn.Module):
     '''
     NeuralNetwork for sound classification
-    expected input shape: (batch_size, 1, clip_length)
+    expected input shape: (batch_size, clip_length)
     output shape: (batch_size, n_classes)
 
     Paramerters:
@@ -169,6 +169,7 @@ class SoundNet(nn.Module):
             nn.init.constant_(m.weight, 1.0)
 
     def forward(self, input_values: torch.Tensor, **kwargs):
+        input_values.unsqueeze_(1)
         x = self.start(input_values)
         x = self.down(x)
         x = self.down2(x)
