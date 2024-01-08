@@ -1,10 +1,8 @@
 defaults: 
   - gain.yaml
+  - background_noise.yaml
   - pitch_shift.yaml
-  - polarity_inversion.yaml
-
-
-
+  #- polarity_inversion.yaml
 
 # waveform_augmentations: 
 #   ColoredNoise:

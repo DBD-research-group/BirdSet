@@ -14,6 +14,7 @@ class MultilabelModule(BaseModule):
             num_epochs,
             len_trainset,
             task,
+            class_weights_loss,
             label_counts
     ):
         super().__init__(
@@ -27,6 +28,7 @@ class MultilabelModule(BaseModule):
             num_epochs=num_epochs,
             len_trainset=len_trainset,
             task=task,
+            class_weights_loss=class_weights_loss,
             label_counts=label_counts
         )
 

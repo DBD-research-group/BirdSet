@@ -6,15 +6,16 @@ defaults:
   - override /module/network: ast.yaml
   - override /callbacks: default.yaml 
   - override /trainer: single_gpu.yaml
+  - override /datamodule/transforms/spectrogram_augmentations: default.yaml
+  - override /datamodule/transforms/waveform_augmentations: default.yaml
 
-
-tags: ["high_sierras", "ast", "multiclass"]
-seed: 2
+tags: ["finetune", "ast", "multiclass", "5event", "aug"]
+train: True
+test: True
 
 module:
   optimizer:
-    lr: 1e-5
-
+    lr: 2e-5
 
 trainer:
   min_epochs: 1
@@ -23,30 +24,33 @@ trainer:
 datamodule:
   dataset:
     val_split: 0.1
-    class_weights_loss: False
-    class_weights_sampler: False
+    class_weights_loss: null
+    class_weights_sampler: null
+  transforms:
+    preprocessing:
+      normalize_waveform: instance_normalization
+
   loaders:
     train:
-      batch_size: 12
+      batch_size: 10
       shuffle: True
       num_workers: 6
-      drop_last: False
+      drop_last: True
       prefetch_factor: 4
-
     valid:
-      batch_size: 12
-    test:
-      batch_size: 12
+      batch_size: 10
+
   mapper: 
     event_limit: 5
     biggest_cluster: True
     no_call: False
-
+  
+callbacks:
+  model_checkpoint:
+    save_last: True
+    every_n_epochs: 5
 logger:
   wandb:
     tags: ${tags}
-    group: "high_sierras_aug_ast"
+    group: "finetune"
     mode: online
-
-
-

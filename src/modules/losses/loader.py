@@ -2,7 +2,7 @@ import hydra
 import torch
 from omegaconf import DictConfig
 
-def load_loss(loss_cfg: DictConfig, label_counts):
+def load_loss(loss_cfg: DictConfig, class_weights_loss, label_counts):
 
     weight_params = {}
 
@@ -10,7 +10,7 @@ def load_loss(loss_cfg: DictConfig, label_counts):
         if "weight" in key:
             weight_params[key] = torch.tensor(value).float()
     
-    if label_counts and "focal" in loss_cfg._target_:
+    if class_weights_loss and "focal" in loss_cfg._target_:
         label_counts = torch.tensor(label_counts)
 
         #calculate sample weights

@@ -1,3 +1,4 @@
+#%%
 from datasets import load_dataset
 
 if __name__ == "__main__":    
@@ -7,9 +8,12 @@ if __name__ == "__main__":
         "dbd-research-group/gadme_v1", 
         ds_name,
         cache_dir="~/projects/GADME/data_gadme",
-        num_proc=3
+        num_proc=3,
+        download_mode='force_redownload'
     )
     print("finished")
+#%%
+ds["train"]["peaks"]
 #%%
 from datasets import Audio
 
