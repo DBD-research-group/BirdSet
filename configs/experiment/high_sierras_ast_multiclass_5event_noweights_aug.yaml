@@ -32,13 +32,13 @@ datamodule:
 
   loaders:
     train:
-      batch_size: 10
+      batch_size: 5
       shuffle: True
       num_workers: 6
       drop_last: True
       prefetch_factor: 4
     valid:
-      batch_size: 10
+      batch_size: 5
 
   mapper: 
     event_limit: 5
