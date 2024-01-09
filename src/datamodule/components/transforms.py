@@ -232,6 +232,33 @@ class TransformsWrapper(BaseTransforms):
             raise ValueError(f"There is no audio in batch {batch.keys()}")
         
         # audio collating and padding
+        waveform_batch = self._get_waveform_batch(batch)
+        
+        
+        attention_mask = waveform_batch["attention_mask"]
+        input_values = waveform_batch["input_values"]
+        input_values = input_values.unsqueeze(1)
+        
+        do_wave_augmentations = self.wave_aug is not None
+        if do_wave_augmentations:
+            input_values = self.wave_aug(
+                samples=waveform_batch, sample_rate=self.sampling_rate
+            )
+        
+        # shape: batch x 1 x sample_rate
+        if self.background_noise:
+            input_values = self._augment_background_noise(batch, input_values)
+                
+        if self.model_type == "waveform":
+           input_values = self._audio_augmentations(input_values, attention_mask)
+
+        if self.model_type == "vision":
+            # spectrogram conversion and augmentation 
+            input_values = self._vision_augmentations(input_values) #!TODO: its conversion + augmentation
+            
+        return input_values
+
+    def _get_waveform_batch(self, batch):
         waveform_batch = [audio["array"] for audio in batch["audio"]]
         
         # extract/pad/truncate
@@ -245,44 +272,12 @@ class TransformsWrapper(BaseTransforms):
             return_attention_mask=True
         )
         
-        
-        attention_mask = waveform_batch["attention_mask"]
-        # i dont know why it was unsqueezed earlier, but this solves the problem of dimensionality (is now the same, if you augment further or not...)
-        # waveform_batch = waveform_batch["input_values"].unsqueeze(1)
-        waveform_batch = waveform_batch["input_values"]
-        waveform_batch = waveform_batch.unsqueeze(1)
+        return waveform_batch
 
-        if self.wave_aug is not None:
-            audio_augmented = self.wave_aug(
-                samples=waveform_batch, sample_rate=self.sampling_rate
-            )
-        else:
-            audio_augmented = waveform_batch
-        
-        # shape: batch x 1 x sample_rate
-        if self.background_noise:
-            noise_events = {key: batch[key] for key in ["filepath", "no_call_events"]}
-            self.background_noise.noise_events = noise_events
-            audio_augmented = self.background_noise(audio_augmented)
-                
-        if self.model_type == "waveform":
-            #TODO vectorize this
-            if self.preprocessing.normalize_waveform == "instance_normalization":
-                # normalize #!TODO: do we have to normalize before spectrogram? '#TODO Implement normalizaton module
-                audio_augmented = self._zero_mean_unit_var_norm(
-                    input_values=audio_augmented,
-                    attention_mask=attention_mask
-                )
-            elif self.preprocessing.normalize_waveform == "instance_min_max":
-                audio_augmented = self._min_max_scaling(
-                    input_values=audio_augmented,
-                    attention_mask=attention_mask
-                )
-
-        if self.model_type == "vision":
-            # spectrogram conversion and augmentation 
-            audio_augmented = self._vision_augmentations(audio_augmented) #!TODO: its conversion + augmentation
-            
+    def _augment_background_noise(self, batch, audio_augmented):
+        noise_events = {key: batch[key] for key in ["filepath", "no_call_events"]}
+        self.background_noise.noise_events = noise_events
+        audio_augmented = self.background_noise(audio_augmented)
         return audio_augmented
     
     def _zero_mean_unit_var_norm(
@@ -338,7 +333,23 @@ class TransformsWrapper(BaseTransforms):
                 
                 normed_input_values.append(normed_vector)
         return torch.stack(normed_input_values)
-   
+    
+    def _audio_augmentations(self, audio_augmented, attention_mask):
+        #TODO vectorize this
+        if self.preprocessing.normalize_waveform == "instance_normalization":
+            # normalize #!TODO: do we have to normalize before spectrogram? '#TODO Implement normalizaton module
+            audio_augmented = self._zero_mean_unit_var_norm(
+                input_values=audio_augmented,
+                attention_mask=attention_mask
+            )
+        elif self.preprocessing.normalize_waveform == "instance_min_max":
+            audio_augmented = self._min_max_scaling(
+                input_values=audio_augmented,
+                attention_mask=attention_mask
+            )
+        return audio_augmented
+    
+    
     def _vision_augmentations(self, audio_augmented):
         spectrograms = self._spectrogram_conversion(audio_augmented)
         if self.spec_aug is not None:
