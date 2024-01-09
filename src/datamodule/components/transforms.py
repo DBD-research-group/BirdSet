@@ -70,7 +70,7 @@ class BaseTransforms:
         1. Applies Event Decoding (almost always)
         2. Applies feature extraction with FeatureExtractor
         """
-        batch = self.transform_batch(batch)
+        batch = self.decode_batch(batch)
         
         values = self.transform_values(batch)
         
@@ -78,7 +78,7 @@ class BaseTransforms:
 
         return {"input_values": values, "labels": labels}
     
-    def transform_batch(self, batch):
+    def decode_batch(self, batch):
         # we overwrite the feature extractor with None because we can do this here manually 
         # this is quite complicated if we want to make adjustments to non bird methods
         if self.event_decoder is not None: 
