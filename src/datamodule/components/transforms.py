@@ -122,13 +122,6 @@ class BaseTransforms:
         
         return labels
     
-    def augment_waveform_batch(self, waveform_batch, attention_mask, batch):
-        """
-        Do your augmentations in derived class here
-        """
-        
-        return waveform_batch
-    
     def set_mode(self, mode):
         self.mode = mode
     
