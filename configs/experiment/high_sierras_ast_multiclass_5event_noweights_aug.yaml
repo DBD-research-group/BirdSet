@@ -15,30 +15,37 @@ test: True
 
 module:
   optimizer:
-    lr: 2e-5
+    lr: 1e-5
+  # lr_scheduler:
+  #   scheduler:
+  #     _target_: transformers.get_cosine_schedule_with_warmup
+  #   extras:
+  #     interval: step
+  #     warmup_ratio: 0.05
 
 trainer:
   min_epochs: 1
-  max_epochs: 5
+  max_epochs: 10
 
 datamodule:
   dataset:
     val_split: 0.1
     class_weights_loss: null
     class_weights_sampler: null
+    classlimit: 800
   transforms:
     preprocessing:
       normalize_waveform: instance_normalization
 
   loaders:
     train:
-      batch_size: 5
+      batch_size: 8
       shuffle: True
       num_workers: 6
       drop_last: True
       prefetch_factor: 4
     valid:
-      batch_size: 5
+      batch_size: 8
 
   mapper: 
     event_limit: 5
