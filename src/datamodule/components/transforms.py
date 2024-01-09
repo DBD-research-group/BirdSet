@@ -25,7 +25,7 @@ class PreprocessingConfig:
     db_scale: bool = True
     target_height: int | None = None
     target_width: int | None = 1024
-    normalize_spectorgram: bool = True
+    normalize_spectrogram: bool = True
     normalize_waveform: Literal['instance_normalization', 'instance_min_max'] | None  = None
 
 class TransformsWrapper:

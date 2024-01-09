@@ -24,6 +24,7 @@ dataset:
   sampling_rate: ${module.network.sampling_rate}
   class_weights_loss: null
   class_weights_sampler: null
+  classlimit: 500
 
 
 
