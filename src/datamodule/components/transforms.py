@@ -138,7 +138,7 @@ class BaseTransforms:
 
         return batch
 
-class TransformsWrapper(BaseTransforms):
+class GADMETransformsWrapper(BaseTransforms):
     """
     A class to handle audio transformations for different model types and modes.
 
@@ -238,19 +238,18 @@ class TransformsWrapper(BaseTransforms):
         attention_mask = waveform_batch["attention_mask"]
         input_values = waveform_batch["input_values"]
         input_values = input_values.unsqueeze(1)
-        
-        do_wave_augmentations = self.wave_aug is not None
-        if do_wave_augmentations:
+
+        if self.wave_aug: 
             input_values = self.wave_aug(
-                samples=waveform_batch, sample_rate=self.sampling_rate
+                samples=input_values, sample_rate=self.sampling_rate
             )
         
         # shape: batch x 1 x sample_rate
         if self.background_noise:
-            input_values = self._augment_background_noise(batch, input_values)
+            input_values = self._augment_background_noise(batch, input_values) #!TODO: Remove? 
                 
         if self.model_type == "waveform":
-           input_values = self._audio_augmentations(input_values, attention_mask)
+           input_values = self._waveform_scaling(input_values, attention_mask) #!TODO: only for waveform?!
 
         if self.model_type == "vision":
             # spectrogram conversion and augmentation 
@@ -334,7 +333,7 @@ class TransformsWrapper(BaseTransforms):
                 normed_input_values.append(normed_vector)
         return torch.stack(normed_input_values)
     
-    def _audio_augmentations(self, audio_augmented, attention_mask):
+    def _waveform_scaling(self, audio_augmented, attention_mask):
         #TODO vectorize this
         if self.preprocessing.normalize_waveform == "instance_normalization":
             # normalize #!TODO: do we have to normalize before spectrogram? '#TODO Implement normalizaton module
@@ -382,7 +381,7 @@ class TransformsWrapper(BaseTransforms):
         )
         # batch_size x 1 x height x width
         if self.preprocessing.normalize_spectrogram:
-            audio_augmented = (audio_augmented - (-4.268)) / (4.569 * 2)
+            audio_augmented = (audio_augmented - (-4.268)) / (4.569 * 2) #!TODO!
         return audio_augmented
    
     def _prepare_call(self):

@@ -1,6 +1,6 @@
 from collections import Counter
 from src.datamodule.components.event_decoding import EventDecoding
-from src.datamodule.components.transforms import TransformsWrapper
+from src.datamodule.components.transforms import GADMETransformsWrapper
 from src.datamodule.components.event_mapping import XCEventMapping
 from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
 from datasets import DatasetDict, Dataset
@@ -14,7 +14,7 @@ class PretrainDataModule(BaseDataModuleHF):
             self,
             dataset: DatasetConfig = DatasetConfig(),
             loaders: LoadersConfig = LoadersConfig(),
-            transforms: TransformsWrapper = TransformsWrapper(),
+            transforms: GADMETransformsWrapper = GADMETransformsWrapper(),
             mapper: XCEventMapping = XCEventMapping()
     ):
         super().__init__(

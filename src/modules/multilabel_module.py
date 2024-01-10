@@ -13,6 +13,7 @@ class MultilabelModule(BaseModule):
             logging_params,
             num_epochs,
             len_trainset,
+            batch_size,
             task,
             class_weights_loss,
             label_counts
@@ -29,7 +30,8 @@ class MultilabelModule(BaseModule):
             len_trainset=len_trainset,
             task=task,
             class_weights_loss=class_weights_loss,
-            label_counts=label_counts
+            label_counts=label_counts,
+            batch_size=batch_size
         )
 
     def test_step(self, batch, batch_idx):
