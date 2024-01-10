@@ -49,19 +49,19 @@ metrics:
     #   num_labels: ${datamodule.dataset.n_classes}
     #   average: "macro"
     #   thresholds: null
-  eval_complete:
-    pcmap:
-      _target_: src.modules.metrics.pcmAP
-      num_labels: ${datamodule.dataset.n_classes}
-      padding_factor: 5
-      average: macro
-      thresholds: null
-    cmap5:
-      _target_: src.modules.metrics.cmAP
-      num_labels: ${datamodule.dataset.n_classes}
-      sample_threshold: 5
-      average: macro
-      thresholds: null
+  # eval_complete:
+  #   pcmap:
+  #     _target_: src.modules.metrics.pcmAP
+  #     num_labels: ${datamodule.dataset.n_classes}
+  #     padding_factor: 5
+  #     average: macro
+  #     thresholds: null
+  #   cmap5:
+  #     _target_: src.modules.metrics.cmAP
+  #     num_labels: ${datamodule.dataset.n_classes}
+  #     sample_threshold: 5
+  #     average: macro
+  #     thresholds: null
 
 
 output_activation: 
