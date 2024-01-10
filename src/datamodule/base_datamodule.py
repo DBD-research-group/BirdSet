@@ -13,7 +13,7 @@ import numpy as np
 from datasets import load_dataset, load_from_disk, Audio, DatasetDict, Dataset, IterableDataset, IterableDatasetDict
 from torch.utils.data import DataLoader
 from src.datamodule.components.event_mapping import XCEventMapping
-from src.datamodule.components.transforms import TransformsWrapper
+from src.datamodule.components.transforms import GADMETransformsWrapper
 
 @dataclass
 class DatasetConfig:
@@ -55,7 +55,7 @@ class BaseDataModuleHF(L.LightningDataModule):
     Attributes:
         dataset (DatasetConfig): Configuration for the dataset. Defaults to an instance of `DatasetConfig`.
         loaders (LoadersConfig): Configuration for the data loaders. Defaults to an instance of `LoadersConfig`.
-        transforms (TransformsWrapper): Configuration for the data transformations. Defaults to an instance of `TransformsWrapper`.
+        transforms (GADMETransformsWrapper): Configuration for the data transformations. Defaults to an instance of `GADMETransformsWrapper`.
         extractors (DefaultFeatureExtractor): Configuration for the feature extraction. Defaults to an instance of `DefaultFeatureExtractor`.
 
     Methods:
@@ -72,7 +72,7 @@ class BaseDataModuleHF(L.LightningDataModule):
         mapper: XCEventMapping | None = None,
         dataset: DatasetConfig = DatasetConfig(),
         loaders: LoadersConfig = LoadersConfig(),
-        transforms: TransformsWrapper = TransformsWrapper(),
+        transforms: GADMETransformsWrapper = GADMETransformsWrapper(),
         ):
         super().__init__()
         self.dataset_config = dataset

@@ -17,7 +17,7 @@ loss:
   
 lr_scheduler:
   scheduler:
-    _target_: transformers.get_linear_schedule_with_warmup
+    _target_: transformers.get_cosine_schedule_with_warmup
   extras:
     interval: step
     warmup_ratio: 0.05
@@ -49,19 +49,19 @@ metrics:
     #   num_labels: ${datamodule.dataset.n_classes}
     #   average: "macro"
     #   thresholds: null
-  eval_complete:
-    pcmap:
-      _target_: src.modules.metrics.pcmAP
-      num_labels: ${datamodule.dataset.n_classes}
-      padding_factor: 5
-      average: macro
-      thresholds: null
-    cmap5:
-      _target_: src.modules.metrics.cmAP
-      num_labels: ${datamodule.dataset.n_classes}
-      sample_threshold: 5
-      average: macro
-      thresholds: null
+  # eval_complete:
+  #   pcmap:
+  #     _target_: src.modules.metrics.pcmAP
+  #     num_labels: ${datamodule.dataset.n_classes}
+  #     padding_factor: 5
+  #     average: macro
+  #     thresholds: null
+  #   cmap5:
+  #     _target_: src.modules.metrics.cmAP
+  #     num_labels: ${datamodule.dataset.n_classes}
+  #     sample_threshold: 5
+  #     average: macro
+  #     thresholds: null
 
 
 output_activation: 

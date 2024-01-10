@@ -1,5 +1,5 @@
 from datasets import DatasetDict, Audio
-from src.datamodule.components.transforms import TransformsWrapper
+from src.datamodule.components.transforms import GADMETransformsWrapper
 from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
 import logging
 from datasets import load_dataset, Audio, DatasetDict
@@ -10,7 +10,7 @@ class ESC50(BaseDataModuleHF):
             self,
             dataset: DatasetConfig = DatasetConfig(),
             loaders: LoadersConfig = LoadersConfig(),
-            transforms: TransformsWrapper = TransformsWrapper(),
+            transforms: GADMETransformsWrapper = GADMETransformsWrapper(),
             mapper: None = None
     ):
         super().__init__(
