@@ -5,7 +5,6 @@ import numpy as np
 from omegaconf import DictConfig
 from src.datamodule.components.feature_extraction import DefaultFeatureExtractor
 from src.datamodule.components.event_decoding import EventDecoding
-from src.datamodule.components.augmentations import BackgroundNoise
 from src.datamodule.components.augmentations import Compose
 
 import torch
@@ -147,7 +146,6 @@ class GADMETransformsWrapper(BaseTransforms):
         sampling_rate (int): The sampling rate of the audio data.
         model_type (str): The type of model being used. Can be "vision" or "waveform".
         preprocessing (PreprocessingConfig): Configuration for preprocessing the audio data.
-        background_noise (BackgroundNoise | None): Configuration for augmenting the audio data with background noise.
         waveform_augmentations (DictConfig): Configuration for augmentations to apply to the waveform.
         spectrogram_augmentations (DictConfig): Configuration for augmentations to apply to the spectrogram.
         event_extractions (DefaultFeatureExtractor): Configuration for extracting events from the audio data.
@@ -158,7 +156,6 @@ class GADMETransformsWrapper(BaseTransforms):
                 sampling_rate: int = 32000,
                 model_type: Literal['vision', 'waveform'] = "waveform",
                 preprocessing: PreprocessingConfig = PreprocessingConfig(),
-                background_noise: BackgroundNoise | None = None,
                 spectrogram_augmentations: DictConfig = DictConfig({}), # TODO: typing is wrong, can also be List of Augmentations
                 waveform_augmentations: DictConfig = DictConfig({}), # TODO: typing is wrong, can also be List of Augmentations
                 decoding: EventDecoding | None = None,
@@ -169,7 +166,6 @@ class GADMETransformsWrapper(BaseTransforms):
 
         self.model_type = model_type
         self.preprocessing = preprocessing
-        self.background_noise = background_noise
         self.waveform_augmentations = waveform_augmentations
         self.spectrogram_augmentations = spectrogram_augmentations
 
@@ -241,10 +237,6 @@ class GADMETransformsWrapper(BaseTransforms):
                 samples=input_values, sample_rate=self.sampling_rate
             )
         
-        # shape: batch x 1 x sample_rate
-        if self.background_noise:
-            input_values = self._augment_background_noise(batch, input_values) #!TODO: Remove? 
-                
         if self.model_type == "waveform":
            input_values = self._waveform_scaling(input_values, attention_mask) #!TODO: only for waveform?!
 
@@ -270,12 +262,6 @@ class GADMETransformsWrapper(BaseTransforms):
         
         return waveform_batch
 
-    def _augment_background_noise(self, batch, audio_augmented):
-        noise_events = {key: batch[key] for key in ["filepath", "no_call_events"]}
-        self.background_noise.noise_events = noise_events
-        audio_augmented = self.background_noise(audio_augmented)
-        return audio_augmented
-    
     def _zero_mean_unit_var_norm(
             self, input_values, attention_mask, padding_value=0.0
     ):
@@ -385,7 +371,6 @@ class GADMETransformsWrapper(BaseTransforms):
         if self.mode in ("test", "predict"):
             self.wave_aug = None
             self.spec_aug = None
-            self.background_noise = None
         return
     
 class EmbeddingTransforms(BaseTransforms):
