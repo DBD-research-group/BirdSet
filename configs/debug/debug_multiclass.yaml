@@ -3,7 +3,7 @@ task_name: debug
 
 defaults:
   - override /module: multiclass.yaml
-  - override /module/network: ast.yaml
+  - override /module/network: wav2vec2.yaml
   - override /datamodule: high_sierras.yaml
   - override /callbacks: default.yaml 
   - override /trainer: single_gpu.yaml
@@ -22,6 +22,7 @@ module:
   optimizer:
     lr: 1e-5
 
+
 trainer: 
   max_epochs: 1
   accelerator: gpu
@@ -34,8 +35,7 @@ datamodule:
     val_split: 0.1
     subset: null
     n_workers: 1
-    class_weights_loss: False
-    class_weights_sampler: False
+    class_weights: True
   mapper: 
     event_limit: 5
     biggest_cluster: True

@@ -76,12 +76,12 @@ class BaseModule(L.LightningModule):
         )
 
         if self.lrs_params.get("scheduler"):
-            num_training_steps = math.ceil((self.num_epochs * self.len_trainset) / self.batch_size) 
-            # TODO: Handle the case when drop_last=True more explicitly   
+            num_training_steps = math.ceil((self.num_epochs * self.len_trainset) / self.batch_size)
+            # TODO: Handle the case when drop_last=True more explicitly
 
             scheduler_target = self.lrs_params.scheduler._target_
-            is_linear_warmup = scheduler_target == "transformers.get_linear_schedule_with_warmup"  
-            is_cosine_warmup = scheduler_target == "transformers.get_cosine_schedule_with_warmup"       
+            is_linear_warmup = scheduler_target == "transformers.get_linear_schedule_with_warmup"
+            is_cosine_warmup = scheduler_target == "transformers.get_cosine_schedule_with_warmup"
 
             if is_linear_warmup or is_cosine_warmup:
 
@@ -101,7 +101,7 @@ class BaseModule(L.LightningModule):
                     "_convert_": "partial"
                 }
 
-            #instantiate hydra    
+            #instantiate hydra
             scheduler = hydra.utils.instantiate(self.lrs_params.scheduler, **scheduler_args)
             lr_scheduler_dict = {"scheduler": scheduler}
 
@@ -179,8 +179,8 @@ class BaseModule(L.LightningModule):
         test_loss, preds, targets = self.model_step(batch, batch_idx)
 
         self.log(
-            f"test{self.loss.__class__.__name__}",
-            test_loss, 
+            f"test/{self.loss.__class__.__name__}",
+            test_loss,
             on_step=False,
             on_epoch=True,
             prog_bar=True
@@ -199,7 +199,7 @@ class BaseModule(L.LightningModule):
         return {"loss": test_loss, "preds": preds, "targets": targets}
 
     def setup(self, stage):
-        if self.torch_compile and stage=="fit":
+        if self.torch_compile and stage == "fit":
             self.model = torch.compile(self.model)
 
     def on_test_epoch_end(self):
