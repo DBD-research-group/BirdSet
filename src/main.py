@@ -4,7 +4,7 @@ import hydra
 import lightning as L 
 from omegaconf import OmegaConf
 from src import utils
-import pyrootutils
+import pyrootutils 
 
 log = utils.get_pylogger(__name__)
 #rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
@@ -44,7 +44,7 @@ def main(cfg):
 
     # Setup logger
     log.info(f"Instantiate logger")
-    logger = utils.instantiate_wandb(cfg)
+    logger = utils.instantiate_wandb(cfg) 
 
     # Setup callbacks
     log.info(f"Instantiate callbacks")
@@ -56,11 +56,11 @@ def main(cfg):
         cfg.trainer, callbacks= callbacks, logger=logger
     )
 
-    # Setup model
-    log.info(f"Instantiate model <{cfg.module.network.model._target_}>")
+    # Setup model 
+    log.info(f"Instantiate model <{cfg.module.network.model._target_}>")     
     model = hydra.utils.instantiate(
         cfg.module,
-        num_epochs=cfg.trainer.max_epochs,
+        num_epochs=cfg.trainer.max_epochs, #?
         len_trainset=datamodule.len_trainset,
         batch_size=datamodule.loaders_config.train.batch_size,
         label_counts=datamodule.num_train_labels,
@@ -68,7 +68,7 @@ def main(cfg):
     )
 
     object_dict = {
-        "cfg": cfg,
+        "cfg": cfg, 
         "datamodule": datamodule,
         "model": model,
         "callbacks": callbacks,
@@ -87,7 +87,7 @@ def main(cfg):
             ckpt_path=cfg.get("ckpt_path"))
         #!TODO: check
         model.model.model.save_pretrained(f"last_ckpt_hf") #triple model check
-
+    
         train_metrics = trainer.callback_metrics
 
     if cfg.get("test"):
@@ -103,7 +103,7 @@ def main(cfg):
             log.info(
                 f"The best checkpoint for {cfg.callbacks.model_checkpoint.monitor}"
                 f" is {trainer.checkpoint_callback.best_model_score}"
-                f" and saved in {ckpt_path}"
+                f" and saved in {ckpt_path}"   
             )
         trainer.test(model=model, datamodule=datamodule, ckpt_path=ckpt_path)
 
@@ -118,9 +118,10 @@ def main(cfg):
             **cfg.extras.state_dict_saving_params  
         )
 
+    
     #metric_dict = {**train_metrics, **test_metrics}
     
     utils.close_loggers()
 
-if __name__ == "__main__":
+if __name__ == "__main__":    
     main()
