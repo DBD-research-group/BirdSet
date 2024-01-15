@@ -147,6 +147,7 @@ class GADMETransformsWrapper(BaseTransforms):
         sampling_rate (int): The sampling rate of the audio data.
         model_type (str): The type of model being used. Can be "vision" or "waveform".
         preprocessing (PreprocessingConfig): Configuration for preprocessing the audio data.
+        background_noise (BackgroundNoise | None): Configuration for augmenting the audio data with background noise.
         waveform_augmentations (DictConfig): Configuration for augmentations to apply to the waveform.
         spectrogram_augmentations (DictConfig): Configuration for augmentations to apply to the spectrogram.
         event_extractions (DefaultFeatureExtractor): Configuration for extracting events from the audio data.
@@ -157,6 +158,7 @@ class GADMETransformsWrapper(BaseTransforms):
                 sampling_rate: int = 32000,
                 model_type: Literal['vision', 'waveform'] = "waveform",
                 preprocessing: PreprocessingConfig = PreprocessingConfig(),
+                background_noise: BackgroundNoise | None = None,
                 spectrogram_augmentations: DictConfig = DictConfig({}), # TODO: typing is wrong, can also be List of Augmentations
                 waveform_augmentations: DictConfig = DictConfig({}), # TODO: typing is wrong, can also be List of Augmentations
                 decoding: EventDecoding | None = None,
@@ -167,6 +169,7 @@ class GADMETransformsWrapper(BaseTransforms):
 
         self.model_type = model_type
         self.preprocessing = preprocessing
+        self.background_noise = background_noise
         self.waveform_augmentations = waveform_augmentations
         self.spectrogram_augmentations = spectrogram_augmentations
 
@@ -179,12 +182,6 @@ class GADMETransformsWrapper(BaseTransforms):
         self.wave_aug = torch_audiomentations.Compose(
             transforms=wave_aug,
             output_type="tensor")
-        
-        # self.wave_aug_background = Compose(
-        #     transforms=[BackgroundNoise(p=0.5)]
-        # )
-
-        self.background_noise = BackgroundNoise(p=0.5)
 
         # spectrogram augmentations
         spec_aug = []
