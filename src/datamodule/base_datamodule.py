@@ -367,17 +367,16 @@ class BaseDataModuleHF(L.LightningDataModule):
 
         # Subset the dataset
         return dataset.select(limited_indices)
-    
+
     def map(self, x, label_name):
         file = x["filepath"]
         label = x[label_name]
         return {"id": f"{file}-{label}"}
-    
+
     def _smart_sampling(self, dataset, label_name, class_limit, event_limit):
         class_limit = class_limit if class_limit else -float("inf")
         dataset = dataset.map(lambda x: self.map(x, label_name))
         df = pd.DataFrame(dataset)
-        # df = df[df[label_name] != 0]
         path_label_count = df.groupby(["id", label_name], as_index=False).size()
         path_label_count = path_label_count.set_index("id")
         class_sizes = df.groupby(label_name).size()
@@ -412,7 +411,7 @@ class BaseDataModuleHF(L.LightningDataModule):
         for file, indices in all_file_indices.items():
             limit = path_label_count.loc[file]["size"]
             limited_indices.extend(random.sample(indices, limit))
-            
+
         dataset = dataset.remove_columns("id")
         return dataset.select(limited_indices)
 
