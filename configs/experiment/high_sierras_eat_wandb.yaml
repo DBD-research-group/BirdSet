@@ -1,21 +1,23 @@
 # @package _global_
 #package global is neccessary!
 defaults:
-  - override /datamodule: esc50.yaml
+  - override /datamodule: high_sierras.yaml
   - override /datamodule/transforms: eat_default_transforms.yaml
+  - override /datamodule/transforms/decoding: bird_event_decoder.yaml
+  - override /datamodule/transforms/feature_extractor: default_aug.yaml
   - override /module: multiclass.yaml
   - override /module/network: eat_soundnet.yaml
   - override /callbacks: default.yaml 
   - override /trainer: single_gpu.yaml
 
 
-tags: ["esc50", "eat", "no-augmentations"]
+tags: ["high_sierras", "eat", 'no-augmentations']
 seed: 2
 
 callbacks:
   early_stopping:
     patience: 50
-    min_delta: 5e-10
+    min_delta: 5e-10da
 
 module:
   lr_scheduler:
@@ -26,7 +28,7 @@ module:
     weight_decay: 0.01
   network:
     model:
-      n_classes: 50
+      n_classes: 22
       seq_len: 110250
 trainer:
   min_epochs: 1
@@ -42,7 +44,9 @@ datamodule:
       num_workers: 16
     test:
       batch_size: 6
-
+  transforms:
+    # override waveform_augmentations with empty list in DictConfig
+    waveform_augmentations: "${oc.decode: '[]'}"
 logger:
   wandb:
     tags: ${tags}
