@@ -1,6 +1,6 @@
 from collections import Counter
 from src.datamodule.components.event_decoding import EventDecoding
-from src.datamodule.components.transforms import TransformsWrapper
+from src.datamodule.components.transforms import GADMETransformsWrapper
 from src.datamodule.components.event_mapping import XCEventMapping
 from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
 from datasets import DatasetDict, Dataset
@@ -14,7 +14,7 @@ class PretrainDataModule(BaseDataModuleHF):
             self,
             dataset: DatasetConfig = DatasetConfig(),
             loaders: LoadersConfig = LoadersConfig(),
-            transforms: TransformsWrapper = TransformsWrapper(),
+            transforms: GADMETransformsWrapper = GADMETransformsWrapper(),
             mapper: XCEventMapping = XCEventMapping()
     ):
         super().__init__(
@@ -69,6 +69,12 @@ class PretrainDataModule(BaseDataModuleHF):
 
             if self.dataset_config.class_weights_loss or self.dataset_config.class_weights_sampler:
                 self.num_train_labels = self._count_labels((dataset["train"]["ebird_code"]))
+            
+            if self.dataset_config.classlimit:
+                dataset["train"] = self._limit_classes(
+                    dataset=dataset["train"],
+                    label_name="ebird_code",
+                    limit=self.dataset_config.classlimit)
 
             dataset = dataset.rename_column("ebird_code", "labels")
 

@@ -35,12 +35,12 @@ trainer:
 datamodule:
   dataset:
     val_split: 0.1
-    subset: 100
+    subset: 50000
     n_workers: 1
     class_weights_loss: null
     class_weights_sampler: null
   mapper: 
-    event_limit: 1
+    event_limit: 5
     biggest_cluster: True
     no_call: False
   loaders:

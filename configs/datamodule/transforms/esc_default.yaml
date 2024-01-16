@@ -1,4 +1,4 @@
-_target_: src.datamodule.components.transforms.TransformsWrapper
+_target_: src.datamodule.components.transforms.GADMETransformsWrapper
 sampling_rate: ${module.network.sampling_rate}
 model_type: ${module.network.model_type}
 task: ${datamodule.dataset.task}

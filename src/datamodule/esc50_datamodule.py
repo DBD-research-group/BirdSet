@@ -1,6 +1,6 @@
-from typing import Literal
-from datasets import Audio
-from src.datamodule.components.transforms import TransformsWrapper
+from datasets import DatasetDict, Audio
+from pyparsing import Literal
+from src.datamodule.components.transforms import GADMETransformsWrapper
 from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
 from datasets import load_dataset, Audio, DatasetDict
 from src.datamodule.components.event_mapping import Mapper
@@ -10,8 +10,8 @@ class ESC50(BaseDataModuleHF):
             self,
             dataset: DatasetConfig = DatasetConfig(),
             loaders: LoadersConfig = LoadersConfig(),
-            transforms: TransformsWrapper = TransformsWrapper(),
-            mapper: Mapper | None = None
+            transforms: GADMETransformsWrapper = GADMETransformsWrapper(),
+            mapper: None = None
     ):
         super().__init__(
             dataset=dataset,

@@ -180,6 +180,8 @@ class XCEventMapping(Mapper):
         
         return no_event_periods
 
+#class ClassLimitation():
+
         
 
 # class XCEventMapping:

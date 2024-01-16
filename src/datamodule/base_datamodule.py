@@ -5,13 +5,16 @@ import random
 import os
 from typing import List, Literal
 from collections import Counter
+from torch.utils.data import Subset
 
 import lightning as L
+import numpy as np
+import pandas as pd
 
 from datasets import load_dataset, load_from_disk, Audio, DatasetDict, Dataset, IterableDataset, IterableDatasetDict
 from torch.utils.data import DataLoader
 from src.datamodule.components.event_mapping import XCEventMapping
-from src.datamodule.components.transforms import TransformsWrapper
+from src.datamodule.components.transforms import GADMETransformsWrapper
 
 @dataclass
 class DatasetConfig:
@@ -28,6 +31,7 @@ class DatasetConfig:
     sampling_rate: int = 32_000
     class_weights_loss = None
     class_weights_sampler = None
+    class_limit: int = None
 
 
 @dataclass
@@ -53,7 +57,7 @@ class BaseDataModuleHF(L.LightningDataModule):
     Attributes:
         dataset (DatasetConfig): Configuration for the dataset. Defaults to an instance of `DatasetConfig`.
         loaders (LoadersConfig): Configuration for the data loaders. Defaults to an instance of `LoadersConfig`.
-        transforms (TransformsWrapper): Configuration for the data transformations. Defaults to an instance of `TransformsWrapper`.
+        transforms (GADMETransformsWrapper): Configuration for the data transformations. Defaults to an instance of `GADMETransformsWrapper`.
         extractors (DefaultFeatureExtractor): Configuration for the feature extraction. Defaults to an instance of `DefaultFeatureExtractor`.
 
     Methods:
@@ -70,7 +74,7 @@ class BaseDataModuleHF(L.LightningDataModule):
         mapper: XCEventMapping | None = None,
         dataset: DatasetConfig = DatasetConfig(),
         loaders: LoadersConfig = LoadersConfig(),
-        transforms: TransformsWrapper = TransformsWrapper(),
+        transforms: GADMETransformsWrapper = GADMETransformsWrapper(),
         ):
         super().__init__()
         self.dataset_config = dataset
@@ -127,10 +131,10 @@ class BaseDataModuleHF(L.LightningDataModule):
             return
 
         logging.info("Prepare Data")
-        
+
         dataset = self._load_data()
-        dataset = self._preprocess_data(dataset, self.dataset_config.task)
         dataset = self._create_splits(dataset)
+        dataset = self._preprocess_data(dataset)
 
         # set the length of the training set to be accessed by the model
         self.len_trainset = len(dataset["train"])        
@@ -334,7 +338,7 @@ class BaseDataModuleHF(L.LightningDataModule):
                 logging.info("test")
                 self.test_dataset = self._get_dataset("test")
 
-    def _count_labels(self,labels):
+    def _count_labels(self, labels):
         # frequency
         label_counts = Counter(labels)
 
@@ -346,6 +350,65 @@ class BaseDataModuleHF(L.LightningDataModule):
         
         return counts
 
+    def _limit_classes(self, dataset, label_name, limit):
+        # Count labels
+        label_counts = Counter(dataset[label_name])
+
+        # Gather indices for each class
+        all_indices = {label: [] for label in label_counts.keys()}
+        for idx, label in enumerate(dataset[label_name]):
+            all_indices[label].append(idx)
+
+        # Randomly select indices for classes exceeding the limit
+        limited_indices = []
+        for label, indices in all_indices.items():
+            if label_counts[label] > limit:
+                limited_indices.extend(random.sample(indices, limit))
+            else:
+                limited_indices.extend(indices)
+
+        # Subset the dataset
+        return dataset.select(limited_indices)
+
+    def _smart_sampling(self, dataset, label_name, class_limit, event_limit):
+        class_limit = class_limit if class_limit else -float("inf")
+        df = pd.DataFrame(dataset)
+        path_label_count = df.groupby(["filepath", label_name], as_index=False).size()
+        path_label_count = path_label_count.set_index("filepath")
+        class_sizes = df.groupby(label_name).size()
+
+        for label in class_sizes.index:
+            current = path_label_count[path_label_count[label_name] == label]
+            total = current["size"].sum()
+            most = current["size"].max()
+
+            while total > class_limit or most != event_limit:
+                largest_count = current["size"].value_counts()[current["size"].max()]
+                n_largest = current.nlargest(largest_count + 1, "size")
+                to_del = (n_largest["size"].max() - n_largest["size"].min())
+
+                idxs = n_largest[n_largest["size"] == n_largest["size"].max()].index
+                if total - (to_del * largest_count) < class_limit or most == event_limit or most == 1:
+                    break
+                for idx in idxs:
+                    current.at[idx, "size"] = current.at[idx, "size"] - to_del
+                    path_label_count.at[idx, "size"] = path_label_count.at[idx, "size"] - to_del
+
+                total = current["size"].sum()
+                most = current["size"].max()
+
+        event_counts = Counter(dataset["filepath"])
+
+        all_file_indices = {label: [] for label in event_counts.keys()}
+        for idx, label in enumerate(dataset["filepath"]):
+            all_file_indices[label].append(idx)
+
+        limited_indices = []
+        for file, indices in all_file_indices.items():
+            limit = path_label_count.loc[file]["size"]
+            limited_indices.extend(random.sample(indices, limit))
+
+        return dataset.select(limited_indices)
 
     def _classes_one_hot(self, batch):
         """
