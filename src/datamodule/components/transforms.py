@@ -176,31 +176,9 @@ class GADMETransformsWrapper(BaseTransforms):
             aug = self.waveform_augmentations.get(wave_aug_name)
             wave_aug.append(aug)
 
-        if self.mode == "train":
-            # waveform augmentations
-            wave_aug = []
-            if self.waveform_augmentations:
-                for wave_aug_name in self.waveform_augmentations:
-                    aug = self.waveform_augmentations.get(wave_aug_name)
-                    wave_aug.append(aug)
-
-            self.wave_aug = torch_audiomentations.Compose(
-                transforms=wave_aug,
-                output_type="tensor")
-
-            # spectrogram augmentations
-            spec_aug = []
-            if self.spectrogram_augmentations:
-                for spec_aug_name in self.spectrogram_augmentations:
-                    aug = self.spectrogram_augmentations.get(spec_aug_name)
-                    spec_aug.append(aug)
-                
-            self.spec_aug = torchvision.transforms.Compose(
-                transforms=spec_aug)
-                
-        elif self.mode in ("valid", "test", "predict"):
-            self.wave_aug = None
-            self.spec_aug = None
+        self.wave_aug = torch_audiomentations.Compose(
+            transforms=wave_aug,
+            output_type="tensor")
         
         # self.wave_aug_background = Compose(
         #     transforms=[BackgroundNoise(p=0.5)]

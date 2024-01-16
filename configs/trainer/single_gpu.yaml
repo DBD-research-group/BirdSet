@@ -2,4 +2,4 @@ defaults:
   - default.yaml
 
 accelerator: gpu
-devices: [3]
+devices: 1
