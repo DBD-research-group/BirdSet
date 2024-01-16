@@ -98,7 +98,6 @@ class GADMEDataModule(BaseDataModuleHF):
             dataset = dataset.rename_column("ebird_code_multilabel", "labels")
 
             if self.dataset_config.classlimit or self.dataset_config.eventlimit:
-                print("smart sampling")
                 dataset["train"] = self._smart_sampling(
                     dataset=dataset["train"],
                     label_name="ebird_code",
