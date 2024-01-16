@@ -1,0 +1,6 @@
+multilabel_mix: 
+  _target_: datamodule.components.augmentations.MultilabelMix
+  p: 0.6
+  min_snr_in_db: 3.0
+  max_snr_in_db: 30.0
+  mix_target: union

@@ -72,11 +72,11 @@ class BaseTransforms:
         """
         batch = self.decode_batch(batch)
         
-        values = self.transform_values(batch)
+        input_values, labels = self.transform_values(batch)
         
-        labels = self.transform_labels(batch)
+        labels = self.transform_labels(labels)
 
-        return {"input_values": values, "labels": labels}
+        return {"input_values": input_values, "labels": labels}
     
     def decode_batch(self, batch):
         # we overwrite the feature extractor with None because we can do this here manually 
@@ -108,17 +108,14 @@ class BaseTransforms:
         # waveform_batch = waveform_batch["input_values"].unsqueeze(1)
         waveform_batch = waveform_batch["input_values"]
         
-        return waveform_batch
+        return waveform_batch, batch["labels"]
     
-    def transform_labels(self, batch):
-        # print(batch)
-        if self.task == "multiclass":
-            labels = batch["labels"]
+    def transform_labels(self, labels):
+        if self.task == "multilabel": #for bcelosswithlogits
+            labels = torch.tensor(labels, dtype=torch.float16)
         
-        else:
-            # self.task == "multilabel"
-            # datatype of labels must be float32 to support BCEWithLogitsLoss
-            labels = torch.tensor(batch["labels"], dtype=torch.float32)
+        elif self.task =="multiclass":
+            labels = labels
         
         return labels
     
@@ -160,15 +157,18 @@ class GADMETransformsWrapper(BaseTransforms):
                 spectrogram_augmentations: DictConfig = DictConfig({}), # TODO: typing is wrong, can also be List of Augmentations
                 waveform_augmentations: DictConfig = DictConfig({}), # TODO: typing is wrong, can also be List of Augmentations
                 decoding: EventDecoding | None = None,
-                feature_extractor: DefaultFeatureExtractor = DefaultFeatureExtractor()
+                feature_extractor: DefaultFeatureExtractor = DefaultFeatureExtractor(),
+                max_length: int = 5,
+                n_classes: int = None
             ):
-        max_length = 5
+        #max_length = 5
         super().__init__(task, sampling_rate, max_length, decoding, feature_extractor)
 
         self.model_type = model_type
         self.preprocessing = preprocessing
         self.waveform_augmentations = waveform_augmentations
         self.spectrogram_augmentations = spectrogram_augmentations
+        self.n_classes = n_classes
 
         # waveform augmentations
         wave_aug = []
@@ -178,13 +178,14 @@ class GADMETransformsWrapper(BaseTransforms):
 
         self.wave_aug = torch_audiomentations.Compose(
             transforms=wave_aug,
-            output_type="tensor")
-        
+            output_type="object_dict")
+
         # self.wave_aug_background = Compose(
         #     transforms=[BackgroundNoise(p=0.5)]
         # )
 
-        self.background_noise = BackgroundNoise(p=0.5)
+        #self.background_noise = BackgroundNoise(p=0.5)
+        self.background_noise = None
 
         # spectrogram augmentations
         spec_aug = []
@@ -238,12 +239,44 @@ class GADMETransformsWrapper(BaseTransforms):
         attention_mask = waveform_batch["attention_mask"]
         input_values = waveform_batch["input_values"]
         input_values = input_values.unsqueeze(1)
+        labels = torch.tensor(batch["labels"])
 
         if self.wave_aug: 
-            input_values = self.wave_aug(
-                samples=input_values, sample_rate=self.sampling_rate
-            )
-        
+            if self.task == "multilabel":
+                labels = labels.unsqueeze(1).unsqueeze(1)
+                output_dict = self.wave_aug(
+                    samples=input_values, 
+                    sample_rate=self.sampling_rate,
+                    targets=labels
+                )
+                labels = output_dict.targets.squeeze(1).squeeze(1)
+
+            elif self.task == "multiclass":
+                if "multilabel_mix" in self.waveform_augmentations:
+                    labels = torch.nn.functional.one_hot(labels, self.n_classes)
+                    labels = labels.unsqueeze(1).unsqueeze(1)
+                    
+                    output_dict = self.wave_aug(
+                            samples=input_values, 
+                            sample_rate=self.sampling_rate,
+                            targets=labels
+                        )
+                    labels = output_dict.targets.squeeze(1).squeeze(1).to(torch.float16)
+                    # Iterate through each row  # split labels (not optimal, has to be probabilistic depending on snr)
+                    for i in range(labels.shape[0]):
+                        # Check if the row contains exactly two '1's
+                        if torch.sum(labels[i] == 1) == 2:
+                            # Replace the '1's with '0.5's in that row
+                            labels[i][labels[i] == 1] = 0.5
+
+                else:
+                    output_dict = self.wave_aug(
+                        samples=input_values, 
+                        sample_rate=self.sampling_rate,
+                    )
+                    
+            input_values = output_dict.samples
+
         # shape: batch x 1 x sample_rate
         if self.background_noise:
             input_values = self._augment_background_noise(batch, input_values) #!TODO: Remove? 
@@ -254,8 +287,8 @@ class GADMETransformsWrapper(BaseTransforms):
         if self.model_type == "vision":
             # spectrogram conversion and augmentation 
             input_values = self._vision_augmentations(input_values) #!TODO: its conversion + augmentation
-            
-        return input_values
+        
+        return input_values, labels
 
     def _get_waveform_batch(self, batch):
         waveform_batch = [audio["array"] for audio in batch["audio"]]
