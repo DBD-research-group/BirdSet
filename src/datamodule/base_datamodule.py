@@ -364,7 +364,6 @@ class BaseDataModuleHF(L.LightningDataModule):
                 limited_indices.extend(random.sample(indices, limit))
             else:
                 limited_indices.extend(indices)
-
         # Subset the dataset
         return dataset.select(limited_indices)
 
