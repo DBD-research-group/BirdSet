@@ -1,7 +1,7 @@
 import numpy as np
 import random
 
-class XCEventMapping():
+class XCEventMapping:
     """extracts all event_cluster into individual rows, should be used as mapping
      used on a hf dataset with batched=True (does not save the audio array, only filepath)
 
