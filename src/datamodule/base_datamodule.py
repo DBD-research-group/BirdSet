@@ -31,7 +31,8 @@ class DatasetConfig:
     sampling_rate: int = 32_000
     class_weights_loss = None
     class_weights_sampler = None
-    class_limit: int = None
+    classlimit: int = None
+    eventlimit: int = None
 
 
 @dataclass
@@ -367,14 +368,15 @@ class BaseDataModuleHF(L.LightningDataModule):
         # Subset the dataset
         return dataset.select(limited_indices)
 
-    def _rename_filepath(self, x, label_name):
+    def _unique_identifier(self, x, label_name):
         file = x["filepath"]
         label = x[label_name]
         return {"id": f"{file}-{label}"}
 
     def _smart_sampling(self, dataset, label_name, class_limit, event_limit):
+        print("smart sampling")
         class_limit = class_limit if class_limit else -float("inf")
-        dataset = dataset.map(lambda x: self._rename_filepath(x, label_name))
+        dataset = dataset.map(lambda x: self._unique_identifier(x, label_name))
         df = pd.DataFrame(dataset)
         path_label_count = df.groupby(["id", label_name], as_index=False).size()
         path_label_count = path_label_count.set_index("id")
