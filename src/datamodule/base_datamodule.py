@@ -368,11 +368,17 @@ class BaseDataModuleHF(L.LightningDataModule):
         # Subset the dataset
         return dataset.select(limited_indices)
 
+    def _rename_filepath(self, x, label_name):
+        file = x["filepath"]
+        label = x[label_name]
+        return {"id": f"{file}-{label}"}
+
     def _smart_sampling(self, dataset, label_name, class_limit, event_limit):
         class_limit = class_limit if class_limit else -float("inf")
+        dataset = dataset.map(lambda x: self._rename_filepath(x, label_name))
         df = pd.DataFrame(dataset)
-        path_label_count = df.groupby(["filepath", label_name], as_index=False).size()
-        path_label_count = path_label_count.set_index("filepath")
+        path_label_count = df.groupby(["id", label_name], as_index=False).size()
+        path_label_count = path_label_count.set_index("id")
         class_sizes = df.groupby(label_name).size()
 
         for label in class_sizes.index:
@@ -395,10 +401,10 @@ class BaseDataModuleHF(L.LightningDataModule):
                 total = current["size"].sum()
                 most = current["size"].max()
 
-        event_counts = Counter(dataset["filepath"])
+        event_counts = Counter(dataset["id"])
 
         all_file_indices = {label: [] for label in event_counts.keys()}
-        for idx, label in enumerate(dataset["filepath"]):
+        for idx, label in enumerate(dataset["id"]):
             all_file_indices[label].append(idx)
 
         limited_indices = []
@@ -406,6 +412,7 @@ class BaseDataModuleHF(L.LightningDataModule):
             limit = path_label_count.loc[file]["size"]
             limited_indices.extend(random.sample(indices, limit))
 
+        dataset = dataset.remove_columns("id")
         return dataset.select(limited_indices)
 
     def _classes_one_hot(self, batch):
