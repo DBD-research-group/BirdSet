@@ -32,10 +32,10 @@ trainer:
 datamodule:
   dataset:
     val_split: 0.1
-    subset: null
+    subset: 300
     n_workers: 1
-    class_weights_loss: False
-    class_weights_sampler: False
+    class_weights_loss: null
+    class_weights_sampler: null
   mapper: 
     event_limit: 5
     biggest_cluster: True

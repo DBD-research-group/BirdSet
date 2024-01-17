@@ -1,8 +1,9 @@
 defaults: 
-  - gain.yaml
+  - multilabel_mix.yaml
   - background_noise.yaml
+  - gain.yaml
   - pitch_shift.yaml
-  #- polarity_inversion.yaml
+  # - polarity_inversion.yaml
 
 # waveform_augmentations: 
 #   ColoredNoise:

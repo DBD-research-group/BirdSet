@@ -2,6 +2,8 @@ _target_: src.datamodule.components.transforms.GADMETransformsWrapper
 sampling_rate: ${module.network.sampling_rate}
 model_type: ${module.network.model_type}
 task: ${datamodule.dataset.task}
+max_length: 5
+n_classes: ${datamodule.dataset.n_classes}
 
 defaults:
   - _self_

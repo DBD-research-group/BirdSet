@@ -33,23 +33,23 @@ trainer:
 datamodule:
   dataset:
     val_split: 0.1
-    subset: Null
+    subset: 300
     n_workers: 1
     class_weights_loss: False
     class_weights_sampler: True
 
   loaders:
     train: 
-      batch_size: 8
+      batch_size: 2
       num_workers: 1
       shuffle: True
       pin_memory: False
     valid: 
-      batch_size: 8
+      batch_size: 2
       num_workers: 1 
       pin_memory: False
     test:
-      batch_size: 8
+      batch_size: 2
       num_workers: 1 
       pin_memory: False
 

@@ -14,12 +14,12 @@ optimizer:
 
 loss:
   #_target_: src.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
-  #_target_: torch.nn.BCEWithLogitsLoss
-  _target_: src.modules.losses.focal_loss.MultiLabelFocalLoss
+  _target_: torch.nn.BCEWithLogitsLoss
+  #_target_: src.modules.losses.focal_loss.MultiLabelFocalLoss
   
 lr_scheduler:
   scheduler:
-    _target_: transformers.get_linear_schedule_with_warmup
+    _target_: transformers.get_cosine_schedule_with_warmup
   extras:
     interval: step
     warmup_ratio: 0.05
