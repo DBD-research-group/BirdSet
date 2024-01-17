@@ -134,8 +134,8 @@ class BaseDataModuleHF(L.LightningDataModule):
         logging.info("Prepare Data")
 
         dataset = self._load_data()
-        dataset = self._create_splits(dataset)
         dataset = self._preprocess_data(dataset)
+        dataset = self._create_splits(dataset)
 
         # set the length of the training set to be accessed by the model
         self.len_trainset = len(dataset["train"])        
@@ -374,7 +374,6 @@ class BaseDataModuleHF(L.LightningDataModule):
         return {"id": f"{file}-{label}"}
 
     def _smart_sampling(self, dataset, label_name, class_limit, event_limit):
-        print("smart sampling")
         class_limit = class_limit if class_limit else -float("inf")
         dataset = dataset.map(lambda x: self._unique_identifier(x, label_name))
         df = pd.DataFrame(dataset)
