@@ -135,7 +135,7 @@ class BaseDataModuleHF(L.LightningDataModule):
 
         dataset = self._load_data()
         dataset = self._create_splits(dataset)
-        dataset = self._preprocess_data(dataset)
+        dataset = self._preprocess_data(dataset, self.dataset_config.task)
 
         # set the length of the training set to be accessed by the model
         self.len_trainset = len(dataset["train"])        

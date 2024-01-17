@@ -7,7 +7,7 @@ model:
   n_layers: 4
   nhead: 8
   factors: [4, 4, 4, 4]
-  n_classes: 50
+  n_classes: ${datamodule.dataset.n_classes}
   dim_feedforward: 512
 torch_compile: False
 model_type: 'waveform'
