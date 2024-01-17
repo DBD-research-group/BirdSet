@@ -24,7 +24,7 @@ class GADMEDataModule(BaseDataModuleHF):
     def _load_data(self, decode: bool = False):
         return super()._load_data(decode=decode)
 
-    def _preprocess_data(self, dataset, task_type: Literal['multiclass', 'multilabel']):
+    def _preprocess_data(self, dataset):
         if self.dataset_config.task == "multiclass":
             # pick only train and test dataset
             dataset = DatasetDict({split: dataset[split] for split in ["train", "test"]})
