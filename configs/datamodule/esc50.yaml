@@ -1,4 +1,5 @@
-_target_: src.datamodule.esc50_datamodule.ESC50
+#ESC50
+_target_: src.datamodule.esc50_datamodule.ESC50DataModule
 
 defaults:
   - _self_
