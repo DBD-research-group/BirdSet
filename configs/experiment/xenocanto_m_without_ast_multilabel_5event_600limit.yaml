@@ -1,23 +1,20 @@
 # @package _global_
 #package global is neccessary!
 defaults:
-  - override /datamodule: high_sierras.yaml
+  - override /datamodule: xenocanto_m.yaml
   - override /module: multilabel.yaml
   - override /module/network: ast.yaml
   - override /callbacks: default.yaml 
   - override /trainer: single_gpu.yaml
 
-
-tags: ["high_sierras", "ast", "augment", "multlabel"]
+tags: ["pretrain_xencanto_m", "ast", "multilabel", "5event"]
 seed: 2
+train: True
+test: False
 
 module:
   optimizer:
-    lr: 1e-5
-loss:
-  #_target_: src.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
-  _target_: torch.nn.BCEWithLogitsLoss #cannot be overwritten??
-  #_target_: src.modules.losses.focal_loss.MultiLabelFocalLoss
+    lr: 2e-5
 
 
 trainer:
@@ -29,7 +26,7 @@ datamodule:
     val_split: 0.1
     class_weights_loss: null
     class_weights_sampler: null
-    classlimit: 700
+    classlimit: 600
   transforms:
     preprocessing:
       normalize_waveform: instance_normalization
@@ -39,23 +36,22 @@ datamodule:
       batch_size: 10
       shuffle: True
       num_workers: 6
-      drop_last: False
+      drop_last: True
       prefetch_factor: 4
-
     valid:
       batch_size: 10
-    test:
-      batch_size: 10
+
   mapper: 
     event_limit: 5
     biggest_cluster: True
     no_call: True
-
+  
+callbacks:
+  model_checkpoint:
+    save_last: True
+    every_n_epochs: 5
 logger:
   wandb:
     tags: ${tags}
-    group: "high_sierras_aug"
+    group: "pretrain"
     mode: online
-
-
-
