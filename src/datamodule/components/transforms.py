@@ -5,7 +5,6 @@ import numpy as np
 from omegaconf import DictConfig
 from src.datamodule.components.feature_extraction import DefaultFeatureExtractor
 from src.datamodule.components.event_decoding import EventDecoding
-from src.datamodule.components.augmentations import BackgroundNoise
 from src.datamodule.components.augmentations import Compose
 
 import torch
@@ -180,13 +179,6 @@ class GADMETransformsWrapper(BaseTransforms):
             transforms=wave_aug,
             output_type="object_dict")
 
-        # self.wave_aug_background = Compose(
-        #     transforms=[BackgroundNoise(p=0.5)]
-        # )
-
-        #self.background_noise = BackgroundNoise(p=0.5)
-        self.background_noise = None
-
         # spectrogram augmentations
         spec_aug = []
         for spec_aug_name in self.spectrogram_augmentations:
@@ -306,12 +298,6 @@ class GADMETransformsWrapper(BaseTransforms):
         
         return waveform_batch
 
-    def _augment_background_noise(self, batch, audio_augmented):
-        noise_events = {key: batch[key] for key in ["filepath", "no_call_events"]}
-        self.background_noise.noise_events = noise_events
-        audio_augmented = self.background_noise(audio_augmented)
-        return audio_augmented
-    
     def _zero_mean_unit_var_norm(
             self, input_values, attention_mask, padding_value=0.0
     ):
@@ -421,7 +407,6 @@ class GADMETransformsWrapper(BaseTransforms):
         if self.mode in ("test", "predict"):
             self.wave_aug = None
             self.spec_aug = None
-            self.background_noise = None
         return
     
 class EmbeddingTransforms(BaseTransforms):
