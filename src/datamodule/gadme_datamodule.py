@@ -25,15 +25,27 @@ class GADMEDataModule(BaseDataModuleHF):
         )
 
     def _load_data(self, decode: bool = False):
-        return super()._load_data(decode=decode)
+        dataset = super()._load_data(decode=decode)
+        if self.dataset_config.task == "multilabel":
+            dataset["test"] = dataset["test_5s"]
+        return dataset
 
     def _preprocess_data(self, dataset):
         if self.dataset_config.task == "multiclass":
             # pick only train and test dataset
-            dataset = DatasetDict({split: dataset[split] for split in ["train", "test"]})
+            dataset = DatasetDict({split: dataset[split] for split in ["train", "valid", "test"]})
 
             logging.info("> Mapping data set.")
             dataset["train"] = dataset["train"].map(
+                self.event_mapper,
+                remove_columns=["audio"],
+                batched=True,
+                batch_size=300,
+                load_from_cache_file=True,
+                num_proc=self.dataset_config.n_workers,
+            )
+
+            dataset["valid"] = dataset["valid"].map(
                 self.event_mapper,
                 remove_columns=["audio"],
                 batched=True,
@@ -45,17 +57,25 @@ class GADMEDataModule(BaseDataModuleHF):
             if self.dataset_config.class_weights_loss or self.dataset_config.class_weights_sampler:
                 self.num_train_labels = self._count_labels((dataset["train"]["ebird_code"]))
             
-            if self.dataset_config.classlimit:
+            if self.dataset_config.classlimit and not self.dataset_config.eventlimit:
                 dataset["train"] = self._limit_classes(
                     dataset=dataset["train"],
                     label_name="ebird_code",
-                    limit=self.dataset_config.classlimit)
+                    limit=self.dataset_config.classlimit
+                )
+            elif self.dataset_config.classlimit or self.dataset_config.eventlimit:
+                dataset["train"] = self._smart_sampling(
+                    dataset=dataset["train"],
+                    label_name="ebird_code",
+                    class_limit=self.dataset_config.classlimit,
+                    event_limit=self.dataset_config.eventlimit
+                )
 
             dataset = dataset.rename_column("ebird_code", "labels")
 
         elif self.dataset_config.task == "multilabel":
             # pick only train and test_5s dataset
-            dataset = DatasetDict({split: dataset[split] for split in ["train", "test_5s"]})
+            dataset = DatasetDict({split: dataset[split] for split in ["train", "valid", "test"]})
 
             logging.info("> Mapping data set.")
             dataset["train"] = dataset["train"].map(
@@ -66,8 +86,24 @@ class GADMEDataModule(BaseDataModuleHF):
                 load_from_cache_file=True,
                 num_proc=self.dataset_config.n_workers,
             )
+            dataset["valid"] = dataset["valid"].map(
+                self.event_mapper,
+                remove_columns=["audio"],
+                batched=True,
+                batch_size=300,
+                load_from_cache_file=True,
+                num_proc=self.dataset_config.n_workers,
+            )
 
             dataset = dataset.rename_column("ebird_code_multilabel", "labels")
+
+            if self.dataset_config.classlimit or self.dataset_config.eventlimit:
+                dataset["train"] = self._smart_sampling(
+                    dataset=dataset["train"],
+                    label_name="ebird_code",
+                    class_limit=self.dataset_config.classlimit,
+                    event_limit=self.dataset_config.eventlimit
+                )
 
             dataset = dataset.map(
                 self._classes_one_hot,
@@ -80,16 +116,17 @@ class GADMEDataModule(BaseDataModuleHF):
             if self.dataset_config.class_weights_loss or self.dataset_config.class_weights_sampler:
                 self.num_train_labels = self._count_labels((dataset["train"]["ebird_code"]))
 
-            dataset["test"] = dataset["test_5s"]
-            
+            #dataset["test"] = dataset["test_5s"]
 
         dataset["train"] = dataset["train"].select_columns(
             ["filepath", "labels", "detected_events", "start_time", "end_time", "no_call_events"]
         )
+        dataset["valid"] = dataset["valid"].select_columns(
+            ["filepath", "labels", "detected_events", "start_time", "end_time", "no_call_events"]
+        )
         # maybe has to be added to test data to avoid two selections
-        dataset["test"]= dataset["test"].select_columns(
+        dataset["test"] = dataset["test"].select_columns(
             ["filepath", "labels", "detected_events", "start_time", "end_time"]
         )
 
         return dataset
-        
