@@ -5,7 +5,6 @@ import numpy as np
 from omegaconf import DictConfig
 from src.datamodule.components.feature_extraction import DefaultFeatureExtractor
 from src.datamodule.components.event_decoding import EventDecoding
-from src.datamodule.components.augmentations import BackgroundNoise
 from src.datamodule.components.augmentations import Compose
 
 import torch
@@ -179,12 +178,6 @@ class GADMETransformsWrapper(BaseTransforms):
         self.wave_aug = torch_audiomentations.Compose(
             transforms=wave_aug,
             output_type="tensor")
-        
-        # self.wave_aug_background = Compose(
-        #     transforms=[BackgroundNoise(p=0.5)]
-        # )
-
-        self.background_noise = BackgroundNoise(p=0.5)
 
         # spectrogram augmentations
         spec_aug = []
@@ -244,10 +237,6 @@ class GADMETransformsWrapper(BaseTransforms):
                 samples=input_values, sample_rate=self.sampling_rate
             )
         
-        # shape: batch x 1 x sample_rate
-        if self.background_noise:
-            input_values = self._augment_background_noise(batch, input_values) #!TODO: Remove? 
-                
         if self.model_type == "waveform":
            input_values = self._waveform_scaling(input_values, attention_mask) #!TODO: only for waveform?!
 
@@ -273,12 +262,6 @@ class GADMETransformsWrapper(BaseTransforms):
         
         return waveform_batch
 
-    def _augment_background_noise(self, batch, audio_augmented):
-        noise_events = {key: batch[key] for key in ["filepath", "no_call_events"]}
-        self.background_noise.noise_events = noise_events
-        audio_augmented = self.background_noise(audio_augmented)
-        return audio_augmented
-    
     def _zero_mean_unit_var_norm(
             self, input_values, attention_mask, padding_value=0.0
     ):
@@ -388,7 +371,6 @@ class GADMETransformsWrapper(BaseTransforms):
         if self.mode in ("test", "predict"):
             self.wave_aug = None
             self.spec_aug = None
-            self.background_noise = None
         return
     
 class EmbeddingTransforms(BaseTransforms):
