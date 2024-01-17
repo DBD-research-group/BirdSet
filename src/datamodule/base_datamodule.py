@@ -134,8 +134,8 @@ class BaseDataModuleHF(L.LightningDataModule):
         logging.info("Prepare Data")
 
         dataset = self._load_data()
+        dataset = self._preprocess_data(dataset)
         dataset = self._create_splits(dataset)
-        dataset = self._preprocess_data(dataset, self.dataset_config.task)
 
         # set the length of the training set to be accessed by the model
         self.len_trainset = len(dataset["train"])        
@@ -144,7 +144,7 @@ class BaseDataModuleHF(L.LightningDataModule):
         # set to done so that lightning does not call it again
         self._prepare_done = True
        
-    def _preprocess_data(self, dataset, task_type: Literal['multiclass', 'multilabel']):
+    def _preprocess_data(self, dataset):
         """
         Preprocesses the dataset.
         This includes stuff that only needs to be done once.
@@ -189,7 +189,7 @@ class BaseDataModuleHF(L.LightningDataModule):
                 dataset = dataset[list(dataset.keys())[0]]
                 return self._ensure_train_test_splits(dataset)
     
-    def _create_splits(self, dataset: DatasetDict | Dataset) -> DatasetDict:
+    def _create_splits(self, dataset: DatasetDict | Dataset):
         """
         Creates train, validation, and test splits for the dataset.
 
@@ -224,8 +224,6 @@ class BaseDataModuleHF(L.LightningDataModule):
                 return self._create_splits(dataset["train"])
             else: 
                 return self._create_splits(dataset[list(dataset.keys())[0]])
-            
-        
 
     def _load_data(self,decode: bool = True ):
         """
@@ -376,7 +374,6 @@ class BaseDataModuleHF(L.LightningDataModule):
         return {"id": f"{file}-{label}"}
 
     def _smart_sampling(self, dataset, label_name, class_limit, event_limit):
-        print("smart sampling")
         class_limit = class_limit if class_limit else -float("inf")
         dataset = dataset.map(lambda x: self._unique_identifier(x, label_name))
         df = pd.DataFrame(dataset)

@@ -22,6 +22,7 @@ dataset:
   class_weights_loss: null
   class_weights_sampler: null
   classlimit: 500
+  eventlimit: 5
 
 
 

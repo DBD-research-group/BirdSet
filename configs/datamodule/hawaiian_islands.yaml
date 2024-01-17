@@ -19,6 +19,8 @@ dataset:
   task: ${module.task}
   subset: null
   sampling_rate: ${module.network.sampling_rate}
+  classlimit: 500
+  eventlimit: 5
 
 
 

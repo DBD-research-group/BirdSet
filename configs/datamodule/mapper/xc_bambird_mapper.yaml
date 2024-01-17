@@ -1,4 +1,4 @@
 _target_: src.datamodule.components.XCEventMapping
-event_limit: 5
+event_limit: null # redundend because of dataset/eventlimit
 biggest_cluster: True
 no_call: True   
