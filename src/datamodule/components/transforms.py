@@ -160,7 +160,8 @@ class GADMETransformsWrapper(BaseTransforms):
                 decoding: EventDecoding | None = None,
                 feature_extractor: DefaultFeatureExtractor = DefaultFeatureExtractor(),
                 max_length: int = 5,
-                n_classes: int = None
+                n_classes: int = None,
+                nocall_sampler = None
             ):
         #max_length = 5
         super().__init__(task, sampling_rate, max_length, decoding, feature_extractor)
@@ -170,6 +171,7 @@ class GADMETransformsWrapper(BaseTransforms):
         self.waveform_augmentations = waveform_augmentations
         self.spectrogram_augmentations = spectrogram_augmentations
         self.n_classes = n_classes
+        self.nocall_sampler = nocall_sampler
 
         # waveform augmentations
         wave_aug = []
@@ -251,9 +253,13 @@ class GADMETransformsWrapper(BaseTransforms):
                     )
                     
             input_values = output_dict.samples
+
+        if self.nocall_sampler: 
+            self.nocall_sampler(input_values, labels)
                 
         if self.model_type == "waveform":
            input_values = self._waveform_scaling(input_values, attention_mask) #!TODO: only for waveform?!
+           
 
         if self.model_type == "vision":
             # spectrogram conversion and augmentation 

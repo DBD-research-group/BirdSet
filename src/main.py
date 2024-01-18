@@ -86,7 +86,7 @@ def main(cfg):
             datamodule=datamodule,
             ckpt_path=cfg.get("ckpt_path"))
         #!TODO: check
-        model.model.model.save_pretrained(f"last_ckpt_hf") #triple model check
+        #model.model.model.save_pretrained(f"last_ckpt_hf") #triple model check
     
         train_metrics = trainer.callback_metrics
 

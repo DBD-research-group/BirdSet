@@ -169,7 +169,10 @@ class SoundNet(nn.Module):
             nn.init.constant_(m.weight, 1.0)
 
     def forward(self, input_values: torch.Tensor, **kwargs):
-        input_values.unsqueeze_(1)
+        #!TODO: check shape for other models
+        if len(input_values.shape) < 3:
+            input_values.unsqueeze_(1)
+        # has to be (batch x 1 x length)
         x = self.start(input_values)
         x = self.down(x)
         x = self.down2(x)
