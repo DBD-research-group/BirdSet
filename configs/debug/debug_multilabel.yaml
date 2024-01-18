@@ -3,11 +3,13 @@ task_name: debug
 
 defaults:
   - override /module: multilabel.yaml
-  - override /module/network: ast.yaml
+  - override /module/network: eat_soundnet.yaml
   - override /datamodule: high_sierras.yaml
   - override /callbacks: default.yaml 
   - override /trainer: single_gpu.yaml
   - override /datamodule/transforms: bird_default_multilabel.yaml
+  - override /datamodule/transforms/spectrogram_augmentations: none.yaml
+  - override /datamodule/transforms/waveform_augmentations: none.yaml
 
 extras: 
   ignore_warnings: False
@@ -36,8 +38,19 @@ datamodule:
     val_split: 0.1
     subset: 300
     n_workers: 1
-    class_weights_loss: False
-    class_weights_sampler: True
+    class_weights_loss: null
+    class_weights_sampler: null
+    classlimit: 700
+    eventlimit: 5
+  transforms:
+    preprocessing:
+      normalize_waveform: instance_normalization
+    
+  mapper:
+    event_limit: 5
+    biggest_cluster: True
+    no_call: False
+  
 
   loaders:
     train: 

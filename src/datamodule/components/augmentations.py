@@ -732,7 +732,7 @@ class NoCallMixer():
 
         self.paths = self.get_all_file_paths(directory)
         self.no_call_tensor = torch.zeros(n_classes)
-        self.no_call_tensor[0] = 1 # ensure that no_call is 0!!
+        self.no_call_tensor[0] = 1 # !TODO: [ensure that no_call is 0!!
 
     def get_all_file_paths(self, directory):
         pattern = os.path.join(directory, '**', '*')
@@ -759,12 +759,19 @@ class NoCallMixer():
                 
                 else:
                     audio, sr = sf.read(selected_path)
-
+                
                 if sr != self.sampling_rate:
                     audio = librosa.resample(audio, orig_sr=sr, target_sr=self.sampling_rate)
                     sr = self.sampling_rate
 
-                input_values[idx] = torch.tensor(audio)
+                audio = torch.tensor(audio)
+
+                if audio.numel() < input_values[idx].numel():
+                    padding = input_values[idx].numel() - audio.numel()
+                    audio = torch.nn.functional.pad(audio, (0, padding))
+
+
+                input_values[idx] = audio
                 labels[idx] = self.no_call_tensor 
         
         return input_values, labels
