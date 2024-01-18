@@ -7,6 +7,7 @@ defaults:
   - override /datamodule: high_sierras.yaml
   - override /callbacks: default.yaml 
   - override /trainer: single_gpu.yaml
+  - override /datamodule/transforms: bird_default_multilabel.yaml
 
 extras: 
   ignore_warnings: False

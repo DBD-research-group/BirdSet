@@ -6,6 +6,7 @@ defaults:
   - override /module/network: ast.yaml
   - override /callbacks: default.yaml 
   - override /trainer: single_gpu.yaml
+  - override /datamodule/transforms: bird_default_multilabel.yaml
 
 
 tags: ["high_sierras", "ast", "augment", "multlabel"]
@@ -22,7 +23,7 @@ loss:
 
 trainer:
   min_epochs: 1
-  max_epochs: 10
+  max_epochs: 5
 
 datamodule:
   dataset:
@@ -30,6 +31,7 @@ datamodule:
     class_weights_loss: null
     class_weights_sampler: null
     classlimit: 700
+    eventlimit: 5
   transforms:
     preprocessing:
       normalize_waveform: instance_normalization
@@ -47,9 +49,9 @@ datamodule:
     test:
       batch_size: 10
   mapper: 
-    event_limit: 5
+    event_limit: null
     biggest_cluster: True
-    no_call: True
+    no_call: False
 
 logger:
   wandb:

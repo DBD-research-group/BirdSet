@@ -12,6 +12,8 @@ import torch.nn.functional as F
 
 from torchaudio import transforms
 import soundfile as sf 
+from pathlib import Path
+import glob
 
 def pad_spectrogram_width(
     spectrogram: torch.Tensor, target_width: int, value: float
@@ -600,6 +602,7 @@ class BackgroundNoise(AudioTransforms):
 
 from typing import Optional
 import torch
+import os 
 from torch import Tensor
 from torch_audiomentations.core.transforms_interface import BaseWaveformTransform
 from torch_audiomentations.utils.dsp import calculate_rms
@@ -721,9 +724,56 @@ class MultilabelMix(BaseWaveformTransform):
         )          
         
         
+class NoCallMixer():
+    def __init__(self, directory, p, sampling_rate, n_classes, length=5):
+        self.p = p
+        self.sampling_rate = sampling_rate
+        self.length = length 
+
+        self.paths = self.get_all_file_paths(directory)
+        self.no_call_tensor = torch.zeros(n_classes)
+        self.no_call_tensor[0] = 1 # ensure that no_call is 0!!
+
+    def get_all_file_paths(self, directory):
+        pattern = os.path.join(directory, '**', '*')
+        file_paths = [path for path in glob.glob(pattern, recursive=True) if os.path.isfile(path)]
+        
+        absolute_file_paths = [os.path.abspath(path) for path in file_paths]
+        
+        return absolute_file_paths
+
+    def __call__(self, input_values, labels):
+        for idx in range(len(input_values)):
+            if random.random() < self.p: 
+                selected_path = random.choice(self.paths)
+                info = sf.info(selected_path)
+                sr = info.samplerate
+                duration = info.duration
+                
+                if duration >= self.length:
+                    latest_start = int(duration-self.length) * sr
+
+                    start_frame = int(random.randint(0, latest_start))
+                    end_frame = start_frame + self.length * sr
+                    audio, sr = sf.read(selected_path, start=start_frame, stop=end_frame)
+                
+                else:
+                    audio, sr = sf.read(selected_path)
+
+                if sr != self.sampling_rate:
+                    audio = librosa.resample(audio, orig_sr=sr, target_sr=self.sampling_rate)
+                    sr = self.sampling_rate
+
+                input_values[idx] = torch.tensor(audio)
+                labels[idx] = self.no_call_tensor 
+        
+        return input_values, labels
+
+        
+
             
-        
-        
+            
+
 
 
 
