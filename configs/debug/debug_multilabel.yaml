@@ -54,16 +54,16 @@ datamodule:
 
   loaders:
     train: 
-      batch_size: 2
+      batch_size: 8
       num_workers: 1
       shuffle: True
       pin_memory: False
     valid: 
-      batch_size: 2
+      batch_size: 8
       num_workers: 1 
       pin_memory: False
     test:
-      batch_size: 2
+      batch_size: 8
       num_workers: 1 
       pin_memory: False
 

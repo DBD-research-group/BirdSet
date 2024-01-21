@@ -29,8 +29,13 @@ metrics:
     _target_: src.modules.metrics.cmAP
     num_labels: ${datamodule.dataset.n_classes}
     sample_threshold: 0
-    average: macro
     thresholds: null
+  # main:
+  #   _target_: torchmetrics.classification.AveragePrecision
+  #   task: multilabel
+  #   num_labels: ${datamodule.dataset.n_classes}
+  #   average: macro
+
   val_best: 
     _target_: "torchmetrics.MaxMetric"
   additional: 
@@ -40,8 +45,17 @@ metrics:
       num_labels: ${datamodule.dataset.n_classes} 
       average: "macro"
       thresholds: null
-    t1acc:
-      _target_: src.modules.metrics.T1Accuracy
+    # t1acc:
+    #   _target_: src.modules.metrics.TopKAccuracy
+    #   topk: 1
+    t3acc:
+      _target_: src.modules.metrics.TopKAccuracy
+      topk: 5
+    map:
+      _target_: src.modules.metrics.mAP
+      num_labels: ${datamodule.dataset.n_classes}
+    
+      thresholds: null
   eval_complete:
     pcmap:
       _target_: src.modules.metrics.pcmAP
@@ -53,7 +67,6 @@ metrics:
       _target_: src.modules.metrics.cmAP
       num_labels: ${datamodule.dataset.n_classes}
       sample_threshold: 5
-      average: macro
       thresholds: null
 
 output_activation: 
