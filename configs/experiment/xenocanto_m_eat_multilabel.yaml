@@ -1,17 +1,17 @@
 # @package _global_
 #package global is neccessary!
 defaults:
-  - override /datamodule: high_sierras.yaml
+  - override /datamodule: xenocanto_m.yaml
   - override /module: multilabel.yaml
   - override /module/network: eat_soundnet.yaml
   - override /callbacks: default.yaml 
   - override /trainer: single_gpu.yaml
   - override /datamodule/transforms: bird_default_multilabel.yaml
-  # - override /datamodule/transforms/spectrogram_augmentations: none.yaml
-  # - override /datamodule/transforms/waveform_augmentations: none.yaml
 
-tags: ["high_sierras", "eat", "augment", "multilabel"]
-seed: 4
+tags: ["pretrain_xencanto_m", "eat", "multilabel", "5event"]
+seed: 2
+train: True
+test: False
 
 module:
   optimizer:
@@ -39,26 +39,26 @@ datamodule:
 
   loaders:
     train:
-      batch_size: 21
+      batch_size: 22
       shuffle: True
       num_workers: 6
-      drop_last: False
+      drop_last: True
       prefetch_factor: 4
-
     valid:
-      batch_size: 21
-    test:
-      batch_size: 21
+      batch_size: 22
+
   mapper: 
     event_limit: null
     biggest_cluster: True
     no_call: False
+  
+callbacks:
+  model_checkpoint:
+    save_last: True
+    every_n_epochs: 5
 
 logger:
   wandb:
     tags: ${tags}
-    group: "high_sierras_aug"
+    group: "pretrain"
     mode: online
-
-
-

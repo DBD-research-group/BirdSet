@@ -36,7 +36,7 @@ trainer:
 datamodule:
   dataset:
     val_split: 0.1
-    subset: 300
+    subset: 100
     n_workers: 1
     class_weights_loss: null
     class_weights_sampler: null
@@ -54,16 +54,23 @@ datamodule:
 
   loaders:
     train: 
-      batch_size: 2
+      batch_size: 20
       num_workers: 1
       shuffle: True
       pin_memory: False
     valid: 
-      batch_size: 2
+      batch_size: 20
       num_workers: 1 
       pin_memory: False
     test:
-      batch_size: 2
+      batch_size: 20
       num_workers: 1 
       pin_memory: False
 
+tags: ["debug"]
+
+logger:
+  wandb:
+    tags: ${tags}
+    group: "high_sierras_aug"
+    mode: online

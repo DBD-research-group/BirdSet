@@ -1,5 +1,6 @@
 import torch
 from .base_module import BaseModule
+import wandb 
 
 class MultilabelModule(BaseModule):
     def __init__(
@@ -16,8 +17,11 @@ class MultilabelModule(BaseModule):
             batch_size,
             task,
             class_weights_loss,
-            label_counts
+            label_counts,
+            prediction_table
     ):
+        self.prediction_table = prediction_table
+
         super().__init__(
             network = network,
             output_activation=output_activation,
@@ -61,21 +65,52 @@ class MultilabelModule(BaseModule):
 
         return {"loss": test_loss, "preds": preds, "targets": targets}
     
+
+    
     def on_test_epoch_end(self):
         test_targets = torch.cat(self.test_targets).int()
         test_preds = torch.cat(self.test_preds)
-        self.test_complete_metrics(test_preds, test_targets)
+        #self.test_complete_metrics(test_preds, test_targets)
 
         log_dict = {}
 
         # Rename cmap to cmap5!
         for metric_name, metric in self.test_complete_metrics.named_children():
-            # Check for padding_factor attribute
-            if hasattr(metric, 'sample_threshold') and metric.sample_threshold == 5:
-                modified_name = 'cmAP5'
-            else:
-                modified_name = metric_name
-            log_dict[f"test/{modified_name}"] = metric
+            value = metric(test_preds, test_targets)
+            log_dict[f"test/{metric_name}"] = value
 
         self.log_dict(log_dict, **self.logging_params)
+
+        if self.prediction_table:
+            self._wandb_prediction_table(test_preds, test_targets)
+
+
+    def _wandb_prediction_table(self, preds, targets):
+        top5_values_preds, top5_indices_preds = preds.topk(dim=1, k=5, sorted=True)
+
+        top5_values_preds = top5_values_preds.cpu().numpy()
+        top5_indices_preds = top5_indices_preds.cpu().numpy()
+
+        indices_targets= (targets == 1).nonzero(as_tuple=False)
+        multilabel_list = [[] for _ in range(targets.size(0))]        
+        for idx in indices_targets:
+            row, col = idx.tolist()
+            multilabel_list[row].append(col)
+
+        # Convert the indices to strings
+        top5_indices_preds_str = [', '.join(map(str, indices)) for indices in top5_indices_preds]
+        multilabel_list_str = [', '.join(map(str, indices)) for indices in multilabel_list]
+
+        # Prepare the data for the wandb table
+        columns = ["Predictions", "Targets"]
+        data = [[pred_str, tgt_str] for pred_str, tgt_str in zip(top5_indices_preds_str, multilabel_list_str)]
+        table = wandb.Table(data=data, columns=columns)
+
+        # Log the table to wandb
+        wandb.log({"Top 5 Predictions vs Targets": table})
+
+
+
+
+
 
