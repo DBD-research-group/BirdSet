@@ -17,7 +17,6 @@ class cmAP(Metric):
         self.sample_threshold = sample_threshold
         self.thresholds = thresholds
 
-        # Initialize the metric to be used
         self.multilabel_ap = MultilabelAveragePrecision(
             average='macro',
             num_labels=self.num_labels,
@@ -41,7 +40,6 @@ class cmAP(Metric):
         # Calculate class-wise AP
         class_aps = self.multilabel_ap(all_predictions, all_labels)
 
-        # Apply sample threshold
         if self.sample_threshold > 1:
             mask = all_labels.sum(axis=0) >= self.sample_threshold
             class_aps = torch.where(mask, class_aps, torch.nan)
@@ -54,42 +52,6 @@ class cmAP(Metric):
         # Reset accumulated predictions and labels
         self.accumulated_predictions = []
         self.accumulated_labels = []
-
-# class cmAP(torchmetrics.Metric):
-    
-#     def __init__(
-#             self,
-#             num_labels,
-#             sample_threshold,
-#             thresholds=None,
-#         ):
-#         super().__init__()
-
-#         self.average = None
-#         self.num_labels = num_labels
-#         self.sample_threshold = sample_threshold
-#         self.thresholds = thresholds
-
-#         self.multilabel_ap = MultilabelAveragePrecision(
-#             average=self.average,
-#             num_labels=self.num_labels,
-#             thresholds=self.thresholds
-#         )
-
-#         self.add_state("class_aps", default=torch.tensor(0))
-
-
-#     def update(self, logits, labels):
-#         self.class_aps = self.multilabel_ap(logits, labels)
-
-#         if self.sample_threshold > 1:
-#             mask = labels.sum(axis=0) > self.sample_threshold
-#             self.class_aps = self.class_aps.where(mask, torch.nan)
-    
-#     def compute(self):
-#         macro_cmap = self.class_aps.nanmean() #same as macro
-#         return macro_cmap# macro: average of the average classes 
-
 
 class mAP(MultilabelAveragePrecision):
     
@@ -133,22 +95,6 @@ class pcmAP(MultilabelAveragePrecision):
         pcmap = super().__call__(logits, targets, **kwargs)
         return pcmap
 
-# class TopKAccuracy(torchmetrics.Metric):
-#     def __init__(self, **kwargs):
-#         super().__init__(**kwargs)
-#         self.add_state("correct", default=torch.tensor(0), dist_reduce_fx="sum")
-#         self.add_state("total", default=torch.tensor(0), dist_reduce_fx="sum")
-
-#     def update(self, preds, targets):
-#         top_pred_indices = preds.argmax(dim=1)
-#         # search if top_pred_indices = 1 in targets
-#         target_top_pred = targets[torch.arange(targets.size(0)), top_pred_indices]
-#         # sum up the correct predictions
-#         self.correct += torch.sum(target_top_pred)
-#         self.total += targets.size(0)
-
-#     def compute(self):
-#         return self.correct.float() / self.total
 
 class TopKAccuracy(torchmetrics.Metric):
     def __init__(self, topk=1, **kwargs):
@@ -159,8 +105,6 @@ class TopKAccuracy(torchmetrics.Metric):
     def update(self, preds, targets):
         # Get the top-k predictions
         _, topk_pred_indices = preds.topk(self.topk, dim=1, largest=True, sorted=True)
-        
-        # Ensure targets are in the same device as predictions
         targets = targets.to(topk_pred_indices.device)
         
         # Convert one-hot encoded targets to class indices
