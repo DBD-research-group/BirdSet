@@ -51,9 +51,9 @@ class EventDecoding:
             new_end_time = end
         
         # select a random interval of 5 seconds
-        max_start_interval = new_end_time - self.extracted_interval,2
-        random_start = random.uniform(new_start_time, max_start_interval),2
-        random_end = random_start + self.extracted_interval,2
+        max_start_interval = new_end_time - self.extracted_interval
+        random_start = random.uniform(new_start_time, max_start_interval)
+        random_end = random_start + self.extracted_interval
 
         return random_start, random_end
     
