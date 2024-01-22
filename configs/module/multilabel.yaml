@@ -40,31 +40,31 @@ metrics:
   val_best: 
     _target_: "torchmetrics.MaxMetric"
   additional: 
-    auroc:
+    MultilabelAUROC:
       _target_: "torchmetrics.classification.AUROC"
       task: "multilabel"
       num_labels: ${datamodule.dataset.n_classes} 
       average: "macro"
       thresholds: null
-    t1acc:
+    T1Accuracy:
       _target_: src.modules.metrics.TopKAccuracy
       topk: 1
-    t3acc:
+    T3Accuracy:
       _target_: src.modules.metrics.TopKAccuracy
       topk: 5
-    map:
+    mAP:
       _target_: src.modules.metrics.mAP
       num_labels: ${datamodule.dataset.n_classes}
     
       thresholds: null
   eval_complete:
-    pcmap:
+    pcmAP:
       _target_: src.modules.metrics.pcmAP
       num_labels: ${datamodule.dataset.n_classes}
       padding_factor: 5
       average: macro
       thresholds: null
-    cmap5:
+    cmAP5:
       _target_: src.modules.metrics.cmAP
       num_labels: ${datamodule.dataset.n_classes}
       sample_threshold: 5
