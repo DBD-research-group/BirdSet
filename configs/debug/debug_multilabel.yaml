@@ -69,8 +69,8 @@ datamodule:
 
 tags: ["debug"]
 
-logger:
-  wandb:
-    tags: ${tags}
-    group: "high_sierras_aug"
-    mode: online
+# logger:
+#   wandb:
+#     tags: ${tags}
+#     group: "high_sierras_aug"
+#     mode: online
