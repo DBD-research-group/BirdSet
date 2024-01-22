@@ -6,6 +6,7 @@ defaults:
 
 task: multilabel
 class_weights_loss: ${datamodule.dataset.class_weights_loss}
+prediction_table: True
 
 optimizer:
   _target_: torch.optim.AdamW
@@ -45,9 +46,9 @@ metrics:
       num_labels: ${datamodule.dataset.n_classes} 
       average: "macro"
       thresholds: null
-    # t1acc:
-    #   _target_: src.modules.metrics.TopKAccuracy
-    #   topk: 1
+    t1acc:
+      _target_: src.modules.metrics.TopKAccuracy
+      topk: 1
     t3acc:
       _target_: src.modules.metrics.TopKAccuracy
       topk: 5
