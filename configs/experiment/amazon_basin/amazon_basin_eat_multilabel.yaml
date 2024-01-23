@@ -1,43 +1,34 @@
 # @package _global_
-task_name: debug
-
+#package global is neccessary!
 defaults:
+  - override /datamodule: amazon_basin.yaml
   - override /module: multilabel.yaml
   - override /module/network: eat_soundnet.yaml
-  - override /datamodule: amazon_basin.yaml
   - override /callbacks: default.yaml 
   - override /trainer: single_gpu.yaml
   - override /datamodule/transforms: bird_default_multilabel.yaml
   # - override /datamodule/transforms/spectrogram_augmentations: none.yaml
   # - override /datamodule/transforms/waveform_augmentations: none.yaml
 
-extras: 
-  ignore_warnings: False
-
-hydra: 
-  job_logging: 
-    root:
-      level: DEBUG
-
+tags: ["amazon_basin", "eat", "augment", "multilabel"]
 seed: 4
 
 module:
   optimizer:
     lr: 1e-5
+  loss:
+  #  _target_: src.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
+    _target_: torch.nn.BCEWithLogitsLoss 
+  #_target_: src.modules.losses.focal_loss.MultiLabelFocalLoss
 
 
-trainer: 
-  max_epochs: 1
-  accelerator: gpu
-  devices: 1
-  detect_anomaly: True
-  fast_dev_run: False
+trainer:
+  min_epochs: 1
+  max_epochs: 15
 
 datamodule:
   dataset:
     val_split: 0.1
-    subset: null
-    #n_workers: 1
     class_weights_loss: null
     class_weights_sampler: null
     classlimit: 500
@@ -45,32 +36,29 @@ datamodule:
   transforms:
     preprocessing:
       normalize_waveform: instance_normalization
-    
-  mapper:
+
+  loaders:
+    train:
+      batch_size: 21
+      shuffle: True
+      num_workers: 6
+      drop_last: False
+      prefetch_factor: 4
+
+    valid:
+      batch_size: 21
+    test:
+      batch_size: 21
+  mapper: 
     event_limit: null
     biggest_cluster: True
     no_call: False
-  
 
-  loaders:
-    train: 
-      batch_size: 20
-      num_workers: 3
-      shuffle: True
-      pin_memory: False
-    valid: 
-      batch_size: 20
-      num_workers: 3
-      pin_memory: False
-    test:
-      batch_size: 20
-      num_workers: 3
-      pin_memory: False
+logger:
+  wandb:
+    tags: ${tags}
+    group: "high_sierras_aug"
+    mode: online
 
-tags: ["debug"]
 
-# logger:
-#   wandb:
-#     tags: ${tags}
-#     group: "high_sierras_aug"
-#     mode: online
+
