@@ -81,6 +81,14 @@ def main(cfg):
 
     if cfg.get("train"):
         log.info(f"Starting training")
+
+        ckpt = cfg.get("ckpt_path")
+
+        if ckpt:
+            log.info(f"Resume training from checkpoint {ckpt}")
+        else:
+            log.info("No checkpoint found. Training from scratch!")
+                     
         trainer.fit(
             model=model, 
             datamodule=datamodule,

@@ -5,6 +5,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import lightning as L
 from dataclasses import dataclass, field
+import warnings 
 
 class ResBlock1dTF(nn.Module):
     def __init__(self, dim, dilation=1, kernel_size=3):
@@ -104,7 +105,7 @@ class SoundNet(nn.Module):
     expected input shape: (batch_size, clip_length)
     output shape: (batch_size, n_classes)
 
-    Paramerters:
+    Parameters:
     nf (int): Number of filters in the convolutional layers. Default is 32.
     clip_length (Optional[int]): Length of the audio clips. Default is None.
     embed_dim (int): Dimension of the embeddings. Default is 128.
@@ -124,8 +125,11 @@ class SoundNet(nn.Module):
             factors: List[int] = [4, 4, 4, 4],
             n_classes: int | None = None,
             dim_feedforward: int = 512 ,
+            checkpoint: str | None = None
                  ):
         super().__init__()
+        self.checkpoint = checkpoint
+
         ds_fac = np.prod(np.array(factors)) * 4
         clip_length = seq_len // ds_fac
         model = [
@@ -156,6 +160,23 @@ class SoundNet(nn.Module):
         self.clip_length = clip_length
         self.tf = TAggregate(embed_dim=embed_dim, clip_length=clip_length, n_layers=n_layers, nhead=nhead, n_classes=n_classes, dim_feedforward=dim_feedforward)
         self.apply(self._init_weights)
+
+        if self.checkpoint:
+            self.load_state_dict_from_file(self.checkpoint)
+
+    def load_state_dict_from_file(self, file_path):
+        state_dict = torch.load(file_path)
+
+        try: 
+            self.load_state_dict(state_dict)
+        
+        except RuntimeError as e: 
+            warnings.warn(f"There is a mismatch between the state_dict and the model layers: {e}."
+                          "The mismatched layers are ignored")
+
+            output_layers = ["tf.fc.weight", "tf.fc.bias"]
+            filtered_state_dict = {k: v for k, v in state_dict.items() if k not in output_layers}
+            self.load_state_dict(filtered_state_dict, strict=False)
 
     def _init_weights(self, m):
         if isinstance(m, nn.Conv1d):

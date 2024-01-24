@@ -4,12 +4,14 @@ task_name: debug
 defaults:
   - override /module: multilabel.yaml
   - override /module/network: eat_soundnet.yaml
-  - override /datamodule: amazon_basin.yaml
+  - override /datamodule: high_sierras.yaml
   - override /callbacks: default.yaml 
   - override /trainer: single_gpu.yaml
   - override /datamodule/transforms: bird_default_multilabel.yaml
-  # - override /datamodule/transforms/spectrogram_augmentations: none.yaml
-  # - override /datamodule/transforms/waveform_augmentations: none.yaml
+  - override /datamodule/transforms/spectrogram_augmentations: none.yaml
+  - override /datamodule/transforms/waveform_augmentations: none.yaml
+
+#ckpt_path: "/home/lrauch/projects/GADME/src/output/train/runs/xenocanto_m_withoutnd/eat/2024-01-23_145247/checkpoints"
 
 extras: 
   ignore_warnings: False
@@ -24,6 +26,9 @@ seed: 4
 module:
   optimizer:
     lr: 1e-5
+  network: 
+    model:
+      checkpoint: /home/lrauch/projects/GADME/src/output/train/runs/xenocanto_m_withoutnd/eat/2024-01-24_135830/last_ckpt.path  
 
 
 trainer: 
@@ -36,7 +41,7 @@ trainer:
 datamodule:
   dataset:
     val_split: 0.1
-    subset: null
+    subset: 200
     #n_workers: 1
     class_weights_loss: null
     class_weights_sampler: null
