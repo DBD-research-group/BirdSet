@@ -9,6 +9,7 @@ model:
   factors: [4, 4, 4, 4]
   n_classes: ${datamodule.dataset.n_classes}
   dim_feedforward: 512
+  checkpoint: null
 torch_compile: False
 model_type: 'waveform'
 sampling_rate: 22050
