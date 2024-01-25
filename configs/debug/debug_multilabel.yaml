@@ -43,7 +43,7 @@ trainer:
 datamodule:
   dataset:
     val_split: 0.1
-    subset: 200
+    subset: null
     #n_workers: 1
     class_weights_loss: null
     class_weights_sampler: null
