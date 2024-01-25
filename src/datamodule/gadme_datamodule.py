@@ -1,10 +1,8 @@
-from typing import Literal
 from src import utils
 from src.datamodule.components.transforms import GADMETransformsWrapper
 from src.datamodule.components.event_mapping import XCEventMapping
 from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
 from datasets import DatasetDict
-import logging
 
 log = utils.get_pylogger(__name__)
 
@@ -84,11 +82,11 @@ class GADMEDataModule(BaseDataModuleHF):
                     class_limit=self.dataset_config.classlimit,
                     event_limit=self.dataset_config.eventlimit
                 )
-            log.info(">> One-hot-encode the classes")
+            log.info(">> One-hot-encode classes")
             dataset = dataset.map(
                 self._classes_one_hot,
                 batched=True,
-                batch_size=300,
+                batch_size=500,
                 load_from_cache_file=True,
                 num_proc=self.dataset_config.n_workers,
             )
