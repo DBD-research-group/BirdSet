@@ -12,6 +12,8 @@ defaults:
   - override /datamodule/transforms/waveform_augmentations: none.yaml
 
 #ckpt_path: "/home/lrauch/projects/GADME/src/output/train/runs/xenocanto_m_withoutnd/eat/2024-01-23_145247/checkpoints"
+train: False
+test: True
 
 extras: 
   ignore_warnings: False
@@ -41,7 +43,7 @@ trainer:
 datamodule:
   dataset:
     val_split: 0.1
-    subset: 200
+    subset: null
     #n_workers: 1
     class_weights_loss: null
     class_weights_sampler: null

@@ -6,7 +6,7 @@ import os
 from typing import List, Literal
 from collections import Counter
 from torch.utils.data import Subset
-
+from tqdm import tqdm
 import lightning as L
 import numpy as np
 import pandas as pd
@@ -92,6 +92,7 @@ class BaseDataModuleHF(L.LightningDataModule):
         self.len_trainset = None
         self.num_train_labels = None
         self.train_label_list = None
+        self.disk_save_path = None
 
     @property
     def num_classes(self):
@@ -166,13 +167,18 @@ class BaseDataModuleHF(L.LightningDataModule):
             None
         """
         dataset.set_format("np")
+        fingerprint = dataset["train"]._fingerprint
 
-        data_path = os.path.join(
+        self.disk_save_path = os.path.join(
             self.dataset_config.data_dir,
-            f"{self.dataset_config.dataset_name}_processed_{self.dataset_config.seed}",
+            f"{self.dataset_config.dataset_name}_processed_{self.dataset_config.seed}_{fingerprint}",
         )
-        logging.info(f"Saving to disk: {data_path}")
-        dataset.save_to_disk(data_path)
+
+        if os.path.exists(self.disk_save_path):
+            logging.info(f"Train fingerprint found in {self.disk_save_path}, saving to disk is skipped")
+        else:
+            logging.info(f"Saving to disk: {self.disk_save_path}")
+            dataset.save_to_disk(self.disk_save_path)
 
     def _ensure_train_test_splits(self, dataset: Dataset | DatasetDict) -> DatasetDict:
         if isinstance(dataset, Dataset):
@@ -245,7 +251,7 @@ class BaseDataModuleHF(L.LightningDataModule):
         assert isinstance(dataset, DatasetDict | Dataset)
         dataset = self._ensure_train_test_splits(dataset)
 
-
+        
         if self.dataset_config.subset:
             dataset = self._fast_dev_subset(dataset, self.dataset_config.subset)
 
@@ -284,13 +290,7 @@ class BaseDataModuleHF(L.LightningDataModule):
         Get Dataset from disk and add run-time transforms to a specified split.
         """
         
-        dataset_path = os.path.join(
-            self.dataset_config.data_dir,
-            f"{self.dataset_config.dataset_name}_processed_{self.dataset_config.seed}",
-            split
-        )
-
-        dataset = load_from_disk(dataset_path)
+        dataset = load_from_disk(os.path.join(self.disk_save_path, split))
 
         self.transforms.set_mode(split)
 
@@ -381,7 +381,7 @@ class BaseDataModuleHF(L.LightningDataModule):
         path_label_count = path_label_count.set_index("id")
         class_sizes = df.groupby(label_name).size()
 
-        for label in class_sizes.index:
+        for label in tqdm(class_sizes.index, desc="Processing labels"):
             current = path_label_count[path_label_count[label_name] == label]
             total = current["size"].sum()
             most = current["size"].max()
