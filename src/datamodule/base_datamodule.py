@@ -169,7 +169,7 @@ class BaseDataModuleHF(L.LightningDataModule):
 
         data_path = os.path.join(
             self.dataset_config.data_dir,
-            f"{self.dataset_config.dataset_name}_processed",    
+            f"{self.dataset_config.dataset_name}_processed_{self.dataset_config.seed}",
         )
         logging.info(f"Saving to disk: {data_path}")
         dataset.save_to_disk(data_path)
@@ -286,7 +286,7 @@ class BaseDataModuleHF(L.LightningDataModule):
         
         dataset_path = os.path.join(
             self.dataset_config.data_dir,
-            f"{self.dataset_config.dataset_name}_processed", 
+            f"{self.dataset_config.dataset_name}_processed_{self.dataset_config.seed}",
             split
         )
 
