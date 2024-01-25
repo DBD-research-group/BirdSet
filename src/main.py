@@ -81,9 +81,7 @@ def main(cfg):
 
     if cfg.get("train"):
         log.info(f"Starting training")
-
         ckpt = cfg.get("ckpt_path")
-
         if ckpt:
             log.info(f"Resume training from checkpoint {ckpt}")
         else:
@@ -101,7 +99,6 @@ def main(cfg):
     if cfg.get("test"):
         log.info(f"Starting testing")
         ckpt_path = trainer.checkpoint_callback.best_model_path
-        print(ckpt_path)
         if ckpt_path == "":
             log.warning(
                 "No ckpt saved or found. Using current weights for testing"
@@ -118,7 +115,7 @@ def main(cfg):
         test_metrics = trainer.callback_metrics
 
     if cfg.get("save_state_dict"):
-        log.info("Saving state dicts")
+        log.info(f"Saving state dicts")
         utils.save_state_dicts(
             trainer=trainer,
             model=model, 

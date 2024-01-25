@@ -17,8 +17,8 @@ module:
   optimizer:
     lr: 1e-5
   loss:
-  #  _target_: src.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
-    _target_: torch.nn.BCEWithLogitsLoss 
+    _target_: src.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
+    #_target_: torch.nn.BCEWithLogitsLoss 
   #_target_: src.modules.losses.focal_loss.MultiLabelFocalLoss
   network: 
     model:
@@ -32,7 +32,7 @@ datamodule:
   dataset:
     val_split: 0.1
     class_weights_loss: null
-    class_weights_sampler: null
+    class_weights_sampler: True
     classlimit: 700
     eventlimit: 5
   transforms:
@@ -61,6 +61,12 @@ logger:
     tags: ${tags}
     group: "high_sierras_aug"
     mode: online
+
+callbacks: 
+  model_checkpoint: 
+    save_last: True
+    save_top_k: 2
+    every_n_epochs: 2
 
 
 

@@ -12,6 +12,8 @@ defaults:
   - override /datamodule/transforms/waveform_augmentations: none.yaml
 
 #ckpt_path: "/home/lrauch/projects/GADME/src/output/train/runs/xenocanto_m_withoutnd/eat/2024-01-23_145247/checkpoints"
+train: False
+test: True
 
 extras: 
   ignore_warnings: False
