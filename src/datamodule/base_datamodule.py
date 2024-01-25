@@ -245,7 +245,7 @@ class BaseDataModuleHF(L.LightningDataModule):
         assert isinstance(dataset, DatasetDict | Dataset)
         dataset = self._ensure_train_test_splits(dataset)
 
-
+        
         if self.dataset_config.subset:
             dataset = self._fast_dev_subset(dataset, self.dataset_config.subset)
 

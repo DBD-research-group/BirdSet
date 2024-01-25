@@ -1,10 +1,12 @@
 from typing import Literal
+from src import utils
 from src.datamodule.components.transforms import GADMETransformsWrapper
 from src.datamodule.components.event_mapping import XCEventMapping
 from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
 from datasets import DatasetDict
 import logging
 
+log = utils.get_pylogger(__name__)
 
 class GADMEDataModule(BaseDataModuleHF):
     def __init__(
@@ -29,7 +31,7 @@ class GADMEDataModule(BaseDataModuleHF):
             # pick only train and test dataset
             dataset = DatasetDict({split: dataset[split] for split in ["train", "test"]})
 
-            logging.info("> Mapping data set.")
+            log.info("> Mapping data set.")
             dataset["train"] = dataset["train"].map(
                 self.event_mapper,
                 remove_columns=["audio"],
@@ -62,7 +64,7 @@ class GADMEDataModule(BaseDataModuleHF):
             # pick only train and test_5s dataset
             dataset = DatasetDict({split: dataset[split] for split in ["train", "test_5s"]})
 
-            logging.info("> Mapping data set.")
+            log.info(">> Mapping train data.")
             dataset["train"] = dataset["train"].map(
                 self.event_mapper,
                 remove_columns=["audio"],
@@ -70,23 +72,24 @@ class GADMEDataModule(BaseDataModuleHF):
                 batch_size=300,
                 load_from_cache_file=True,
                 num_proc=self.dataset_config.n_workers,
-            )
+            ) # has to be deterministic for cache loading??
 
             dataset = dataset.rename_column("ebird_code_multilabel", "labels")
 
             if self.dataset_config.classlimit or self.dataset_config.eventlimit:
+                log.info(">> Smart Sampling") #!TODO: implement custom caching?
                 dataset["train"] = self._smart_sampling(
                     dataset=dataset["train"],
                     label_name="ebird_code",
                     class_limit=self.dataset_config.classlimit,
                     event_limit=self.dataset_config.eventlimit
                 )
-
+            log.info(">> One-hot-encode the classes")
             dataset = dataset.map(
                 self._classes_one_hot,
                 batched=True,
                 batch_size=300,
-                load_from_cache_file=False,
+                load_from_cache_file=True,
                 num_proc=self.dataset_config.n_workers,
             )
 
