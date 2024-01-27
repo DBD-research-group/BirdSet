@@ -80,6 +80,8 @@ First log in to HuggingFace with:
 huggingface-cli login
 ```
 
+For a detailed guide to using the GADME data pipeline and its many configuration options, see our comprehensive [GADME Data Pipeline Tutorial](notebooks/tutorials/gadme-pipeline_tutorial.ipynb).
+
 ## Datamodule
 
 The datamodules are defined in `src/datamodule` and configurations are stored under `configs/datamodule`.
@@ -95,9 +97,6 @@ The following steps are performed in `prepare_data`:
 
 The following steps are performed in `setup`:
 1. Data is loaded from disk with `_get_dataset` in which the transforms are applied
-
-
-For a detailed guide to using the GADME data pipeline and its many configuration options, see our comprehensive [GADME Data Pipeline Tutorial](notebooks/tutorials/gadme-pipeline_tutorial.ipynb).
 
 ## Transformations
 
