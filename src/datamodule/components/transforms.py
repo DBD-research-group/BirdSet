@@ -19,6 +19,30 @@ log = utils.get_pylogger(__name__)
 
 @dataclass
 class PreprocessingConfig:
+    """
+    A class used to configure the preprocessing for the audio data.
+
+    Attributes
+    ----------
+    use_spectrogram : bool
+        Determines whether the audio data should be converted into a spectrogram, a visual representation of the spectrum of frequencies in the sound.
+    n_fft : int
+        The size of the FFT (Fast Fourier Transform) window, impacting the frequency resolution of the spectrogram.
+    hop_length : int
+        The number of samples between successive frames in the spectrogram. A smaller hop length leads to a higher time resolution.
+    n_mels : int
+        The number of Mel bands to generate. This parameter is crucial for the Mel spectrogram and impacts the spectral resolution.
+    db_scale : bool
+        Indicates whether to scale the magnitude of the spectrogram to the decibel scale, which can help in visualizing the spectrum more clearly.
+    target_height : int | None
+        The height to which the spectrogram images will be resized. This can be important for maintaining consistency in input size for certain neural networks.
+    target_width : int | None
+        The width to which the spectrogram images will be resized. This can be important for maintaining consistency in input size for certain neural networks.
+    normalize_spectrogram : bool
+        Whether to apply normalization to the spectrogram. Normalization can help in stabilizing the training process.
+    normalize_waveform : str | None
+        Determines whether to apply normalization to the raw waveform data. Possible values are 'instance_normalization', 'instance_min_max', or None.
+    """
     use_spectrogram: bool = True
     n_fft: int = 1024
     hop_length: int = 79
@@ -140,15 +164,30 @@ class GADMETransformsWrapper(BaseTransforms):
     """
     A class to handle audio transformations for different model types and modes.
 
-    Attributes:
-        mode (str): The mode in which the class is operating. Can be "train", "valid", "test", or "predict".
-        sampling_rate (int): The sampling rate of the audio data.
-        model_type (str): The type of model being used. Can be "vision" or "waveform".
-        preprocessing (PreprocessingConfig): Configuration for preprocessing the audio data.
-        waveform_augmentations (DictConfig): Configuration for augmentations to apply to the waveform.
-        spectrogram_augmentations (DictConfig): Configuration for augmentations to apply to the spectrogram.
-        event_extractions (DefaultFeatureExtractor): Configuration for extracting events from the audio data.
-        resizer (Resizer): An instance of the Resizer class for resizing the spectrogram.
+    Attributes
+    ----------
+    task : str
+        Specifies the type of task (e.g., 'multiclass' or 'multilabel').
+    sampling_rate : int
+        The sampling rate at which the audio data should be processed.
+    model_type : str
+        Indicates the type of model (e.g. 'vision' for spectrogram-based models or 'waveform' for waveform-based models).
+    preprocessing : PreprocessingConfig
+        The preprocessing configuration defined earlier.
+    spectrogram_augmentations : DictConfig
+        The set of augmentations to be applied to the spectrogram data.
+    waveform_augmentations : DictConfig
+        The set of augmentations to be applied to the waveform data.
+    decoding : EventDecoding | None
+        The component responsible for data decoding.
+    feature_extractor : DefaultFeatureExtractor
+        The component responsible for feature extraction.
+    max_length : int
+        The maximum length for the processed data segments in seconds.
+    n_classes : int
+        The total number of distinct classes in the dataset.
+    nocall_sampler : NoCallMixer | None
+        The no-call sampler component, if configured.
     """
     def __init__(self,
                 task: str = "multiclass",

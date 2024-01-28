@@ -2,13 +2,19 @@ import numpy as np
 import random
 
 class XCEventMapping:
-    """extracts all event_cluster into individual rows, should be used as mapping
-     used on a hf dataset with batched=True (does not save the audio array, only filepath)
+    """
+    Extracts all event_cluster into individual rows, should be used as mapping
+    used on a hf dataset with batched=True (does not save the audio array, only filepath).
 
-     with_noise_cluster: weather to include cluster that are marker as noise from event detection
-            IF True: when all cluster are noise cluster, cluster will be deleted and audio will be included once
-     biggest_cluster: use only samples from the biggest cluster, which might be the primary bird
-     only_one: choose one of the events at random per audio"""
+    Attributes
+    ----------
+    biggest_cluster : bool
+        If set to True, the mapper focuses on the biggest cluster of events, which can be particularly useful for datasets with imbalanced event distributions.
+    event_limit : int
+        Specifies the maximum number of events to consider. This can be used to limit the scope of the mapping, although it's usually already managed by the DatasetConfig.
+    no_call : bool
+        Indicates whether 'no-call' events should be included. In this configuration, it's set to False as the no-call samples are handled separately by the nocall_sampler.
+    """
     def __init__(
             self, 
             biggest_cluster: bool = True, 
