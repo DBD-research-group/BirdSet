@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Dict, Literal
+from typing import Any, Dict, Literal, Optional
 from src import utils
 
 import numpy as np
@@ -28,6 +28,8 @@ class PreprocessingConfig:
     target_width: int | None = 1024
     normalize_spectrogram: bool = True
     normalize_waveform: Literal['instance_normalization', 'instance_min_max'] | None  = None
+    mean: Optional[float] = -4.268 # calculated on AudioSet
+    std: Optional[float] = 4.569 # calculated on AudioSet
 
 class BaseTransforms:
     """
@@ -384,8 +386,10 @@ class GADMETransformsWrapper(BaseTransforms):
             target_width=self.preprocessing.target_width
         )
         # batch_size x 1 x height x width
+
+        # standardize spectrograms
         if self.preprocessing.normalize_spectrogram:
-            audio_augmented = (audio_augmented - (-4.268)) / (4.569 * 2) #!TODO!
+            audio_augmented = (audio_augmented - self.preprocessing.mean) / self.preprocessing.std
         return audio_augmented
    
     def _prepare_call(self):
