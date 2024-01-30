@@ -33,6 +33,12 @@ class cmAP(Metric):
         self.accumulated_labels.append(labels)
 
     def compute(self) -> torch.Tensor:
+        # Ensure that accumulated variables are lists
+        if not isinstance(self.accumulated_predictions, list):
+            self.accumulated_predictions = [self.accumulated_predictions]
+        if not isinstance(self.accumulated_labels, list):
+            self.accumulated_labels = [self.accumulated_labels]
+
         # Concatenate accumulated predictions and labels along the batch dimension
         all_predictions = torch.cat(self.accumulated_predictions, dim=0)
         all_labels = torch.cat(self.accumulated_labels, dim=0)
