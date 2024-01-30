@@ -9,6 +9,22 @@ import torch
 logger = logging.get_logger(__name__)
 
 class DefaultFeatureExtractor(SequenceFeatureExtractor):
+    """
+    A class used to extract features from audio data.
+
+    Attributes
+    ----------
+    _target_ : str
+        Specifies the feature extractor component used in the pipeline.
+    feature_size : int
+        Determines the size of the extracted features.
+    sampling_rate : int
+        The sampling rate at which the audio data should be processed.
+    padding_value : float
+        The value used for padding shorter sequences to a consistent length.
+    return_attention_mask : bool
+        Indicates whether an attention mask should be returned along with the processed features.
+    """
     model_input_names = ["input_values", "attention_mask"]
 
     def __init__(

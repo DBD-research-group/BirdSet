@@ -733,6 +733,24 @@ class MultilabelMix(BaseWaveformTransform):
         
         
 class NoCallMixer():
+    """
+    A class used to mix no-call samples into the dataset.
+
+    Attributes
+    ----------
+    _target_ : str
+        Specifies the no-call sampler component in the pipeline.
+    directory : str
+        The directory containing the no-call data. It's essential to ensure that this path is correctly set to the location of your no-call samples.
+    p : float
+        The probability of a sample being replaced with a no-call sample. This parameter allows you to control the frequency of no-call samples in your dataset.
+    sampling_rate : int
+        The sampling rate at which the audio data should be processed. This parameter should align with the rest of your dataset and model configuration.
+    length : int
+        The length of the audio samples. This parameter should align with the rest of your dataset and model configuration.
+    n_classes : int
+        The total number of distinct classes in the dataset. This parameter should align with the rest of your dataset and model configuration.
+    """
     def __init__(self, directory, p, sampling_rate, n_classes, length=5):
         self.p = p
         self.sampling_rate = sampling_rate

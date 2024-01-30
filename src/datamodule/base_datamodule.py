@@ -18,6 +18,40 @@ from src.datamodule.components.transforms import GADMETransformsWrapper
 
 @dataclass
 class DatasetConfig:
+    """
+    A class used to configure the dataset for the model.
+
+    Attributes
+    ----------
+    data_dir : str
+        Specifies the directory where the dataset files are stored.
+    dataset_name : str
+        The name assigned to the dataset.
+    hf_path : str
+        The path to the dataset stored on HuggingFace.
+    hf_name : str
+        The name of the dataset on HuggingFace.
+    seed : int
+        A seed value for ensuring reproducibility across runs.
+    n_classes : int
+        The total number of distinct classes in the dataset.
+    n_workers : int
+        The number of worker processes used for data loading.
+    val_split : float
+        The proportion of the dataset reserved for validation.
+    task : str
+        Defines the type of task (e.g., 'multilabel' or 'multiclass').
+    sampling_rate : int
+        The sampling rate for audio data processing.
+    class_weights_loss : list | None
+        (Deprecated) Previously used for applying class weights in loss calculation.
+    class_weights_sampler : bool
+        Indicates whether to use class weights in the sampler for handling imbalanced datasets.
+    class_limit : int
+        The maximum number of samples per class.
+    event_limit : int
+        Defines the maximum number of audio events processed per audio file, capping the quantity to ensure balance across files.
+    """
     data_dir: str = "/workspace/data_gadme"
     dataset_name: str = "esc50"
     hf_path: str = "ashraq/esc50"
@@ -37,6 +71,26 @@ class DatasetConfig:
 
 @dataclass
 class LoaderConfig:
+    """
+    A class used to configure the data loader for the model.
+
+    Attributes
+    ----------
+    batch_size : int
+        Specifies the number of samples contained in each batch. This is a crucial parameter as it impacts memory utilization and model performance.
+    shuffle : bool
+        Determines whether the data is shuffled at the beginning of each epoch. Shuffling is typically used for training data to ensure model robustness and prevent overfitting.
+    num_workers : int
+        Sets the number of subprocesses to be used for data loading. More workers can speed up the data loading process but also increase memory consumption.
+    pin_memory : bool
+        When set to `True`, enables the DataLoader to copy Tensors into CUDA pinned memory before returning them. This can lead to faster data transfer to CUDA-enabled GPUs.
+    drop_last : bool
+        Determines whether to drop the last incomplete batch. Setting this to `True` is useful when the total size of the dataset is not divisible by the batch size.
+    persistent_workers : bool
+        Indicates whether the data loader should keep the workers alive for the next epoch. This can improve performance at the cost of memory.
+    prefetch_factor : int
+        Defines the number of samples loaded in advance by each worker. This parameter is commented out here and can be adjusted based on specific requirements.
+    """
     batch_size: int = 32
     shuffle: bool = True
     num_workers: int = 1
