@@ -3,7 +3,7 @@ import logging
 import torch
 import random
 import os
-from typing import List, Literal
+from typing import List, Literal, Optional
 from collections import Counter
 from torch.utils.data import Subset
 from tqdm import tqdm
@@ -61,12 +61,12 @@ class DatasetConfig:
     n_workers: int = 1
     val_split: float = 0.2
     task: Literal["multiclass", "multilabel"] = "multiclass"
-    subset: int | None = None
+    subset: Optional[int] = None
     sampling_rate: int = 32_000
-    class_weights_loss = None
-    class_weights_sampler = None
-    classlimit: int = None
-    eventlimit: int = None
+    class_weights_loss: Optional[bool] = None
+    class_weights_sampler: Optional[bool] = None
+    classlimit: Optional[int] = None
+    eventlimit: Optional[int] = None
 
 
 @dataclass
@@ -491,15 +491,17 @@ class BaseDataModuleHF(L.LightningDataModule):
             class_one_hot_matrix[class_idx, idx] = 1
 
         class_one_hot_matrix = torch.tensor(class_one_hot_matrix, dtype=torch.float32)
-        return {"labels": class_one_hot_matrix}  
-        
+        return {"labels": class_one_hot_matrix}
+
     def train_dataloader(self):
-        if self.dataset_config.class_weights_sampler is None: 
-            return DataLoader(self.train_dataset, **asdict(self.loaders_config.train)) # type: ignore
-        else: # change so that it works as a flag 
+        if self.dataset_config.class_weights_sampler:
             weighted_sampler = self._create_weighted_sampler()
-            self.loaders_config.train.shuffle = False # mutually exclusive!
+            self.loaders_config.train.shuffle = False  # Mutually exclusive with sampler!
+            # Use the weighted_sampler in the DataLoader
             return DataLoader(self.train_dataset, sampler=weighted_sampler, **asdict(self.loaders_config.train))
+        else:
+            # If class_weights_sampler is not True, return a regular DataLoader without the weighted sampler
+            return DataLoader(self.train_dataset, **asdict(self.loaders_config.train))  # type: ignore
 
     def val_dataloader(self):
         return DataLoader(self.val_dataset, **asdict(self.loaders_config.valid)) # type: ignore
