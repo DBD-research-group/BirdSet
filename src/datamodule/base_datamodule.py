@@ -39,6 +39,8 @@ class DatasetConfig:
         The number of worker processes used for data loading.
     val_split : float
         The proportion of the dataset reserved for validation.
+    test_split : float
+        The proportion of the dataset reserved for testing.
     task : str
         Defines the type of task (e.g., 'multilabel' or 'multiclass').
     sampling_rate : int
@@ -60,6 +62,7 @@ class DatasetConfig:
     n_classes: int = 50
     n_workers: int = 1
     val_split: float = 0.2
+    test_split: float = 0.2
     task: Literal["multiclass", "multilabel"] = "multiclass"
     subset: Optional[int] = None
     sampling_rate: int = 32_000
@@ -264,12 +267,12 @@ class BaseDataModuleHF(L.LightningDataModule):
             DatasetDict: The dataset with train, validation, and test splits. The keys are the names of the splits and the values are the datasets for each split.
         """
         if isinstance(dataset, Dataset):
-            split_1 = dataset.train_test_split(
-                self.dataset_config.val_split, shuffle=True, seed=self.dataset_config.seed
+            split_train_test = dataset.train_test_split(
+                self.dataset_config.test_split, shuffle=True, seed=self.dataset_config.seed
             )
-            split_2 = split_1["test"].train_test_split(
-                0.2, shuffle=False, seed=self.dataset_config.seed)
-            return DatasetDict({"train": split_1["train"], "valid": split_2["train"], "test": split_2["test"]})
+            split_train_val = split_train_test["train"].train_test_split(
+                self.dataset_config.val_split, shuffle=False, seed=self.dataset_config.seed)
+            return DatasetDict({"train": split_train_val["train"], "valid": split_train_val["test"], "test": split_train_test["test"]})
         elif isinstance(dataset, DatasetDict):
             # check if dataset has train, valid, test splits
             if "train" in dataset.keys() and "valid" in dataset.keys() and "test" in dataset.keys():
