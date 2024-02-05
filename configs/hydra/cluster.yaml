@@ -1,0 +1,8 @@
+defaults: 
+  - override hydra_logging: colorlog
+  - override job_logging: colorlog 
+
+job:
+  chdir: True
+run:
+  dir: mnt/work/bird2vec/gadme_outputs/${task_name}/${datamodule.dataset.dataset_name}/${module.network.model_name}/${now:%Y-%m-%d_%H%M%S}
