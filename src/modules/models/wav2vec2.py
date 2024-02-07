@@ -4,14 +4,17 @@ from transformers import AutoModelForAudioClassification
 
 
 class Wav2vec2SequenceClassifier(nn.Module):
-    def __init__(self, checkpoint, num_classes):
+    def __init__(self, checkpoint, num_classes, cache_dir):
         super(Wav2vec2SequenceClassifier, self).__init__()
 
         self.checkpoint = checkpoint
         self.num_classes = num_classes
+        self.cache_dir = cache_dir
+        
         self.model = AutoModelForAudioClassification.from_pretrained(
             self.checkpoint,
             num_labels=self.num_classes,
+            cache_dir=self.cache_dir
         )
 
     def forward(self, input_values, attention_mask=None, labels=None, return_hidden_state=False):

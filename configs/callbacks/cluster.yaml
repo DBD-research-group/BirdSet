@@ -1,0 +1,6 @@
+defaults:
+  - _self_
+  - learning_rate_monitor.yaml
+  - time_tracking.yaml
+  - model_summary.yaml
+  - model_checkpoint.yaml #topk=0 if not wanted!

@@ -3,8 +3,8 @@
 defaults:
   - override /datamodule: xenocanto_m.yaml
   - override /module: multilabel.yaml
-  - override /module/network: eat_soundnet.yaml
-  - override /callbacks: default.yaml 
+  - override /module/network: ast.yaml
+  - override /callbacks: cluster.yaml 
   - override /trainer: single_gpu.yaml
   - override /datamodule/transforms: bird_default_multilabel.yaml
   - override /paths: cluster.yaml
@@ -20,7 +20,7 @@ logger:
     tags: ${tags}
     group: "pretrain_ast"
     mode: online
-    version: pretraineatxcm_1 #to resume train run # needs to be tested
+    version: pretraineatxcm_2 #to resume train run # needs to be tested
 
 module:
   optimizer:
@@ -48,13 +48,13 @@ datamodule:
 
   loaders:
     train:
-      batch_size: 10
+      batch_size: 14
       shuffle: True
-      num_workers: 6
+      num_workers: 8
       drop_last: True
       prefetch_factor: 4
     valid:
-      batch_size: 10
+      batch_size: 14
 
   mapper: 
     event_limit: null

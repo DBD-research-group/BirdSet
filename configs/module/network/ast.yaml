@@ -3,6 +3,8 @@ model:
   checkpoint: MIT/ast-finetuned-audioset-10-10-0.4593
   #checkpoint: null
   num_classes: ${datamodule.dataset.n_classes}
+  cache_dir: ${paths.dataset_path}
+
 
 model_name: ast
 model_type: vision

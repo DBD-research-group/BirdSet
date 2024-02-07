@@ -3,6 +3,7 @@ import rootutils
 import hydra
 import lightning as L 
 from omegaconf import OmegaConf
+
 from src import utils
 import pyrootutils 
 
@@ -32,6 +33,11 @@ def main(cfg):
 
     log.info(f"Log path: <{os.path.abspath(cfg.paths.log_dir)}>")
     os.makedirs(cfg.paths.log_dir, exist_ok=True)
+
+    log.info(f"Root Dir:<{os.path.abspath(cfg.paths.log_dir)}>")
+    log.info(f"Work Dir:<{os.path.abspath(cfg.paths.work_dir)}>")
+    log.info(f"Output Dir:<{os.path.abspath(cfg.paths.output_dir)}>")
+    log.info(f"Background Dir:<{os.path.abspath(cfg.paths.background_path)}>")
 
     log.info(f"Seed everything with <{cfg.seed}>")
     L.seed_everything(cfg.seed)

@@ -2,7 +2,8 @@ model:
   _target_: src.modules.models.hubert.HubertSequenceClassifier
   checkpoint: facebook/hubert-base-ls960
   num_classes: ${datamodule.dataset.n_classes}
-
+  cache_dir: ${paths.dataset_path}
+  
 model_name: hubert
 model_type: raw
 torch_compile: False

@@ -7,3 +7,5 @@ n_mels: 128
 db_scale: True
 target_height: null
 target_width: 1024
+mean: -4.268
+std: 4.569

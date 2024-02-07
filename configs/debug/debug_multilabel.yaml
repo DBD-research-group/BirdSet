@@ -3,17 +3,17 @@ task_name: debug
 
 defaults:
   - override /module: multilabel.yaml
-  - override /module/network: eat_soundnet.yaml
-  - override /datamodule: high_sierras.yaml
+  - override /module/network: ast.yaml
+  - override /datamodule: xenocanto_m.yaml
   - override /callbacks: default.yaml 
   - override /trainer: single_gpu.yaml
   - override /datamodule/transforms: bird_default_multilabel.yaml
-  - override /datamodule/transforms/spectrogram_augmentations: none.yaml
-  - override /datamodule/transforms/waveform_augmentations: none.yaml
+  #- override /datamodule/transforms/spectrogram_augmentations: none.yaml
+  #- override /datamodule/transforms/waveform_augmentations: none.yaml
 
 #ckpt_path: "/home/lrauch/projects/GADME/src/output/train/runs/xenocanto_m_withoutnd/eat/2024-01-23_145247/checkpoints"
-train: False
-test: True
+train: True
+test: False
 
 extras: 
   ignore_warnings: False
@@ -28,9 +28,8 @@ seed: 4
 module:
   optimizer:
     lr: 1e-5
-  network: 
-    model:
-      checkpoint: /home/lrauch/projects/GADME/src/output/train/runs/xenocanto_m_withoutnd/eat/2024-01-24_135830/last_ckpt.path  
+  loss:
+    _target_: torch.nn.BCEWithLogitsLoss
 
 
 trainer: 
@@ -43,7 +42,7 @@ trainer:
 datamodule:
   dataset:
     val_split: 0.1
-    subset: null
+    subset: 300
     #n_workers: 1
     class_weights_loss: null
     class_weights_sampler: null
@@ -61,16 +60,16 @@ datamodule:
 
   loaders:
     train: 
-      batch_size: 20
+      batch_size: 5
       num_workers: 3
       shuffle: True
       pin_memory: False
     valid: 
-      batch_size: 20
+      batch_size: 5
       num_workers: 3
       pin_memory: False
     test:
-      batch_size: 20
+      batch_size: 5
       num_workers: 3
       pin_memory: False
 
