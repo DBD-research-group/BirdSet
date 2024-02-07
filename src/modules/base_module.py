@@ -24,7 +24,8 @@ class BaseModule(L.LightningModule):
         batch_size,
         task,
         class_weights_loss,
-        label_counts):
+        label_counts,
+        num_gpus):
 
         super(BaseModule, self).__init__()
         
@@ -37,6 +38,7 @@ class BaseModule(L.LightningModule):
         self.model = hydra.utils.instantiate(network.model)
         self.opt_params = optimizer
         self.lrs_params = lr_scheduler
+        self.num_gpus = num_gpus
 
         self.loss = load_loss(loss, class_weights_loss, label_counts)
         self.output_activation = hydra.utils.instantiate(
@@ -76,7 +78,7 @@ class BaseModule(L.LightningModule):
         )
 
         if self.lrs_params.get("scheduler"):
-            num_training_steps = math.ceil((self.num_epochs * self.len_trainset) / self.batch_size) 
+            num_training_steps = math.ceil((self.num_epochs * self.len_trainset) / self.batch_size*self.num_gpus) 
             # TODO: Handle the case when drop_last=True more explicitly   
 
             scheduler_target = self.lrs_params.scheduler._target_

@@ -6,6 +6,7 @@ defaults:
   
 task: multiclass
 class_weights_loss: ${datamodule.dataset.class_weights_loss}
+num_gpus: ${trainer.devices}
 
 optimizer:
   _target_: torch.optim.AdamW
