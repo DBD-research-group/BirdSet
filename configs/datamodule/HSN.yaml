@@ -1,0 +1,34 @@
+#HSN
+_target_: src.datamodule.gadme_datamodule.GADMEDataModule
+
+defaults: 
+  - _self_
+  - transforms: bird_default.yaml
+  - loaders: default.yaml
+  - mapper: xc_bambird_mapper.yaml
+
+dataset:
+  data_dir: ${paths.dataset_path}
+  dataset_name: HSN
+  hf_path: DBD-research-group/gadme
+  hf_name: HSN
+  seed: ${seed}
+  # feature_extractor:
+  #   _target_: transformers.AutoFeatureExtractor.from_pretrained
+  #   pretrained_model_name_or_path: ${module.network.model.checkpoint}
+  n_classes: 22
+  n_workers: 3
+  val_split: 0.2
+  task: ${module.task}
+  subset: null
+  sampling_rate: ${module.network.sampling_rate}
+  class_weights_loss: null
+  class_weights_sampler: null
+  classlimit: 500
+  eventlimit: 5
+
+
+
+
+
+

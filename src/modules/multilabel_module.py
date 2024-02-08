@@ -18,7 +18,8 @@ class MultilabelModule(BaseModule):
             task,
             class_weights_loss,
             label_counts,
-            prediction_table
+            prediction_table,
+            num_gpus
     ):
         self.prediction_table = prediction_table
 
@@ -35,7 +36,8 @@ class MultilabelModule(BaseModule):
             task=task,
             class_weights_loss=class_weights_loss,
             label_counts=label_counts,
-            batch_size=batch_size
+            batch_size=batch_size,
+            num_gpus=num_gpus
         )
 
     def test_step(self, batch, batch_idx):
