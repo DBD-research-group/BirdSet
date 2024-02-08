@@ -1,6 +1,6 @@
 root_dir: ${oc.env:PROJECT_ROOT}
 work_dir: ${hydra:runtime.cwd}
 output_dir: ${hydra:runtime.output_dir}
-dataset_path: /mnt/work/bird2vec/gadme_hf_download
-background_path: /mnt/work/bird2vec/data/dcase18/wav
+dataset_path: /scratch/gadme/${datamodule.dataset.dataset_name}/
+background_path: ${paths.dataset_path}/background/
 log_dir: ${paths.output_dir}/logs/
