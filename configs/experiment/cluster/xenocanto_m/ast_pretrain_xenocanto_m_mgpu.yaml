@@ -20,7 +20,7 @@ logger:
     tags: ${tags}
     group: "pretrain_ast"
     mode: online
-    #version: pretraineatxcm_2 #to resume train run # needs to be tested
+    version: pretraineatxcm_mgpu #to resume train run # needs to be tested
 
 module:
   optimizer:
