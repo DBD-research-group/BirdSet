@@ -2,6 +2,7 @@ model:
   _target_: src.modules.models.wav2vec2.Wav2vec2SequenceClassifier
   checkpoint: facebook/wav2vec2-base
   num_classes: ${datamodule.dataset.n_classes}
+  cache_dir: ${paths.dataset_path}/models
 
 model_name: wav2vec2
 model_type: raw
