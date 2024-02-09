@@ -33,7 +33,7 @@ module:
 
 trainer:
   min_epochs: 1
-  max_epochs: 15
+  max_epochs: 5
 
 datamodule:
   dataset:
@@ -52,7 +52,7 @@ datamodule:
       shuffle: True
       num_workers: 8
       drop_last: True
-      prefetch_factor: 4
+      prefetch_factor: 2
     valid:
       batch_size: 14
 
