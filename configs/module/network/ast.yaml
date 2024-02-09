@@ -8,7 +8,7 @@ model:
 
 model_name: ast
 model_type: vision
-torch_compile: false
+torch_compile: True
 sampling_rate: 32_000
 
 

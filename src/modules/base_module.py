@@ -202,6 +202,7 @@ class BaseModule(L.LightningModule):
 
     def setup(self, stage):
         if self.torch_compile and stage=="fit":
+            print("COMPILE")
             self.model = torch.compile(self.model)
 
     def on_test_epoch_end(self):
