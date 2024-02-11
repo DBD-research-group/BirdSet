@@ -1,6 +1,3 @@
 [submodule ".devcontainer"]
 	path = .devcontainer
 	url = git@github.com:raphaelschwinger/cuda-python-devcontainer.git
-[submodule "dataset/embeddings/perch"]
-	path = dataset/embeddings/perch
-	url = https://github.com/mo01010010itz/perch-submodule.git
