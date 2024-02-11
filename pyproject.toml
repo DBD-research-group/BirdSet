@@ -56,7 +56,7 @@ torch-audiomentations = "^0.11.0"
 wandb = "^0.16.0"
 transformers = "^4.35.0"
 pyrootutils = "^1.0.4"
-
+chirp = {git = "https://github.com/mo01010010itz/perch-gadme.git#main"}
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.25.2"

@@ -2,7 +2,7 @@
 audiomentations==0.32.0
 ipython==8.14.0
 librosa==0.10.1
-notebook==7.0.2
+notebook==7.0.4
 numpy==1.24.4
 torchaudio
 torchvision
@@ -24,3 +24,4 @@ hydra_colorlog == 1.2.0
 #rootuils == 1.0.7
 wandb ==  0.16.0
 rich==13.7.0
+chirp @ git+https://github.com/mo01010010itz/perch-gadme.git@main
