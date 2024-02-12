@@ -4,7 +4,7 @@ import logging
 from datasets import Dataset, DatasetDict
 
 from dataset.embeddings.ds_saver import DsSaver
-from dataset.embeddings.embedding_backend_model import EmbedModel
+from dataset.embeddings.embedding_backend_model import BaseEmbedModel
 
 class EmbeddingCreator():
     def __init__(self, embedding_model) -> None:
@@ -29,7 +29,7 @@ class BaseEmbeddingModule():
 
 
 class EmbeddingModule(BaseEmbeddingModule):
-    def __init__(self, backend: e.BACKEND, device: e.DEVICE, save_config:DsSaver, embedding:EmbedModel) -> None:
+    def __init__(self, backend: e.BACKEND, device: e.DEVICE, save_config:DsSaver, embedding:BaseEmbedModel) -> None:
         self.backend = backend
         self.device = device
         self.embedding = embedding
