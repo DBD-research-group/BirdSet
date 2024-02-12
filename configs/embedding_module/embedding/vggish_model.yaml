@@ -1,0 +1,14 @@
+_target_: dataset.embeddings.embedding_backend_model.VGGish
+
+model_key: "tfhub_model"
+model_name: "VGGish"
+embed_dim: 128
+num_classes: ${datamodule.dataset.n_classes}
+
+config:
+  window_size_s: 3.0
+  hop_size_s: 3.0
+  sample_rate: 16_000
+  model_path: "https://tfhub.dev/google/vggish/1"
+  embedding_index: -1
+  logits_index: -1

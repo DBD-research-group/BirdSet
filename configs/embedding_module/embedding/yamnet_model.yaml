@@ -1,0 +1,14 @@
+_target_: dataset.embeddings.embedding_backend_model.Yamnet
+
+model_key: "tfhub_model"
+model_name: "Yamnet"
+embed_dim: 1024
+num_classes: ${datamodule.dataset.n_classes}
+
+config:
+  window_size_s: 3.0
+  hop_size_s: 3.0
+  sample_rate: 16_000
+  model_path: "https://tfhub.dev/google/yamnet/1"
+  embedding_index: 1
+  logits_index: 0

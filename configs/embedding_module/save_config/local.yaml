@@ -1,0 +1,8 @@
+  _target_: dataset.embeddings.ds_saver.Local
+  data_dir: ${paths.dataset_path}
+  embedding_dir: "embeddings"
+  dataset_name: ${datamodule.dataset.dataset_name}
+  model_name: ${embedding_module.embedding.model_name}
+  hf_path: DBD-research-group/gadme_v1
+  hf_name: ${datamodule.dataset.hf_name}
+  override: True

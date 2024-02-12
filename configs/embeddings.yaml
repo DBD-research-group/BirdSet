@@ -1,0 +1,28 @@
+# @package _global_
+defaults:
+  - _self_
+  - datamodule: high_sierras
+  - embedding_module: embedding
+  - paths: laptop
+  - hydra: default
+  - extras: default
+  - override /datamodule/mapper: xc_bambird_mapper_unlimited.yaml
+  - override /datamodule/transforms: base_transform.yaml
+
+
+task_name: "embed"
+seed: 42
+
+# some values for interface compatibility
+module:
+  task: "multilabel"
+  network:
+    model_name: ${embedding_module.embedding.model_name}
+    model_type: "raw"
+    sampling_rate: ${embedding_module.embedding.config.sample_rate}
+    window_size_s: ${embedding_module.embedding.config.window_size_s}
+
+datamodule:
+  _target_: dataset.embeddings.embedding_datamodule.EmbeddingDatamodule
+
+

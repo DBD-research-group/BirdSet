@@ -4,4 +4,5 @@ output_dir: ${hydra:runtime.output_dir}
 dataset_path: ${paths.root_dir}/data_gadme/${datamodule.dataset.dataset_name}
 background_path: ${paths.root_dir}/data_gadme/background_noise/dcase18_unpacked_wav
 log_dir: ${paths.output_dir}/logs/
+model_path: ${paths.root_dir}/pretrained_models
 

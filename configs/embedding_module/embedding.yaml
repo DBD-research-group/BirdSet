@@ -1,0 +1,10 @@
+_target_: dataset.embeddings.embedding_module.EmbeddingModule
+
+defaults:
+  - _self_
+  - embedding: perch_model.yaml
+  - save_config: local.yaml
+
+
+backend: tf # tf | torch
+device: "cpu"
