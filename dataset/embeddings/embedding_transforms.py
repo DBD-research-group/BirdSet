@@ -9,4 +9,4 @@ class EmbeddingTransforms(BaseTransforms):
         self.task = task
     
     def transform_labels(self, batch):
-        return batch["labels"]
+        return batch
