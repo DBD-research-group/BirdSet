@@ -49,7 +49,7 @@ def main(cfg):
 
     # Setup logger
     log.info(f"Instantiate logger")
-    logger = utils.instantiate_wandb(cfg) 
+    logger = utils.instantiate_loggers(cfg.get("logger")) 
 
     # Setup callbacks
     log.info(f"Instantiate callbacks")

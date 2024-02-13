@@ -1,6 +1,13 @@
 root_dir: ${oc.env:PROJECT_ROOT}
 work_dir: ${hydra:runtime.cwd}
+
+# dynamic output directory
+# store ckpts etc. 
 output_dir: ${hydra:runtime.output_dir}
+
+# data directory
 dataset_path: /mnt/work/bird2vec/gadme_hf_download/${datamodule.dataset.dataset_name}
 background_path: /mnt/work/bird2vec/data/dcase18/wav
-log_dir: ${paths.output_dir}/logs/
+
+# logging directory, has to be static to work properly
+log_dir: /mnt/work/bird2vec/gadme_logs/

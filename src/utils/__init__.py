@@ -4,5 +4,5 @@ from src.utils.utils import (
     log_hyperparameters,
     register_custom_resolvers
 )
-from src.utils.instantiate import instantiate_callbacks, instantiate_wandb
+from src.utils.instantiate import instantiate_callbacks, instantiate_wandb, instantiate_loggers
 from src.utils.pylogger import get_pylogger

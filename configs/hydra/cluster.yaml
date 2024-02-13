@@ -5,4 +5,7 @@
 job:
   chdir: True
 run:
-  dir: /mnt/work/bird2vec/gadme_outputs/${task_name}/${datamodule.dataset.dataset_name}/${module.network.model_name}/${start_time}
+  dir: ${paths.log_dir}/${task_name}/runs/${datamodule.dataset.dataset_name}/${module.network.model_name}/${now:%Y-%m-%d_%H%M%S}
+  
+  
+  

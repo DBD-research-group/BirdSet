@@ -3,7 +3,8 @@ from lightning import Callback
 from omegaconf import DictConfig
 from omegaconf import OmegaConf
 from src.utils import pylogger
-import wandb
+from pytorch_lightning.loggers import Logger
+from typing import Any, Callable, List, Optional
 
 from pytorch_lightning.loggers import WandbLogger
 log = pylogger.get_pylogger(__name__)
@@ -23,17 +24,17 @@ def instantiate_callbacks(callbacks_args):
     return callbacks
     
 
-def instantiate_wandb(args):
-    logger_args = args.logger
+def instantiate_wandb(cfg):
+    logger_cfg = cfg.logger
 
-    if not logger_args:
+    if not logger_cfg:
         log.warning("No callbacks found")
         return None
     
-    #logging.info(f"Instantiating logger <{logger_args._target_}>")
-    log.info(f"Instantiate logger <{logger_args.wandb._target_}>")
+    #logging.info(f"Instantiating logger <{logger_cfg._target_}>")
+    log.info(f"Instantiate logger <{logger_cfg.wandb._target_}>")
     logger = hydra.utils.instantiate(
-        logger_args
+        logger_cfg
     )
     logger = logger.wandb
     # wandb.config.update(OmegaConf.to_container(
@@ -44,18 +45,19 @@ def instantiate_wandb(args):
     return logger
 
 
-def initialize_wandb_logger(args):
-    wandb_logger = WandbLogger(
-        name=args.module.network.model_name+'_'+args.datamodule.dataset.dataset_name+'#'+str(args.seed),
-        save_dir=args.paths.log_dir,
-        project=args.logger.wandb.project,
-        mode=args.logger.wandb.mode,
-        entity=args.logger.wandb.entity,
-        config=OmegaConf.to_container(
-            args,
-            resolve=True,
-            throw_on_missing=True
-        )
-    )
+def instantiate_loggers(logger_cfg):
+    logger: List[Logger] = []
 
-    return wandb_logger
+    if not logger_cfg:
+        log.warning("No loger configs found, skipping...")
+        return logger
+
+    if not isinstance(logger_cfg, DictConfig):
+        raise TypeError("Logger config must be a DictConfig!")
+    
+    for _, lg_conf in logger_cfg.items():
+        if isinstance(lg_conf, DictConfig) and "_target_" in lg_conf:
+            log.info(f"Instantiate logger <{lg_conf._target_}>")
+            logger.append(hydra.utils.instantiate(lg_conf))
+    
+    return logger
