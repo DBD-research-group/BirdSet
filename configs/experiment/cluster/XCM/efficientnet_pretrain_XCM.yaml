@@ -7,8 +7,8 @@ defaults:
   - override /callbacks: cluster.yaml 
   - override /trainer: multi_gpu.yaml
   - override /datamodule/transforms: bird_default_multilabel.yaml
-  - override /paths: fricco_cluster.yaml
-  - override /hydra: fricco_cluster.yaml
+  - override /paths: default.yaml
+  - override /hydra: default.yaml
 
 tags: ["pretrain_xencanto_m", "efficientnet", "multilabel", "5event"]
 seed: 2

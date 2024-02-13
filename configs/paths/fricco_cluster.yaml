@@ -1,7 +1,0 @@
-root_dir: ${oc.env:PROJECT_ROOT}
-work_dir: ${hydra:runtime.cwd}
-output_dir: ${hydra:runtime.output_dir}
-dataset_path: /share/data1/rheinrich/DBD/gadme_hf_download/${datamodule.dataset.dataset_name}
-background_path: /share/data1/rheinrich/DBD/data/background_noise/dcase18_unpacked_wav
-log_dir: ${paths.output_dir}/logs/
-
