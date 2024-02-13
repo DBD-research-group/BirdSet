@@ -89,9 +89,9 @@ class MultilabelModule(BaseModule):
 
     def _wandb_prediction_table(self, preds, targets):
         top5_values_preds, top5_indices_preds = preds.topk(dim=1, k=5, sorted=True)
-
-        top5_values_preds = top5_values_preds.cpu().numpy()
-        top5_indices_preds = top5_indices_preds.cpu().numpy()
+        
+        top5_values_preds = top5_values_preds.cpu().typesafe_numpy()
+        top5_indices_preds = top5_indices_preds.cpu().typesafe_numpy()
 
         indices_targets= (targets == 1).nonzero(as_tuple=False)
         multilabel_list = [[] for _ in range(targets.size(0))]        
@@ -110,7 +110,6 @@ class MultilabelModule(BaseModule):
 
         # Log the table to wandb
         wandb.log({"Top 5 Predictions vs Targets": table})
-
 
 
 
