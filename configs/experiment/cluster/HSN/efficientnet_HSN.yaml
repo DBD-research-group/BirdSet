@@ -5,7 +5,7 @@ defaults:
   - override /module: multilabel.yaml
   - override /module/network: efficientnet.yaml
   - override /callbacks: default.yaml
-  - override /trainer: multi_gpu.yaml
+  - override /trainer: single_gpu.yaml
   - override /datamodule/transforms: bird_default_multilabel.yaml
   - override /paths: default.yaml
   - override /hydra: default.yaml
@@ -34,8 +34,6 @@ module:
 trainer:
   min_epochs: 1
   max_epochs: 150
-  accelerator: gpu
-  devices: 2
 
 datamodule:
   dataset:
@@ -52,15 +50,15 @@ datamodule:
     train:
       batch_size: 32
       shuffle: True
-      num_workers: 128
+      num_workers: 32
       drop_last: True
     valid:
       batch_size: 32
-      num_workers: 128
+      num_workers: 32
       shuffle: False
     test:
       batch_size: 32
-      num_workers: 128
+      num_workers: 32
       shuffle: False
 
   mapper: 
