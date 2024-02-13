@@ -3,8 +3,8 @@ task_name: debug
 
 defaults:
   - override /module: multilabel.yaml
-  - override /module/network: ast.yaml
-  - override /datamodule: xenocanto_m.yaml
+  - override /module/network: eat_soundnet.yaml
+  - override /datamodule: high_sierras.yaml
   - override /callbacks: default.yaml 
   - override /trainer: single_gpu.yaml
   - override /datamodule/transforms: bird_default_multilabel.yaml
@@ -13,7 +13,7 @@ defaults:
 
 #ckpt_path: "/home/lrauch/projects/GADME/src/output/train/runs/xenocanto_m_withoutnd/eat/2024-01-23_145247/checkpoints"
 train: True
-test: False
+test: True
 
 extras: 
   ignore_warnings: False
@@ -60,16 +60,16 @@ datamodule:
 
   loaders:
     train: 
-      batch_size: 5
+      batch_size: 20
       num_workers: 3
       shuffle: True
       pin_memory: False
     valid: 
-      batch_size: 5
+      batch_size: 20
       num_workers: 3
       pin_memory: False
     test:
-      batch_size: 5
+      batch_size: 20
       num_workers: 3
       pin_memory: False
 
