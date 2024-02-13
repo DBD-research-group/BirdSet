@@ -1,9 +1,8 @@
 import os 
-import rootutils
 import hydra
 import lightning as L 
 from omegaconf import OmegaConf
-
+import json
 from src import utils
 import pyrootutils 
 
@@ -118,7 +117,7 @@ def main(cfg):
             )
         trainer.test(model=model, datamodule=datamodule, ckpt_path=ckpt_path)
 
-        test_metrics = trainer.callback_metrics
+        test_metrics = trainer.callback_metrics 
 
     if cfg.get("save_state_dict"):
         log.info(f"Saving state dicts")
@@ -129,8 +128,15 @@ def main(cfg):
             **cfg.extras.state_dict_saving_params  
         )
 
-    
-    #metric_dict = {**train_metrics, **test_metrics}
+    if cfg.get("dump_metrics"):
+        log.info(f"Dumping final metrics locally to {cfg.paths.output_dir}")
+        metric_dict = {**train_metrics, **test_metrics}
+
+        metric_dict = [{'name': k, 'value': v.item() if hasattr(v, 'item') else v} for k, v in metric_dict.items()]
+
+        file_path = os.path.join(cfg.paths.output_dir, "finalmetrics.json")
+        with open(file_path, 'w') as json_file:
+            json.dump(metric_dict, json_file)
     
     utils.close_loggers()
 

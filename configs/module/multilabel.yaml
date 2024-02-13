@@ -6,7 +6,7 @@ defaults:
 
 task: multilabel
 class_weights_loss: ${datamodule.dataset.class_weights_loss}
-prediction_table: True
+prediction_table: False
 num_gpus: ${trainer.devices}
 
 optimizer:

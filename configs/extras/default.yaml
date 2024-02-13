@@ -10,4 +10,6 @@ state_dict_saving_params:
   symbols: 6
   exceptions: ["loss"]
 
+dump_metrics: True
+
 
