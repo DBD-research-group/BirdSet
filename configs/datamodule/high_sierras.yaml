@@ -8,7 +8,7 @@ defaults:
   - mapper: xc_bambird_mapper.yaml
 
 dataset:
-  data_dir: ${paths.dataset_path}
+  data_dir: ${paths.dataset_path} # we need to override this with dataset_path/embeddings/model_name for embedding offline use
   dataset_name: high_sierras
   hf_path: DBD-research-group/gadme_v1
   hf_name: high_sierras
