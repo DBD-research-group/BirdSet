@@ -1,5 +1,6 @@
 from chirp.inference import models
 from torch import from_numpy as torch_from_numpy
+from chirp.inference.models import tf
 
 class BaseEmbedModel():
     def __init__(self, instance) -> None:
@@ -23,10 +24,15 @@ class TfEmbedModel(BaseEmbedModel):
         self.instance = instance
     
     def get_embeddings(self, input_values):
-        inference = self.instance(input_values)
+        inference = self.get_inference(input_values)
         embeddings = inference.embeddings
         embeddings = self.transform_embeddings(embeddings)
         return torch_from_numpy(embeddings)
+    
+    # @tf.function
+    def get_inference(self, input_values):
+        inference = self.instance(input_values)
+        return inference
 
 class DownloadEmbedModel(TfEmbedModel):
     def __init__(self, model_key, model_name, num_classes, embed_dim, config) -> None:
