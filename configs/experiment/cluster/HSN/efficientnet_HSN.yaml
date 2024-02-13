@@ -1,7 +1,7 @@
 # @package _global_
 #package global is neccessary!
 defaults:
-  - override /datamodule: XCM.yaml
+  - override /datamodule: HSN.yaml
   - override /module: multilabel.yaml
   - override /module/network: efficientnet.yaml
   - override /callbacks: default.yaml
@@ -10,17 +10,17 @@ defaults:
   - override /paths: default.yaml
   - override /hydra: default.yaml
 
-tags: ["pretrain_xencanto_m", "efficientnet", "multilabel", "5event"]
+tags: ["HSN", "efficientnet", "multilabel"]
 seed: 2
 train: True
-test: False
+test: True
 
 logger:
   wandb:
     tags: ${tags}
-    group: "pretrain_efficientnet_XCM"
+    group: "HSN_train_efficientnet"
     mode: online
-    version: pretrain_efficientnet_${start_time} #to resume train run # needs to be tested
+    #version: pretraineatxcm_2 #to resume train run # needs to be tested
 
 module:
   optimizer:
@@ -33,13 +33,13 @@ module:
 
 trainer:
   min_epochs: 1
-  max_epochs: 200
+  max_epochs: 150
   accelerator: gpu
   devices: 2
 
 datamodule:
   dataset:
-    val_split: 0.1
+    val_split: 0.2
     class_weights_loss: null
     class_weights_sampler: null
     classlimit: 600
