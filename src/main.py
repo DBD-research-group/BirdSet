@@ -3,6 +3,7 @@ import rootutils
 import hydra
 import lightning as L 
 from omegaconf import OmegaConf
+import torch
 
 from src import utils
 import pyrootutils 
@@ -26,6 +27,7 @@ _HYDRA_PARAMS = {
 @utils.register_custom_resolvers(**_HYDRA_PARAMS)
 @hydra.main(**_HYDRA_PARAMS)
 def main(cfg):
+    torch.Tensor.typesafe_numpy = utils.bfloat16_numpy # when the dtype is bfloat16, we cannot convert, this enables us to convert to float32
     log.info('Using config: \n%s', OmegaConf.to_yaml(cfg))
 
     log.info(f"Dataset path: <{os.path.abspath(cfg.paths.dataset_path)}>")
