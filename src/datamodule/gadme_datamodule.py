@@ -21,8 +21,8 @@ class GADMEDataModule(BaseDataModuleHF):
             mapper=mapper
         )
 
-    def _load_data(self, decode: bool = False):
-        return super()._load_data(decode=decode)
+    def _load_and_configure_data(self, decode: bool = False):
+        return super()._load_and_configure_data(decode=decode)
 
     def _preprocess_data(self, dataset):
         if self.dataset_config.task == "multiclass":

@@ -24,7 +24,7 @@ class PretrainDataModule(BaseDataModuleHF):
             mapper=mapper
         )
 
-    def _load_data(self, decode: bool = False):
+    def _load_and_configure_data(self, decode: bool = False):
         """
         Load audio dataset from Hugging Face Datasets.
 
