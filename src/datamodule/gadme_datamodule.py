@@ -24,18 +24,18 @@ class GADMEDataModule(BaseDataModuleHF):
     def _load_and_configure_data(self, decode: bool = False):
         return super()._load_and_configure_data(decode=decode)
 
-    def _preprocess_data(self, dataset):
+    def _preprocess_data(self, dataset, data_column_name="filepath"):
         if self.dataset_config.task == "multiclass":
             dataset = self._preprocess_multiclass(dataset)
         elif self.dataset_config.task == "multilabel":
             dataset = self._preprocess_multilabel(dataset)
 
         dataset["train"] = dataset["train"].select_columns(
-            ["filepath", "labels", "detected_events", "start_time", "end_time", "no_call_events"]
+            [data_column_name, "labels", "detected_events", "start_time", "end_time", "no_call_events"]
         )
         # maybe has to be added to test data to avoid two selections
         dataset["test"] = dataset["test"].select_columns(
-            ["filepath", "labels", "detected_events", "start_time", "end_time"]
+            [data_column_name, "labels", "detected_events", "start_time", "end_time"]
         )
 
         return dataset
