@@ -47,16 +47,25 @@ class AverageEmbedModel(TfEmbedModel):
         super().__init__(model_name, num_classes, embed_dim, instance)
     
     def transform_embeddings(self, embeddings):
+        embeddings = embeddings.squeeze() # i assume we need this!
         embeddings = embeddings.mean(axis=1)
         return super().transform_embeddings(embeddings)
 
 class Perch(DownloadEmbedModel):
     def __init__(self, model_key, model_name, num_classes, embed_dim, config) -> None:
         super().__init__(model_key, model_name, num_classes, embed_dim, config)
+    
+    def transform_embeddings(self, embeddings):
+        embeddings = embeddings.squeeze()
+        return embeddings
 
 class BirdNet(DownloadEmbedModel):
     def __init__(self, model_key, model_name, num_classes, embed_dim, config) -> None:
         super().__init__(model_key, model_name, num_classes, embed_dim, config)
+    
+    def transform_embeddings(self, embeddings):
+        embeddings = embeddings.squeeze()
+        return embeddings
 
 class Yamnet(AverageEmbedModel):
     def __init__(self, model_key, model_name, num_classes, embed_dim, config) -> None:
