@@ -5,7 +5,13 @@ from datasets import Dataset, DatasetDict, load_from_disk, load_dataset
 
 # this enables saving and loading of datasets at specified locations
 # its intended use is in the datamodule and in creating the emebddings
-   
+
+def get_ds_manager(mode:Literal["local", "hf"], data_dir, dataset_name, hf_path, hf_name, num_proc):
+    if mode=="hf":
+        return HfDsManager(data_dir, dataset_name, hf_path, hf_name, num_proc)
+    elif mode == "local":
+        return LocalDsManager(data_dir, dataset_name, hf_path, hf_name, num_proc)
+
 class DsManager():
     def __init__(self, data_dir, dataset_name, hf_path, hf_name, num_proc) -> None:
         self.data_dir = data_dir
