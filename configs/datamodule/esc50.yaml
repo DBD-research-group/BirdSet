@@ -8,6 +8,7 @@ defaults:
   - mapper: null
 
 dataset:
+  mode: "hf" # local or hf
   data_dir: ${paths.dataset_path}
   dataset_name: esc50
   hf_path: ashraq/esc50

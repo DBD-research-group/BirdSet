@@ -8,6 +8,7 @@ defaults:
   - mapper: xc_bambird_mapper.yaml
 
 dataset:
+  mode: "hf" # local or hf
   data_dir: ${paths.dataset_path}
   dataset_name: HSN
   hf_path: DBD-research-group/gadme

@@ -8,6 +8,7 @@ defaults:
 
 
 dataset:
+  mode: "hf" # local or hf
   data_dir: ${paths.dataset_path}
   dataset_name: nips
   hf_path: DBD-research-group/gadme_v1

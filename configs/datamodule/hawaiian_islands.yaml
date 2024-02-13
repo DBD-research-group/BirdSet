@@ -8,6 +8,7 @@ defaults:
   - loaders: default.yaml
 
 dataset:
+  mode: "hf" # local or hf
   data_dir: ${paths.dataset_path}
   dataset_name: hawaiian_islands
   hf_path: DBD-research-group/gadme_v1
