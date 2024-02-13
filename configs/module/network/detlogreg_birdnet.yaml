@@ -1,4 +1,4 @@
-model_name: "Deterministic Logistic Regression Birdnet"
+model_name: "BirdNet-v2.4"
 model:
   _target_: src.modules.models.logistic_regression.DeterministicLogisticRegression
   embedding_size: 1024
@@ -6,5 +6,6 @@ model:
 
 model_type: embedding
 sampling_rate: 48_000
-window_size_s: 3.0
-hop_size_s: 3.0
+# window_size_s: 3.0
+# hop_size_s: 3.0
+torch_compile: False

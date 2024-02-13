@@ -1,4 +1,4 @@
-model_name: "Deterministic Logistic Regression Perch"
+model_name: "GooglePerch-V4"
 model:
   _target_: src.modules.models.logistic_regression.DeterministicLogisticRegression
   embedding_size: 1280
@@ -8,3 +8,4 @@ model_type: embedding
 sampling_rate: 32_000
 window_size_s: 5.0
 hop_size_s: 5.0
+torch_compile: False
