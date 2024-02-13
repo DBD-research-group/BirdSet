@@ -15,6 +15,8 @@ from datasets import load_dataset, load_from_disk, Audio, DatasetDict, Dataset, 
 from torch.utils.data import DataLoader
 from src.datamodule.components.event_mapping import XCEventMapping
 from src.datamodule.components.transforms import GADMETransformsWrapper
+from src.utils.path_utils import get_ds_manager, DsManager
+
 
 @dataclass
 class DatasetConfig:
@@ -23,6 +25,9 @@ class DatasetConfig:
 
     Attributes
     ----------
+    mode: Literal["local", "hf"]
+        Specifies the mode in which the datamodule should load the data. 
+        If given local, the hf dataset will be restored from disk, loaded from hf/ cache_dir otherwise.
     data_dir : str
         Specifies the directory where the dataset files are stored.
     dataset_name : str
@@ -52,6 +57,7 @@ class DatasetConfig:
     event_limit : int
         Defines the maximum number of audio events processed per audio file, capping the quantity to ensure balance across files.
     """
+    mode: Literal["local", "hf"] = "hf"
     data_dir: str = "/workspace/data_gadme"
     dataset_name: str = "esc50"
     hf_path: str = "ashraq/esc50"
@@ -188,7 +194,7 @@ class BaseDataModuleHF(L.LightningDataModule):
 
         logging.info("Prepare Data")
 
-        dataset = self._load_data()
+        dataset = self._load_and_configure_data()
         dataset = self._preprocess_data(dataset)
         dataset = self._create_splits(dataset)
 
@@ -285,26 +291,34 @@ class BaseDataModuleHF(L.LightningDataModule):
             else: 
                 return self._create_splits(dataset[list(dataset.keys())[0]])
 
-    def _load_data(self,decode: bool = True ):
+    def _load_and_configure_data(self,decode: bool = True ):
         """
         Load audio dataset from Hugging Face Datasets.
 
         Returns HF dataset with audio column casted to Audio feature, containing audio data as numpy array and sampling rate.
         """
         logging.info("> Loading data set.")
-
-        dataset = load_dataset(
-            name=self.dataset_config.hf_name,
-            path=self.dataset_config.hf_path,
-            cache_dir=self.dataset_config.data_dir,
-            num_proc=3,
-        )
+        
+        dataset = self._load_data()
+        
+        dataset = self._configure_data(dataset, decode)
+        
+        return dataset
+    
+    def _load_data(self):
+        
+        dsManager: DsManager = get_ds_manager(self.dataset_config.mode, self.dataset_config.data_dir, self.dataset_config.dataset_name, self.dataset_config.hf_path, self.dataset_config.hf_name, 3)
+        
+        dataset = dsManager.load()
+        
         if isinstance(dataset, IterableDataset |IterableDatasetDict):
             logging.error("Iterable datasets not supported yet.")
             return
         assert isinstance(dataset, DatasetDict | Dataset)
+        return dataset
+    
+    def _configure_data(self, dataset, decode:bool = True):
         dataset = self._ensure_train_test_splits(dataset)
-
         
         if self.dataset_config.subset:
             dataset = self._fast_dev_subset(dataset, self.dataset_config.subset)
