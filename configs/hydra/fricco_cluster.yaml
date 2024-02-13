@@ -1,0 +1,8 @@
+# defaults: 
+#   - override hydra_logging: colorlog
+#   - override job_logging: colorlog 
+
+job:
+  chdir: True
+run:
+  dir: /share/data1/rheinrich/DBD/gadme_outputs/${task_name}/${datamodule.dataset.dataset_name}/${module.network.model_name}/${start_time}
