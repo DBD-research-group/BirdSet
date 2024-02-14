@@ -1,6 +1,6 @@
 defaults:
   - _self_
-  #- early_stopping.yaml
+  - early_stopping.yaml
   - learning_rate_monitor.yaml
   - time_tracking.yaml
   - model_summary.yaml

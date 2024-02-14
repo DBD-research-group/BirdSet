@@ -1,9 +1,9 @@
 background_noise:
   #_target_: torch_audiomentations.AddBackgroundNoise
   _target_: datamodule.components.augmentations.AddBackgroundNoise
-  p: 0.75
-  min_snr_in_db: 1.0
-  max_snr_in_db: 40.0
+  p: 0.5
+  min_snr_in_db: 3.0 #1.0
+  max_snr_in_db: 30.0 #40.0
   sample_rate: ${module.network.sampling_rate}
   target_rate: ${module.network.sampling_rate}
   background_paths: ${paths.background_path}

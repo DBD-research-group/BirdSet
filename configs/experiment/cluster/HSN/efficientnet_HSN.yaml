@@ -24,7 +24,9 @@ logger:
 
 module:
   optimizer:
-    lr: 1e-5
+    _target_: torch.optim.Adam
+    lr: 5e-4
+    weight_decay: 5e-4
   loss:
   #  _target_: src.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
     _target_: torch.nn.BCEWithLogitsLoss 
@@ -33,18 +35,28 @@ module:
 
 trainer:
   min_epochs: 1
-  max_epochs: 150
+  max_epochs: 200
 
 datamodule:
   dataset:
     val_split: 0.2
     class_weights_loss: null
-    class_weights_sampler: null
+    class_weights_sampler: True
     classlimit: 600
     eventlimit: 3
   transforms:
     preprocessing:
-      normalize_waveform: instance_normalization
+      normalize_waveform: null
+      normalize_spectrogram: True
+      use_spectrogram: True
+      n_fft: 1024
+      hop_length: 320
+      n_mels: 128
+      db_scale: True
+      target_height: null
+      target_width: null
+      mean: -4.268
+      std: 4.569
 
   loaders:
     train:

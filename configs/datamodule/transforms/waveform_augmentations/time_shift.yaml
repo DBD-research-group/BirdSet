@@ -1,0 +1,6 @@
+  time_shift:
+    _target_: torch_audiomentations.Shift
+    p: 0.5
+    min_shift: -0.5
+    max_shift: 0.5
+    rollover: True
