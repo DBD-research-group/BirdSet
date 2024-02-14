@@ -44,12 +44,12 @@ metrics:
     balanced_acc_top5:
       _target_: src.modules.metrics.BalancedAccuracyTop5
       num_classes: ${datamodule.dataset.n_classes}  
-    # auroc:
-    #   _target_: "torchmetrics.classification.AUROC"
-    #   task: "multiclass"
-    #   num_labels: ${datamodule.dataset.n_classes}
-    #   average: "macro"
-    #   thresholds: null
+    auroc:
+      _target_: "torchmetrics.classification.AUROC"
+      task: "multiclass"
+      num_classes: ${datamodule.dataset.n_classes} 
+      average: "macro"
+      thresholds: null
   # eval_complete:
   #   pcmap:
   #     _target_: src.modules.metrics.pcmAP
