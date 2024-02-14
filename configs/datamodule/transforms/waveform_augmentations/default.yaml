@@ -3,7 +3,6 @@ defaults:
   - background_noise.yaml
   - gain.yaml
   - pitch_shift.yaml
-  - time_shift.yaml
   - colored_noise.yaml
   # - polarity_inversion.yaml
 
