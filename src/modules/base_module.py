@@ -77,7 +77,7 @@ class BaseModule(L.LightningModule):
             _convert_='partial'
         )
 
-        if self.lrs_params.get("scheduler"):
+        if self.lrs_params is not None and self.lrs_params.get("scheduler"):
             num_training_steps = math.ceil((self.num_epochs * self.len_trainset) / self.batch_size*self.num_gpus) 
             # TODO: Handle the case when drop_last=True more explicitly   
 
