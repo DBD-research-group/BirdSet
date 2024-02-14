@@ -1,0 +1,10 @@
+# used with det log reg to archive comparable results
+early_stopping:
+  _target_: lightning.pytorch.callbacks.EarlyStopping
+  monitor: ${replace:"val/__loss__"}
+  patience: 5
+  min_delta: 0.05
+  mode: "min"
+  verbose: False
+  check_finite: True
+  

@@ -1,0 +1,9 @@
+defaults:
+  - _self_
+  #- early_stopping.yaml
+  - learning_rate_monitor.yaml
+  - time_tracking.yaml
+  - model_summary.yaml
+  - rich_progress_bar.yaml
+  - model_checkpoint.yaml #topk=0 if not wanted!
+  - embed_early_stopping.yaml

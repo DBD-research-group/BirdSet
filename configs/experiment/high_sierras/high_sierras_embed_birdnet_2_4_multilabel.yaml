@@ -5,7 +5,7 @@ defaults:
   - override /datamodule/transforms: embedding_transform.yaml
   - override /module: multilabel.yaml
   - override /module/network: detlogreg_birdnet.yaml
-  - override /callbacks: default.yaml 
+  - override /callbacks: embed_default.yaml 
   - override /trainer: default.yaml
 
 
