@@ -41,7 +41,7 @@ datamodule:
   dataset:
     val_split: 0.2
     class_weights_loss: null
-    class_weights_sampler: True
+    class_weights_sampler: null
     classlimit: 600
     eventlimit: 3
   transforms:
