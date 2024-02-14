@@ -41,7 +41,7 @@ class PreprocessingConfig:
     normalize_spectrogram : bool
         Whether to apply normalization to the spectrogram. Normalization can help in stabilizing the training process.
     normalize_waveform : str | None
-        Determines whether to apply normalization to the raw waveform data. Possible values are 'instance_normalization', 'instance_min_max', or None.
+        Determines whether to apply normalization to the raw waveform data. Possible values are 'instance_normalization', 'instance_min_max', 'instance_peak_normalization', or None.
     """
     use_spectrogram: bool = True
     n_fft: int = 1024
@@ -51,7 +51,7 @@ class PreprocessingConfig:
     target_height: int | None = None
     target_width: int | None = 1024
     normalize_spectrogram: bool = True
-    normalize_waveform: Literal['instance_normalization', 'instance_min_max'] | None  = None
+    normalize_waveform: Literal['instance_normalization', 'instance_min_max', 'instance_peak_normalization'] | None  = None
     mean: Optional[float] = -4.268 # calculated on AudioSet
     std: Optional[float] = 4.569 # calculated on AudioSet
 
@@ -377,6 +377,41 @@ class GADMETransformsWrapper(BaseTransforms):
                 
                 normed_input_values.append(normed_vector)
         return torch.stack(normed_input_values)
+
+    def _zero_center_and_peak_normalization(self, input_values: torch.Tensor, target_peak: float = 0.25,) -> torch.Tensor:
+        """Zero-centers and peak normalizes the input values to a specified target peak amplitude.
+
+        Args:
+            input_values (torch.Tensor): The input tensor with shape [..., T].
+            target_peak (float): The target peak value for normalization.
+
+        Returns:
+            torch.Tensor: The normalized and reshaped tensor.
+        """
+
+        # Clone to avoid modifying the original tensor
+        input_values = input_values.clone()
+
+        # Subtract mean along the last dimension for zero-centering
+        input_values -= torch.mean(input_values, dim=-1, keepdim=True)
+
+        # Calculate the peak normalization factor
+        peak_norm = torch.max(torch.abs(input_values), dim=-1, keepdim=True)[0]
+
+        # Normalize the tensor to the peak value, avoiding division by zero
+        input_values = torch.where(
+            peak_norm > 0.0,
+            input_values / peak_norm,
+            input_values
+        )
+
+        # Scale to the target peak amplitude
+        input_values *= target_peak
+
+        # Reshape the tensor
+        #input_values = input_values.view(-1, input_values.shape[-1])
+
+        return input_values
     
     def _waveform_scaling(self, audio_augmented, attention_mask):
         #TODO vectorize this
@@ -390,6 +425,10 @@ class GADMETransformsWrapper(BaseTransforms):
             audio_augmented = self._min_max_scaling(
                 input_values=audio_augmented,
                 attention_mask=attention_mask
+            )
+        elif self.preprocessing.normalize_waveform == "instance_peak_normalization":
+            audio_augmented = self._zero_center_and_peak_normalization(
+                input_values=audio_augmented,
             )
         return audio_augmented
     
