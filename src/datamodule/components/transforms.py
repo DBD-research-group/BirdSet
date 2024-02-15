@@ -81,7 +81,9 @@ class BaseTransforms:
         if self.event_decoder is None:
             self.event_decoder = EventDecoding(min_len=0,
                                           max_len=self.max_length,
-                                          sampling_rate=self.sampling_rate)
+                                          sampling_rate=self.sampling_rate,
+                                          extension_time=7,
+                                          extracted_interval=5)
         self.feature_extractor = feature_extractor
         if self.feature_extractor is None:
             self.feature_extractor = DefaultFeatureExtractor(feature_size=1,
