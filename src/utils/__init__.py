@@ -6,3 +6,4 @@ from src.utils.utils import (
 )
 from src.utils.instantiate import instantiate_callbacks, instantiate_wandb, instantiate_loggers
 from src.utils.pylogger import get_pylogger
+from src.utils.label_utils  import get_label_to_class_mapping_from_metadata
