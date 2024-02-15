@@ -3,7 +3,7 @@ defaults:
   - _self_
   - datamodule: high_sierras
   - embedding_module: embedding
-  - paths: laptop
+  - paths: default
   - hydra: default
   - extras: default
   - override /datamodule/mapper: xc_bambird_mapper_unlimited.yaml

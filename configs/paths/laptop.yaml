@@ -1,8 +1,0 @@
-root_dir: ${oc.env:PROJECT_ROOT}
-work_dir: ${hydra:runtime.cwd}
-output_dir: ${hydra:runtime.output_dir}
-dataset_path: /Volumes/BigChongusF/Datasets/Huggingface/gadme_v1/data
-log_dir: ${paths.output_dir}/logs/
-# model_dir: "/Users/moritzrichert/Downloads/V2.4/BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite"
-model_path: /Users/moritzrichert/Downloads
-background_path: ${paths.root_dir}/data_gadme/background_noise/dcase18_unpacked_wav
