@@ -32,6 +32,7 @@ metrics:
     num_labels: ${datamodule.dataset.n_classes}
     sample_threshold: 0
     thresholds: null
+    average: "macro"
   # main:
   #   _target_: torchmetrics.classification.AveragePrecision
   #   task: multilabel
@@ -56,6 +57,7 @@ metrics:
     mAP:
       _target_: src.modules.metrics.mAP
       num_labels: ${datamodule.dataset.n_classes}
+      average: "micro"
     
       thresholds: null
   eval_complete:
@@ -70,6 +72,11 @@ metrics:
       num_labels: ${datamodule.dataset.n_classes}
       sample_threshold: 5
       thresholds: null
+      average: "macro"
+    calibration_error:
+      _target_: torchmetrics.classification.BinaryCalibrationError
+      n_bins: ${datamodule.dataset.n_classes}
+      norm: "l1"
 
 output_activation: 
   _target_: "torch.sigmoid"

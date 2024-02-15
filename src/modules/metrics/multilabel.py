@@ -9,6 +9,7 @@ class cmAP(Metric):
             num_labels: int,
             sample_threshold: int,
             thresholds=None,
+            average="macro", # can be macro or micro
             dist_sync_on_step=False
         ):
         super().__init__(dist_sync_on_step=dist_sync_on_step)
@@ -18,7 +19,7 @@ class cmAP(Metric):
         self.thresholds = thresholds
 
         self.multilabel_ap = MultilabelAveragePrecision(
-            average='macro',
+            average=average,
             num_labels=self.num_labels,
             thresholds=self.thresholds
         )
@@ -64,11 +65,12 @@ class mAP(MultilabelAveragePrecision):
     def __init__(
             self,
             num_labels,
+            average="micro",
             thresholds=None
         ):
         super().__init__(
             num_labels=num_labels,
-            average="micro",
+            average=average,
             thresholds=thresholds
         )
 
