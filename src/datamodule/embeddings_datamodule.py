@@ -20,6 +20,8 @@ class EmbeddingsDataModule(GADMEDataModule):
         )
     
     def _configure_data(self, dataset, decode: bool = True):
+        if self.dataset_config.task == "multilabel":
+            dataset["test"] = dataset["test_5s"]
         dataset = self._ensure_train_test_splits(dataset)
         
         if self.dataset_config.subset:
@@ -47,7 +49,7 @@ class EmbeddingsDataModule(GADMEDataModule):
         return dataset
     
     def _preprocess_multilabel(self, dataset):
-        dataset = DatasetDict({split: dataset[split] for split in ["train", "test_5s"]})
+        dataset = DatasetDict({split: dataset[split] for split in ["train", "test"]})
         
         dataset = dataset.rename_column("ebird_code_multilabel", "labels")
         
@@ -63,6 +65,7 @@ class EmbeddingsDataModule(GADMEDataModule):
         if self.dataset_config.class_weights_loss or self.dataset_config.class_weights_sampler:
             self.num_train_labels = self._count_labels((dataset["train"]["ebird_code"]))
 
-        dataset["test"] = dataset["test_5s"]
+        # dataset["test"] = dataset["test_5s"]
         # dataset = dataset.drop_column("ebird_code_multilabel", "labels")
+        
         return dataset

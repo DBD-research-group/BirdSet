@@ -24,6 +24,19 @@ trainer:
 #   _target_: src.modules.mc_multilabel_module.MCDropoutModel
 #   mc_iteration: ${datamodule.dataset.n_classes}
 
+module:
+  optimizer:
+    _target_: torch.optim.Adam
+    lr: 1e-3
+    weight_decay: 0
+  loss:
+    _target_: torch.nn.BCEWithLogitsLoss
+  lr_scheduler: null
+  output_activation: 
+    _target_: "torch.sigmoid"
+
+
+
 
 datamodule:
   _target_: src.datamodule.embeddings_datamodule.EmbeddingsDataModule

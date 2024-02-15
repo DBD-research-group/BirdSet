@@ -2,7 +2,10 @@ _target_: src.datamodule.components.transforms.BaseTransforms
 sampling_rate: ${module.network.sampling_rate}
 task: ${datamodule.dataset.task}
 max_length: ${module.network.window_size_s} # Attention: this might not work with any model!! -> You must specify it or set to 5s as its done in code
-  
-
-
-
+decoding:
+  _target_: src.datamodule.components.event_decoding.EventDecoding
+  min_len: 0
+  max_len: ${datamodule.transforms.max_length}
+  sampling_rate: ${datamodule.transforms.sampling_rate}
+  extension_time: False
+  extracted_interval: 0
