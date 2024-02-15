@@ -6,7 +6,7 @@ defaults:
   - override /module/network: perch_logreg.yaml
   - override /callbacks: default.yaml 
   - override /trainer: default.yaml
-  - override /datamodule/transforms: bird_default_multilabel.yaml
+  - override /datamodule/transforms: base_transform.yaml
   # - override /datamodule/transforms/spectrogram_augmentations: none.yaml
   # - override /datamodule/transforms/waveform_augmentations: none.yaml
 
@@ -38,22 +38,19 @@ datamodule:
     class_weights_sampler: null
     classlimit: null
     eventlimit: null
-  transforms:
-    preprocessing:
-      normalize_waveform: instance_normalization
 
   loaders:
     train:
-      batch_size: 256
+      batch_size: 32
       shuffle: True
       num_workers: 6
       drop_last: False
       prefetch_factor: 4
 
     valid:
-      batch_size: 256
+      batch_size: 32
     test:
-      batch_size: 256
+      batch_size: 32
   mapper: 
     event_limit: null
     biggest_cluster: True
