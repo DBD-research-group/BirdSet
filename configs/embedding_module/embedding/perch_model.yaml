@@ -8,5 +8,5 @@ config:
   window_size_s: 5.0
   sample_rate: 32_000
   hop_size_s: 5.0
-  model_path: ""
-  tfhub_version: 4
+  model_path: ${paths.model_path}/Perch
+  tfhub_version: null
