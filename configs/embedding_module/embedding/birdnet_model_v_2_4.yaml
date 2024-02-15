@@ -12,3 +12,7 @@ config:
   model_path: ${paths.model_path}/BirdNet/V2.4/BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
   num_tflite_threads: 4
   class_list_name: "birdnet_v2_4"
+
+# the model's tflite file has to be downloaded.
+# it is available @ github: https://github.com/kahst/BirdNET-Analyzer
+# https://github.com/kahst/BirdNET-Analyzer/tree/main/checkpoints/V2.4

@@ -10,3 +10,9 @@ config:
   hop_size_s: 5.0
   model_path: ${paths.model_path}/Perch
   tfhub_version: null
+
+# You can either specify the version @ tfhub
+# currently 1/2/3/4 
+# or specify the path to the downloaded archive.
+# Perch is available here:
+# https://www.kaggle.com/models/google/bird-vocalization-classifier/frameworks/TensorFlow2/variations/bird-vocalization-classifier
