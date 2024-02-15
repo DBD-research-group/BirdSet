@@ -13,3 +13,6 @@ background_path: ${paths.root_dir}/data_gadme/background_noise/dcase18_unpacked_
 # logging directory, has to be static to work properly
 log_dir: ${paths.root_dir}/logs/
 
+# path where pretrained models are stored
+model_path: ${paths.root_dir}/pretrained_models
+

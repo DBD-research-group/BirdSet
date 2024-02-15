@@ -1,0 +1,16 @@
+model:
+  _target_: src.modules.models.logistic_regression_embedding_models.BirdNetTFLiteModel
+  model_path: ${paths.model_path}/${module.model_name}/V2.4/BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+  num_classes: ${datamodule.dataset.n_classes}
+  num_threads: null
+  
+model_name: birdnet
+model_type: raw
+torch_compile: False
+sampling_rate: 48_000
+
+
+
+
+
+

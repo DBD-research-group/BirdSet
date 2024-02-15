@@ -37,9 +37,9 @@ class PerchModel(nn.Module):
         self,
         num_classes: int,
         tfhub_version: str,
-        label_path: str,
         train_classifier: bool = True,
         restrict_logits: bool = False,
+        label_path: Optional[str] = None,
         dataset_info_path: Optional[str] = None,
         task: Optional[str] = None,
     ) -> None:
@@ -60,8 +60,9 @@ class PerchModel(nn.Module):
         self.model = None  # Placeholder for the loaded model
 
         self.train_classifier = train_classifier
+        self.train_classifier = True # remove this line when inference is possible
         self.restrict_logits = restrict_logits
-        self.restrict_logits = False
+        self.restrict_logits = False # remove this line when inference is possible
         self.dataset_info_path = dataset_info_path
         self.label_path = label_path
         self.task = task

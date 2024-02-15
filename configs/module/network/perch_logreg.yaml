@@ -1,0 +1,20 @@
+model:
+  _target_: src.modules.models.logistic_regression_embedding_models.PerchModel
+  num_classes: ${datamodule.dataset.n_classes}
+  tfhub_version: 4
+  train_classifier: True
+  restrict_logits: False
+  label_path: null
+  dataset_info_path: null
+  task: ${module.task}
+  
+model_name: perch
+model_type: raw
+torch_compile: False
+sampling_rate: 32_000
+
+
+
+
+
+
