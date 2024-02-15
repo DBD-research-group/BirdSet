@@ -9,7 +9,7 @@ model:
   task: ${module.task}
   
 model_name: perch
-model_type: raw
+model_type: waveform
 torch_compile: False
 sampling_rate: 32_000
 
