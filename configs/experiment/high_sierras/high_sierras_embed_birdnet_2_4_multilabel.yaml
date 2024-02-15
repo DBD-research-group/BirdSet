@@ -18,7 +18,7 @@ seed: 42
 
 trainer:
   min_epochs: 1
-  max_epochs: 2
+  max_epochs: 128
 
 # module:
 #   _target_: src.modules.mc_multilabel_module.MCDropoutModel
@@ -31,6 +31,8 @@ datamodule:
     mode: "local"
     data_dir: ${paths.dataset_path}/embeddings/${module.network.model_name}
     val_split: 0.2
+    classlimit: null
+    eventlimit: null
   loaders:
     train:
       batch_size: 256

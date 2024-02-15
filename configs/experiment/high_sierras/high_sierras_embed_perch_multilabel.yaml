@@ -31,6 +31,8 @@ datamodule:
     mode: "local"
     data_dir: ${paths.dataset_path}/embeddings/${module.network.model_name}
     val_split: 0.2
+    classlimit: null
+    eventlimit: null
   loaders:
     train:
       batch_size: 256
