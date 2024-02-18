@@ -10,7 +10,7 @@ defaults:
   - hydra: default
   - extras: default
 
-  - experiment: cluster/HSN/efficientnet_HSN
+  - experiment: cluster/XCL/efficientnet_XCL
   - hparams_search: null
   - debug: null
 
