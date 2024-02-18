@@ -24,7 +24,7 @@ logger:
 
 module:
   optimizer:
-    _target_: torch.optim.Adam
+    _target_: torch.optim.AdamW
     lr: 5e-4
     weight_decay: 5e-4
   loss:
