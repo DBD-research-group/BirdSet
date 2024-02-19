@@ -758,7 +758,7 @@ class NoCallMixer():
 
         self.paths = self.get_all_file_paths(directory)
         self.no_call_tensor = torch.zeros(n_classes)
-        self.no_call_tensor[0] = 1 # !TODO: [ensure that no_call is 0!!
+        #self.no_call_tensor[0] = 1 # !TODO: [ensure that no_call is 0!!
 
     def get_all_file_paths(self, directory):
         pattern = os.path.join(directory, '**', '*')
