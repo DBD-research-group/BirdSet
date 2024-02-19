@@ -1,5 +1,5 @@
-#xcm
-_target_: src.datamodule.pretrain_datamodule.PretrainDataModule
+#PER amazon basin
+_target_: src.datamodule.gadme_datamodule.GADMEDataModule
 
 defaults: 
   - _self_
@@ -9,13 +9,13 @@ defaults:
 
 dataset:
   data_dir: ${paths.dataset_path}
-  dataset_name: XCL
+  dataset_name: PER
   hf_path: DBD-research-group/gadme
-  hf_name: XCL
+  hf_name: PER
   seed: ${seed}
-  n_classes: 9734
+  n_classes: 132
   n_workers: 3
-  val_split: 0.05
+  val_split: 0.2
   task: ${module.task}
   subset: null
   sampling_rate: ${module.network.sampling_rate}
@@ -23,4 +23,3 @@ dataset:
   class_weights_sampler: null
   classlimit: 500
   eventlimit: 5
-

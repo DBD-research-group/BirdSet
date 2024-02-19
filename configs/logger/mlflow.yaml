@@ -1,0 +1,10 @@
+mlflow:
+  _target_: pytorch_lightning.loggers.MLFlowLogger
+  experiment_name: gadme
+  run_name: ${module.network.model_name}_${datamodule.dataset.dataset_name}_${module.task}#${seed}_${start_time}
+  tracking_uri: ${paths.log_dir}/mlflow/mlruns # run `mlflow ui` command inside the `logs/mlflow/` dir to open the UI
+  tags: null
+  # save_dir: "./mlruns"
+  prefix: ""
+  #artifact_location: null
+  # run_id: "" 

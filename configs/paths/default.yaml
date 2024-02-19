@@ -1,7 +1,15 @@
 root_dir: ${oc.env:PROJECT_ROOT}
 work_dir: ${hydra:runtime.cwd}
+
+# dynamic output directory
+# store ckpts etc. 
 output_dir: ${hydra:runtime.output_dir}
-dataset_path: /mnt/data/DBD/${datamodule.dataset.dataset_name}
-background_path: /mnt/data/DBD/background_noise/dcase18_unpacked_wav #${paths.root_dir}/data_gadme/background_noise/dcase18_unpacked_wav
-log_dir: ${paths.output_dir}/logs/
+
+# data directory
+#dataset_path: ${paths.root_dir}/data_gadme
+dataset_path: ${paths.root_dir}/data_gadme/${datamodule.dataset.dataset_name}
+background_path: ${paths.root_dir}/data_gadme/background_noise/dcase18_unpacked_wav
+
+# logging directory, has to be static to work properly
+log_dir: ${paths.root_dir}/logs/
 
