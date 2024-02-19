@@ -4,7 +4,7 @@ task_name: debug
 defaults:
   - override /module: multilabel.yaml
   - override /module/network: eat_soundnet.yaml
-  - override /datamodule: high_sierras.yaml
+  - override /datamodule: HSN.yaml
   - override /callbacks: default.yaml 
   - override /trainer: single_gpu.yaml
   - override /datamodule/transforms: bird_default_multilabel.yaml
