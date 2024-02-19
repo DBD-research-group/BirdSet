@@ -102,28 +102,51 @@ class pcmAP(MultilabelAveragePrecision):
         return pcmap
 
 
+# class TopKAccuracy(torchmetrics.Metric):
+#     def __init__(self, topk=1, **kwargs):
+#         super().__init__(**kwargs)
+#         self.topk = topk
+#         self.add_state("correct", default=torch.tensor(0), dist_reduce_fx="sum")
+#         self.add_state("total", default=torch.tensor(0), dist_reduce_fx="sum")
+#     def update(self, preds, targets):
+#         # Get the top-k predictions
+#         _, topk_pred_indices = preds.topk(self.topk, dim=1, largest=True, sorted=True)
+#         targets = targets.to(topk_pred_indices.device)
+        
+#         # Convert one-hot encoded targets to class indices
+#         target_indices = targets.argmax(dim=1)
+        
+#         # Compare each of the top-k indices with the target index
+#         correct = topk_pred_indices.eq(target_indices.unsqueeze(1)).any(dim=1)
+
+#         # Update correct and total
+#         self.correct += correct.sum()
+#         self.total += targets.size(0)
+
+#     def compute(self):
+#         return self.correct.float() / self.total
+    
+
 class TopKAccuracy(torchmetrics.Metric):
     def __init__(self, topk=1, **kwargs):
         super().__init__(**kwargs)
         self.topk = topk
         self.add_state("correct", default=torch.tensor(0), dist_reduce_fx="sum")
         self.add_state("total", default=torch.tensor(0), dist_reduce_fx="sum")
+        
     def update(self, preds, targets):
-        # Get the top-k predictions
+        # top-k predictions
         _, topk_pred_indices = preds.topk(self.topk, dim=1, largest=True, sorted=True)
         targets = targets.to(topk_pred_indices.device)
         
-        # Convert one-hot encoded targets to class indices
-        target_indices = targets.argmax(dim=1)
+        #expand targets to match the shape of topk_pred_indices for broadcasting
+        expanded_targets = targets.unsqueeze(1).expand(-1, self.topk, -1)
         
-        # Compare each of the top-k indices with the target index
-        correct = topk_pred_indices.eq(target_indices.unsqueeze(1)).any(dim=1)
-
-        # Update correct and total
+        #check if any of the top-k predictions match the true labels
+        correct = expanded_targets.gather(2, topk_pred_indices.unsqueeze(-1)).any(dim=1)
+        
         self.correct += correct.sum()
         self.total += targets.size(0)
 
     def compute(self):
         return self.correct.float() / self.total
-    
-
