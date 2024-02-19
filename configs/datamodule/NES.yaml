@@ -1,5 +1,5 @@
-#xcm
-_target_: src.datamodule.pretrain_datamodule.PretrainDataModule
+#NES colombia costa rica
+_target_: src.datamodule.gadme_datamodule.GADMEDataModule
 
 defaults: 
   - _self_
@@ -9,13 +9,13 @@ defaults:
 
 dataset:
   data_dir: ${paths.dataset_path}
-  dataset_name: XCM
+  dataset_name: NES
   hf_path: DBD-research-group/gadme
-  hf_name: XCM
+  hf_name: NES
   seed: ${seed}
-  n_classes: 410
+  n_classes: 89
   n_workers: 3
-  val_split: 0.05
+  val_split: 0.2
   task: ${module.task}
   subset: null
   sampling_rate: ${module.network.sampling_rate}
@@ -23,10 +23,3 @@ dataset:
   class_weights_sampler: null
   classlimit: 500
   eventlimit: 5
-
-
-
-
-
-
-
