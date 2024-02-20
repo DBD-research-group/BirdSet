@@ -1,0 +1,14 @@
+model: 
+  _target_: src.modules.models.perch.PerchModel
+  num_classes: ${datamodule.dataset.n_classes}
+  tfhub_version: 4
+  train_classifier: True
+  label_path: ${paths.root_dir}/dataset/perch/label.csv
+  restrict_logits: False  
+  dataset_info_path: null
+  task: ${module.task}
+
+model_name: perch
+model_type: waveform
+torch_compile: True
+sampling_rate: 32_000
