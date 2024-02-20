@@ -1,0 +1,26 @@
+model:
+  _target_: src.modules.models.convnext.ConvNextClassifier
+  architecture: "convnext_tiny"
+  num_classes: ${datamodule.dataset.n_classes}
+  num_channels: 1
+  checkpoint: null
+
+model_name: convnext
+model_type: vision
+torch_compile: True
+sampling_rate: 32_000
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
