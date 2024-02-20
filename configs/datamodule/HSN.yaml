@@ -1,4 +1,4 @@
-#HSN
+#HSN high_sierras
 _target_: src.datamodule.gadme_datamodule.GADMEDataModule
 
 defaults: 
@@ -16,7 +16,7 @@ dataset:
   # feature_extractor:
   #   _target_: transformers.AutoFeatureExtractor.from_pretrained
   #   pretrained_model_name_or_path: ${module.network.model.checkpoint}
-  n_classes: 22
+  n_classes: 21
   n_workers: 3
   val_split: 0.2
   task: ${module.task}

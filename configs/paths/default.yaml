@@ -6,8 +6,8 @@ work_dir: ${hydra:runtime.cwd}
 output_dir: ${hydra:runtime.output_dir}
 
 # data directory
-dataset_path: ${paths.root_dir}/data_gadme
-#dataset_path: ${paths.root_dir}/data_gadme/${datamodule.dataset.dataset_name}
+#dataset_path: ${paths.root_dir}/data_gadme
+dataset_path: ${paths.root_dir}/data_gadme/${datamodule.dataset.dataset_name}
 background_path: ${paths.root_dir}/data_gadme/background_noise/dcase18_unpacked_wav
 
 # logging directory, has to be static to work properly
