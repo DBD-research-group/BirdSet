@@ -29,8 +29,8 @@ class cmAP(Metric):
 
     def update(self, logits: torch.Tensor, labels: torch.Tensor):
         # Accumulate predictions and labels
-        self.accumulated_predictions.append(logits)
-        self.accumulated_labels.append(labels)
+        self.accumulated_predictions.append(logits.detach())
+        self.accumulated_labels.append(labels.detach())
 
     def compute(self) -> torch.Tensor:
         # Ensure that accumulated variables are lists
