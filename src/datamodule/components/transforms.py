@@ -435,6 +435,7 @@ class GADMETransformsWrapper(BaseTransforms):
         if self.mode in ("test", "predict"):
             self.wave_aug = None
             self.spec_aug = None
+            self.nocall_sampler = None
         return
     
 class EmbeddingTransforms(BaseTransforms):

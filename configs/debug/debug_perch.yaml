@@ -10,6 +10,9 @@ defaults:
   - override /datamodule/transforms/waveform_augmentations: none.yaml
   - override /datamodule/transforms/spectrogram_augmentations: none.yaml
 
+train: False
+test: True
+
 extras: 
   ignore_warnings: False
 
@@ -24,8 +27,13 @@ module:
   optimizer:
     lr: 5e-4
     weight_decay: 5e-4
-
-
+  loss:
+    _target_: torch.nn.BCEWithLogitsLoss
+  network:
+    train_classifier: False
+    restrict_logits: True
+    dataset_info_path: /home/lrauch/projects/GADME/data_gadme/HSN/HSN_processed_2_14993c47380e9f0f/train/dataset_info.json
+    
 trainer: 
   max_epochs: 1
   accelerator: gpu
@@ -44,15 +52,15 @@ datamodule:
   loaders:
     train: 
       batch_size: 32
-      num_workers: 2
+      num_workers: 1
       shuffle: True
       pin_memory: False
     valid: 
       batch_size: 64
-      num_workers: 2
+      num_workers: 1
       pin_memory: False
     test:
       batch_size: 64
-      num_workers: 2
+      num_workers: 1
       pin_memory: False
 

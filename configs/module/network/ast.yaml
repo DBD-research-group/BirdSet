@@ -5,7 +5,6 @@ model:
   num_classes: ${datamodule.dataset.n_classes}
   cache_dir: ${paths.dataset_path}/models/
 
-
 model_name: ast
 model_type: vision
 torch_compile: True

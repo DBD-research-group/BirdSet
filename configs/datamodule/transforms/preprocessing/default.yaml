@@ -1,6 +1,6 @@
-normalize_waveform: "instance_min_max"
-normalize_spectrogram: True
-use_spectrogram: True
+normalize_waveform: ${module.network.normalize_waveform}
+normalize_spectrogram: ${module.network.normalize_spectrogram}
+use_spectrogram: True #!TODO Aufräumen
 n_fft: 1024
 hop_length: 79
 n_mels: 128
