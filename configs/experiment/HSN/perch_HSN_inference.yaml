@@ -1,0 +1,72 @@
+# @package _global_
+defaults:
+  - override /module: multilabel.yaml
+  - override /module/network: perch_inference.yaml
+  - override /datamodule: HSN.yaml
+  - override /callbacks: default.yaml 
+  - override /trainer: single_gpu.yaml
+  - override /datamodule/transforms/waveform_augmentations: none.yaml
+  - override /datamodule/transforms/spectrogram_augmentations: none.yaml
+  #-override /datamodule/transforms: base_transform.yaml
+  - override /datamodule/transforms: bird_default_multilabel.yaml
+
+tags: ["HSN", "perch", "multilabel"]
+seed: 2
+train: False
+test: True
+
+logger:
+  wandb:
+    tags: ${tags}
+    group: "HSN_train_perch_inference"
+    mode: online
+
+module:
+  optimizer:
+    lr: 5e-4
+    weight_decay: 5e-4
+  loss:
+    _target_: torch.nn.BCEWithLogitsLoss
+  network:
+    model:
+      train_classifier: False
+      restrict_logits: True
+      dataset_info_path: /home/lrauch/projects/GADME/data_gadme/HSN/HSN_processed_2_14993c47380e9f0f/train/dataset_info.json
+      tfhub_version: 1
+
+
+trainer: 
+  max_epochs: 15
+  accelerator: gpu
+  devices: 1
+
+datamodule:
+  dataset:
+    val_split: 0.1
+    subset: null
+    class_weights_loss: null
+    class_weights_sampler: null
+    classlimit: 600
+    eventlimit: 3
+  
+
+  loaders:
+    train: 
+      batch_size: 1
+      num_workers: 1
+      shuffle: True
+      pin_memory: False
+    valid: 
+      batch_size: 1
+      num_workers: 1
+      pin_memory: False
+    test:
+      batch_size: 1
+      num_workers: 1
+      pin_memory: False
+
+callbacks:
+  model_checkpoint:
+    save_last: True
+    every_n_epochs: 1
+    save_on_train_epoch_end: True

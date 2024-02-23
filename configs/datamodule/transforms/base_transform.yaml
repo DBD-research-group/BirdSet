@@ -1,7 +1,7 @@
 _target_: src.datamodule.components.transforms.BaseTransforms
 sampling_rate: ${module.network.sampling_rate}
 task: ${datamodule.dataset.task}
-max_length: ${module.network.model.embedding_model.window_size_s} # Attention: this might not work with any model!! -> You must specify it or set to 5s as its done in code
+max_length: 5 # Attention: this might not work with any model!! -> You must specify it or set to 5s as its done in code
   
 
 

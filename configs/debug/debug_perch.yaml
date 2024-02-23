@@ -1,0 +1,66 @@
+# @package _global_
+task_name: debug
+
+defaults:
+  - override /module: multilabel.yaml
+  - override /module/network: perch.yaml
+  - override /datamodule: HSN.yaml
+  - override /callbacks: default.yaml 
+  - override /trainer: single_gpu.yaml
+  - override /datamodule/transforms/waveform_augmentations: none.yaml
+  - override /datamodule/transforms/spectrogram_augmentations: none.yaml
+
+train: False
+test: True
+
+extras: 
+  ignore_warnings: False
+
+hydra: 
+  job_logging: 
+    root:
+      level: DEBUG
+
+seed: 2
+
+module:
+  optimizer:
+    lr: 5e-4
+    weight_decay: 5e-4
+  loss:
+    _target_: torch.nn.BCEWithLogitsLoss
+  network:
+    train_classifier: False
+    restrict_logits: True
+    dataset_info_path: /home/lrauch/projects/GADME/data_gadme/HSN/HSN_processed_2_14993c47380e9f0f/train/dataset_info.json
+    
+trainer: 
+  max_epochs: 1
+  accelerator: gpu
+  devices: 1
+  detect_anomaly: True
+  fast_dev_run: False
+
+datamodule:
+  dataset:
+    val_split: 0.1
+    subset: 500
+    n_workers: 2
+    class_weights_loss: False
+    class_weights_sampler: True
+
+  loaders:
+    train: 
+      batch_size: 32
+      num_workers: 1
+      shuffle: True
+      pin_memory: False
+    valid: 
+      batch_size: 64
+      num_workers: 1
+      pin_memory: False
+    test:
+      batch_size: 64
+      num_workers: 1
+      pin_memory: False
+

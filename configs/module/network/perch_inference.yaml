@@ -1,0 +1,16 @@
+model: 
+  _target_: src.modules.models.perch.PerchModel
+  num_classes: ${datamodule.dataset.n_classes}
+  tfhub_version: 4
+  train_classifier: False
+  label_path: ${paths.root_dir}/dataset/perch/label.csv
+  restrict_logits: True  
+  dataset_info_path: /home/lrauch/projects/GADME/data_gadme/HSN/HSN_processed_2_14993c47380e9f0f/train/dataset_info.json
+  task: ${module.task}
+
+model_name: perch
+model_type: waveform
+torch_compile: False
+sampling_rate: 32_000
+normalize_spectrogram: False
+normalize_waveform: null
