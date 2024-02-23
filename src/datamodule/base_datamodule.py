@@ -49,7 +49,7 @@ class DatasetConfig:
         Indicates whether to use class weights in the sampler for handling imbalanced datasets.
     class_limit : int
         The maximum number of samples per class.
-    event_limit : int
+     : int
         Defines the maximum number of audio events processed per audio file, capping the quantity to ensure balance across files.
     """
     data_dir: str = "/workspace/data_gadme"
@@ -427,7 +427,7 @@ class BaseDataModuleHF(L.LightningDataModule):
         label = x[label_name]
         return {"id": f"{file}-{label}"}
 
-    def _smart_sampling(self, dataset, label_name, class_limit, event_limit):
+    def _smart_sampling(self, dataset, label_name, class_limit, ):
         class_limit = class_limit if class_limit else -float("inf")
         dataset = dataset.map(lambda x: self._unique_identifier(x, label_name))
         df = pd.DataFrame(dataset)
@@ -440,13 +440,13 @@ class BaseDataModuleHF(L.LightningDataModule):
             total = current["size"].sum()
             most = current["size"].max()
 
-            while total > class_limit or most != event_limit:
+            while total > class_limit or most != :
                 largest_count = current["size"].value_counts()[current["size"].max()]
                 n_largest = current.nlargest(largest_count + 1, "size")
                 to_del = (n_largest["size"].max() - n_largest["size"].min())
 
                 idxs = n_largest[n_largest["size"] == n_largest["size"].max()].index
-                if total - (to_del * largest_count) < class_limit or most == event_limit or most == 1:
+                if total - (to_del * largest_count) < class_limit or most ==  or most == 1:
                     break
                 for idx in idxs:
                     current.at[idx, "size"] = current.at[idx, "size"] - to_del

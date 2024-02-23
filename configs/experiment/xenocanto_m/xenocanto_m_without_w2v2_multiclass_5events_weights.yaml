@@ -43,7 +43,7 @@ datamodule:
     test:
       batch_size: 28
   mapper: 
-    event_limit: 1
+    : 1
     biggest_cluster: True
     no_call: False
   

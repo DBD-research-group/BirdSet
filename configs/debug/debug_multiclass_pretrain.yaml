@@ -40,7 +40,7 @@ datamodule:
     class_weights_loss: null
     class_weights_sampler: null
   mapper: 
-    event_limit: 5
+    : 5
     biggest_cluster: True
     no_call: False
   loaders:
