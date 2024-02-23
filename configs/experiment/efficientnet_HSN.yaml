@@ -4,16 +4,16 @@ defaults:
   - override /datamodule: HSN.yaml
   - override /module: multilabel.yaml
   - override /module/network: efficientnet.yaml
-  - override /callbacks: cluster.yaml
+  - override /callbacks: default.yaml
   - override /trainer: single_gpu.yaml
   - override /datamodule/transforms: bird_default_multilabel.yaml
-  - override /paths: cluster.yaml
-  - override /hydra: cluster.yaml
+  - override /paths: default.yaml
+  - override /hydra: default.yaml
 
 tags: ["HSN", "efficientnet", "multilabel"]
 seed: 2
 train: True
-test: False
+test: True
 
 logger:
   wandb:
@@ -39,13 +39,15 @@ trainer:
 
 datamodule:
   dataset:
-    val_split: 0.1
+    val_split: 0.2
     class_weights_loss: null
     class_weights_sampler: null
     classlimit: 600
-    eventlimit: 4
+    eventlimit: 3
   transforms:
     preprocessing:
+      normalize_waveform: null
+      normalize_spectrogram: True
       use_spectrogram: True
       n_fft: 1024
       hop_length: 320
@@ -58,18 +60,17 @@ datamodule:
 
   loaders:
     train:
-      batch_size: 48
+      batch_size: 32
       shuffle: True
-      num_workers: 18
+      num_workers: 32
       drop_last: True
-      pin_memory: True
     valid:
-      batch_size: 48
-      num_workers: 18
+      batch_size: 32
+      num_workers: 32
       shuffle: False
     test:
-      batch_size: 48
-      num_workers: 18
+      batch_size: 32
+      num_workers: 32
       shuffle: False
 
   mapper: 
