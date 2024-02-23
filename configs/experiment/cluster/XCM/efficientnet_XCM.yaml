@@ -18,7 +18,7 @@ test: False
 logger:
   wandb:
     tags: ${tags}
-    group: "HSN_train_efficientnet"
+    group: "XCM_train_efficientnet"
     mode: online
     #version: pretraineatxcm_2 #to resume train run # needs to be tested
 
@@ -43,11 +43,9 @@ datamodule:
     class_weights_loss: null
     class_weights_sampler: null
     classlimit: 600
-    eventlimit: 3
+    eventlimit: 5
   transforms:
     preprocessing:
-      normalize_waveform: null
-      normalize_spectrogram: True
       use_spectrogram: True
       n_fft: 1024
       hop_length: 320
@@ -62,7 +60,7 @@ datamodule:
     train:
       batch_size: 32
       shuffle: True
-      num_workers: 24
+      num_workers: 16
       drop_last: True
       pin_memory: True
     valid:
@@ -70,7 +68,7 @@ datamodule:
       num_workers: 24
       shuffle: False
     test:
-      batch_size: 32
+      batch_size: 16
       num_workers: 24
       shuffle: False
 
