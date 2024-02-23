@@ -26,6 +26,6 @@ logger:
 
 train: True
 test: True
-save_state_dict: False
+save_state_dict: True
 start_time: ${now:%Y-%m-%d_%H%M%S}
-dump_metrics: False
+dump_metrics: True
