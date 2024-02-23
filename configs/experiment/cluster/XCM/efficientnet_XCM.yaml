@@ -1,16 +1,16 @@
 # @package _global_
 #package global is neccessary!
 defaults:
-  - override /datamodule: XCM.yaml
+  - override /datamodule: HSN.yaml
   - override /module: multilabel.yaml
-  - override /module/network: ast.yaml
-  - override /callbacks: cluster.yaml 
+  - override /module/network: efficientnet.yaml
+  - override /callbacks: cluster.yaml
   - override /trainer: single_gpu.yaml
   - override /datamodule/transforms: bird_default_multilabel.yaml
   - override /paths: cluster.yaml
   - override /hydra: cluster.yaml
 
-tags: ["pretrain_xencanto_m", "ast", "multilabel", "5event"]
+tags: ["HSN", "efficientnet", "multilabel"]
 seed: 2
 train: True
 test: False
@@ -18,13 +18,15 @@ test: False
 logger:
   wandb:
     tags: ${tags}
-    group: "pretrain_ast_XCM"
+    group: "XCM_train_efficientnet"
     mode: online
-    version: pretrain_ast_${start_time} #to resume train run # needs to be tested
+    #version: pretraineatxcm_2 #to resume train run # needs to be tested
 
 module:
   optimizer:
-    lr: 1e-5
+    _target_: torch.optim.AdamW
+    lr: 5e-4
+    weight_decay: 5e-4
   loss:
   #  _target_: src.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
     _target_: torch.nn.BCEWithLogitsLoss 
@@ -33,28 +35,40 @@ module:
 
 trainer:
   min_epochs: 1
-  max_epochs: 12
+  max_epochs: 200
 
 datamodule:
   dataset:
-    val_split: 0.1
+    val_split: 0.2
     class_weights_loss: null
     class_weights_sampler: null
     classlimit: 600
-    eventlimit: 3
+    eventlimit: 5
   transforms:
     preprocessing:
-      normalize_waveform: instance_normalization
+      use_spectrogram: True
+      n_fft: 1024
+      hop_length: 320
+      n_mels: 128
+      db_scale: True
+      target_height: null
+      target_width: null
+      mean: -4.268
+      std: 4.569
 
   loaders:
     train:
-      batch_size: 14
+      batch_size: 32
       shuffle: True
-      num_workers: 24
+      num_workers: 16
       drop_last: True
-      #prefetch_factor: 4
+      pin_memory: True
     valid:
-      batch_size: 18
+      batch_size: 32
+      num_workers: 24
+      shuffle: False
+    test:
+      batch_size: 16
       num_workers: 24
       shuffle: False
 

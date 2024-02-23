@@ -4,3 +4,4 @@ defaults:
   - time_tracking.yaml
   - model_summary.yaml
   - model_checkpoint.yaml #topk=0 if not wanted!
+  - progress_bar.yaml

@@ -9,7 +9,8 @@ model_name: mobilenet
 model_type: vision
 torch_compile: True
 sampling_rate: 32_000
-
+normalize_waveform: null
+normalize_spectrogram: True
 
 
 
