@@ -5,9 +5,10 @@ defaults:
   - override /module: multilabel.yaml
   - override /module/network: eat_soundnet.yaml
   - override /datamodule: HSN.yaml
-  - override /callbacks: default.yaml 
+  #- override /callbacks: default.yaml 
   - override /trainer: single_gpu.yaml
   - override /datamodule/transforms: bird_default_multilabel.yaml
+  - override /callbacks: cluster.yaml
   #- override /datamodule/transforms/spectrogram_augmentations: none.yaml
   #- override /datamodule/transforms/waveform_augmentations: none.yaml
 
@@ -42,34 +43,30 @@ trainer:
 datamodule:
   dataset:
     val_split: 0.1
-    subset: null
+    subset: 100
     #n_workers: 1
     class_weights_loss: null
     class_weights_sampler: null
     classlimit: 500
     eventlimit: 1
-  transforms:
-    preprocessing:
-      normalize_waveform: instance_normalization
     
   mapper:
     event_limit: null
     biggest_cluster: True
     no_call: False
   
-
   loaders:
     train: 
-      batch_size: 20
+      batch_size: 3
       num_workers: 3
       shuffle: True
       pin_memory: False
     valid: 
-      batch_size: 20
+      batch_size: 3
       num_workers: 3
       pin_memory: False
     test:
-      batch_size: 20
+      batch_size: 3
       num_workers: 3
       pin_memory: False
 

@@ -327,6 +327,7 @@ class GADMETransformsWrapper(BaseTransforms):
     def _zero_mean_unit_var_norm(
             self, input_values, attention_mask, padding_value=0.0
     ):
+        #w2v2
         # instance normalization taken from huggingface
         if attention_mask is not None:
             attention_mask = np.array(attention_mask, np.int32)

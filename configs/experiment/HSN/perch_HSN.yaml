@@ -5,11 +5,11 @@ defaults:
   - override /datamodule: HSN.yaml
   - override /callbacks: default.yaml 
   - override /trainer: single_gpu.yaml
-  #- override /datamodule/transforms/waveform_augmentations: none.yaml
+  - override /datamodule/transforms/waveform_augmentations: none.yaml
   - override /datamodule/transforms/spectrogram_augmentations: none.yaml
   - override /datamodule/transforms: bird_default_multilabel.yaml
 
-tags: ["HSN", "perch", "multilabel"]
+tags: ["HSN", "perch", "no_augments"]
 seed: 2
 train: True
 test: True
@@ -25,8 +25,8 @@ module:
     lr: 5e-4
     weight_decay: 5e-4
   loss:
-    #_target_: torch.nn.BCEWithLogitsLoss
-    _target_: src.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
+    _target_: torch.nn.BCEWithLogitsLoss
+    #_target_: src.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
 
 trainer: 
   max_epochs: 50
