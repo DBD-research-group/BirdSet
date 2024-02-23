@@ -53,7 +53,7 @@ class GADMEDataModule(BaseDataModuleHF):
                     dataset=dataset["train"],
                     label_name="ebird_code",
                     class_limit=self.dataset_config.classlimit,
-                    =self.dataset_config.eventlimit
+                    event_limit=self.dataset_config.eventlimit
                 )
 
             dataset = dataset.rename_column("ebird_code", "labels")
@@ -80,7 +80,7 @@ class GADMEDataModule(BaseDataModuleHF):
                     dataset=dataset["train"],
                     label_name="ebird_code",
                     class_limit=self.dataset_config.classlimit,
-                    =self.dataset_config.eventlimit
+                    event_limit=self.dataset_config.eventlimit
                 )
             log.info(">> One-hot-encode classes")
             dataset = dataset.map(
