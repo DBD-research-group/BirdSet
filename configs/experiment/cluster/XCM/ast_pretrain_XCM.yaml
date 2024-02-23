@@ -42,20 +42,25 @@ datamodule:
     class_weights_sampler: null
     classlimit: 600
     eventlimit: 3
-  transforms:
-    preprocessing:
-      normalize_waveform: instance_normalization
+
 
   loaders:
     train:
       batch_size: 14
       shuffle: True
-      num_workers: 16
+      num_workers: 12
       drop_last: True
-      #prefetch_factor: 4
+      prefetch_factor: 2
+      pin_memory: True
+
     valid:
-      batch_size: 18
-      num_workers: 16
+      batch_size: 20
+      num_workers: 12
+      shuffle: False
+    
+    test:
+      batch_size: 20
+      num_workers: 12
       shuffle: False
 
   mapper: 
