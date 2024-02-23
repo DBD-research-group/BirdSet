@@ -3,7 +3,7 @@ task_name: debug
 
 defaults:
   - override /module: multilabel.yaml
-  - override /module/network: eat_soundnet.yaml
+  - override /module/network: efficientnet.yaml
   - override /datamodule: HSN.yaml
   #- override /callbacks: default.yaml 
   - override /trainer: single_gpu.yaml
@@ -58,16 +58,16 @@ datamodule:
   loaders:
     train: 
       batch_size: 3
-      num_workers: 3
+      num_workers: 1
       shuffle: True
       pin_memory: False
     valid: 
       batch_size: 3
-      num_workers: 3
+      num_workers: 1
       pin_memory: False
     test:
       batch_size: 3
-      num_workers: 3
+      num_workers: 1
       pin_memory: False
 
 tags: ["debug"]
