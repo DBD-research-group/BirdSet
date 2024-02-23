@@ -1,0 +1,26 @@
+model:
+  _target_: src.modules.models.efficientnet.EfficientNetClassifier
+  architecture: "efficientnet_b1"
+  num_classes: ${datamodule.dataset.n_classes}
+  num_channels: 1
+  checkpoint: null
+
+model_name: efficientnet
+model_type: vision
+torch_compile: True
+sampling_rate: 32_000
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
