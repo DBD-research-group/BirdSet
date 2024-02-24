@@ -44,17 +44,6 @@ datamodule:
     class_weights_sampler: null
     classlimit: 600
     eventlimit: 4
-  transforms:
-    preprocessing:
-      use_spectrogram: True
-      n_fft: 1024
-      hop_length: 320
-      n_mels: 128
-      db_scale: True
-      target_height: null
-      target_width: null
-      mean: -4.268
-      std: 4.569
 
   loaders:
     train:
