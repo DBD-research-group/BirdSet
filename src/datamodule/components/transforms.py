@@ -292,9 +292,9 @@ class GADMETransformsWrapper(BaseTransforms):
         
         if self.nocall_sampler: 
             self.nocall_sampler(input_values, labels) 
-
-        if self.model_type == "waveform":
-           input_values = self._waveform_scaling(input_values, attention_mask)  #only for waveform? 
+        
+        if self.preprocessing.normalize_waveform:
+            self._waveform_scaling(input_values, attention_mask)
            
         if self.model_type == "vision":
             spectrograms = self.spectrogram_conversion(input_values)

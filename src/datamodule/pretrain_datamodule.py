@@ -86,19 +86,20 @@ class PretrainDataModule(BaseDataModuleHF):
                 self.event_mapper,
                 remove_columns=["audio"],
                 batched=True,
-                batch_size=300,
-                load_from_cache_file=True,
-                num_proc=self.dataset_config.n_workers,
+                batch_size=350,
+                load_from_cache_file=False,
+                num_proc=1,
             )
 
             dataset = dataset.rename_column("ebird_code_multilabel", "labels")
 
+            logging.info(">> One-hot-encode classes")
             dataset = dataset.map(
                 self._classes_one_hot,
                 batched=True,
-                batch_size=300,
+                batch_size=350,
                 load_from_cache_file=False,
-                num_proc=self.dataset_config.n_workers,
+                num_proc=1,
             )
 
             if self.dataset_config.class_weights_loss or self.dataset_config.class_weights_sampler:
