@@ -13,7 +13,7 @@ defaults:
 tags: ["HSN", "efficientnet", "multilabel"]
 seed: 2
 train: True
-test: False
+test: True
 
 logger:
   wandb:
@@ -58,18 +58,18 @@ datamodule:
 
   loaders:
     train:
-      batch_size: 48
+      batch_size: 64
       shuffle: True
-      num_workers: 18
+      num_workers: 24
       drop_last: True
       pin_memory: True
     valid:
-      batch_size: 48
-      num_workers: 18
+      batch_size: 64
+      num_workers: 24
       shuffle: False
     test:
-      batch_size: 48
-      num_workers: 18
+      batch_size: 64
+      num_workers: 24
       shuffle: False
 
   mapper: 
