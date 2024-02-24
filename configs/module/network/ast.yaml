@@ -7,7 +7,7 @@ model:
 
 model_name: ast
 model_type: vision
-torch_compile: True
+torch_compile: False
 sampling_rate: 32_000
 normalize_spectrogram: True
 normalize_waveform: null

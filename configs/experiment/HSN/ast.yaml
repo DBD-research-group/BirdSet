@@ -1,39 +1,44 @@
 # @package _global_
 #package global is neccessary!
 defaults:
-  - override /datamodule: XCM.yaml
+  - override /datamodule: HSN.yaml
   - override /module: multilabel.yaml
-  - override /module/network: ast.yaml
-  - override /callbacks: cluster.yaml 
+  - override /module/network: efficientnet.yaml
+  - override /callbacks: default.yaml
   - override /trainer: single_gpu.yaml
   - override /datamodule/transforms: bird_default_multilabel.yaml
-  - override /paths: cluster.yaml
-  - override /hydra: cluster.yaml
+  - override /paths: default.yaml
+  - override /hydra: default.yaml
+  - override /datamodule/transforms/spectrogram_augmentations: none.yaml
+  - override /datamodule/transforms/waveform_augmentations: none.yaml
 
-tags: ["pretrain_xencanto_m", "ast", "multilabel", "5event"]
+tags: ["HSN", "efficientnet", "multilabel"]
 seed: 2
 train: True
-test: False
+test: True
 
-logger:
-  wandb:
-    tags: ${tags}
-    group: "pretrain_ast_XCM"
-    mode: online
-    version: pretrain_ast_${start_time} #to resume train run # needs to be tested
+# logger:
+#   wandb:
+#     tags: ${tags}
+#     group: "HSN_train_efficientnet"
+#     mode: online
+    #version: pretraineatxcm_2 #to resume train run # needs to be tested
 
 module:
   optimizer:
-    lr: 1e-5
+    _target_: torch.optim.AdamW
+    lr: 5e-4
+    weight_decay: 5e-4
   loss:
   #  _target_: src.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
     _target_: torch.nn.BCEWithLogitsLoss 
   #_target_: src.modules.losses.focal_loss.MultiLabelFocalLoss
-
+  network:
+    torch_compile: False
 
 trainer:
   min_epochs: 1
-  max_epochs: 8
+  max_epochs: 200
 
 datamodule:
   dataset:
@@ -41,30 +46,25 @@ datamodule:
     class_weights_loss: null
     class_weights_sampler: null
     classlimit: 600
-    eventlimit: 3
-
+    eventlimit: 4
 
   loaders:
     train:
-      batch_size: 14
+      batch_size: 48
       shuffle: True
-      num_workers: 16
+      num_workers: 18
       drop_last: True
-      prefetch_factor: 2
       pin_memory: True
-
     valid:
-      batch_size: 20
-      num_workers: 16
+      batch_size: 48
+      num_workers: 18
       shuffle: False
-    
     test:
-      batch_size: 20
-      num_workers: 16
+      batch_size: 48
+      num_workers: 18
       shuffle: False
 
   mapper: 
-   
     biggest_cluster: True
     no_call: False
   

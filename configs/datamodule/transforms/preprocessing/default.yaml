@@ -1,11 +1,10 @@
+defaults:
+  - spectrogram_conversion.yaml
+  - melscale_conversion.yaml
+  - dbscale_conversion.yaml
+  - resizer.yaml
+  
 normalize_waveform: ${module.network.normalize_waveform}
 normalize_spectrogram: ${module.network.normalize_spectrogram}
-use_spectrogram: True #!TODO Aufräumen
-n_fft: 1024
-hop_length: 79
-n_mels: 128
-db_scale: True
-target_height: null
-target_width: 1024
 mean: -4.268
 std: 4.569

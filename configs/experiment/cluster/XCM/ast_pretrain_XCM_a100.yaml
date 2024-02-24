@@ -63,7 +63,7 @@ datamodule:
       shuffle: False
 
   mapper: 
-    : null
+   
     biggest_cluster: True
     no_call: False
   
