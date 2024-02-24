@@ -10,6 +10,7 @@ from tqdm import tqdm
 import lightning as L
 import numpy as np
 import pandas as pd
+import hydra 
 
 from datasets import load_dataset, load_from_disk, Audio, DatasetDict, Dataset, IterableDataset, IterableDatasetDict
 from torch.utils.data import DataLoader
@@ -134,7 +135,7 @@ class BaseDataModuleHF(L.LightningDataModule):
         super().__init__()
         self.dataset_config = dataset
         self.loaders_config = loaders
-        self.transforms = transforms
+        self.transforms = transforms #hier erst nach 15 iterations??
         self.event_mapper = mapper
 
         self.data_path = None

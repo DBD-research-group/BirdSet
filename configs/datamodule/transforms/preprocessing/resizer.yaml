@@ -1,0 +1,3 @@
+resizer:
+  _target_: src.datamodule.components.resize.Resizer
+  db_scale: True # manually adjusted!! False when not using it

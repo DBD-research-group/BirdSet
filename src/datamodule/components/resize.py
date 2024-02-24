@@ -3,8 +3,10 @@ import torch.nn.functional as F
 
 class Resizer:
     def __init__(self,
-                 use_spectrogram: bool = False,
-                 db_scale: bool = False,) -> None:
+                 use_spectrogram: bool = True,
+                 db_scale: bool = False,
+                 target_height: int = None,
+                 target_width: int = 1024 ) -> None:
         """
         Initializes the Resizer object.
 
@@ -13,14 +15,16 @@ class Resizer:
             db_scale (bool): Flag indicating whether spectrograms in decibel (dB) units are used. Only required if
             use_spectrogram=True.
         """
-        self.use_spectrogram = use_spectrogram
+        self.use_spectrogram = use_spectrogram # can be removed
+        self.target_height = target_height
+        self.target_width = target_width
 
         if db_scale:
             self.padding_value = -80.
         else:
             self.padding_value = 0.
 
-    def pad_spectrogram_height(self, spectrogram: Tensor, target_height: int) -> Tensor:
+    def pad_spectrogram_height(self, spectrogram: Tensor) -> Tensor:
         """
         Pads the height of a 3D spectrogram to a given target height with the specified padding value.
 
@@ -31,13 +35,13 @@ class Resizer:
         Returns:
             Tensor: The padded 3D spectrogram.
         """
-        difference = target_height - spectrogram.shape[1]
+        difference = self.target_height - spectrogram.shape[1]
         if difference > 0:
             padding = (0, 0, 0, difference)
             return F.pad(spectrogram, padding, value=self.padding_value)
         return spectrogram
 
-    def pad_spectrogram_width(self, spectrogram: Tensor, target_width: int) -> Tensor:
+    def pad_spectrogram_width(self, spectrogram: Tensor) -> Tensor:
         """
         Pads the width of a 3D spectrogram to a given target width with the specified padding value.
 
@@ -48,14 +52,13 @@ class Resizer:
         Returns:
             Tensor: The padded 3D spectrogram.
         """
-        difference = target_width - spectrogram.shape[2]
+        difference = self.target_width - spectrogram.shape[2]
         if difference > 0:
             padding = (0, difference, 0, 0)
             return F.pad(spectrogram, padding, value=self.padding_value)
         return spectrogram
 
-    @staticmethod
-    def truncate_spectrogram_height(spectrogram: Tensor, target_height: int) -> Tensor:
+    def truncate_spectrogram_height(self,spectrogram: Tensor) -> Tensor:
         """
         Truncates the height of a 3D spectrogram to a given target height.
 
@@ -66,10 +69,9 @@ class Resizer:
         Returns:
             Tensor: The truncated 3D spectrogram.
         """
-        return spectrogram[:, :target_height, :]
+        return spectrogram[:, :self.target_height, :]
 
-    @staticmethod
-    def truncate_spectrogram_width(spectrogram: Tensor, target_width: int) -> Tensor:
+    def truncate_spectrogram_width(self,spectrogram: Tensor) -> Tensor:
         """
         Truncates the width of a 3D spectrogram to a given target width.
 
@@ -80,10 +82,9 @@ class Resizer:
         Returns:
             Tensor: The truncated 3D spectrogram.
         """
-        return spectrogram[:, :, :target_width]
+        return spectrogram[:, :, :self.target_width]
 
-    @staticmethod
-    def truncate_spectrogram_width_batch(spectrogram: Tensor, target_width: int) -> Tensor:
+    def truncate_spectrogram_width_batch(self, spectrogram: Tensor) -> Tensor:
         """
         Truncates the width of a 3D spectrogram to a given target width.
 
@@ -94,9 +95,9 @@ class Resizer:
         Returns:
             Tensor: The truncated 3D spectrogram.
         """
-        return spectrogram[:, :, :, :target_width]
+        return spectrogram[:, :, :, :self.target_width]
 
-    def resize_spectrogram(self, spectrogram: Tensor, target_height: int = None, target_width: int = None) -> Tensor:
+    def resize_spectrogram(self, spectrogram: Tensor) -> Tensor:
         """
         Resizes a 3D spectrogram to a given maximum height and width by either padding or truncating.
 
@@ -108,20 +109,21 @@ class Resizer:
         Returns:
             Tensor: The resized 3D spectrogram.
         """
-        if target_height:
-            if spectrogram.shape[1] < target_height:
-                spectrogram = self.pad_spectrogram_height(spectrogram, target_height)
-            elif spectrogram.shape[1] > target_height:
-                spectrogram = self.truncate_spectrogram_height(spectrogram, target_height)
+        if self.target_height:
+            if spectrogram.shape[1] < self.target_height:
+                spectrogram = self.pad_spectrogram_height(spectrogram, self.target_height)
+            elif spectrogram.shape[1] > self.target_height:
+                spectrogram = self.truncate_spectrogram_height(spectrogram, self.target_height)
 
-        if target_width:
-            if spectrogram.shape[2] < target_width:
-                spectrogram = self.pad_spectrogram_width(spectrogram, target_width)
-            elif spectrogram.shape[2] > target_width:
-                spectrogram = self.truncate_spectrogram_width(spectrogram, target_width)
+        if self.target_width:
+            if spectrogram.shape[2] < self.target_width:
+                spectrogram = self.pad_spectrogram_width(spectrogram, self.target_width)
+            elif spectrogram.shape[2] > self.target_width:
+                spectrogram = self.truncate_spectrogram_width(spectrogram, self.target_width)
 
         return spectrogram
-    def resize_spectrogram_batch(self, spectrogram: Tensor, target_height: int = None, target_width: int = None) -> Tensor:
+    
+    def resize_spectrogram_batch(self, spectrogram: Tensor) -> Tensor:
         """
         Resizes a 3D spectrogram to a given maximum height and width by either padding or truncating.
 
@@ -133,37 +135,21 @@ class Resizer:
         Returns:
             Tensor: The resized 3D spectrogram.
         """
-        if target_height:
-            if spectrogram.shape[1] < target_height:
-                spectrogram = self.pad_spectrogram_height(spectrogram, target_height)
-            elif spectrogram.shape[1] > target_height:
-                spectrogram = self.truncate_spectrogram_height(spectrogram, target_height)
+        if self.target_height:
+            if spectrogram.shape[1] < self.target_height:
+                spectrogram = self.pad_spectrogram_height(spectrogram)
+            elif spectrogram.shape[1] > self.target_height:
+                spectrogram = self.truncate_spectrogram_height(spectrogram)
 
-        if target_width:
-            if spectrogram.shape[3] < target_width:
-                spectrogram = self.pad_spectrogram_width(spectrogram, target_width)
-            elif spectrogram.shape[3] > target_width:
-                spectrogram = self.truncate_spectrogram_width_batch(spectrogram, target_width)
+        if self.target_width:
+            if spectrogram.shape[3] < self.target_width:
+                spectrogram = self.pad_spectrogram_width(spectrogram)
+            elif spectrogram.shape[3] > self.target_width:
+                spectrogram = self.truncate_spectrogram_width_batch(spectrogram)
 
         return spectrogram
 
-    def resize_waveform(self, waveform: Tensor) -> Tensor:
-        """
-        Resizes a waveform. Currently, this method is not implemented.
-
-        Args:
-            waveform (Tensor): The input waveform to be resized.
-
-        Raises:
-            NotImplementedError: This method is not implemented yet.
-        """
-
-        #raise NotImplementedError("Resizing for waveforms is not implemented yet.")
-
-        #TODO: Implement resizing for waveforms
-        return waveform
-
-    def resize(self, data: Tensor, target_height: int = None, target_width: int = None) -> Tensor:
+    def resize(self, data: Tensor) -> Tensor:
         """
         Resizes data (either 3D spectrogram or waveform) based on the mode set during initialization.
 
@@ -176,6 +162,6 @@ class Resizer:
             Tensor: The resized data.
         """
         if self.use_spectrogram:
-            return self.resize_spectrogram(data, target_height, target_width)
+            return self.resize_spectrogram(data, self.target_height, self.target_width)
         else:
             return self.resize_waveform(data)
