@@ -286,29 +286,31 @@ class GADMETransformsWrapper(BaseTransforms):
         input_values = waveform_batch["input_values"]
         input_values = input_values.unsqueeze(1)
         labels = torch.tensor(batch["labels"])
-                
-        if self.model_type == "waveform":
-           input_values = self._waveform_scaling(input_values, attention_mask) 
-           input_values, labels = self._waveform_augmentation(input_values, labels)
+
+        if self.wave_aug: 
+            input_values, labels = self._waveform_augmentation(input_values, labels)
         
         if self.nocall_sampler: 
-            self.nocall_sampler(input_values, labels)
+            self.nocall_sampler(input_values, labels) 
+
+        if self.model_type == "waveform":
+           input_values = self._waveform_scaling(input_values, attention_mask)  #only for waveform? 
            
         if self.model_type == "vision":
             spectrograms = self.spectrogram_conversion(input_values)
 
             if self.spec_aug:
                 spectrograms = self.spec_aug(spectrograms)
-            
+
             if self.melscale_conversion:
                 spectrograms = self.melscale_conversion(spectrograms)
 
             if self.dbscale_conversion:
                 spectrograms = self.dbscale_conversion(spectrograms)
-            
+
             if self.resizer:
                 spectrograms = self.resizer.resize_spectrogram_batch(spectrograms)
-
+                
             if self.preprocessing.normalize_spectrogram:
                 spectrograms = (spectrograms - self.preprocessing.mean) / self.preprocessing.std
             

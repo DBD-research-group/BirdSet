@@ -52,7 +52,7 @@ datamodule:
     test:
       batch_size: 21
   mapper: 
-    : null
+   
     biggest_cluster: True
     no_call: False
 

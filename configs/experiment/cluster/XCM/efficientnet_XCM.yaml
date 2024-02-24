@@ -13,13 +13,14 @@ defaults:
 tags: ["HSN", "efficientnet", "multilabel"]
 seed: 2
 train: True
-test: True
+test: False
 
 logger:
   wandb:
     tags: ${tags}
     group: "XCM_train_efficientnet"
     mode: online
+    version: pretrain_effnet_${start_time}
     #version: pretraineatxcm_2 #to resume train run # needs to be tested
 
 module:
@@ -35,7 +36,7 @@ module:
 
 trainer:
   min_epochs: 1
-  max_epochs: 200
+  max_epochs: 100
 
 datamodule:
   dataset:
@@ -44,36 +45,25 @@ datamodule:
     class_weights_sampler: null
     classlimit: 600
     eventlimit: 3
-  transforms:
-    preprocessing:
-      use_spectrogram: True
-      n_fft: 1024
-      hop_length: 320
-      n_mels: 128
-      db_scale: True
-      target_height: null
-      target_width: null
-      mean: -4.268
-      std: 4.569
 
   loaders:
     train:
-      batch_size: 64
+      batch_size: 128
       shuffle: True
-      num_workers: 24
+      num_workers: 28
       drop_last: True
       pin_memory: True
     valid:
-      batch_size: 64
-      num_workers: 24
+      batch_size: 128
+      num_workers: 28
       shuffle: False
     test:
-      batch_size: 64
-      num_workers: 24
+      batch_size: 128
+      num_workers: 28
       shuffle: False
 
   mapper: 
-    : null
+   
     biggest_cluster: True
     no_call: False
   

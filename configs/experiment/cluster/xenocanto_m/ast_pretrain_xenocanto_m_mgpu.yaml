@@ -57,7 +57,7 @@ datamodule:
       batch_size: 14
 
   mapper: 
-    : null
+   
     biggest_cluster: True
     no_call: False
   
