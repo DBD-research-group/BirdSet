@@ -291,10 +291,10 @@ class GADMETransformsWrapper(BaseTransforms):
             input_values, labels = self._waveform_augmentation(input_values, labels)
         
         if self.nocall_sampler: 
-            self.nocall_sampler(input_values, labels) 
+            input_values, labels = self.nocall_sampler(input_values, labels) 
         
         if self.preprocessing.normalize_waveform:
-            self._waveform_scaling(input_values, attention_mask)
+            input_values = self._waveform_scaling(input_values, attention_mask)
            
         if self.model_type == "vision":
             spectrograms = self.spectrogram_conversion(input_values)
@@ -306,7 +306,9 @@ class GADMETransformsWrapper(BaseTransforms):
                 spectrograms = self.melscale_conversion(spectrograms)
 
             if self.dbscale_conversion:
-                spectrograms = self.dbscale_conversion(spectrograms)
+                # spectrograms = [spectrogram.numpy() for spectrogram in spectrograms]
+                # spectrograms = torch.from_numpy(librosa.power_to_db(spectrograms)) #list to tensor!
+                spectrograms = self.dbscale_conversion(spectrograms) # different results??
 
             if self.resizer:
                 spectrograms = self.resizer.resize_spectrogram_batch(spectrograms)
