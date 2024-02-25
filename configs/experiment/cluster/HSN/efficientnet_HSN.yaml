@@ -32,7 +32,9 @@ module:
     _target_: torch.nn.BCEWithLogitsLoss 
   #_target_: src.modules.losses.focal_loss.MultiLabelFocalLoss
   network: 
-    normalize_waveform: instance_peak_normalization
+    torch_compile: True
+  # normalize_waveform: instance_peak_normalization
+
 
 
 trainer:
