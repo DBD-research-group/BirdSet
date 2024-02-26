@@ -2,6 +2,7 @@ import torch
 import torchmetrics
 from torchmetrics.classification.average_precision import MultilabelAveragePrecision
 from torchmetrics import Metric
+from torchmetrics.utilities.data import dim_zero_cat
 
 class cmAP(Metric):
     def __init__(
@@ -29,8 +30,8 @@ class cmAP(Metric):
 
     def update(self, logits: torch.Tensor, labels: torch.Tensor):
         # Accumulate predictions and labels
-        self.accumulated_predictions.append(logits.detach().cpu())
-        self.accumulated_labels.append(labels.detach().cpu())
+        self.accumulated_predictions.append(logits)
+        self.accumulated_labels.append(labels)
 
     def compute(self) -> torch.Tensor:
         # Ensure that accumulated variables are lists
@@ -54,10 +55,10 @@ class cmAP(Metric):
         macro_cmap = torch.nanmean(class_aps)
         return macro_cmap
 
-    def reset(self):
-        # Reset accumulated predictions and labels
-        self.accumulated_predictions = []
-        self.accumulated_labels = []
+    # def reset(self):
+    #     # Reset accumulated predictions and labels
+    #     self.accumulated_predictions = []
+    #     self.accumulated_labels = []
 
 class mAP(MultilabelAveragePrecision):
     

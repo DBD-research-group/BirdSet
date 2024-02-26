@@ -240,40 +240,39 @@ class GADMETransformsWrapper(BaseTransforms):
         self.dbscale_conversion = self.preprocessing.get("dbscale_conversion")
         self.resizer = self.preprocessing.get("resizer")
 
+    # def _spectrogram_conversion(self):
+    #     """
+    #     Converts a waveform to a spectrogram.
 
-    def _spectrogram_conversion(self):
-        """
-        Converts a waveform to a spectrogram.
+    #     This method applies a spectrogram transformation to a waveform. If "time_stretch" is in the 
+    #     `spectrogram_augmentations` attribute, the power of the spectrogram transformation is set to 0.0. 
+    #     Otherwise, the power is set to 2.0.
 
-        This method applies a spectrogram transformation to a waveform. If "time_stretch" is in the 
-        `spectrogram_augmentations` attribute, the power of the spectrogram transformation is set to 0.0. 
-        Otherwise, the power is set to 2.0.
+    #     Args:
+    #         waveform (torch.Tensor): The waveform to be converted to a spectrogram.
 
-        Args:
-            waveform (torch.Tensor): The waveform to be converted to a spectrogram.
+    #     Returns:
+    #         list: A list of spectrograms corresponding to the input waveform.
+    #     """
 
-        Returns:
-            list: A list of spectrograms corresponding to the input waveform.
-        """
-
-        if "time_stretch" in self.spectrogram_augmentations:
-            spectrogram_transform = torchaudio.transforms.Spectrogram(
-                n_fft=self.preprocessing.n_fft,
-                hop_length=self.preprocessing.hop_length,
-                power=0.0
-                )     
-        else:
-            spectrogram_transform = torchaudio.transforms.Spectrogram(
-                n_fft=self.preprocessing.n_fft,
-                hop_length=self.preprocessing.hop_length,
-                power=2.0 # TODO: hard coded?
-                )     
+    #     if "time_stretch" in self.spectrogram_augmentations:
+    #         spectrogram_transform = torchaudio.transforms.Spectrogram(
+    #             n_fft=self.preprocessing.n_fft,
+    #             hop_length=self.preprocessing.hop_length,
+    #             power=0.0
+    #             )     
+    #     else:
+    #         spectrogram_transform = torchaudio.transforms.Spectrogram(
+    #             n_fft=self.preprocessing.n_fft,
+    #             hop_length=self.preprocessing.hop_length,
+    #             power=2.0 # TODO: hard coded?
+    #             )     
         
         #spectrograms = [spectrogram_transform(waveform) for waveform in waveform]
 
         # size: [batch x 1 x 513 x 2026]
         #spectrograms = spectrogram_transform(waveform)
-        return spectrogram_transform
+        #return spectrogram_transform
     
     def transform_values(self, batch):
         if not "audio" in batch.keys():
@@ -335,7 +334,8 @@ class GADMETransformsWrapper(BaseTransforms):
                     samples=input_values, 
                     sample_rate=self.sampling_rate,
                 )
-            input_values = output_dict.samples
+            
+        input_values = output_dict.samples
         
         return input_values, labels
 

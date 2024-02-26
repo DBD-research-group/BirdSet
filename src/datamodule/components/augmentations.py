@@ -23,6 +23,15 @@ from torch_audiomentations.utils.dsp import calculate_rms
 from torch_audiomentations.utils.file import find_audio_files_in_paths
 from torch_audiomentations.utils.object_dict import ObjectDict
 
+from typing import Optional
+import torch
+import os 
+from torch import Tensor
+from torch_audiomentations.core.transforms_interface import BaseWaveformTransform
+from torch_audiomentations.utils.dsp import calculate_rms
+from torch_audiomentations.utils.object_dict import ObjectDict
+from torch_audiomentations.utils.io import Audio
+
 def pad_spectrogram_width(
     spectrogram: torch.Tensor, target_width: int, value: float
 ) -> torch.Tensor:
@@ -606,16 +615,6 @@ class BackgroundNoise(AudioTransforms):
         augmented_audio = torch.stack(augmented_audio)
 
         return augmented_audio
-
-
-from typing import Optional
-import torch
-import os 
-from torch import Tensor
-from torch_audiomentations.core.transforms_interface import BaseWaveformTransform
-from torch_audiomentations.utils.dsp import calculate_rms
-from torch_audiomentations.utils.object_dict import ObjectDict
-from torch_audiomentations.utils.io import Audio
 
 #Mix not officially released yet 
 class MultilabelMix(BaseWaveformTransform):
