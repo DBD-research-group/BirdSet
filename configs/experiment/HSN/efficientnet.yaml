@@ -21,9 +21,7 @@ logger:
   wandb:
     tags: ${tags}
     group: "XCM_train_efficientnet"
-    mode: disabled
-    version: pretrain_effnet_${start_time}
-    #version: pretraineatxcm_2 #to resume train run # needs to be tested
+    mode: online
 
 module:
   optimizer:
@@ -35,35 +33,33 @@ module:
     _target_: torch.nn.BCEWithLogitsLoss 
   #_target_: src.modules.losses.focal_loss.MultiLabelFocalLoss
   network: 
-    torch_compile: False
+    torch_compile: True
 
 trainer:
   min_epochs: 1
-  max_epochs: 1
-  profiler: "simple"
+  max_epochs: 200
 
 datamodule:
   dataset:
-    val_split: 0.1
+    val_split: 0.2
     class_weights_loss: null
     class_weights_sampler: null
     classlimit: 600
     eventlimit: 3
-
+    
   loaders:
     train:
       batch_size: 64
       shuffle: True
-      num_workers: 24
+      num_workers: 32
       drop_last: True
-      pin_memory: False
     valid:
       batch_size: 64
-      num_workers: 24
+      num_workers: 32
       shuffle: False
     test:
       batch_size: 64
-      num_workers: 24
+      num_workers: 32
       shuffle: False
 
   mapper: 
