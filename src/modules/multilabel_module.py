@@ -67,7 +67,6 @@ class MultilabelModule(BaseModule):
 
         return {"loss": test_loss, "preds": preds, "targets": targets}
     
-
     
     def on_test_epoch_end(self):
         test_targets = torch.cat(self.test_targets).int()

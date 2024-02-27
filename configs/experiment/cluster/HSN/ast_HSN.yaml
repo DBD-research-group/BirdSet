@@ -20,7 +20,7 @@ logger:
     tags: ${tags}
     group: "HSN_train_ast"
     mode: online
-    #version: pretraineatxcm_2 #to resume train run # needs to be tested
+    version: ast_train_${start_time} #to resume train run # needs to be tested
 
 module:
   optimizer:
@@ -29,33 +29,39 @@ module:
   #  _target_: src.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
     _target_: torch.nn.BCEWithLogitsLoss 
   #_target_: src.modules.losses.focal_loss.MultiLabelFocalLoss
+  network:
+    torch_compile: False
 
 
 trainer:
   min_epochs: 1
-  max_epochs: 5
+  max_epochs: 7
 
 datamodule:
   dataset:
-    val_split: 0.1
+    val_split: 0.2
     class_weights_loss: null
     class_weights_sampler: null
     classlimit: 600
     eventlimit: 3
+  transforms:
+    preprocessing:
+      resizer:
+        target_width: 1_024
 
   loaders:
     train:
       batch_size: 14
-      shuffle: True
-      num_workers: 12
+      shuffle: False #True depends on dataset size??
+      num_workers: 14
       drop_last: True
     valid:
       batch_size: 20
-      num_workers: 12
+      num_workers: 14
       shuffle: False
     test:
       batch_size: 20
-      num_workers: 12
+      num_workers: 14
       shuffle: False
 
   mapper: 

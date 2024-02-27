@@ -10,7 +10,7 @@ model_type: vision
 torch_compile: False
 sampling_rate: 32_000
 normalize_spectrogram: True
-normalize_waveform: null
+normalize_waveform: "instance_normalization"
 
 
 

@@ -49,7 +49,7 @@ class BaseModule(L.LightningModule):
         
         self.metrics = load_metrics(metrics)
         self.train_metric = self.metrics["main_metric"].clone()
-        self.train_add_metrics = self.metrics["add_metrics"].clone(prefix="train/")
+        #self.train_add_metrics = self.metrics["add_metrics"].clone(prefix="train/")
 
         self.valid_metric = self.metrics["main_metric"].clone()
         self.valid_metric_best = self.metrics["val_metric_best"].clone()

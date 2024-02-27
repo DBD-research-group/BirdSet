@@ -48,8 +48,7 @@ metrics:
       topk: 5
     mAP:
       _target_: src.modules.metrics.mAP
-      num_labels: ${datamodule.dataset.n_classes}
-    
+      num_labels: ${datamodule.dataset.n_classes}    
       thresholds: null
   eval_complete:
     pcmAP:

@@ -49,18 +49,18 @@ datamodule:
 
   loaders:
     train:
-      batch_size: 64
+      batch_size: 256
       shuffle: True
-      num_workers: 24
+      num_workers: 32
       drop_last: True
-      pin_memory: True
+      pin_memory: False
     valid:
-      batch_size: 64
-      num_workers: 24
+      batch_size: 256
+      num_workers: 32
       shuffle: False
     test:
-      batch_size: 64
-      num_workers: 24
+      batch_size: 256
+      num_workers: 32
       shuffle: False
 
   mapper: 
