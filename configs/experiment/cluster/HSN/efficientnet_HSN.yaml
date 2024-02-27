@@ -20,7 +20,7 @@ logger:
     tags: ${tags}
     group: "HSN_train_efficientnet"
     mode: online
-    #version: pretraineatxcm_2 #to resume train run # needs to be tested
+    version: effnet_train_${start_time} #to resume train run # needs to be tested
 
 module:
   optimizer:
@@ -36,18 +36,17 @@ module:
   # normalize_waveform: instance_peak_normalization
 
 
-
 trainer:
   min_epochs: 1
-  max_epochs: 200
+  max_epochs: 150
 
 datamodule:
   dataset:
-    val_split: 0.1
+    val_split: 0.2
     class_weights_loss: null
     class_weights_sampler: null
     classlimit: 600
-    eventlimit: 4
+    eventlimit: 3
 
   loaders:
     train:

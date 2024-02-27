@@ -30,14 +30,7 @@ metrics:
   main: 
     _target_: src.modules.metrics.cmAP
     num_labels: ${datamodule.dataset.n_classes}
-    sample_threshold: 0
     thresholds: null
-  # main:
-  #   _target_: torchmetrics.classification.AveragePrecision
-  #   task: multilabel
-  #   num_labels: ${datamodule.dataset.n_classes}
-  #   average: macro
-
   val_best: 
     _target_: "torchmetrics.MaxMetric"
   additional: 
@@ -66,7 +59,7 @@ metrics:
       average: macro
       thresholds: null
     cmAP5:
-      _target_: src.modules.metrics.cmAP
+      _target_: src.modules.metrics.cmAP5
       num_labels: ${datamodule.dataset.n_classes}
       sample_threshold: 5
       thresholds: null

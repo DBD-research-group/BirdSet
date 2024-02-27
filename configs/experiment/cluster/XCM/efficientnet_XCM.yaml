@@ -10,7 +10,7 @@ defaults:
   - override /paths: cluster.yaml
   - override /hydra: cluster.yaml
 
-tags: ["HSN", "efficientnet", "multilabel"]
+tags: ["HSN", "efficientnet", "multilabel", "pretraining"]
 seed: 2
 train: True
 test: False
@@ -18,7 +18,7 @@ test: False
 logger:
   wandb:
     tags: ${tags}
-    group: "XCM_train_efficientnet"
+    group: "XCM_pretrain_efficientnet"
     mode: online
     version: pretrain_effnet_${start_time}
     #version: pretraineatxcm_2 #to resume train run # needs to be tested
@@ -32,11 +32,12 @@ module:
   #  _target_: src.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
     _target_: torch.nn.BCEWithLogitsLoss 
   #_target_: src.modules.losses.focal_loss.MultiLabelFocalLoss
-
+  network: 
+    torch_compile: True
 
 trainer:
   min_epochs: 1
-  max_epochs: 100
+  max_epochs: 150
 
 datamodule:
   dataset:
@@ -48,22 +49,21 @@ datamodule:
 
   loaders:
     train:
-      batch_size: 128
+      batch_size: 64
       shuffle: True
-      num_workers: 28
+      num_workers: 24
       drop_last: True
       pin_memory: True
     valid:
-      batch_size: 128
-      num_workers: 28
+      batch_size: 64
+      num_workers: 24
       shuffle: False
     test:
-      batch_size: 128
-      num_workers: 28
+      batch_size: 64
+      num_workers: 24
       shuffle: False
 
   mapper: 
-   
     biggest_cluster: True
     no_call: False
   

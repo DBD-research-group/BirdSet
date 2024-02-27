@@ -4,7 +4,7 @@ from torchmetrics.classification.average_precision import MultilabelAveragePreci
 from torchmetrics import Metric
 from torchmetrics.utilities.data import dim_zero_cat
 
-class cmAP(Metric):
+class cmAP5(Metric):
     def __init__(
             self,
             num_labels: int,
@@ -44,6 +44,9 @@ class cmAP(Metric):
         all_predictions = torch.cat(self.accumulated_predictions, dim=0)
         all_labels = torch.cat(self.accumulated_labels, dim=0)
 
+        # self.accumulated_predictions.clear()
+        # self.accumulated_labels.clear()
+
         # Calculate class-wise AP
         class_aps = self.multilabel_ap(all_predictions, all_labels)
 
@@ -59,6 +62,22 @@ class cmAP(Metric):
     #     # Reset accumulated predictions and labels
     #     self.accumulated_predictions = []
     #     self.accumulated_labels = []
+
+class cmAP(MultilabelAveragePrecision):
+    def __init__(
+            self,
+            num_labels,
+            thresholds=None
+        ):
+        super().__init__(
+            num_labels=num_labels,
+            average="macro",
+            thresholds=thresholds
+        )
+
+    def __call__(self, logits, labels):
+        macro_cmap = super().__call__(logits, labels)
+        return macro_cmap   
 
 class mAP(MultilabelAveragePrecision):
     
