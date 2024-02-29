@@ -3,20 +3,27 @@ import torch.nn as nn
 from transformers import AutoModelForAudioClassification, AutoConfig
 from transformers import ASTForAudioClassification
 
+
 class ASTSequenceClassifier(nn.Module):
-    def __init__(self, checkpoint, num_classes, cache_dir):
+    def __init__(self, checkpoint: str, local_checkpoint: str | None, num_classes: int, cache_dir: str | None):
         super(ASTSequenceClassifier, self).__init__()
 
         self.checkpoint = checkpoint
         self.num_classes = num_classes
         self.cache_dir = cache_dir
+        state_dict = None
 
-        if self.checkpoint: 
+        if self.checkpoint:
+            if local_checkpoint:
+                state_dict = torch.load(local_checkpoint)["state_dict"]
+                state_dict = {key.replace('model.model.', ''): weight for key, weight in state_dict.items()}
+
             self.model = AutoModelForAudioClassification.from_pretrained(
                 self.checkpoint,
                 num_labels=self.num_classes,
-                ignore_mismatched_sizes=True,
-                cache_dir=self.cache_dir
+                cache_dir=self.cache_dir,
+                state_dict=state_dict,
+                ignore_mismatched_sizes=True
             )
         else:
             config = AutoConfig.from_pretrained("MIT/ast-finetuned-audioset-10-10-0.4593", num_labels=self.num_classes)
@@ -79,3 +86,11 @@ class ASTSequenceClassifier(nn.Module):
     @torch.inference_mode()
     def get_representations(self, dataloader, device):
         pass
+
+
+class ASTSequenceClassifierRandomInit(ASTSequenceClassifier):
+    def __init__(self, *args, **kwargs):
+        super(ASTSequenceClassifierRandomInit, self).__init__(*args, **kwargs)
+
+        config = AutoConfig.from_pretrained(self.checkpoint, num_labels=kwargs["num_classes"])
+        self.model = AutoModelForAudioClassification.from_config(config)

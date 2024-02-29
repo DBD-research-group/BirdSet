@@ -1,6 +1,7 @@
 model:
   _target_: src.modules.models.hubert.HubertSequenceClassifier
   checkpoint: facebook/hubert-base-ls960
+  local_checkpoint: null
   num_classes: ${datamodule.dataset.n_classes}
   cache_dir: ${paths.dataset_path}
   
