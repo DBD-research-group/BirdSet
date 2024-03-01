@@ -2,21 +2,37 @@ import torch
 import torch.nn as nn
 from transformers import AutoModelForAudioClassification, AutoConfig
 from transformers import ASTForAudioClassification
+import datasets
+
 
 class ASTSequenceClassifier(nn.Module):
-    def __init__(self, checkpoint, num_classes, cache_dir):
+    def __init__(self, checkpoint: str, local_checkpoint: str | None, num_classes: int, cache_dir: str | None, pretrain_info):
         super(ASTSequenceClassifier, self).__init__()
 
         self.checkpoint = checkpoint
-        self.num_classes = num_classes
+        # self.num_classes = num_classes
+
+        self.hf_path = pretrain_info.hf_path
+        self.hf_name = pretrain_info.hf_name if not pretrain_info.hf_pretrain_name else pretrain_info.hf_pretrain_name
+        self.num_classes = len(
+            datasets.load_dataset_builder(self.hf_path, self.hf_name).info.features["ebird_code"].names)
+
         self.cache_dir = cache_dir
 
-        if self.checkpoint: 
+
+        state_dict = None
+
+        if self.checkpoint:
+            if local_checkpoint:
+                state_dict = torch.load(local_checkpoint)["state_dict"]
+                state_dict = {key.replace('model.model.', ''): weight for key, weight in state_dict.items()}
+
             self.model = AutoModelForAudioClassification.from_pretrained(
                 self.checkpoint,
                 num_labels=self.num_classes,
-                ignore_mismatched_sizes=True,
-                cache_dir=self.cache_dir
+                cache_dir=self.cache_dir,
+                state_dict=state_dict,
+                ignore_mismatched_sizes=True
             )
         else:
             config = AutoConfig.from_pretrained("MIT/ast-finetuned-audioset-10-10-0.4593", num_labels=self.num_classes)
@@ -79,3 +95,11 @@ class ASTSequenceClassifier(nn.Module):
     @torch.inference_mode()
     def get_representations(self, dataloader, device):
         pass
+
+
+class ASTSequenceClassifierRandomInit(ASTSequenceClassifier):
+    def __init__(self, *args, **kwargs):
+        super(ASTSequenceClassifierRandomInit, self).__init__(*args, **kwargs)
+
+        config = AutoConfig.from_pretrained(self.checkpoint, num_labels=kwargs["num_classes"])
+        self.model = AutoModelForAudioClassification.from_config(config)

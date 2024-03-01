@@ -1,43 +1,48 @@
 import torch
-import math 
+import math
 import hydra
 
 from src.modules.losses import load_loss
 from src.modules.metrics import load_metrics
+import datasets
 
-#logger = logging.getLogger(__name__)
 import lightning as L
+
 
 class BaseModule(L.LightningModule):
     def __init__(
-        self,
-        network,
-        output_activation,
-        loss,
-        optimizer,
-        lr_scheduler,
-        metrics,
-        logging_params,
-        num_epochs,
-        len_trainset,
-        batch_size,
-        task,
-        class_weights_loss,
-        label_counts,
-        num_gpus):
+            self,
+            network,
+            output_activation,
+            loss,
+            optimizer,
+            lr_scheduler,
+            metrics,
+            logging_params,
+            num_epochs,
+            len_trainset,
+            batch_size,
+            task,
+            class_weights_loss,
+            label_counts,
+            num_gpus):
 
         super(BaseModule, self).__init__()
-        
+
         # partial
         self.num_epochs = num_epochs
         self.len_trainset = len_trainset
         self.batch_size = batch_size
-        self.task = task 
+        self.task = task
 
         self.model = hydra.utils.instantiate(network.model)
         self.opt_params = optimizer
         self.lrs_params = lr_scheduler
         self.num_gpus = num_gpus
+
+        self.hf_path = network.model.pretrain_info["hf_path"]
+        self.hf_name = network.model.pretrain_info["hf_name"]
+        self.pretrain_dataset = network.model.pretrain_info["hf_pretrain_name"]
 
         self.loss = load_loss(loss, class_weights_loss, label_counts)
         self.output_activation = hydra.utils.instantiate(
@@ -45,10 +50,10 @@ class BaseModule(L.LightningModule):
             _partial_=True
         )
         self.logging_params = logging_params
-        
+
         self.metrics = load_metrics(metrics)
         self.train_metric = self.metrics["main_metric"].clone()
-        #self.train_add_metrics = self.metrics["add_metrics"].clone(prefix="train/")
+        # self.train_add_metrics = self.metrics["add_metrics"].clone(prefix="train/")
 
         self.valid_metric = self.metrics["main_metric"].clone()
         self.valid_metric_best = self.metrics["val_metric_best"].clone()
@@ -65,24 +70,29 @@ class BaseModule(L.LightningModule):
 
         self.test_targets = []
         self.test_preds = []
-        
+        self.class_mask = None
+        if self.pretrain_dataset:
+            pretrain_info = datasets.load_dataset_builder(self.hf_path, self.pretrain_dataset).info.features["ebird_code"]
+            dataset_info = datasets.load_dataset_builder(self.hf_path, self.hf_name).info.features["ebird_code"]
+            self.class_mask = [pretrain_info.names.index(i) for i in dataset_info.names]
+
     def forward(self, *args, **kwargs):
         return self.model.forward(*args, **kwargs)
 
     def configure_optimizers(self):
         optimizer = hydra.utils.instantiate(
-            self.opt_params, 
+            self.opt_params,
             params=self.parameters(),
             _convert_='partial'
         )
 
         if self.lrs_params.get("scheduler"):
-            num_training_steps = math.ceil((self.num_epochs * self.len_trainset) / self.batch_size*self.num_gpus) 
+            num_training_steps = math.ceil((self.num_epochs * self.len_trainset) / self.batch_size * self.num_gpus)
             # TODO: Handle the case when drop_last=True more explicitly   
 
             scheduler_target = self.lrs_params.scheduler._target_
-            is_linear_warmup = scheduler_target == "transformers.get_linear_schedule_with_warmup"  
-            is_cosine_warmup = scheduler_target == "transformers.get_cosine_schedule_with_warmup"       
+            is_linear_warmup = scheduler_target == "transformers.get_linear_schedule_with_warmup"
+            is_cosine_warmup = scheduler_target == "transformers.get_cosine_schedule_with_warmup"
 
             if is_linear_warmup or is_cosine_warmup:
 
@@ -102,26 +112,28 @@ class BaseModule(L.LightningModule):
                     "_convert_": "partial"
                 }
 
-            #instantiate hydra    
+            # instantiate hydra
             scheduler = hydra.utils.instantiate(self.lrs_params.scheduler, **scheduler_args)
             lr_scheduler_dict = {"scheduler": scheduler}
 
             if self.lrs_params.get("extras"):
                 for key, value in self.lrs_params.get("extras").items():
                     lr_scheduler_dict[key] = value
-            
+
             return {"optimizer": optimizer, "lr_scheduler": lr_scheduler_dict}
 
         return {"optimizer": optimizer}
-    
+
     def model_step(self, batch, batch_idx):
         logits = self.forward(**batch)
+        if self.class_mask:
+            logits = logits[:, self.class_mask]
         loss = self.loss(logits, batch["labels"])
         preds = self.output_activation(logits)
         return loss, preds, batch["labels"]
-    
+
     def on_train_start(self):
-        self.valid_metric_best.reset()       
+        self.valid_metric_best.reset()
 
     def training_step(self, batch, batch_idx):
         train_loss, preds, targets = self.model_step(batch, batch_idx)
@@ -140,11 +152,11 @@ class BaseModule(L.LightningModule):
             **self.logging_params
         )
 
-        #self.train_add_metrics(preds, targets)
-        #self.log_dict(self.train_add_metrics, **self.logging_params)
+        # self.train_add_metrics(preds, targets)
+        # self.log_dict(self.train_add_metrics, **self.logging_params)
 
         return {"loss": train_loss}
-    
+
     def validation_step(self, batch, batch_idx):
         val_loss, preds, targets = self.model_step(batch, batch_idx)
 
@@ -166,7 +178,7 @@ class BaseModule(L.LightningModule):
         self.valid_add_metrics(preds, targets.int())
         self.log_dict(self.valid_add_metrics, **self.logging_params)
         return {"loss": val_loss, "preds": preds, "targets": targets}
-    
+
     def on_validation_epoch_end(self):
         valid_metric = self.valid_metric.compute()  # get current valid metric
         self.valid_metric_best(valid_metric)  # update best so far valid metric
@@ -175,13 +187,13 @@ class BaseModule(L.LightningModule):
             f"val/{self.valid_metric.__class__.__name__}_best",
             self.valid_metric_best.compute(),
         )
-    
+
     def test_step(self, batch, batch_idx):
         test_loss, preds, targets = self.model_step(batch, batch_idx)
 
         self.log(
-            f"test{self.loss.__class__.__name__}",
-            test_loss, 
+            f"test/{self.loss.__class__.__name__}",
+            test_loss,
             on_step=False,
             on_epoch=True,
             prog_bar=True
@@ -200,13 +212,9 @@ class BaseModule(L.LightningModule):
         return {"loss": test_loss, "preds": preds, "targets": targets}
 
     def setup(self, stage):
-        if self.torch_compile and stage=="fit":
+        if self.torch_compile and stage == "fit":
             print("COMPILE")
             self.model = torch.compile(self.model)
 
     def on_test_epoch_end(self):
         pass
-
-
-
-

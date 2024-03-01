@@ -1,8 +1,14 @@
 model:
   _target_: src.modules.models.wav2vec2.Wav2vec2SequenceClassifier
   checkpoint: facebook/wav2vec2-base
+  local_checkpoint: null
   num_classes: ${datamodule.dataset.n_classes}
   cache_dir: ${paths.dataset_path}/models
+
+  pretrain_info:
+    hf_path: ${datamodule.dataset.hf_path}
+    hf_name: ${datamodule.dataset.hf_name}
+    hf_pretrain_name: null
 
 model_name: wav2vec2
 model_type: waveform
