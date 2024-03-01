@@ -3,7 +3,7 @@ task_name: debug
 
 defaults:
   - override /module: multilabel.yaml
-  - override /module/network: ast.yaml
+  - override /module/network: efficientnet.yaml
   - override /datamodule: HSN.yaml
   #- override /callbacks: default.yaml 
   - override /trainer: single_gpu.yaml
@@ -36,6 +36,8 @@ module:
     _target_: torch.nn.BCEWithLogitsLoss 
   network:
     torch_compile: False
+    model: 
+      checkpoint: /home/lrauch/mnt/train/runs/XCM/efficientnet/2024-02-27_175354/callback_checkpoints/efficientnet_XCM_146.ckpt
 
 
 

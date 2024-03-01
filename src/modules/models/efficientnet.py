@@ -32,7 +32,7 @@ EfficientNetVersion = Literal[
 ]
 
 
-def load_state_dict(
+def generate_state_dict(
     checkpoint_path: str, map_location: Optional[Union[str, torch.device]] = None
 ) -> Dict[str, torch.Tensor]:
     """
@@ -54,13 +54,16 @@ def load_state_dict(
     """
     # Load the checkpoint file. torch.load() automatically loads the tensor to the specified device
     # if map_location is provided.
+    print(">> Found a checkpoint. Loading..")
     checkpoint = torch.load(checkpoint_path, map_location=map_location)
-
+   
     # Extract the state dictionary from the checkpoint. The structure of the checkpoint can vary
     # depending on whether it's from plain PyTorch or PyTorch Lightning.
     if "state_dict" in checkpoint:
         # PyTorch Lightning checkpoints usually nest the model state dictionary under the 'state_dict' key.
         state_dict = checkpoint["state_dict"]
+        state_dict = {key.replace('model._orig_mod.model.', ''): value for key, value in state_dict.items()}
+        state_dict = {k: v for k, v in state_dict.items() if k not in ["classifier.1.weight", "classifier.1.bias"]}
     else:
         # For plain PyTorch checkpoints, the file directly contains the state dictionary.
         state_dict = checkpoint
@@ -186,13 +189,11 @@ class EfficientNetClassifier(nn.Module):
 
         # Update the first layer to match num_channels if needed
         update_first_cnn_layer(model=efficientnet_model, num_channels=self.num_channels)
-
-        # Load checkpoint if provided
-        if self.checkpoint:
-            state_dict = load_state_dict(self.checkpoint)
-            efficientnet_model.load_state_dict(state_dict, strict=False)
-
         self.model = efficientnet_model
+
+        if self.checkpoint: 
+            state_dict = generate_state_dict(self.checkpoint)
+            self.model.load_state_dict(state_dict, strict=False) # check missing keys
 
     def forward(
         self, input_values: torch.Tensor, labels: Optional[torch.Tensor] = None
