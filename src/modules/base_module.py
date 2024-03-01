@@ -5,7 +5,6 @@ import hydra
 from src.modules.losses import load_loss
 from src.modules.metrics import load_metrics
 
-
 #logger = logging.getLogger(__name__)
 import lightning as L
 

@@ -32,10 +32,9 @@ module:
   network:
     torch_compile: False
 
-
 trainer:
   min_epochs: 1
-  max_epochs: 7
+  max_epochs: 15
 
 datamodule:
   dataset:
