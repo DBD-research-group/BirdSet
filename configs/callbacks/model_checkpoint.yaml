@@ -5,7 +5,7 @@ model_checkpoint:
   monitor: ${replace:"val/__loss__"}
   verbose: False
   save_last: False #file: last.ckpt
-  save_top_k: 1
+  save_top_k: 2
   mode: "min"
   auto_insert_metric_name: False
   save_weights_only: False
