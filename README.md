@@ -19,7 +19,10 @@ poetry shell
 ```
 
 ## Logging
-Logs will be written to [Weights&Biases](https://wandb.ai/) by default. 
+Logs will be written to [Weights&Biases](https://wandb.ai/) by default.
+
+## Background noise
+To enhance model performance we mix in additional background noise from downloaded from the [DCASE18](https://dcase.community/challenge2018/index). To download the files and convert them to the correct format, run the notebook 'download_background_noise.ipynb' in the 'notebooks' folder.
 
 ## Run experiments
 
