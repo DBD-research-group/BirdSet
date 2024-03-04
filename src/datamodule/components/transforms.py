@@ -6,53 +6,50 @@ import numpy as np
 from omegaconf import DictConfig
 from src.datamodule.components.feature_extraction import DefaultFeatureExtractor
 from src.datamodule.components.event_decoding import EventDecoding
-from src.datamodule.components.augmentations import Compose
+from src.datamodule.components.augmentations import Compose, PowerToDB
 
 import torch
 
 from src.datamodule.components.resize import Resizer
 import torch_audiomentations
-import torchaudio
-import librosa
+from torchaudio.transforms import Spectrogram, MelScale
 import torchvision
 log = utils.get_pylogger(__name__)
 
-# @dataclass
-# class PreprocessingConfig:
-#     """
-#     A class used to configure the preprocessing for the audio data.
+class PreprocessingConfig:
+    def __init__(
+        self,
+        spectrogram_conversion: Spectrogram | None =None,
+        resizer: Resizer | None = None,
+        melscale_conversion: MelScale | None = None,
+        dbscale_conversion: PowerToDB | None = None,
+        normalize_spectrogram=True,
+        normalize_waveform=None,
+        mean=-4.268,  # calculated on AudioSet
+        std=-4.569,  # calculated on AudioSet
+    ):
+        self.spectrogram_conversion = spectrogram_conversion if spectrogram_conversion is not None else Spectrogram(
+            n_fft=1024,
+            hop_length=320,
+            power=2.0,
+        )
+        self.resizer = resizer if resizer is not None else Resizer(
+            db_scale=True, # manually adjusted!! False when not using it
 
-#     Attributes
-#     ----------
-#     use_spectrogram : bool
-#         Determines whether the audio data should be converted into a spectrogram, a visual representation of the spectrum of frequencies in the sound.
-#     n_fft : int
-#         The size of the FFT (Fast Fourier Transform) window, impacting the frequency resolution of the spectrogram.
-#     hop_length : int
-#         The number of samples between successive frames in the spectrogram. A smaller hop length leads to a higher time resolution.
-#     n_mels : int
-#         The number of Mel bands to generate. This parameter is crucial for the Mel spectrogram and impacts the spectral resolution.
-#     db_scale : bool
-#         Indicates whether to scale the magnitude of the spectrogram to the decibel scale, which can help in visualizing the spectrum more clearly.
-#     target_height : int | None
-#         The height to which the spectrogram images will be resized. This can be important for maintaining consistency in input size for certain neural networks.
-#     target_width : int | None
-#         The width to which the spectrogram images will be resized. This can be important for maintaining consistency in input size for certain neural networks.
-#     normalize_spectrogram : bool
-#         Whether to apply normalization to the spectrogram. Normalization can help in stabilizing the training process.
-#     normalize_waveform : str | None
-#         Determines whether to apply normalization to the raw waveform data. Possible values are 'instance_normalization', 'instance_min_max', 'instance_peak_normalization', or None.
-#     """
-#     n_fft: int = 1024
-#     hop_length: int = 79
-#     n_mels: int = 128
-#     db_scale: bool = True
-#     target_height: int | None = None
-#     target_width: int | None = 1024
-#     normalize_spectrogram: bool = True
-#     normalize_waveform: Literal['instance_normalization', 'instance_min_max', 'instance_peak_normalization'] | None  = None
-#     mean: Optional[float] = -4.268 # calculated on AudioSet
-#     std: Optional[float] = 4.569 # calculated on AudioSet
+        )
+        self.melscale_conversion = melscale_conversion if melscale_conversion is not None else MelScale(
+            n_mels=128,
+            sample_rate=32000,
+            n_stft=513, # n_fft//2+1!!! how to include in code
+        )
+        self.dbscale_conversion = dbscale_conversion if dbscale_conversion is not None else PowerToDB()
+
+        self.normalize_spectrogram = normalize_spectrogram
+        self.normalize_waveform = normalize_waveform
+        self.mean = mean
+        self.std = std
+    
+    
 
 class BaseTransforms:
     """
@@ -191,7 +188,7 @@ class GADMETransformsWrapper(BaseTransforms):
         The no-call sampler component, if configured.
     """
     def __init__(self,
-                task: str = "multilabel",
+                task: Literal['multiclass', 'multilabel'] = "multilabel",
                 sampling_rate: int = 32000,
                 model_type: Literal['vision', 'waveform'] = "waveform",
                 spectrogram_augmentations: DictConfig = DictConfig({}), # TODO: typing is wrong, can also be List of Augmentations
@@ -199,9 +196,9 @@ class GADMETransformsWrapper(BaseTransforms):
                 decoding: EventDecoding | None = None,
                 feature_extractor: DefaultFeatureExtractor = DefaultFeatureExtractor(),
                 max_length: int = 5,
-                n_classes: int = None,
-                nocall_sampler: DictConfig = DictConfig({}),
-                preprocessing: DictConfig = DictConfig({})
+                n_classes: int | None = None,
+                nocall_sampler: DictConfig = DictConfig({}), # TODO: fix typing
+                preprocessing: PreprocessingConfig = PreprocessingConfig()
             ):
         #max_length = 5
         super().__init__(task, sampling_rate, max_length, decoding, feature_extractor)
@@ -235,10 +232,10 @@ class GADMETransformsWrapper(BaseTransforms):
         # spectrogram_conversion
        #self.spectrogram_transform = self._spectrogram_conversion()
 
-        self.spectrogram_conversion = self.preprocessing.get("spectrogram_conversion")
-        self.melscale_conversion = self.preprocessing.get("melscale_conversion")
-        self.dbscale_conversion = self.preprocessing.get("dbscale_conversion")
-        self.resizer = self.preprocessing.get("resizer")
+        self.spectrogram_conversion = self.preprocessing.spectrogram_conversion
+        self.melscale_conversion = self.preprocessing.melscale_conversion
+        self.dbscale_conversion = self.preprocessing.dbscale_conversion
+        self.resizer = self.preprocessing.resizer
 
     # def _spectrogram_conversion(self):
     #     """
