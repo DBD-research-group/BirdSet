@@ -35,14 +35,11 @@ class BaseModule(L.LightningModule):
         self.batch_size = batch_size
         self.task = task
 
-        self.model = hydra.utils.instantiate(network.model)
+        self.model = hydra.utils.instantiate(network.model) # TODO: breaks using without hydra!
         self.opt_params = optimizer
         self.lrs_params = lr_scheduler
         self.num_gpus = num_gpus
 
-        self.hf_path = network.model.pretrain_info["hf_path"]
-        self.hf_name = network.model.pretrain_info["hf_name"]
-        self.pretrain_dataset = network.model.pretrain_info["hf_pretrain_name"]
 
         self.loss = load_loss(loss, class_weights_loss, label_counts)
         self.output_activation = hydra.utils.instantiate(
@@ -71,7 +68,11 @@ class BaseModule(L.LightningModule):
         self.test_targets = []
         self.test_preds = []
         self.class_mask = None
-        if self.pretrain_dataset:
+
+        if "pretrain_info" in network.model and network.model.pretrain_info is not None:
+            self.pretrain_dataset = network.model.pretrain_info["hf_pretrain_name"]
+            self.hf_path = network.model.pretrain_info["hf_path"]
+            self.hf_name = network.model.pretrain_info["hf_name"]
             pretrain_info = datasets.load_dataset_builder(self.hf_path, self.pretrain_dataset).info.features["ebird_code"]
             dataset_info = datasets.load_dataset_builder(self.hf_path, self.hf_name).info.features["ebird_code"]
             self.class_mask = [pretrain_info.names.index(i) for i in dataset_info.names]

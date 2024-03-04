@@ -13,7 +13,7 @@ pip install -e .
 
 Or [poetry](https://python-poetry.org/).
 ```
-mv pyproject.raphael pyproject.toml
+mv pyproject.poetry pyproject.toml
 poetry install
 poetry shell
 ```

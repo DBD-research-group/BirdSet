@@ -12,7 +12,7 @@ defaults:
   - spectrogram_augmentations: default.yaml
   - decoding: bird_event_decoder.yaml
   - feature_extractor: default_aug.yaml
-  - nocall_sampler: default.yaml
+  # - nocall_sampler: default.yaml
   
 
 
