@@ -9,7 +9,19 @@ log = utils.get_pylogger(__name__)
 class GADMEDataModule(BaseDataModuleHF):
     def __init__(
             self,
-            dataset: DatasetConfig = DatasetConfig(),
+            dataset: DatasetConfig = DatasetConfig(
+                dataset_name='HSN',
+                hf_path='DBD-research-group/gadme',
+                hf_name='HSN',
+                n_classes=21,
+                n_workers=3,
+                val_split=0.2,
+                task="multilabel",
+                classlimit=500,
+                eventlimit=5,
+                sampling_rate=32000,
+                
+            ),
             loaders: LoadersConfig = LoadersConfig(),
             transforms: GADMETransformsWrapper = GADMETransformsWrapper(),
             mapper: XCEventMapping = XCEventMapping()
