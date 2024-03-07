@@ -196,8 +196,7 @@ class GADMETransformsWrapper(BaseTransforms):
                 decoding: EventDecoding | None = None,
                 feature_extractor: DefaultFeatureExtractor = DefaultFeatureExtractor(),
                 max_length: int = 5,
-                n_classes: int | None = None,
-                nocall_sampler: DictConfig = DictConfig({}), # TODO: fix typing
+                nocall_sampler: NoCallMixer | None = None, 
                 preprocessing: PreprocessingConfig = PreprocessingConfig()
             ):
         #max_length = 5
