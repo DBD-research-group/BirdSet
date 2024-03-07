@@ -6,7 +6,7 @@ import numpy as np
 from omegaconf import DictConfig
 from src.datamodule.components.feature_extraction import DefaultFeatureExtractor
 from src.datamodule.components.event_decoding import EventDecoding
-from src.datamodule.components.augmentations import Compose, PowerToDB
+from src.datamodule.components.augmentations import Compose, NoCallMixer, PowerToDB
 
 import torch
 
@@ -17,6 +17,28 @@ import torchvision
 log = utils.get_pylogger(__name__)
 
 class PreprocessingConfig:
+    """
+    A class used to configure the preprocessing steps for the audio data.
+
+    Attributes
+    ----------
+    spectrogram_conversion : Spectrogram
+        The configuration for converting the audio waveform to a spectrogram. If not provided, a default Spectrogram configuration is used.
+    resizer : Resizer
+        The configuration for resizing the spectrogram. If not provided, a default Resizer configuration is used.
+    melscale_conversion : MelScale
+        The configuration for converting the spectrogram to a Mel scale. If not provided, a default MelScale configuration is used.
+    dbscale_conversion : PowerToDB
+        The configuration for converting the spectrogram to a dB scale. If not provided, a default PowerToDB configuration is used.
+    normalize_spectrogram : bool
+        Whether to normalize the spectrogram. Defaults to True.
+    normalize_waveform : bool, optional
+        Whether to normalize the audio waveform. If not provided, no normalization is applied to the waveform.
+    mean : float
+        The mean value used for normalization. Defaults to -4.268 (calculated on AudioSet).
+    std : float
+        The standard deviation used for normalization. Defaults to -4.569 (calculated on AudioSet).
+    """
     def __init__(
         self,
         spectrogram_conversion: Spectrogram | None =None,
@@ -65,7 +87,7 @@ class BaseTransforms:
     
     def __init__(self, 
                  task: Literal['multiclass', 'multilabel'] = "multiclass", 
-                 sampling_rate:int = 3200, 
+                 sampling_rate:int = 32000, 
                  max_length:int = 5, 
                  decoding: EventDecoding | None = None,
                  feature_extractor : DefaultFeatureExtractor | None = None) -> None:
@@ -84,6 +106,7 @@ class BaseTransforms:
                                                              sampling_rate=self.sampling_rate,
                                                              padding_value=0.0,
                                                              return_attention_mask=False)
+        assert type(self.feature_extractor) == DefaultFeatureExtractor, "Feature Extractor must be of type DefaultFeatureExtractor"
     
     def _transform(self, batch):
         """
@@ -119,9 +142,10 @@ class BaseTransforms:
         # extract/pad/truncate
         # max_length determains the difference with input waveforms as factor 5 (embedding)
         max_length = int(int(self.sampling_rate) * int(self.max_length)) #!TODO: how to determine 5s
+        assert type(self.feature_extractor) == DefaultFeatureExtractor,        "Feature Extractor must be of type DefaultFeatureExtractor"
         waveform_batch = self.feature_extractor(
             waveform_batch,
-            padding="max_length",
+            padding=True,
             max_length=max_length, 
             truncation=True,
             return_attention_mask=True
@@ -170,8 +194,6 @@ class GADMETransformsWrapper(BaseTransforms):
         The sampling rate at which the audio data should be processed.
     model_type : str
         Indicates the type of model (e.g. 'vision' for spectrogram-based models or 'waveform' for waveform-based models).
-    preprocessing : PreprocessingConfig
-        The preprocessing configuration defined earlier.
     spectrogram_augmentations : DictConfig
         The set of augmentations to be applied to the spectrogram data.
     waveform_augmentations : DictConfig
@@ -182,15 +204,15 @@ class GADMETransformsWrapper(BaseTransforms):
         The component responsible for feature extraction.
     max_length : int
         The maximum length for the processed data segments in seconds.
-    n_classes : int
-        The total number of distinct classes in the dataset.
     nocall_sampler : NoCallMixer | None
         The no-call sampler component, if configured.
+    preprocessing : PreprocessingConfig
+        The preprocessing configuration defined earlier.
     """
     def __init__(self,
                 task: Literal['multiclass', 'multilabel'] = "multilabel",
                 sampling_rate: int = 32000,
-                model_type: Literal['vision', 'waveform'] = "waveform",
+                model_type: Literal['vision', 'waveform'] = "vision",
                 spectrogram_augmentations: DictConfig = DictConfig({}), # TODO: typing is wrong, can also be List of Augmentations
                 waveform_augmentations: DictConfig = DictConfig({}), # TODO: typing is wrong, can also be List of Augmentations
                 decoding: EventDecoding | None = None,
@@ -206,7 +228,6 @@ class GADMETransformsWrapper(BaseTransforms):
         self.preprocessing = preprocessing
         self.waveform_augmentations = waveform_augmentations
         self.spectrogram_augmentations = spectrogram_augmentations
-        self.n_classes = n_classes
         self.nocall_sampler = nocall_sampler
 
         # waveform augmentations
@@ -343,7 +364,7 @@ class GADMETransformsWrapper(BaseTransforms):
         max_length = int(int(self.sampling_rate) * int(self.max_length)) #!TODO: how to determine 5s
         waveform_batch = self.feature_extractor(
             waveform_batch,
-            padding="max_length",
+            padding=True,
             max_length=max_length, 
             truncation=True,
             return_attention_mask=True

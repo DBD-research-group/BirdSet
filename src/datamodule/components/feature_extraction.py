@@ -30,7 +30,7 @@ class DefaultFeatureExtractor(SequenceFeatureExtractor):
     def __init__(
         self,
         feature_size: int = 1,
-        sampling_rate: int = 16000,
+        sampling_rate: int = 32000,
         padding_value: float = 0.0,
         return_attention_mask: bool = False,
         **kwargs,

@@ -7,25 +7,55 @@ from datasets import DatasetDict
 log = utils.get_pylogger(__name__)
 
 class GADMEDataModule(BaseDataModuleHF):
+    """
+    A data module for the GADME dataset.
+
+    This class handles the loading, preprocessing, and transformation of the GADME dataset. It extends the BaseDataModuleHF class.
+
+    Attributes:
+        dataset (DatasetConfig): The configuration for the dataset.
+        loaders (LoadersConfig): The configuration for the loaders.
+        transforms (GADMETransformsWrapper): The transforms to be applied to the data.
+        mapper (XCEventMapping): The mapping for the events.
+
+    Methods:
+        _load_data(decode: bool = False): Loads the data.
+        _preprocess_data(dataset): Preprocesses the data.
+    """
+
     def __init__(
-            self,
-            dataset: DatasetConfig = DatasetConfig(
-                dataset_name='HSN',
-                hf_path='DBD-research-group/gadme',
-                hf_name='HSN',
-                n_classes=21,
-                n_workers=3,
-                val_split=0.2,
-                task="multilabel",
-                classlimit=500,
-                eventlimit=5,
-                sampling_rate=32000,
-                
-            ),
-            loaders: LoadersConfig = LoadersConfig(),
-            transforms: GADMETransformsWrapper = GADMETransformsWrapper(),
-            mapper: XCEventMapping = XCEventMapping()
+        self,
+        dataset: DatasetConfig = DatasetConfig(
+            dataset_name='HSN',
+            hf_path='DBD-research-group/gadme',
+            hf_name='HSN',
+            n_classes=21,
+            n_workers=3,
+            val_split=0.2,
+            task="multilabel",
+            classlimit=500,
+            eventlimit=5,
+            sampling_rate=32000,
+        ),
+        loaders: LoadersConfig = LoadersConfig(),
+        transforms: GADMETransformsWrapper = GADMETransformsWrapper(),
+        mapper: XCEventMapping = XCEventMapping()
     ):
+        """
+        Initializes the data module.
+
+        This method initializes the data module with the specified dataset, loaders, transforms, and mapper. 
+        It then calls the superclass's __init__ method with these arguments.
+
+        Args:
+            dataset (DatasetConfig, optional): The configuration for the dataset. Defaults to a DatasetConfig with specific values.
+            loaders (LoadersConfig, optional): The configuration for the loaders. Defaults to an empty LoadersConfig.
+            transforms (GADMETransformsWrapper, optional): The transforms to be applied to the data. Defaults to an empty GADMETransformsWrapper.
+            mapper (XCEventMapping, optional): The mapping for the events. Defaults to an empty XCEventMapping.
+
+        Returns:
+            None
+        """
         super().__init__(
             dataset=dataset,
             loaders=loaders,
@@ -34,9 +64,32 @@ class GADMEDataModule(BaseDataModuleHF):
         )
 
     def _load_data(self, decode: bool = False):
+        """
+        Loads the data.
+
+        This method loads the data by calling the superclass's _load_data method.
+
+        Args:
+            decode (bool, optional): Whether to decode the data. Defaults to False.
+
+        Returns:
+            The loaded data.
+        """
         return super()._load_data(decode=decode)
 
     def _preprocess_data(self, dataset):
+        """
+        Preprocesses the data.
+
+        This method preprocesses the data based on the task specified in the dataset configuration. 
+        It handles both multiclass and multilabel tasks.
+
+        Args:
+            dataset: The dataset to preprocess.
+
+        Returns:
+            The preprocessed dataset.
+        """
         if self.dataset_config.task == "multiclass":
             # pick only train and test dataset
             dataset = DatasetDict({split: dataset[split] for split in ["train", "test"]})
