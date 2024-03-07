@@ -3,6 +3,13 @@
 
 ## Setup
 
+### Devcontainer
+
+You can use the [devcontainer](https://code.visualstudio.com/docs/devcontainers/containers) configured as as git submodule:
+```bash
+git submodule update --init --recursive
+```
+
 ### Install dependencies
 
 Either with [conda](https://docs.conda.io/en/latest/) and [pip](https://pip.pypa.io/en/stable/).
@@ -17,6 +24,25 @@ mv pyproject.poetry pyproject.toml
 poetry install
 poetry shell
 ```
+
+## Log in to Huggingface
+
+Our datasets are shared via HuggingFace Datasets in our [HuggingFace GADME repository](https://huggingface.co/datasets/DBD-research-group/gadme_v1). Huggingface is a central hub for sharing and utilizing datasets and models, particularly beneficial for machine learning and data science projects. For accessing private datasets hosted on HuggingFace, you need to be authenticated. Here's how you can log in to HuggingFace:
+
+1. **Install HuggingFace CLI**: If you haven't already, you need to install the HuggingFace CLI (Command Line Interface). This tool enables you to interact with HuggingFace services directly from your terminal. You can install it using pip:
+
+   ```bash
+   pip install huggingface_hub
+   ```
+
+2. **Login via CLI**: Once the HuggingFace CLI is installed, you can log in to your HuggingFace account directly from your terminal. This step is essential for accessing private datasets or contributing to the HuggingFace community. Use the following command:
+
+   ```bash
+   huggingface-cli login
+   ```
+
+   After executing this command, you'll be prompted to enter your HuggingFace credentials ([User Access Token](https://huggingface.co/docs/hub/security-tokens)). Once authenticated, your credentials will be saved locally, allowing seamless access to HuggingFace resources.
+
 
 ## Logging
 Logs will be written to [Weights&Biases](https://wandb.ai/) by default.
