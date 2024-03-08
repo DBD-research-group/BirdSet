@@ -4,13 +4,12 @@ import torch.nn.functional as F
 class Resizer:
     def __init__(self,
                  db_scale: bool = False,
-                 target_height: int = None,
+                 target_height: int | None = None,
                  target_width: int = 1024 ) -> None:
         """
         Initializes the Resizer object.
 
         Args:
-            use_spectrogram (bool): If True, the resizer will work with 3D spectrograms of shape (channels, height, width). If False, it will work with waveforms.
             db_scale (bool): Flag indicating whether spectrograms in decibel (dB) units are used. Only required if
             use_spectrogram=True.
         """
@@ -33,8 +32,8 @@ class Resizer:
         Returns:
             Tensor: The padded 3D spectrogram.
         """
-        difference = self.target_height - spectrogram.shape[2]
-        if difference > 0:
+        if self.target_height is not None:
+            difference = self.target_height - spectrogram.shape[2]
             padding = (0, 0, 0, difference)
             return F.pad(spectrogram, padding, value=self.padding_value)
         return spectrogram

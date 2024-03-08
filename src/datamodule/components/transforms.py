@@ -6,53 +6,70 @@ import numpy as np
 from omegaconf import DictConfig
 from src.datamodule.components.feature_extraction import DefaultFeatureExtractor
 from src.datamodule.components.event_decoding import EventDecoding
-from src.datamodule.components.augmentations import Compose
+from src.datamodule.components.augmentations import Compose, NoCallMixer, PowerToDB
 
 import torch
 
 from src.datamodule.components.resize import Resizer
 import torch_audiomentations
-import torchaudio
-import librosa
+from torchaudio.transforms import Spectrogram, MelScale
 import torchvision
 log = utils.get_pylogger(__name__)
 
-# @dataclass
-# class PreprocessingConfig:
-#     """
-#     A class used to configure the preprocessing for the audio data.
+class PreprocessingConfig:
+    """
+    A class used to configure the preprocessing steps for the audio data.
 
-#     Attributes
-#     ----------
-#     use_spectrogram : bool
-#         Determines whether the audio data should be converted into a spectrogram, a visual representation of the spectrum of frequencies in the sound.
-#     n_fft : int
-#         The size of the FFT (Fast Fourier Transform) window, impacting the frequency resolution of the spectrogram.
-#     hop_length : int
-#         The number of samples between successive frames in the spectrogram. A smaller hop length leads to a higher time resolution.
-#     n_mels : int
-#         The number of Mel bands to generate. This parameter is crucial for the Mel spectrogram and impacts the spectral resolution.
-#     db_scale : bool
-#         Indicates whether to scale the magnitude of the spectrogram to the decibel scale, which can help in visualizing the spectrum more clearly.
-#     target_height : int | None
-#         The height to which the spectrogram images will be resized. This can be important for maintaining consistency in input size for certain neural networks.
-#     target_width : int | None
-#         The width to which the spectrogram images will be resized. This can be important for maintaining consistency in input size for certain neural networks.
-#     normalize_spectrogram : bool
-#         Whether to apply normalization to the spectrogram. Normalization can help in stabilizing the training process.
-#     normalize_waveform : str | None
-#         Determines whether to apply normalization to the raw waveform data. Possible values are 'instance_normalization', 'instance_min_max', 'instance_peak_normalization', or None.
-#     """
-#     n_fft: int = 1024
-#     hop_length: int = 79
-#     n_mels: int = 128
-#     db_scale: bool = True
-#     target_height: int | None = None
-#     target_width: int | None = 1024
-#     normalize_spectrogram: bool = True
-#     normalize_waveform: Literal['instance_normalization', 'instance_min_max', 'instance_peak_normalization'] | None  = None
-#     mean: Optional[float] = -4.268 # calculated on AudioSet
-#     std: Optional[float] = 4.569 # calculated on AudioSet
+    Attributes
+    ----------
+    spectrogram_conversion : Spectrogram
+        The configuration for converting the audio waveform to a spectrogram. If not provided, a default Spectrogram configuration is used.
+    resizer : Resizer
+        The configuration for resizing the spectrogram. If not provided, a default Resizer configuration is used.
+    melscale_conversion : MelScale
+        The configuration for converting the spectrogram to a Mel scale. If not provided, a default MelScale configuration is used.
+    dbscale_conversion : PowerToDB
+        The configuration for converting the spectrogram to a dB scale. If not provided, a default PowerToDB configuration is used.
+    normalize_spectrogram : bool
+        Whether to normalize the spectrogram. Defaults to True.
+    normalize_waveform : bool, optional
+        Whether to normalize the audio waveform. If not provided, no normalization is applied to the waveform.
+    mean : float
+        The mean value used for normalization. Defaults to -4.268 (calculated on AudioSet).
+    std : float
+        The standard deviation used for normalization. Defaults to -4.569 (calculated on AudioSet).
+    """
+    def __init__(
+        self,
+        spectrogram_conversion: Spectrogram | None = Spectrogram(
+            n_fft=1024,
+            hop_length=320,
+            power=2.0,
+        ),
+        resizer: Resizer | None = Resizer(
+            db_scale=True, # manually adjusted!! False when not using it
+        ),
+        melscale_conversion: MelScale | None = MelScale(
+            n_mels=128,
+            sample_rate=32000,
+            n_stft=513, # n_fft//2+1!!! how to include in code
+        ),
+        dbscale_conversion: PowerToDB | None = PowerToDB(),
+        normalize_spectrogram=True,
+        normalize_waveform=None,
+        mean=-4.268,  # calculated on AudioSet
+        std=-4.569,  # calculated on AudioSet
+    ):
+        self.spectrogram_conversion = spectrogram_conversion
+        self.resizer = resizer
+        self.melscale_conversion = melscale_conversion
+        self.dbscale_conversion = dbscale_conversion
+        self.normalize_spectrogram = normalize_spectrogram
+        self.normalize_waveform = normalize_waveform
+        self.mean = mean
+        self.std = std
+    
+    
 
 class BaseTransforms:
     """
@@ -68,7 +85,7 @@ class BaseTransforms:
     
     def __init__(self, 
                  task: Literal['multiclass', 'multilabel'] = "multiclass", 
-                 sampling_rate:int = 3200, 
+                 sampling_rate:int = 32000, 
                  max_length:int = 5, 
                  decoding: EventDecoding | None = None,
                  feature_extractor : DefaultFeatureExtractor | None = None) -> None:
@@ -87,6 +104,7 @@ class BaseTransforms:
                                                              sampling_rate=self.sampling_rate,
                                                              padding_value=0.0,
                                                              return_attention_mask=False)
+        assert type(self.feature_extractor) == DefaultFeatureExtractor, "Feature Extractor must be of type DefaultFeatureExtractor"
     
     def _transform(self, batch):
         """
@@ -122,9 +140,10 @@ class BaseTransforms:
         # extract/pad/truncate
         # max_length determains the difference with input waveforms as factor 5 (embedding)
         max_length = int(int(self.sampling_rate) * int(self.max_length)) #!TODO: how to determine 5s
+        assert type(self.feature_extractor) == DefaultFeatureExtractor,        "Feature Extractor must be of type DefaultFeatureExtractor"
         waveform_batch = self.feature_extractor(
             waveform_batch,
-            padding="max_length",
+            padding='max_length',
             max_length=max_length, 
             truncation=True,
             return_attention_mask=True
@@ -173,8 +192,6 @@ class GADMETransformsWrapper(BaseTransforms):
         The sampling rate at which the audio data should be processed.
     model_type : str
         Indicates the type of model (e.g. 'vision' for spectrogram-based models or 'waveform' for waveform-based models).
-    preprocessing : PreprocessingConfig
-        The preprocessing configuration defined earlier.
     spectrogram_augmentations : DictConfig
         The set of augmentations to be applied to the spectrogram data.
     waveform_augmentations : DictConfig
@@ -185,23 +202,22 @@ class GADMETransformsWrapper(BaseTransforms):
         The component responsible for feature extraction.
     max_length : int
         The maximum length for the processed data segments in seconds.
-    n_classes : int
-        The total number of distinct classes in the dataset.
     nocall_sampler : NoCallMixer | None
         The no-call sampler component, if configured.
+    preprocessing : PreprocessingConfig | None
+        A preprocessing configuration or None if no preprocessing is required.
     """
     def __init__(self,
-                task: str = "multilabel",
+                task: Literal['multiclass', 'multilabel'] = "multilabel",
                 sampling_rate: int = 32000,
-                model_type: Literal['vision', 'waveform'] = "waveform",
+                model_type: Literal['vision', 'waveform'] = "vision",
                 spectrogram_augmentations: DictConfig = DictConfig({}), # TODO: typing is wrong, can also be List of Augmentations
                 waveform_augmentations: DictConfig = DictConfig({}), # TODO: typing is wrong, can also be List of Augmentations
                 decoding: EventDecoding | None = None,
                 feature_extractor: DefaultFeatureExtractor = DefaultFeatureExtractor(),
                 max_length: int = 5,
-                n_classes: int = None,
-                nocall_sampler: DictConfig = DictConfig({}),
-                preprocessing: DictConfig = DictConfig({})
+                nocall_sampler: NoCallMixer | None = None, 
+                preprocessing: PreprocessingConfig | None = PreprocessingConfig()
             ):
         #max_length = 5
         super().__init__(task, sampling_rate, max_length, decoding, feature_extractor)
@@ -210,7 +226,6 @@ class GADMETransformsWrapper(BaseTransforms):
         self.preprocessing = preprocessing
         self.waveform_augmentations = waveform_augmentations
         self.spectrogram_augmentations = spectrogram_augmentations
-        self.n_classes = n_classes
         self.nocall_sampler = nocall_sampler
 
         # waveform augmentations
@@ -231,48 +246,6 @@ class GADMETransformsWrapper(BaseTransforms):
         # if i set a debug point here, it takes ~15 skips to get to the value we need from the yaml file 
         self.spec_aug = torchvision.transforms.Compose(
             transforms=spec_aug)
-
-        # spectrogram_conversion
-       #self.spectrogram_transform = self._spectrogram_conversion()
-
-        self.spectrogram_conversion = self.preprocessing.get("spectrogram_conversion")
-        self.melscale_conversion = self.preprocessing.get("melscale_conversion")
-        self.dbscale_conversion = self.preprocessing.get("dbscale_conversion")
-        self.resizer = self.preprocessing.get("resizer")
-
-    # def _spectrogram_conversion(self):
-    #     """
-    #     Converts a waveform to a spectrogram.
-
-    #     This method applies a spectrogram transformation to a waveform. If "time_stretch" is in the 
-    #     `spectrogram_augmentations` attribute, the power of the spectrogram transformation is set to 0.0. 
-    #     Otherwise, the power is set to 2.0.
-
-    #     Args:
-    #         waveform (torch.Tensor): The waveform to be converted to a spectrogram.
-
-    #     Returns:
-    #         list: A list of spectrograms corresponding to the input waveform.
-    #     """
-
-    #     if "time_stretch" in self.spectrogram_augmentations:
-    #         spectrogram_transform = torchaudio.transforms.Spectrogram(
-    #             n_fft=self.preprocessing.n_fft,
-    #             hop_length=self.preprocessing.hop_length,
-    #             power=0.0
-    #             )     
-    #     else:
-    #         spectrogram_transform = torchaudio.transforms.Spectrogram(
-    #             n_fft=self.preprocessing.n_fft,
-    #             hop_length=self.preprocessing.hop_length,
-    #             power=2.0 # TODO: hard coded?
-    #             )     
-        
-        #spectrograms = [spectrogram_transform(waveform) for waveform in waveform]
-
-        # size: [batch x 1 x 513 x 2026]
-        #spectrograms = spectrogram_transform(waveform)
-        #return spectrogram_transform
     
     def transform_values(self, batch):
         if not "audio" in batch.keys():
@@ -292,32 +265,38 @@ class GADMETransformsWrapper(BaseTransforms):
         if self.nocall_sampler: 
             input_values, labels = self.nocall_sampler(input_values, labels) 
         
+        if self.preprocessing is not None:
+            input_values = self._preprocess(input_values, attention_mask)
+        
+        return input_values, labels
+
+    def _preprocess(self, input_values: torch.Tensor, attention_mask: torch.Tensor) -> torch.Tensor:
         if self.preprocessing.normalize_waveform:
             input_values = self._waveform_scaling(input_values, attention_mask)
-           
-        if self.model_type == "vision":
-            spectrograms = self.spectrogram_conversion(input_values)
+        
+        if self.model_type == "vision" and self.preprocessing.spectrogram_conversion is not None:
+            spectrograms = self.preprocessing.spectrogram_conversion(input_values)
 
             if self.spec_aug:
                 spectrograms = self.spec_aug(spectrograms)
 
-            if self.melscale_conversion:
-                spectrograms = self.melscale_conversion(spectrograms)
+            if self.preprocessing.melscale_conversion:
+                spectrograms = self.preprocessing.melscale_conversion(spectrograms)
 
-            if self.dbscale_conversion:
+            if self.preprocessing.dbscale_conversion:
                 # spectrograms = [spectrogram.numpy() for spectrogram in spectrograms]
                 # spectrograms = torch.from_numpy(librosa.power_to_db(spectrograms)) #list to tensor!
-                spectrograms = self.dbscale_conversion(spectrograms) # different results??
+                spectrograms = self.preprocessing.dbscale_conversion(spectrograms) # different results??
 
-            if self.resizer:
-                spectrograms = self.resizer.resize_spectrogram_batch(spectrograms)
+            if self.preprocessing.resizer:
+                spectrograms = self.preprocessing.resizer.resize_spectrogram_batch(spectrograms)
                 
             if self.preprocessing.normalize_spectrogram:
                 spectrograms = (spectrograms - self.preprocessing.mean) / self.preprocessing.std
             
             input_values = spectrograms
-        
-        return input_values, labels
+        return input_values
+
     
     def _waveform_augmentation(self, input_values, labels):
         if self.task == "multilabel":
@@ -347,7 +326,7 @@ class GADMETransformsWrapper(BaseTransforms):
         max_length = int(int(self.sampling_rate) * int(self.max_length)) #!TODO: how to determine 5s
         waveform_batch = self.feature_extractor(
             waveform_batch,
-            padding="max_length",
+            padding='max_length',
             max_length=max_length, 
             truncation=True,
             return_attention_mask=True

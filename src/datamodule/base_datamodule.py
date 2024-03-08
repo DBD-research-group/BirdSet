@@ -25,7 +25,7 @@ class DatasetConfig:
     Attributes
     ----------
     data_dir : str
-        Specifies the directory where the dataset files are stored.
+        Specifies the directory where the dataset files are stored.  **Important**: The dataset uses a lot of disk space, so make sure you have enough storage available.
     dataset_name : str
         The name assigned to the dataset.
     hf_path : str
@@ -42,16 +42,18 @@ class DatasetConfig:
         The proportion of the dataset reserved for validation.
     task : str
         Defines the type of task (e.g., 'multilabel' or 'multiclass').
+    subset : int, optional
+        A subset of the dataset to use. If None, the entire dataset is used.
     sampling_rate : int
         The sampling rate for audio data processing.
-    class_weights_loss : list | None
+    class_weights_loss : bool, optional
         (Deprecated) Previously used for applying class weights in loss calculation.
-    class_weights_sampler : bool
+    class_weights_sampler : bool, optional
         Indicates whether to use class weights in the sampler for handling imbalanced datasets.
-    class_limit : int
-        The maximum number of samples per class.
-    event_limit : int
-        Defines the maximum number of audio events processed per audio file, capping the quantity to ensure balance across files.
+    classlimit : int, optional
+        The maximum number of samples per class. If None, all samples are used.
+    eventlimit : int, optional
+        Defines the maximum number of audio events processed per audio file, capping the quantity to ensure balance across files. If None, all events are processed.
     """
     data_dir: str = "/workspace/data_gadme"
     dataset_name: str = "esc50"

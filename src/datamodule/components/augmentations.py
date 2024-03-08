@@ -740,7 +740,7 @@ class NoCallMixer():
     _target_ : str
         Specifies the no-call sampler component in the pipeline.
     directory : str
-        The directory containing the no-call data. It's essential to ensure that this path is correctly set to the location of your no-call samples.
+        The directory containing the no-call data. The directory should contain audio files in a format that can be read by torchaudio (e.g. .wav). 
     p : float
         The probability of a sample being replaced with a no-call sample. This parameter allows you to control the frequency of no-call samples in your dataset.
     sampling_rate : int

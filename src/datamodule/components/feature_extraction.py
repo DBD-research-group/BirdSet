@@ -3,7 +3,7 @@ from typing import Any, List, Optional, Union
 import numpy as np
 from transformers import BatchFeature
 from transformers import SequenceFeatureExtractor
-from transformers.utils import logging
+from transformers.utils import logging, PaddingStrategy
 import torch 
 
 logger = logging.get_logger(__name__)
@@ -30,7 +30,7 @@ class DefaultFeatureExtractor(SequenceFeatureExtractor):
     def __init__(
         self,
         feature_size: int = 1,
-        sampling_rate: int = 16000,
+        sampling_rate: int = 32000,
         padding_value: float = 0.0,
         return_attention_mask: bool = False,
         **kwargs,
@@ -46,7 +46,7 @@ class DefaultFeatureExtractor(SequenceFeatureExtractor):
     def __call__(
         self,
         waveform: Union[np.ndarray, List[float], List[np.ndarray], List[List[float]]],
-        padding: bool = False,
+        padding: Union[bool, str, PaddingStrategy] = False,
         max_length: int = None,
         truncation: bool = False,
         return_attention_mask: bool = False):
