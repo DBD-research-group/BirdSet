@@ -145,7 +145,7 @@ class BaseTransforms:
         assert type(self.feature_extractor) == DefaultFeatureExtractor,        "Feature Extractor must be of type DefaultFeatureExtractor"
         waveform_batch = self.feature_extractor(
             waveform_batch,
-            padding=True,
+            padding='max_length',
             max_length=max_length, 
             truncation=True,
             return_attention_mask=True
@@ -364,7 +364,7 @@ class GADMETransformsWrapper(BaseTransforms):
         max_length = int(int(self.sampling_rate) * int(self.max_length)) #!TODO: how to determine 5s
         waveform_batch = self.feature_extractor(
             waveform_batch,
-            padding=True,
+            padding='max_length',
             max_length=max_length, 
             truncation=True,
             return_attention_mask=True
