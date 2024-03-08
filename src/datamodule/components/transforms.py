@@ -41,31 +41,29 @@ class PreprocessingConfig:
     """
     def __init__(
         self,
-        spectrogram_conversion: Spectrogram | None =None,
-        resizer: Resizer | None = None,
-        melscale_conversion: MelScale | None = None,
-        dbscale_conversion: PowerToDB | None = None,
+        spectrogram_conversion: Spectrogram | None = Spectrogram(
+            n_fft=1024,
+            hop_length=320,
+            power=2.0,
+        ),
+        resizer: Resizer | None = Resizer(
+            db_scale=True, # manually adjusted!! False when not using it
+        ),
+        melscale_conversion: MelScale | None = MelScale(
+            n_mels=128,
+            sample_rate=32000,
+            n_stft=513, # n_fft//2+1!!! how to include in code
+        ),
+        dbscale_conversion: PowerToDB | None = PowerToDB(),
         normalize_spectrogram=True,
         normalize_waveform=None,
         mean=-4.268,  # calculated on AudioSet
         std=-4.569,  # calculated on AudioSet
     ):
-        self.spectrogram_conversion = spectrogram_conversion if spectrogram_conversion is not None else Spectrogram(
-            n_fft=1024,
-            hop_length=320,
-            power=2.0,
-        )
-        self.resizer = resizer if resizer is not None else Resizer(
-            db_scale=True, # manually adjusted!! False when not using it
-
-        )
-        self.melscale_conversion = melscale_conversion if melscale_conversion is not None else MelScale(
-            n_mels=128,
-            sample_rate=32000,
-            n_stft=513, # n_fft//2+1!!! how to include in code
-        )
-        self.dbscale_conversion = dbscale_conversion if dbscale_conversion is not None else PowerToDB()
-
+        self.spectrogram_conversion = spectrogram_conversion
+        self.resizer = resizer
+        self.melscale_conversion = melscale_conversion
+        self.dbscale_conversion = dbscale_conversion
         self.normalize_spectrogram = normalize_spectrogram
         self.normalize_waveform = normalize_waveform
         self.mean = mean
@@ -206,8 +204,8 @@ class GADMETransformsWrapper(BaseTransforms):
         The maximum length for the processed data segments in seconds.
     nocall_sampler : NoCallMixer | None
         The no-call sampler component, if configured.
-    preprocessing : PreprocessingConfig
-        The preprocessing configuration defined earlier.
+    preprocessing : PreprocessingConfig | None
+        A preprocessing configuration or None if no preprocessing is required.
     """
     def __init__(self,
                 task: Literal['multiclass', 'multilabel'] = "multilabel",
@@ -219,7 +217,7 @@ class GADMETransformsWrapper(BaseTransforms):
                 feature_extractor: DefaultFeatureExtractor = DefaultFeatureExtractor(),
                 max_length: int = 5,
                 nocall_sampler: NoCallMixer | None = None, 
-                preprocessing: PreprocessingConfig = PreprocessingConfig()
+                preprocessing: PreprocessingConfig | None = PreprocessingConfig()
             ):
         #max_length = 5
         super().__init__(task, sampling_rate, max_length, decoding, feature_extractor)
@@ -248,48 +246,6 @@ class GADMETransformsWrapper(BaseTransforms):
         # if i set a debug point here, it takes ~15 skips to get to the value we need from the yaml file 
         self.spec_aug = torchvision.transforms.Compose(
             transforms=spec_aug)
-
-        # spectrogram_conversion
-       #self.spectrogram_transform = self._spectrogram_conversion()
-
-        self.spectrogram_conversion = self.preprocessing.spectrogram_conversion
-        self.melscale_conversion = self.preprocessing.melscale_conversion
-        self.dbscale_conversion = self.preprocessing.dbscale_conversion
-        self.resizer = self.preprocessing.resizer
-
-    # def _spectrogram_conversion(self):
-    #     """
-    #     Converts a waveform to a spectrogram.
-
-    #     This method applies a spectrogram transformation to a waveform. If "time_stretch" is in the 
-    #     `spectrogram_augmentations` attribute, the power of the spectrogram transformation is set to 0.0. 
-    #     Otherwise, the power is set to 2.0.
-
-    #     Args:
-    #         waveform (torch.Tensor): The waveform to be converted to a spectrogram.
-
-    #     Returns:
-    #         list: A list of spectrograms corresponding to the input waveform.
-    #     """
-
-    #     if "time_stretch" in self.spectrogram_augmentations:
-    #         spectrogram_transform = torchaudio.transforms.Spectrogram(
-    #             n_fft=self.preprocessing.n_fft,
-    #             hop_length=self.preprocessing.hop_length,
-    #             power=0.0
-    #             )     
-    #     else:
-    #         spectrogram_transform = torchaudio.transforms.Spectrogram(
-    #             n_fft=self.preprocessing.n_fft,
-    #             hop_length=self.preprocessing.hop_length,
-    #             power=2.0 # TODO: hard coded?
-    #             )     
-        
-        #spectrograms = [spectrogram_transform(waveform) for waveform in waveform]
-
-        # size: [batch x 1 x 513 x 2026]
-        #spectrograms = spectrogram_transform(waveform)
-        #return spectrogram_transform
     
     def transform_values(self, batch):
         if not "audio" in batch.keys():
@@ -309,32 +265,38 @@ class GADMETransformsWrapper(BaseTransforms):
         if self.nocall_sampler: 
             input_values, labels = self.nocall_sampler(input_values, labels) 
         
+        if self.preprocessing is not None:
+            input_values = self._preprocess(input_values, attention_mask)
+        
+        return input_values, labels
+
+    def _preprocess(self, input_values: torch.Tensor, attention_mask: torch.Tensor) -> torch.Tensor:
         if self.preprocessing.normalize_waveform:
             input_values = self._waveform_scaling(input_values, attention_mask)
-           
-        if self.model_type == "vision":
-            spectrograms = self.spectrogram_conversion(input_values)
+        
+        if self.model_type == "vision" and self.preprocessing.spectrogram_conversion is not None:
+            spectrograms = self.preprocessing.spectrogram_conversion(input_values)
 
             if self.spec_aug:
                 spectrograms = self.spec_aug(spectrograms)
 
-            if self.melscale_conversion:
-                spectrograms = self.melscale_conversion(spectrograms)
+            if self.preprocessing.melscale_conversion:
+                spectrograms = self.preprocessing.melscale_conversion(spectrograms)
 
-            if self.dbscale_conversion:
+            if self.preprocessing.dbscale_conversion:
                 # spectrograms = [spectrogram.numpy() for spectrogram in spectrograms]
                 # spectrograms = torch.from_numpy(librosa.power_to_db(spectrograms)) #list to tensor!
-                spectrograms = self.dbscale_conversion(spectrograms) # different results??
+                spectrograms = self.preprocessing.dbscale_conversion(spectrograms) # different results??
 
-            if self.resizer:
-                spectrograms = self.resizer.resize_spectrogram_batch(spectrograms)
+            if self.preprocessing.resizer:
+                spectrograms = self.preprocessing.resizer.resize_spectrogram_batch(spectrograms)
                 
             if self.preprocessing.normalize_spectrogram:
                 spectrograms = (spectrograms - self.preprocessing.mean) / self.preprocessing.std
             
             input_values = spectrograms
-        
-        return input_values, labels
+        return input_values
+
     
     def _waveform_augmentation(self, input_values, labels):
         if self.task == "multilabel":
