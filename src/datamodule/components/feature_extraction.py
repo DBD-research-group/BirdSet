@@ -2,8 +2,8 @@ from typing import Any, List, Optional, Union
 
 import numpy as np
 from transformers import BatchFeature
-from transformers import SequenceFeatureExtractor, PaddingStrategy
-from transformers.utils import logging
+from transformers import SequenceFeatureExtractor
+from transformers.utils import logging, PaddingStrategy
 import torch 
 
 logger = logging.get_logger(__name__)
