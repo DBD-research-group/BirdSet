@@ -1,5 +1,6 @@
-from dataclasses import dataclass
-from typing import Callable, Dict, Literal
+from dataclasses import dataclass, field
+from functools import partial
+from typing import Callable, Dict, Literal, Type
 
 from git import Optional
 from gadme.modules.metrics.multilabel import cmAP, cmAP5, pcmAP
@@ -54,8 +55,8 @@ class MetricsConfig:
         num_labels = 21,
         thresholds = None
     )
-    val_metric_best: Metric = MaxMetric
-    add_metrics: Dict[str, Metric] = {
+    val_metric_best: Metric = MaxMetric()
+    add_metrics: Dict[str, Metric] = field(default_factory=lambda: {
         'MultlabelAUROC': AUROC(
             task="multilabel",
             num_labels=21,
@@ -63,8 +64,8 @@ class MetricsConfig:
             thresholds=None
         )
         # TODO: more default metrics
-    }
-    eval_complete: Dict[str, Metric] = {
+    })
+    eval_complete: Dict[str, Metric] = field(default_factory=lambda: {
         'cmAP5': cmAP5(
             num_labels=21,
             sample_threshold=5,
@@ -76,7 +77,7 @@ class MetricsConfig:
             average="macro",
             thresholds=None
         )
-    }
+    })
 
 @dataclass
 class LoggingParamsConfig:
@@ -94,7 +95,8 @@ class BaseModule(L.LightningModule):
             network: NetworkConfig = NetworkConfig(),
             output_activation: Callable[[torch.Tensor], torch.Tensor] = torch.sigmoid,
             loss: _Loss = BCEWithLogitsLoss(),
-            optimizer: Optimizer  = AdamW(
+            optimizer: partial[Type[Optimizer]] = partial(
+                AdamW,
                 lr=1e-5,
                 weight_decay=0.01,
             ),
@@ -137,11 +139,14 @@ class BaseModule(L.LightningModule):
 
         self.valid_metric = self.metrics.main_metric.clone()
         self.valid_metric_best = self.metrics.val_metric_best.clone()
-        self.valid_add_metrics = self.metrics.add_metrics.clone(prefix="val/")
+        self.valid_add_metrics = {"val/" + k: v for k, v in self.metrics.add_metrics.items()}
+        self.test_add_metrics = {"test/" + k: v for k, v in self.metrics.add_metrics.items()}
+        # self.valid_add_metrics = self.metrics.add_metrics.clone(prefix="val/")
 
         self.test_metric = self.metrics.main_metric.clone()
-        self.test_add_metrics = self.metrics.add_metrics.clone(prefix="test/")
-        self.test_complete_metrics = self.metrics.eval_complete.clone(prefix="test/")
+        # self.test_add_metrics = self.metrics.add_metrics.clone(prefix="test/")
+        # self.test_complete_metrics = self.metrics.eval_complete.clone(prefix="test/")
+        self.test_complete_metrics = {"test/" + k: v for k, v in self.metrics.eval_complete.items()}
 
         self.torch_compile = network.torch_compile
         self.model_name = network.model_name
@@ -152,19 +157,20 @@ class BaseModule(L.LightningModule):
         self.test_preds = []
         self.class_mask = None
 
-        if "pretrain_info" in network.model and network.model.pretrain_info is not None:
-            self.pretrain_dataset = network.model.pretrain_info["hf_pretrain_name"]
-            self.hf_path = network.model.pretrain_info["hf_path"]
-            self.hf_name = network.model.pretrain_info["hf_name"]
-            pretrain_info = datasets.load_dataset_builder(self.hf_path, self.pretrain_dataset).info.features["ebird_code"]
-            dataset_info = datasets.load_dataset_builder(self.hf_path, self.hf_name).info.features["ebird_code"]
-            self.class_mask = [pretrain_info.names.index(i) for i in dataset_info.names]
+        # TODO: reimplement this
+        # if "pretrain_info" in network.model and network.model.pretrain_info is not None:
+        #     self.pretrain_dataset = network.model.pretrain_info["hf_pretrain_name"]
+        #     self.hf_path = network.model.pretrain_info["hf_path"]
+        #     self.hf_name = network.model.pretrain_info["hf_name"]
+        #     pretrain_info = datasets.load_dataset_builder(self.hf_path, self.pretrain_dataset).info.features["ebird_code"]
+        #     dataset_info = datasets.load_dataset_builder(self.hf_path, self.hf_name).info.features["ebird_code"]
+        #     self.class_mask = [pretrain_info.names.index(i) for i in dataset_info.names]
 
     def forward(self, *args, **kwargs):
         return self.model.forward(*args, **kwargs)
 
     def configure_optimizers(self):
-
+        self.optimizer = self.optimizer(self.model.parameters())
         if self.lr_scheduler is not None:
             num_training_steps = math.ceil((self.num_epochs * self.len_trainset) / self.batch_size * self.num_gpus)
             # TODO: Handle the case when drop_last=True more explicitly   
