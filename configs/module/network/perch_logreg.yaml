@@ -1,5 +1,5 @@
 model: 
-  _target_: src.modules.models.perch.PerchModel
+  _target_: gadme.modules.models.perch.PerchModel
   num_classes: ${datamodule.dataset.n_classes}
   tfhub_version: 4
   train_classifier: True

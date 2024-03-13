@@ -1,5 +1,5 @@
 resizer:
-  _target_: src.datamodule.components.resize.Resizer
+  _target_: gadme.datamodule.components.resize.Resizer
   db_scale: True # manually adjusted!! False when not using it
   target_height: null
   target_width: null

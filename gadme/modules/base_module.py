@@ -2,8 +2,8 @@ import torch
 import math
 import hydra
 
-from src.modules.losses import load_loss
-from src.modules.metrics import load_metrics
+from gadme.modules.losses import load_loss
+from gadme.modules.metrics import load_metrics
 import datasets
 
 import lightning as L

@@ -1,5 +1,5 @@
 #HSN
-_target_: src.datamodule.pretrain_datamodule.PretrainDataModule
+_target_: gadme.datamodule.pretrain_datamodule.PretrainDataModule
 
 defaults: 
   - _self_

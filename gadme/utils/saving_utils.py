@@ -7,7 +7,7 @@ from typing import Any, List, Optional, Union
 import torch
 from pytorch_lightning import LightningModule, Trainer
 
-from src.utils import pylogger
+from gadme.utils import pylogger
 
 log = pylogger.get_pylogger(__name__)
 

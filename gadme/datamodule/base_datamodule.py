@@ -14,8 +14,8 @@ import hydra
 
 from datasets import load_dataset, load_from_disk, Audio, DatasetDict, Dataset, IterableDataset, IterableDatasetDict
 from torch.utils.data import DataLoader
-from src.datamodule.components.event_mapping import XCEventMapping
-from src.datamodule.components.transforms import GADMETransformsWrapper
+from gadme.datamodule.components.event_mapping import XCEventMapping
+from gadme.datamodule.components.transforms import GADMETransformsWrapper
 
 @dataclass
 class DatasetConfig:

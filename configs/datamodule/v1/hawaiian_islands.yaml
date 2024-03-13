@@ -1,5 +1,5 @@
 #UHH
-_target_: src.datamodule.gadme_datamodule.GADMEDataModule
+_target_: gadme.datamodule.gadme_datamodule.GADMEDataModule
 
 defaults:
   - _self_

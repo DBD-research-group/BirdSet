@@ -55,7 +55,7 @@ To enhance model performance we mix in additional background noise from download
 Our experiments are defined in the `configs/experiment` folder. To run an experiment, use the following command:
 
 ```
-python src/main.py experiment=EXPERIMENT_NAME
+python gadme/main.py experiment=EXPERIMENT_NAME
 ```
 
 
@@ -84,7 +84,7 @@ This repository is inspired by the [Yet Another Lightning Hydra Template](https:
 ├── dataset                     <- Code to build the GADME dataset
 ├── notebooks                   <- Jupyter notebooks.
 │
-├── src                         <- Source code
+├── gadme                         <- Source code
 │   ├── augmentations           <- Augmentations
 │   ├── callbacks               <- Additional callbacks
 │   ├── datamodules             <- Lightning datamodules
@@ -113,7 +113,7 @@ For a detailed guide to using the GADME data pipeline and its many configuration
 
 ## Datamodule
 
-The datamodules are defined in `src/datamodule` and configurations are stored under `configs/datamodule`.
+The datamodules are defined in `gadme/datamodule` and configurations are stored under `configs/datamodule`.
 `base_datamodule` is the main class that can be inherited for specific datasets. It is responsible for preparing the data in the function `prepare_data` and loading the data in the function `setup`. `prepare_data` downloads the dataset, applies preprocessing, creates validation splits and saves the data to disk. `setup` initiates the dataloaders and configures data transformations.
 
 The following steps are performed in `prepare_data`:

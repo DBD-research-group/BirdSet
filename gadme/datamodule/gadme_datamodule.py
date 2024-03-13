@@ -1,6 +1,6 @@
-from src import utils
-from src.datamodule.components.transforms import GADMETransformsWrapper
-from src.datamodule.components.event_mapping import XCEventMapping
+from gadme import utils
+from gadme.datamodule.components.transforms import GADMETransformsWrapper
+from gadme.datamodule.components.event_mapping import XCEventMapping
 from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
 from datasets import DatasetDict
 

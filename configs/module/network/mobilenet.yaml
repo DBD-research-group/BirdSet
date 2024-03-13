@@ -1,5 +1,5 @@
 model:
-  _target_: src.modules.models.mobilenet.MobileNetClassifier
+  _target_: gadme.modules.models.mobilenet.MobileNetClassifier
   architecture: "mobilenet_v3_large"
   num_classes: ${datamodule.dataset.n_classes}
   num_channels: 1

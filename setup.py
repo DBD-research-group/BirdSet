@@ -1,6 +1,6 @@
 from setuptools import find_packages
 from setuptools import setup
-from src import __version__
+from gadme import __version__
 
 # def requirements():
 #      with open("requirements.txt", "r") as file:
@@ -9,7 +9,7 @@ from src import __version__
 #      return lines
 
 setup(
-    name='src',
+    name='gadme',
     version=__version__,
     description='General Avian Monitoring Evaluation',
     author='Lukas Rauch',

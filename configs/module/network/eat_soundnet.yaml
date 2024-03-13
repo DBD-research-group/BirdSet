@@ -1,6 +1,6 @@
 model_name: "eat"
 model:
-  _target_: src.modules.models.eat_soundnet.SoundNet
+  _target_: gadme.modules.models.eat_soundnet.SoundNet
   nf: 32
   seq_len: 110250
   embed_dim: 128

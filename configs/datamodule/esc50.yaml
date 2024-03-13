@@ -1,5 +1,5 @@
 #ESC50
-_target_: src.datamodule.esc50_datamodule.ESC50DataModule
+_target_: gadme.datamodule.esc50_datamodule.ESC50DataModule
 
 defaults:
   - _self_

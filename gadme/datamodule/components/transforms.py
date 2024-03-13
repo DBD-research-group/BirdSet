@@ -1,16 +1,16 @@
 from dataclasses import dataclass
 from typing import Any, Dict, Literal, Optional
-from src import utils
+from gadme import utils
 
 import numpy as np
 from omegaconf import DictConfig
-from src.datamodule.components.feature_extraction import DefaultFeatureExtractor
-from src.datamodule.components.event_decoding import EventDecoding
-from src.datamodule.components.augmentations import Compose, NoCallMixer, PowerToDB
+from gadme.datamodule.components.feature_extraction import DefaultFeatureExtractor
+from gadme.datamodule.components.event_decoding import EventDecoding
+from gadme.datamodule.components.augmentations import Compose, NoCallMixer, PowerToDB
 
 import torch
 
-from src.datamodule.components.resize import Resizer
+from gadme.datamodule.components.resize import Resizer
 import torch_audiomentations
 from torchaudio.transforms import Spectrogram, MelScale
 import torchvision

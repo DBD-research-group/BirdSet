@@ -7,7 +7,7 @@ from omegaconf import OmegaConf
 import pyrootutils
 from torch.utils.data import DataLoader
 
-from src import utils
+from gadme import utils
 
 log = utils.get_pylogger(__name__)
 # rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
