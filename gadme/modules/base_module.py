@@ -1,3 +1,6 @@
+from dataclasses import dataclass
+from typing import Callable, Literal
+from gadme.modules.models.efficientnet import EfficientNetClassifier
 import torch
 import math
 import hydra
@@ -7,16 +10,50 @@ from gadme.modules.metrics import load_metrics
 import datasets
 
 import lightning as L
+import torch.nn as nn
+from torch.nn import BCEWithLogitsLoss
+from torch.nn.modules.loss import _Loss
+from torch.optim import AdamW, Optimizer
+from transformers import get_cosine_schedule_with_warmup
+@dataclass
+class NetworkConfig:
+    model: nn.Module = EfficientNetClassifier(
+        architecture="efficientnet_b1",
+        num_classes=21,
+        num_channels=1,
+        checkpoint=None
+    )
+    model_name: str = "efficientnet"
+    model_type: Literal['vision', 'waveform'] = "vision"
+    torch_compile: bool = False
+    sample_rate: int = 32000
+    normalize_waveform: bool = False
+    normalize_spectrogram: bool = True
+
+@dataclass
+class LRSchedulerExtrasConfig:
+    interval: str = "step"
+    warmup_ratio: float = 0.5
+
+@dataclass
+class LRSchedulerConfig:
+    scheduler = get_cosine_schedule_with_warmup
+    extras = LRSchedulerExtrasConfig()
+
+
 
 
 class BaseModule(L.LightningModule):
     def __init__(
             self,
-            network,
-            output_activation,
-            loss,
-            optimizer,
-            lr_scheduler,
+            network: NetworkConfig = NetworkConfig(),
+            output_activation: Callable[[torch.Tensor], torch.Tensor] = torch.sigmoid,
+            loss: _Loss = BCEWithLogitsLoss(),
+            optimizer: Optimizer  = AdamW(
+                lr=1e-5,
+                weight_decay=0.01,
+            ),
+            lr_scheduler: LRSchedulerConfig = LRSchedulerConfig(),
             metrics,
             logging_params,
             num_epochs,
