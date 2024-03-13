@@ -1,5 +1,8 @@
 from dataclasses import dataclass
-from typing import Callable, Literal
+from typing import Callable, Dict, Literal
+
+from git import Optional
+from gadme.modules.metrics.multilabel import cmAP, cmAP5, pcmAP
 from gadme.modules.models.efficientnet import EfficientNetClassifier
 import torch
 import math
@@ -15,6 +18,8 @@ from torch.nn import BCEWithLogitsLoss
 from torch.nn.modules.loss import _Loss
 from torch.optim import AdamW, Optimizer
 from transformers import get_cosine_schedule_with_warmup
+from torchmetrics import AUROC, Metric, MaxMetric
+
 @dataclass
 class NetworkConfig:
     model: nn.Module = EfficientNetClassifier(
@@ -30,15 +35,55 @@ class NetworkConfig:
     normalize_waveform: bool = False
     normalize_spectrogram: bool = True
 
+
 @dataclass
 class LRSchedulerExtrasConfig:
     interval: str = "step"
     warmup_ratio: float = 0.5
 
+
 @dataclass
 class LRSchedulerConfig:
     scheduler = get_cosine_schedule_with_warmup
     extras = LRSchedulerExtrasConfig()
+
+
+@dataclass
+class MetricsConfig:
+    main_metric: Metric = cmAP(
+        num_labels = 21,
+        thresholds = None
+    )
+    val_metric_best: Metric = MaxMetric
+    add_metrics: Dict[str, Metric] = {
+        'MultlabelAUROC': AUROC(
+            task="multilabel",
+            num_labels=21,
+            average='macro',
+            thresholds=None
+        )
+        # TODO: more default metrics
+    }
+    eval_complete: Dict[str, Metric] = {
+        'cmAP5': cmAP5(
+            num_labels=21,
+            sample_threshold=5,
+            thresholds=None
+        ),
+        'pcmAP': pcmAP(
+            num_labels=21,
+            padding_factor=5,
+            average="macro",
+            thresholds=None
+        )
+    }
+
+@dataclass
+class LoggingParamsConfig:
+    on_step: bool = False
+    on_epoch: bool = True
+    sync_dist: bool = False
+    prog_bar: bool = True         
 
 
 
@@ -53,49 +98,50 @@ class BaseModule(L.LightningModule):
                 lr=1e-5,
                 weight_decay=0.01,
             ),
-            lr_scheduler: LRSchedulerConfig = LRSchedulerConfig(),
-            metrics,
-            logging_params,
-            num_epochs,
-            len_trainset,
-            batch_size,
-            task,
-            class_weights_loss,
-            label_counts,
-            num_gpus):
+            lr_scheduler: Optional[LRSchedulerConfig] = LRSchedulerConfig(),
+            metrics: MetricsConfig = MetricsConfig(),
+            logging_params: LoggingParamsConfig = LoggingParamsConfig(),
+            num_epochs: int = 50,
+            len_trainset: int = 23000,
+            batch_size: int = 32,
+            task: Literal['multiclass', 'multilabel'] = "multilabel",
+            class_weights_loss: Optional[bool] = None,
+            label_counts: int = 21,
+            num_gpus: int = 1):
 
         super(BaseModule, self).__init__()
+        self.network = network
+        self.output_activation = output_activation
+        # TODO: refactor load_loss
+        # self.loss = load_loss(loss, class_weights_loss, label_counts)
+        self.loss = loss
+        self.optimizer = optimizer
+        self.lr_scheduler = lr_scheduler
+        self.metrics = metrics
+        self.logging_params = logging_params
 
         # partial
         self.num_epochs = num_epochs
-        self.len_trainset = len_trainset
         self.batch_size = batch_size
+        self.len_trainset = len_trainset
         self.task = task
-
-        self.model = hydra.utils.instantiate(network.model) # TODO: breaks using without hydra!
-        self.opt_params = optimizer
-        self.lrs_params = lr_scheduler
         self.num_gpus = num_gpus
 
 
-        self.loss = load_loss(loss, class_weights_loss, label_counts)
-        self.output_activation = hydra.utils.instantiate(
-            output_activation,
-            _partial_=True
-        )
-        self.logging_params = logging_params
 
-        self.metrics = load_metrics(metrics)
-        self.train_metric = self.metrics["main_metric"].clone()
+        self.model = self.network.model
+
+
+        self.train_metric = self.metrics.main_metric.clone()
         # self.train_add_metrics = self.metrics["add_metrics"].clone(prefix="train/")
 
-        self.valid_metric = self.metrics["main_metric"].clone()
-        self.valid_metric_best = self.metrics["val_metric_best"].clone()
-        self.valid_add_metrics = self.metrics["add_metrics"].clone(prefix="val/")
+        self.valid_metric = self.metrics.main_metric.clone()
+        self.valid_metric_best = self.metrics.val_metric_best.clone()
+        self.valid_add_metrics = self.metrics.add_metrics.clone(prefix="val/")
 
-        self.test_metric = self.metrics["main_metric"].clone()
-        self.test_add_metrics = self.metrics["add_metrics"].clone(prefix="test/")
-        self.test_complete_metrics = self.metrics["eval_complete"].clone(prefix="test/")
+        self.test_metric = self.metrics.main_metric.clone()
+        self.test_add_metrics = self.metrics.add_metrics.clone(prefix="test/")
+        self.test_complete_metrics = self.metrics.eval_complete.clone(prefix="test/")
 
         self.torch_compile = network.torch_compile
         self.model_name = network.model_name
@@ -118,49 +164,49 @@ class BaseModule(L.LightningModule):
         return self.model.forward(*args, **kwargs)
 
     def configure_optimizers(self):
-        optimizer = hydra.utils.instantiate(
-            self.opt_params,
-            params=self.parameters(),
-            _convert_='partial'
-        )
 
-        if self.lrs_params.get("scheduler"):
+        if self.lr_scheduler is not None:
             num_training_steps = math.ceil((self.num_epochs * self.len_trainset) / self.batch_size * self.num_gpus)
             # TODO: Handle the case when drop_last=True more explicitly   
 
-            scheduler_target = self.lrs_params.scheduler._target_
-            is_linear_warmup = scheduler_target == "transformers.get_linear_schedule_with_warmup"
-            is_cosine_warmup = scheduler_target == "transformers.get_cosine_schedule_with_warmup"
+            # TODO: check if lr_scheduler can be called like this
+            scheduler = self.lr_scheduler.scheduler(
+                optimizer=self.optimizer,
+                num_warmup_steps=math.ceil(num_training_steps * self.lr_scheduler.extras.warmup_ratio),
+                num_training_steps=num_training_steps
+            )
+            # is_linear_warmup = scheduler_target == "transformers.get_linear_schedule_with_warmup"
+            # is_cosine_warmup = scheduler_target == "transformers.get_cosine_schedule_with_warmup"
 
-            if is_linear_warmup or is_cosine_warmup:
+            # if is_linear_warmup or is_cosine_warmup:
 
-                num_warmup_steps = math.ceil(
-                    num_training_steps * self.lrs_params.extras.warmup_ratio
-                )
+            #     num_warmup_steps = math.ceil(
+            #         num_training_steps * self.lrs_params.extras.warmup_ratio
+            #     )
 
-                scheduler_args = {
-                    "optimizer": optimizer,
-                    "num_warmup_steps": num_warmup_steps,
-                    "num_training_steps": num_training_steps,
-                    "_convert_": "partial"
-                }
-            else:
-                scheduler_args = {
-                    "optimizer": optimizer,
-                    "_convert_": "partial"
-                }
+            #     scheduler_args = {
+            #         "optimizer": self.optimizer,
+            #         "num_warmup_steps": num_warmup_steps,
+            #         "num_training_steps": num_training_steps,
+            #         "_convert_": "partial"
+            #     }
+            # else:
+            #     scheduler_args = {
+            #         "optimizer": self.optimizer,
+            #         "_convert_": "partial"
+            #     }
 
             # instantiate hydra
-            scheduler = hydra.utils.instantiate(self.lrs_params.scheduler, **scheduler_args)
+            # scheduler = hydra.utils.instantiate(self.lrs_params.scheduler, **scheduler_args)
             lr_scheduler_dict = {"scheduler": scheduler}
 
-            if self.lrs_params.get("extras"):
-                for key, value in self.lrs_params.get("extras").items():
+            if self.lr_scheduler.extras is not None and len(self.lr_scheduler.extras) > 0:
+                for key, value in self.lr_scheduler.extras.items():
                     lr_scheduler_dict[key] = value
 
-            return {"optimizer": optimizer, "lr_scheduler": lr_scheduler_dict}
+            return {"optimizer": self.optimizer, "lr_scheduler": lr_scheduler_dict}
 
-        return {"optimizer": optimizer}
+        return {"optimizer": self.optimizer}
 
     def model_step(self, batch, batch_idx):
         logits = self.forward(**batch)
