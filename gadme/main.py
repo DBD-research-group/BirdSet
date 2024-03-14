@@ -22,7 +22,7 @@ _HYDRA_PARAMS = {
     "config_name": "main.yaml"
 }
 
-@utils.register_custom_resolvers(**_HYDRA_PARAMS)
+# @utils.register_custom_resolvers(**_HYDRA_PARAMS)
 @hydra.main(**_HYDRA_PARAMS)
 def main(cfg):
     log.info('Using config: \n%s', OmegaConf.to_yaml(cfg))
@@ -69,7 +69,6 @@ def main(cfg):
         len_trainset=datamodule.len_trainset,
         batch_size=datamodule.loaders_config.train.batch_size,
         label_counts=datamodule.num_train_labels,
-        _recursive_=False # manually instantiate!
     )
 
     object_dict = {

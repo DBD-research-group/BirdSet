@@ -11,62 +11,60 @@ num_gpus: ${trainer.devices}
 
 optimizer:
   _target_: torch.optim.AdamW
+  _partial_: true
   lr: 1e-5
   weight_decay: 0.01
+  
 
 loss:
   #_target_: gadme.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
   _target_: torch.nn.BCEWithLogitsLoss
   #_target_: gadme.modules.losses.focal_loss.MultiLabelFocalLoss
   
-lr_scheduler:
-  scheduler:
-    _target_: transformers.get_cosine_schedule_with_warmup
-  extras:
-    interval: step
-    warmup_ratio: 0.05
+# lr_scheduler:
+#   scheduler:
+#     _target_: torch.optim.lr_scheduler.LambdaLR
+#     _partial_: true
+#     lr_lambda: {lambda epoch: epoch // 30}
+#     # TODO: add lr_lambda
+#   extras:
+#     interval: step
+#     warmup_ratio: 0.05
 
-metrics: 
-  main: 
-    _target_: gadme.modules.metrics.cmAP
-    num_labels: ${datamodule.dataset.n_classes}
-    thresholds: null
-  val_best: 
-    _target_: "torchmetrics.MaxMetric"
-  additional: 
-    MultilabelAUROC:
-      _target_: "torchmetrics.classification.AUROC"
-      task: "multilabel"
-      num_labels: ${datamodule.dataset.n_classes} 
-      average: "macro"
-      thresholds: null
-    T1Accuracy:
-      _target_: gadme.modules.metrics.TopKAccuracy
-      topk: 1
-    T3Accuracy:
-      _target_: gadme.modules.metrics.TopKAccuracy
-      topk: 5
-    mAP:
-      _target_: gadme.modules.metrics.mAP
-      num_labels: ${datamodule.dataset.n_classes}    
-      thresholds: null
-  eval_complete:
-    pcmAP:
-      _target_: gadme.modules.metrics.pcmAP
-      num_labels: ${datamodule.dataset.n_classes}
-      padding_factor: 5
-      average: macro
-      thresholds: null
-    cmAP5:
-      _target_: gadme.modules.metrics.cmAP5
-      num_labels: ${datamodule.dataset.n_classes}
-      sample_threshold: 5
-      thresholds: null
+# metrics:
+#   main_metric: 
+#     _target_: gadme.modules.metrics.cmAP
+#     num_labels: ${datamodule.dataset.n_classes}
+#     thresholds: null
+#   val_metric_best: 
+#     _target_: "torchmetrics.MaxMetric"
+#   add_metrics:
+#     _target_: torchmetrics.MetricCollection
+#     metrics:
+#       - _target_: torchmetrics.AUROC
+#         task: multilabel
+#         num_labels: 21
+#         average: macro
+#         thresholds: null
+#   eval_complete:
+#     _target_: "torchmetrics.MetricCollection"
+#     metrics:
+#       - _target_: gadme.modules.metrics.pcmAP
+#         num_labels: ${datamodule.dataset.n_classes}
+#         padding_factor: 5
+#         average: macro
+#         thresholds: null
+#       - _target_: gadme.modules.metrics.cmAP5
+#         num_labels: ${datamodule.dataset.n_classes}
+#         sample_threshold: 5
+#         thresholds: null
 
 output_activation: 
   _target_: "torch.sigmoid"
+  _partial_: true
 
 logging_params:
+  _target_: gadme.modules.base_module.LoggingParamsConfig 
   on_step: False
   on_epoch: True
   sync_dist: False

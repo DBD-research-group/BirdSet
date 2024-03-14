@@ -67,14 +67,5 @@ datamodule:
     no_call: False
   
 callbacks:
-  model_checkpoint:
-    save_last: True
-    every_n_epochs: 3
-  early_stopping:
-    target_: lightning.pytorch.callbacks.EarlyStopping
-    monitor: "val/mAP"
-    patience: 4
-    min_delta: 5e-2
-    verbose: False
-    check_finite: True
+  
 

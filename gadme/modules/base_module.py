@@ -1,8 +1,7 @@
 from dataclasses import dataclass, field, asdict
 from functools import partial
-from typing import Callable, Dict, Literal, Type
+from typing import Callable, Dict, Literal, Type, Optional
 
-from git import Optional
 from gadme.modules.metrics.multilabel import cmAP, cmAP5, pcmAP
 from gadme.modules.models.efficientnet import EfficientNetClassifier
 import torch
@@ -10,7 +9,6 @@ import math
 import hydra
 
 from gadme.modules.losses import load_loss
-from gadme.modules.metrics import load_metrics
 import datasets
 
 import lightning as L
@@ -59,8 +57,9 @@ class MetricsConfig:
         thresholds = None
     )
     val_metric_best: Metric = MaxMetric()
-    add_metrics: MetricCollection  = MetricCollection({
-        'MultlabelAUROC': AUROC(
+    add_metrics: MetricCollection  = MetricCollection(
+        metrics ={
+        'MultilabelAUROC': AUROC(
             task="multilabel",
             num_labels=21,
             average='macro',
@@ -112,7 +111,8 @@ class BaseModule(L.LightningModule):
             task: Literal['multiclass', 'multilabel'] = "multilabel",
             class_weights_loss: Optional[bool] = None,
             label_counts: int = 21,
-            num_gpus: int = 1):
+            num_gpus: int = 1
+            ):
 
         super(BaseModule, self).__init__()
         self.network = network
@@ -297,7 +297,7 @@ class BaseModule(L.LightningModule):
         )
 
         self.test_add_metrics(preds, targets.int())
-        self.log_dict(self.test_add_metrics, **self.logging_params)
+        self.log_dict(self.test_add_metrics, **asdict(self.logging_params))
 
         return {"loss": test_loss, "preds": preds, "targets": targets}
 
