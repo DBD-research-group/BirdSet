@@ -59,7 +59,7 @@ class MetricsConfig:
         thresholds = None
     )
     val_metric_best: Metric = MaxMetric()
-    add_metrics: MetricCollection = MetricCollection({
+    add_metrics: MetricCollection  = MetricCollection({
         'MultlabelAUROC': AUROC(
             task="multilabel",
             num_labels=21,
@@ -239,7 +239,7 @@ class BaseModule(L.LightningModule):
         self.log(
             f"train/{self.train_metric.__class__.__name__}",
             self.train_metric,
-            **asdict(self.logging_param)
+            **asdict(self.logging_params)
         )
 
         # self.train_add_metrics(preds, targets)
@@ -266,7 +266,7 @@ class BaseModule(L.LightningModule):
         )
 
         # self.valid_add_metrics(preds, targets.int())
-        self.log_dict(self.valid_add_metrics, **asdict(self.logging_params))
+        # self.log_dict(self.valid_add_metrics, **asdict(self.logging_params))
         return {"loss": val_loss, "preds": preds, "targets": targets}
 
     def on_validation_epoch_end(self):
