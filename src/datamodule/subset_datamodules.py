@@ -156,3 +156,130 @@ class POWDataModule(GADMEDataModule):
                                         classlimit=500,
                                         eventlimit=5,
                                         sampling_rate=sampling_rate))
+        
+        
+class SNEDataModule(GADMEDataModule):
+    """A GADMEDataModule for the SNE (sierra_nevada) dataset."""
+    
+    def __init__(self,
+                 n_workers: int = 3,
+                 val_split: float = 0.2,
+                 task: str = "multilabel",
+                 sampling_rate: int = 32000):
+        """Initializes the SNEDataModule.
+        
+        
+        Args:
+            n_workers (int, optional): The number of worker processes used for data loading. Defaults to 3.
+            val_split (float, optional): The proportion of the dataset reserved for validation. Defaults to 0.2.
+            task (str, optional): Defines the type of task (e.g., 'multilabel' or 'multiclass'). Defaults to "multilabel".
+            sampling_rate (int, optional): The sampling rate for audio data processing. Defaults to 32000.
+        """
+        
+        super().__init__(
+            DatasetConfig=DatasetConfig(dataset_name='SNE',
+                                        hf_path='DBD-research-group/gadme',
+                                        hf_name='SNE',
+                                        n_classes=56,
+                                        n_workers=n_workers,
+                                        val_split=val_split,
+                                        task=task,
+                                        classlimit=500,
+                                        eventlimit=5,
+                                        sampling_rate=sampling_rate))
+        
+        
+class SSWDataModule(GADMEDataModule):
+    """A GADMEDataModule for the SSW (sapsucker_woods) dataset."""
+    
+    def __init__(self,
+                 n_workers: int = 3,
+                 val_split: float = 0.2,
+                 task: str = "multilabel",
+                 sampling_rate: int = 32000):
+        """Initializes the SSWDataModule.
+        
+        
+        Args:
+            n_workers (int, optional): The number of worker processes used for data loading. Defaults to 3.
+            val_split (float, optional): The proportion of the dataset reserved for validation. Defaults to 0.2.
+            task (str, optional): Defines the type of task (e.g., 'multilabel' or 'multiclass'). Defaults to "multilabel".
+            sampling_rate (int, optional): The sampling rate for audio data processing. Defaults to 32000.
+        """
+        
+        super().__init__(
+            DatasetConfig=DatasetConfig(dataset_name='SSW',
+                                        hf_path='DBD-research-group/gadme',
+                                        hf_name='SSW',
+                                        n_classes=81,
+                                        n_workers=n_workers,
+                                        val_split=val_split,
+                                        task=task,
+                                        classlimit=500,
+                                        eventlimit=5,
+                                        sampling_rate=sampling_rate))
+        
+        
+class XCMDataModule(GADMEDataModule):
+    """A GADMEDataModule for the XCM (xenocanto) dataset."""
+    
+    def __init__(self,
+                 n_workers: int = 3,
+                 val_split: float = 0.2,
+                 task: str = "multilabel",
+                 sampling_rate: int = 32000):
+        """Initializes the XCMDataModule.
+        
+        
+        Args:
+            n_workers (int, optional): The number of worker processes used for data loading. Defaults to 3.
+            val_split (float, optional): The proportion of the dataset reserved for validation. Defaults to 0.2.
+            task (str, optional): Defines the type of task (e.g., 'multilabel' or 'multiclass'). Defaults to "multilabel".
+            sampling_rate (int, optional): The sampling rate for audio data processing. Defaults to 32000.
+        """
+        
+        super().__init__(
+            DatasetConfig=DatasetConfig(dataset_name='XCM',
+                                        hf_path='DBD-research-group/gadme',
+                                        hf_name='XCM',
+                                        n_classes=409,
+                                        n_workers=n_workers,
+                                        val_split=val_split,
+                                        task=task,
+                                        classlimit=500,
+                                        eventlimit=5,
+                                        sampling_rate=sampling_rate))
+        
+        
+class XCLDataModule(GADMEDataModule):
+    """A GADMEDataModule for the XCL (xenocanto) dataset."""
+    
+    def __init__(self,
+                 n_workers: int = 3,
+                 val_split: float = 0.2,
+                 task: str = "multilabel",
+                 sampling_rate: int = 32000):
+        """Initializes the XCLDataModule.
+        
+        
+        Args:
+            n_workers (int, optional): The number of worker processes used for data loading. Defaults to 3.
+            val_split (float, optional): The proportion of the dataset reserved for validation. Defaults to 0.2.
+            task (str, optional): Defines the type of task (e.g., 'multilabel' or 'multiclass'). Defaults to "multilabel".
+            sampling_rate (int, optional): The sampling rate for audio data processing. Defaults to 32000.
+        """
+        
+        super().__init__(
+            DatasetConfig=DatasetConfig(dataset_name='XCL',
+                                        hf_path='DBD-research-group/gadme',
+                                        hf_name='XCL',
+                                        n_classes=9734,
+                                        n_workers=n_workers,
+                                        val_split=val_split,
+                                        task=task,
+                                        classlimit=500,
+                                        eventlimit=5,
+                                        sampling_rate=sampling_rate))
+        
+        
+# TODO UHH (hawaiian_islands) has strange number of classes. prob 25 tr, 27 te stands for training and test classes. But if so, the parameters here cannot be used?
