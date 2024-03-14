@@ -151,6 +151,11 @@ class BaseDataModuleHF(L.LightningDataModule):
         self.train_label_list = None
         self.disk_save_path = None
 
+        # Make some config parameters accessible
+        self.task = self.dataset_config.task
+        self.train_batch_size = self.loaders_config.train.batch_size
+        
+
     @property
     def num_classes(self):
         return self.dataset_config.n_classes

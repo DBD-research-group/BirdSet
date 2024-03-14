@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
 from functools import partial
 from typing import Callable, Dict, Literal, Type
 
@@ -17,9 +17,9 @@ import lightning as L
 import torch.nn as nn
 from torch.nn import BCEWithLogitsLoss
 from torch.nn.modules.loss import _Loss
-from torch.optim import AdamW, Optimizer
+from torch.optim import AdamW, Optimizer, lr_scheduler 
 from transformers import get_cosine_schedule_with_warmup
-from torchmetrics import AUROC, Metric, MaxMetric
+from torchmetrics import AUROC, Metric, MaxMetric, MetricCollection
 
 @dataclass
 class NetworkConfig:
@@ -37,16 +37,19 @@ class NetworkConfig:
     normalize_spectrogram: bool = True
 
 
-@dataclass
-class LRSchedulerExtrasConfig:
-    interval: str = "step"
-    warmup_ratio: float = 0.5
+# @dataclass
+# class LRSchedulerExtrasConfig:
+#     interval: str = "step"
+#     warmup_ratio: float = 0.5
 
 
 @dataclass
 class LRSchedulerConfig:
-    scheduler = get_cosine_schedule_with_warmup
-    extras = LRSchedulerExtrasConfig()
+    scheduler: partial[Type[lr_scheduler.LRScheduler]] = partial(
+        lr_scheduler.LambdaLR,
+        lr_lambda=lambda epoch: epoch // 30
+    )
+    # extras = LRSchedulerExtrasConfig()
 
 
 @dataclass
@@ -56,7 +59,7 @@ class MetricsConfig:
         thresholds = None
     )
     val_metric_best: Metric = MaxMetric()
-    add_metrics: Dict[str, Metric] = field(default_factory=lambda: {
+    add_metrics: MetricCollection = MetricCollection({
         'MultlabelAUROC': AUROC(
             task="multilabel",
             num_labels=21,
@@ -65,7 +68,7 @@ class MetricsConfig:
         )
         # TODO: more default metrics
     })
-    eval_complete: Dict[str, Metric] = field(default_factory=lambda: {
+    eval_complete: MetricCollection = MetricCollection({
         'cmAP5': cmAP5(
             num_labels=21,
             sample_threshold=5,
@@ -104,7 +107,7 @@ class BaseModule(L.LightningModule):
             metrics: MetricsConfig = MetricsConfig(),
             logging_params: LoggingParamsConfig = LoggingParamsConfig(),
             num_epochs: int = 50,
-            len_trainset: int = 23000,
+            len_trainset: int = 13878, # set to property from datamodule
             batch_size: int = 32,
             task: Literal['multiclass', 'multilabel'] = "multilabel",
             class_weights_loss: Optional[bool] = None,
@@ -133,20 +136,17 @@ class BaseModule(L.LightningModule):
 
         self.model = self.network.model
 
-
+        # configure main metric
         self.train_metric = self.metrics.main_metric.clone()
-        # self.train_add_metrics = self.metrics["add_metrics"].clone(prefix="train/")
-
         self.valid_metric = self.metrics.main_metric.clone()
-        self.valid_metric_best = self.metrics.val_metric_best.clone()
-        self.valid_add_metrics = {"val/" + k: v for k, v in self.metrics.add_metrics.items()}
-        self.test_add_metrics = {"test/" + k: v for k, v in self.metrics.add_metrics.items()}
-        # self.valid_add_metrics = self.metrics.add_metrics.clone(prefix="val/")
-
         self.test_metric = self.metrics.main_metric.clone()
-        # self.test_add_metrics = self.metrics.add_metrics.clone(prefix="test/")
-        # self.test_complete_metrics = self.metrics.eval_complete.clone(prefix="test/")
-        self.test_complete_metrics = {"test/" + k: v for k, v in self.metrics.eval_complete.items()}
+        # configure val_best metric
+        self.valid_metric_best = self.metrics.val_metric_best.clone()
+        # configure additional metrics
+        self.valid_add_metrics = self.metrics.add_metrics.clone(prefix="val/")
+        self.test_add_metrics = self.metrics.add_metrics.clone(prefix="test/")
+        # configure eval_complete metrics
+        self.test_complete_metrics = self.metrics.eval_complete.clone(prefix="test/")
 
         self.torch_compile = network.torch_compile
         self.model_name = network.model_name
@@ -178,8 +178,8 @@ class BaseModule(L.LightningModule):
             # TODO: check if lr_scheduler can be called like this
             scheduler = self.lr_scheduler.scheduler(
                 optimizer=self.optimizer,
-                num_warmup_steps=math.ceil(num_training_steps * self.lr_scheduler.extras.warmup_ratio),
-                num_training_steps=num_training_steps
+                # num_warmup_steps=math.ceil(num_training_steps * self.lr_scheduler.extras.warmup_ratio),
+                # num_training_steps=num_training_steps
             )
             # is_linear_warmup = scheduler_target == "transformers.get_linear_schedule_with_warmup"
             # is_cosine_warmup = scheduler_target == "transformers.get_cosine_schedule_with_warmup"
@@ -206,9 +206,9 @@ class BaseModule(L.LightningModule):
             # scheduler = hydra.utils.instantiate(self.lrs_params.scheduler, **scheduler_args)
             lr_scheduler_dict = {"scheduler": scheduler}
 
-            if self.lr_scheduler.extras is not None and len(self.lr_scheduler.extras) > 0:
-                for key, value in self.lr_scheduler.extras.items():
-                    lr_scheduler_dict[key] = value
+            # if self.lr_scheduler.extras is not None and len(self.lr_scheduler.extras) > 0:
+            #     for key, value in self.lr_scheduler.extras.items():
+            #         lr_scheduler_dict[key] = value
 
             return {"optimizer": self.optimizer, "lr_scheduler": lr_scheduler_dict}
 
@@ -239,7 +239,7 @@ class BaseModule(L.LightningModule):
         self.log(
             f"train/{self.train_metric.__class__.__name__}",
             self.train_metric,
-            **self.logging_params
+            **asdict(self.logging_param)
         )
 
         # self.train_add_metrics(preds, targets)
@@ -262,11 +262,11 @@ class BaseModule(L.LightningModule):
         self.log(
             f"val/{self.valid_metric.__class__.__name__}",
             self.valid_metric,
-            **self.logging_params,
+            **asdict(self.logging_params),
         )
 
-        self.valid_add_metrics(preds, targets.int())
-        self.log_dict(self.valid_add_metrics, **self.logging_params)
+        # self.valid_add_metrics(preds, targets.int())
+        self.log_dict(self.valid_add_metrics, **asdict(self.logging_params))
         return {"loss": val_loss, "preds": preds, "targets": targets}
 
     def on_validation_epoch_end(self):
@@ -293,7 +293,7 @@ class BaseModule(L.LightningModule):
         self.log(
             f"test/{self.test_metric.__class__.__name__}",
             self.test_metric,
-            **self.logging_params,
+            **asdict(self.logging_params),
         )
 
         self.test_add_metrics(preds, targets.int())
