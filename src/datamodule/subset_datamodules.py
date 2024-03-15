@@ -8,7 +8,7 @@ class HSNDataModule(GADMEDataModule):
     """A GADMEDataModule for the HSN (high_sierras) dataset."""
 
     def __init__(self,
-                 n_workers: int = 3,
+                 n_workers: int = 1,
                  val_split: float = 0.2,
                  task: str = "multilabel",
                  sampling_rate: int = 32000,
@@ -42,7 +42,7 @@ class NBPDataModule(GADMEDataModule):
     """A GADMEDataModule for the NBP (nips) dataset."""
 
     def __init__(self,
-                 n_workers: int = 3,
+                 n_workers: int = 1,
                  val_split: float = 0.2,
                  task: str = "multilabel",
                  sampling_rate: int = 32000,
@@ -77,7 +77,7 @@ class NESDataModule(GADMEDataModule):
     """A GADMEDataModule for the NES (columbia_costa_rica) dataset."""
 
     def __init__(self,
-                 n_workers: int = 3,
+                 n_workers: int = 1,
                  val_split: float = 0.2,
                  task: str = "multilabel",
                  sampling_rate: int = 32000,
@@ -112,7 +112,7 @@ class PERDataModule(GADMEDataModule):
     """A GADMEDataModule for the PER (amazon_basin) dataset."""
 
     def __init__(self,
-                 n_workers: int = 3,
+                 n_workers: int = 1,
                  val_split: float = 0.2,
                  task: str = "multilabel",
                  sampling_rate: int = 32000,
@@ -147,7 +147,7 @@ class POWDataModule(GADMEDataModule):
     """A GADMEDataModule for the POW (powdermill_nature) dataset."""
 
     def __init__(self,
-                 n_workers: int = 3,
+                 n_workers: int = 1,
                  val_split: float = 0.2,
                  task: str = "multilabel",
                  sampling_rate: int = 32000,
@@ -182,7 +182,7 @@ class SNEDataModule(GADMEDataModule):
     """A GADMEDataModule for the SNE (sierra_nevada) dataset."""
 
     def __init__(self,
-                 n_workers: int = 3,
+                 n_workers: int = 1,
                  val_split: float = 0.2,
                  task: str = "multilabel",
                  sampling_rate: int = 32000,
@@ -217,7 +217,7 @@ class SSWDataModule(GADMEDataModule):
     """A GADMEDataModule for the SSW (sapsucker_woods) dataset."""
 
     def __init__(self,
-                 n_workers: int = 3,
+                 n_workers: int = 1,
                  val_split: float = 0.2,
                  task: str = "multilabel",
                  sampling_rate: int = 32000,
@@ -253,7 +253,7 @@ class XCMDataModule(GADMEDataModule):
 
     def __init__(self,
                  n_workers: int = 3,
-                 val_split: float = 0.2,
+                 val_split: float = 0.05,
                  task: str = "multilabel",
                  sampling_rate: int = 32000,
                  classlimit: int = 500,
@@ -287,8 +287,8 @@ class XCLDataModule(GADMEDataModule):
     """A GADMEDataModule for the XCL (xenocanto) dataset."""
 
     def __init__(self,
-                 n_workers: int = 3,
-                 val_split: float = 0.2,
+                 n_workers: int = 1,
+                 val_split: float = 0.05,
                  task: str = "multilabel",
                  sampling_rate: int = 32000,
                  classlimit: int = 500,
@@ -322,7 +322,7 @@ class UHHDataModule(GADMEDataModule):
     """A GADMEDataModule for the UHH (hawaiian_islands) dataset."""
 
     def __init__(self,
-                 n_workers: int = 3,
+                 n_workers: int = 1,
                  val_split: float = 0.2,
                  task: str = "multilabel",
                  sampling_rate: int = 32000,
@@ -344,7 +344,7 @@ class UHHDataModule(GADMEDataModule):
             DatasetConfig=DatasetConfig(dataset_name='UHH',
                                         hf_path='DBD-research-group/gadme',
                                         hf_name='UHH',
-                                        n_classes=25, # TODO UHH (hawaiian_islands) has a strange number of classes. "25 tr, 27 te" probably stands for training and test classes. But if so, what to use here?
+                                        n_classes=25, # TODO UHH (hawaiian_islands) has a strange number of classes. "25 tr, 27 te" probably stands for training and test classes. But if so, what to use here? Config said 27 classes.
                                         n_workers=n_workers,
                                         val_split=val_split,
                                         task=task,
