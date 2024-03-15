@@ -318,4 +318,37 @@ class XCLDataModule(GADMEDataModule):
                                         sampling_rate=sampling_rate))
 
 
-# TODO UHH (hawaiian_islands) has strange number of classes. prob 25 tr, 27 te stands for training and test classes. But if so, the parameters here cannot be used?
+class UHUDataModule(GADMEDataModule):
+    """A GADMEDataModule for the UHU (hawaiian_islands) dataset."""
+
+    def __init__(self,
+                 n_workers: int = 3,
+                 val_split: float = 0.2,
+                 task: str = "multilabel",
+                 sampling_rate: int = 32000,
+                 classlimit: int = 500,
+                 eventlimit: int = 5):
+        """Initializes the UHUDataModule.
+        
+        
+        Args:
+            n_workers (int, optional): The number of worker processes used for data loading. Defaults to 3.
+            val_split (float, optional): The proportion of the dataset reserved for validation. Defaults to 0.2.
+            task (str, optional): Defines the type of task (e.g., 'multilabel' or 'multiclass'). Defaults to "multilabel".
+            sampling_rate (int, optional): The sampling rate for audio data processing. Defaults to 32000.
+            classlimit (int, optional): The maximum number of samples per class. If None, all samples are used. Defaults to 500.
+            eventlimit (int, optional): Defines the maximum number of audio events processed per audio file, capping the quantity to ensure balance across files. If None, all events are processed. Defaults to 5.
+        """
+
+        super().__init__(
+            DatasetConfig=DatasetConfig(dataset_name='UHU',
+                                        hf_path='DBD-research-group/gadme',
+                                        hf_name='UHU',
+                                        n_classes=25, # TODO UHH (hawaiian_islands) has a strange number of classes. "25 tr, 27 te" probably stands for training and test classes. But if so, what to use here?
+                                        n_workers=n_workers,
+                                        val_split=val_split,
+                                        task=task,
+                                        classlimit=classlimit,
+                                        eventlimit=eventlimit,
+                                        sampling_rate=sampling_rate))
+
