@@ -1,4 +1,6 @@
 #UHH hawaiian islands
+_target_: src.datamodule.subset_datamodules.UHHDataModule
+
 defaults: 
   - _self_
   - transforms: bird_default.yaml
@@ -7,17 +9,7 @@ defaults:
 
 dataset:
   data_dir: ${paths.dataset_path}
-  dataset_name: UHH
-  hf_path: DBD-research-group/gadme
-  hf_name: UHH
   seed: ${seed}
-  n_classes: 27
-  n_workers: 3
-  val_split: 0.2
-  task: ${module.task}
   subset: null
-  sampling_rate: ${module.network.sampling_rate}
   class_weights_loss: null
   class_weights_sampler: null
-  classlimit: 500
-  eventlimit: 5

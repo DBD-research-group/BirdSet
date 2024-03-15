@@ -318,8 +318,8 @@ class XCLDataModule(GADMEDataModule):
                                         sampling_rate=sampling_rate))
 
 
-class UHUDataModule(GADMEDataModule):
-    """A GADMEDataModule for the UHU (hawaiian_islands) dataset."""
+class UHHDataModule(GADMEDataModule):
+    """A GADMEDataModule for the UHH (hawaiian_islands) dataset."""
 
     def __init__(self,
                  n_workers: int = 3,
@@ -341,9 +341,9 @@ class UHUDataModule(GADMEDataModule):
         """
 
         super().__init__(
-            DatasetConfig=DatasetConfig(dataset_name='UHU',
+            DatasetConfig=DatasetConfig(dataset_name='UHH',
                                         hf_path='DBD-research-group/gadme',
-                                        hf_name='UHU',
+                                        hf_name='UHH',
                                         n_classes=25, # TODO UHH (hawaiian_islands) has a strange number of classes. "25 tr, 27 te" probably stands for training and test classes. But if so, what to use here?
                                         n_workers=n_workers,
                                         val_split=val_split,
