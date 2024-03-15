@@ -14,7 +14,7 @@ dataset:
   hf_name: SSW
   seed: ${seed}
   n_classes: 81
-  n_workers: 3
+  n_workers: 1
   val_split: 0.2
   task: ${module.task}
   subset: null
