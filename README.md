@@ -1,5 +1,8 @@
 # GADME
 
+## Results
+| <sub>Title</sub> | <sub>Notes</sub> | <sub>Accuracy</sub> | <sub>Paper</sub> | <sub>Code</sub> |
+| :--- | :--- | :--- | :--- | :--- |
 
 ## Setup
 
@@ -58,9 +61,7 @@ Our experiments are defined in the `configs/experiment` folder. To run an experi
 python src/main.py experiment=EXPERIMENT_NAME
 ```
 
-##Results
-| <sub>Title</sub> | <sub>Notes</sub> | <sub>Accuracy</sub> | <sub>Paper</sub> | <sub>Code</sub> |
-| :--- | :--- | :--- | :--- | :--- |
+
 
 ## Project structure
 
