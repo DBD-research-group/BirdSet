@@ -27,7 +27,7 @@ class BirdSetDataModule(BaseDataModuleHF):
         self,
         dataset: DatasetConfig = DatasetConfig(
             dataset_name='HSN',
-            hf_path='DBD-research-group/birdset',
+            hf_path='DBD-research-group/BirdSet',
             hf_name='HSN',
             n_classes=21,
             n_workers=3,

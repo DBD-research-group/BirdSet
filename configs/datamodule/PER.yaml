@@ -10,7 +10,7 @@ defaults:
 dataset:
   data_dir: ${paths.dataset_path}
   dataset_name: PER
-  hf_path: DBD-research-group/birdset
+  hf_path: DBD-research-group/BirdSet
   hf_name: PER
   seed: ${seed}
   n_classes: 132
