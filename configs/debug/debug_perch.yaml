@@ -32,7 +32,7 @@ module:
   network:
     train_classifier: False
     restrict_logits: True
-    dataset_info_path: /home/lrauch/projects/GADME/data_gadme/HSN/HSN_processed_2_14993c47380e9f0f/train/dataset_info.json
+    dataset_info_path: /home/lrauch/projects/BirdSet/data_birdset/HSN/HSN_processed_2_14993c47380e9f0f/train/dataset_info.json
     
 trainer: 
   max_epochs: 1

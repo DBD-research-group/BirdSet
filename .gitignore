@@ -9,7 +9,7 @@ wandb/
 *.WAV
 *.csv
 *.json
-output_gadme/
+output_birdset/
 *.hydra
 
 data/*
@@ -18,9 +18,9 @@ logs/*
 
 output/*
 
-data_gadme/*
+data_birdset/*
 
-gadme/output/*
+birdset/output/*
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

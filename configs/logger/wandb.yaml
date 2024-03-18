@@ -4,7 +4,7 @@ wandb:
   save_dir: "${paths.log_dir}"
   mode: offline
   id: null # pass correct id to resume experiment!
-  project: "gadme"
+  project: "birdset"
   log_model: False # upload lightning ckpts
   entity: "deepbirddetect" 
   group: ""

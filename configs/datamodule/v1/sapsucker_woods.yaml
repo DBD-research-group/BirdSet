@@ -1,5 +1,5 @@
 #SSW
-_target_: gadme.datamodule.gadme_datamodule.GADMEDataModule
+_target_: birdset.datamodule.birdset_datamodule.BirdSetDataModule
 
 defaults:
   - _self_
@@ -10,7 +10,7 @@ defaults:
 dataset:
   data_dir: ${paths.dataset_path}
   dataset_name: sapsucker_woods
-  hf_path: DBD-research-group/gadme_v1_1
+  hf_path: DBD-research-group/birdset_v1_1
   hf_name: sapsucker_woods
   seed: ${seed}
   n_classes: 82

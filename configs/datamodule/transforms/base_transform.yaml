@@ -1,4 +1,4 @@
-_target_: gadme.datamodule.components.transforms.BaseTransforms
+_target_: birdset.datamodule.components.transforms.BaseTransforms
 sampling_rate: ${module.network.sampling_rate}
 task: ${datamodule.dataset.task}
 max_length: 5 # Attention: this might not work with any model!! -> You must specify it or set to 5s as its done in code

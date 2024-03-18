@@ -1,5 +1,5 @@
 model:
-  _target_: gadme.modules.models.ast.ASTSequenceClassifier
+  _target_: birdset.modules.models.ast.ASTSequenceClassifier
   checkpoint: MIT/ast-finetuned-audioset-10-10-0.4593
   local_checkpoint: null
   num_classes: ${datamodule.dataset.n_classes}

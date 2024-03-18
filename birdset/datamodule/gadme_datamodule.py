@@ -1,21 +1,21 @@
 from birdset import utils
-from birdset.datamodule.components.transforms import GADMETransformsWrapper
+from birdset.datamodule.components.transforms import BirdSetTransformsWrapper
 from birdset.datamodule.components.event_mapping import XCEventMapping
 from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
 from datasets import DatasetDict
 
 log = utils.get_pylogger(__name__)
 
-class GADMEDataModule(BaseDataModuleHF):
+class BirdSetDataModule(BaseDataModuleHF):
     """
-    A data module for the GADME dataset.
+    A data module for the BirdSet dataset.
 
-    This class handles the loading, preprocessing, and transformation of the GADME dataset. It extends the BaseDataModuleHF class.
+    This class handles the loading, preprocessing, and transformation of the BirdSet dataset. It extends the BaseDataModuleHF class.
 
     Attributes:
         dataset (DatasetConfig): The configuration for the dataset.
         loaders (LoadersConfig): The configuration for the loaders.
-        transforms (GADMETransformsWrapper): The transforms to be applied to the data.
+        transforms (BirdSetTransformsWrapper): The transforms to be applied to the data.
         mapper (XCEventMapping): The mapping for the events.
 
     Methods:
@@ -27,7 +27,7 @@ class GADMEDataModule(BaseDataModuleHF):
         self,
         dataset: DatasetConfig = DatasetConfig(
             dataset_name='HSN',
-            hf_path='DBD-research-group/gadme',
+            hf_path='DBD-research-group/birdset',
             hf_name='HSN',
             n_classes=21,
             n_workers=3,
@@ -38,7 +38,7 @@ class GADMEDataModule(BaseDataModuleHF):
             sampling_rate=32000,
         ),
         loaders: LoadersConfig = LoadersConfig(),
-        transforms: GADMETransformsWrapper = GADMETransformsWrapper(),
+        transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
         mapper: XCEventMapping = XCEventMapping()
     ):
         """
@@ -50,7 +50,7 @@ class GADMEDataModule(BaseDataModuleHF):
         Args:
             dataset (DatasetConfig, optional): The configuration for the dataset. Defaults to a DatasetConfig with specific values.
             loaders (LoadersConfig, optional): The configuration for the loaders. Defaults to an empty LoadersConfig.
-            transforms (GADMETransformsWrapper, optional): The transforms to be applied to the data. Defaults to an empty GADMETransformsWrapper.
+            transforms (BirdSetTransformsWrapper, optional): The transforms to be applied to the data. Defaults to an empty BirdSetTransformsWrapper.
             mapper (XCEventMapping, optional): The mapping for the events. Defaults to an empty XCEventMapping.
 
         Returns:

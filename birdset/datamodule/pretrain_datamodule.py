@@ -1,6 +1,6 @@
 from collections import Counter
 from birdset.datamodule.components.event_decoding import EventDecoding
-from birdset.datamodule.components.transforms import GADMETransformsWrapper
+from birdset.datamodule.components.transforms import BirdSetTransformsWrapper
 from birdset.datamodule.components.event_mapping import XCEventMapping
 from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
 from datasets import DatasetDict, Dataset
@@ -14,7 +14,7 @@ class PretrainDataModule(BaseDataModuleHF):
             self,
             dataset: DatasetConfig = DatasetConfig(),
             loaders: LoadersConfig = LoadersConfig(),
-            transforms: GADMETransformsWrapper = GADMETransformsWrapper(),
+            transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
             mapper: XCEventMapping = XCEventMapping()
     ):
         super().__init__(

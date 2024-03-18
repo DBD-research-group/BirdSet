@@ -17,12 +17,12 @@ module:
   optimizer:
     lr: 1e-5
   loss:
-    _target_: gadme.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
+    _target_: birdset.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
     #_target_: torch.nn.BCEWithLogitsLoss 
-  #_target_: gadme.modules.losses.focal_loss.MultiLabelFocalLoss
+  #_target_: birdset.modules.losses.focal_loss.MultiLabelFocalLoss
   network: 
     model:
-      checkpoint: /home/lrauch/projects/GADME/gadme/output/train/runs/xenocanto_m_withoutnd/eat/2024-01-24_135830/last_ckpt.path  
+      checkpoint: /home/lrauch/projects/BirdSet/birdset/output/train/runs/xenocanto_m_withoutnd/eat/2024-01-24_135830/last_ckpt.path  
 
 trainer:
   min_epochs: 1

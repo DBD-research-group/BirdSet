@@ -1,2 +1,2 @@
 time_tracking:
-  _target_: gadme.callbacks.TimeCallback
+  _target_: birdset.callbacks.TimeCallback

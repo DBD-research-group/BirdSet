@@ -1,4 +1,4 @@
-_target_: gadme.modules.multilabel_module.MultilabelModule
+_target_: birdset.modules.multilabel_module.MultilabelModule
 
 defaults:
   - _self_
@@ -17,9 +17,9 @@ optimizer:
   
 
 loss:
-  #_target_: gadme.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
+  #_target_: birdset.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
   _target_: torch.nn.BCEWithLogitsLoss
-  #_target_: gadme.modules.losses.focal_loss.MultiLabelFocalLoss
+  #_target_: birdset.modules.losses.focal_loss.MultiLabelFocalLoss
   
 # lr_scheduler:
 #   scheduler:
@@ -33,7 +33,7 @@ loss:
 
 # metrics:
 #   main_metric: 
-#     _target_: gadme.modules.metrics.cmAP
+#     _target_: birdset.modules.metrics.cmAP
 #     num_labels: ${datamodule.dataset.n_classes}
 #     thresholds: null
 #   val_metric_best: 
@@ -49,12 +49,12 @@ loss:
 #   eval_complete:
 #     _target_: "torchmetrics.MetricCollection"
 #     metrics:
-#       - _target_: gadme.modules.metrics.pcmAP
+#       - _target_: birdset.modules.metrics.pcmAP
 #         num_labels: ${datamodule.dataset.n_classes}
 #         padding_factor: 5
 #         average: macro
 #         thresholds: null
-#       - _target_: gadme.modules.metrics.cmAP5
+#       - _target_: birdset.modules.metrics.cmAP5
 #         num_labels: ${datamodule.dataset.n_classes}
 #         sample_threshold: 5
 #         thresholds: null
@@ -64,7 +64,7 @@ output_activation:
   _partial_: true
 
 logging_params:
-  _target_: gadme.modules.base_module.LoggingParamsConfig 
+  _target_: birdset.modules.base_module.LoggingParamsConfig 
   on_step: False
   on_epoch: True
   sync_dist: False

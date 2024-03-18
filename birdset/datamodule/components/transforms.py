@@ -180,7 +180,7 @@ class BaseTransforms:
 
         return batch
 
-class GADMETransformsWrapper(BaseTransforms):
+class BirdSetTransformsWrapper(BaseTransforms):
     """
     A class to handle audio transformations for different model types and modes.
 

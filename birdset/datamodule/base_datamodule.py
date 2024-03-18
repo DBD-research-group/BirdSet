@@ -15,7 +15,7 @@ import hydra
 from datasets import load_dataset, load_from_disk, Audio, DatasetDict, Dataset, IterableDataset, IterableDatasetDict
 from torch.utils.data import DataLoader
 from birdset.datamodule.components.event_mapping import XCEventMapping
-from birdset.datamodule.components.transforms import GADMETransformsWrapper
+from birdset.datamodule.components.transforms import BirdSetTransformsWrapper
 
 @dataclass
 class DatasetConfig:
@@ -55,7 +55,7 @@ class DatasetConfig:
     eventlimit : int, optional
         Defines the maximum number of audio events processed per audio file, capping the quantity to ensure balance across files. If None, all events are processed.
     """
-    data_dir: str = "/workspace/data_gadme"
+    data_dir: str = "/workspace/data_birdset"
     dataset_name: str = "esc50"
     hf_path: str = "ashraq/esc50"
     hf_name: str = ""
@@ -115,7 +115,7 @@ class BaseDataModuleHF(L.LightningDataModule):
     Attributes:
         dataset (DatasetConfig): Configuration for the dataset. Defaults to an instance of `DatasetConfig`.
         loaders (LoadersConfig): Configuration for the data loaders. Defaults to an instance of `LoadersConfig`.
-        transforms (GADMETransformsWrapper): Configuration for the data transformations. Defaults to an instance of `GADMETransformsWrapper`.
+        transforms (BirdSetTransformsWrapper): Configuration for the data transformations. Defaults to an instance of `BirdSetTransformsWrapper`.
         extractors (DefaultFeatureExtractor): Configuration for the feature extraction. Defaults to an instance of `DefaultFeatureExtractor`.
 
     Methods:
@@ -132,7 +132,7 @@ class BaseDataModuleHF(L.LightningDataModule):
         mapper: XCEventMapping | None = None,
         dataset: DatasetConfig = DatasetConfig(),
         loaders: LoadersConfig = LoadersConfig(),
-        transforms: GADMETransformsWrapper = GADMETransformsWrapper(),
+        transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
         ):
         super().__init__()
         self.dataset_config = dataset

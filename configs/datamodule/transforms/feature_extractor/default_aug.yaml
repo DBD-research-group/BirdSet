@@ -1,4 +1,4 @@
-_target_: gadme.datamodule.components.DefaultFeatureExtractor
+_target_: birdset.datamodule.components.DefaultFeatureExtractor
 feature_size: 1
 sampling_rate: ${module.network.sampling_rate}
 padding_value: 0.0

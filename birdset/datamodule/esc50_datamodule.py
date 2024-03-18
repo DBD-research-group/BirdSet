@@ -1,5 +1,5 @@
 from datasets import Audio
-from birdset.datamodule.components.transforms import GADMETransformsWrapper
+from birdset.datamodule.components.transforms import BirdSetTransformsWrapper
 from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
 from datasets import load_dataset, Audio
 
@@ -8,7 +8,7 @@ class ESC50DataModule(BaseDataModuleHF):
             self,
             dataset: DatasetConfig = DatasetConfig(),
             loaders: LoadersConfig = LoadersConfig(),
-            transforms: GADMETransformsWrapper = GADMETransformsWrapper(),
+            transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
             mapper: None = None
     ):
         super().__init__(
