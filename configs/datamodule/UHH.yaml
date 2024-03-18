@@ -1,4 +1,6 @@
 #UHH hawaiian islands
+_target_: src.datamodule.gadme_datamodule.GADMEDataModule
+
 defaults: 
   - _self_
   - transforms: bird_default.yaml
@@ -12,7 +14,7 @@ dataset:
   hf_name: UHH
   seed: ${seed}
   n_classes: 27
-  n_workers: 3
+  n_workers: 1
   val_split: 0.2
   task: ${module.task}
   subset: null

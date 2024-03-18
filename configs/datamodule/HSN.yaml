@@ -17,7 +17,7 @@ dataset:
   #   _target_: transformers.AutoFeatureExtractor.from_pretrained
   #   pretrained_model_name_or_path: ${module.network.model.checkpoint}
   n_classes: 21
-  n_workers: 3
+  n_workers: 1
   val_split: 0.2
   task: ${module.task}
   subset: null

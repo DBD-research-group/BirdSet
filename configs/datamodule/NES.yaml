@@ -14,7 +14,7 @@ dataset:
   hf_name: NES
   seed: ${seed}
   n_classes: 89
-  n_workers: 3
+  n_workers: 1
   val_split: 0.2
   task: ${module.task}
   subset: null
