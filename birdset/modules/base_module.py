@@ -21,6 +21,18 @@ from torchmetrics import AUROC, Metric, MaxMetric, MetricCollection
 
 @dataclass
 class NetworkConfig:
+    """
+    A dataclass for configuring a neural network model for training.
+
+    Attributes:
+        model (nn.Module): The model to be used for training. Defaults to an instance of `EfficientNetClassifier`.
+        model_name (str): The name of the model. Defaults to "efficientnet".
+        model_type (Literal['vision', 'waveform']): The type of the model, can be either 'vision' or 'waveform'. Defaults to "vision".
+        torch_compile (bool): Whether to compile the model using TorchScript. Defaults to False.
+        sample_rate (int): The sample rate for audio data. Defaults to 32000.
+        normalize_waveform (bool): Whether to normalize the waveform data. Defaults to False.
+        normalize_spectrogram (bool): Whether to normalize the spectrogram data. Defaults to True.
+    """
     model: nn.Module = EfficientNetClassifier(
         architecture="efficientnet_b1",
         num_classes=21,
@@ -52,6 +64,17 @@ class LRSchedulerConfig:
 
 @dataclass
 class MetricsConfig:
+    """
+    A dataclass for configuring the metrics used during model training and evaluation.
+
+    Attributes:
+        main_metric (Metric): The main metric used for model training. Defaults to an instance of `cmAP`.
+        val_metric_best (Metric): The metric used for model validation. Defaults to an instance of `MaxMetric`.
+        add_metrics (MetricCollection): A collection of additional metrics used during model training. 
+            Defaults to a `MetricCollection` with 'MultilabelAUROC', 'T1Accuracy', 'T3Accuracy', and 'mAP'.
+        eval_complete (MetricCollection): A collection of metrics used during model evaluation. 
+            Defaults to a `MetricCollection` with 'cmAP5' and 'pcmAP'.
+    """
     main_metric: Metric = cmAP(
         num_labels = 21,
         thresholds = None
@@ -88,6 +111,15 @@ class MetricsConfig:
 
 @dataclass
 class LoggingParamsConfig:
+    """
+    A dataclass for configuring the logging parameters during model training.
+
+    Attributes:
+        on_step (bool): Whether to log metrics after each training step. Defaults to False.
+        on_epoch (bool): Whether to log metrics after each epoch. Defaults to True.
+        sync_dist (bool): Whether to synchronize the logging in a distributed setting. Defaults to False.
+        prog_bar (bool): Whether to display a progress bar during training. Defaults to True.
+    """
     on_step: bool = False
     on_epoch: bool = True
     sync_dist: bool = False
@@ -97,6 +129,25 @@ class LoggingParamsConfig:
 
 
 class BaseModule(L.LightningModule):
+    """
+    BaseModule is a PyTorch Lightning module that serves as a base for all models.
+
+    Attributes:
+        network (NetworkConfig): Configuration for the network.
+        output_activation (Callable): The output activation function.
+        loss (_Loss): The loss function.
+        optimizer (partial): The optimizer function to be initalized in configure_optimizers.
+        lr_scheduler (LRSchedulerConfig, optional): The learning rate scheduler configuration.
+        metrics (MetricsConfig): The metrics configuration.
+        logging_params (LoggingParamsConfig): The logging parameters configuration.
+        num_epochs (int): The number of epochs for training.
+        len_trainset (int): The length of the training set.
+        batch_size (int): The batch size for training.
+        task (str): The task type, can be either 'multiclass' or 'multilabel'.
+        class_weights_loss (bool, optional): Whether to use class weights for the loss function.
+        label_counts (int): The number of labels.
+        num_gpus (int): The number of GPUs to use for training.
+    """
     def __init__(
             self,
             network: NetworkConfig = NetworkConfig(),
