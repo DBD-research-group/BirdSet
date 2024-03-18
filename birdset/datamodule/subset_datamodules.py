@@ -1,3 +1,4 @@
+from birdset.datamodule.base_datamodule import DatasetConfig
 from .birdset_datamodule import BirdSetDataModule
 
 HF_PATH = 'DBD-research-group/BirdSet'
