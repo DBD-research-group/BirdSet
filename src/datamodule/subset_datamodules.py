@@ -3,6 +3,7 @@ from src.datamodule.components.event_mapping import XCEventMapping
 from src.datamodule.components.transforms import GADMETransformsWrapper
 from .gadme_datamodule import GADMEDataModule
 
+HF_PATH = 'DBD-research-group/BirdSet'
 
 class HSNDataModule(GADMEDataModule):
     """A GADMEDataModule for the HSN (high_sierras) dataset."""
@@ -27,7 +28,7 @@ class HSNDataModule(GADMEDataModule):
 
         super().__init__(
             DatasetConfig=DatasetConfig(dataset_name='HSN',
-                                        hf_path='DBD-research-group/gadme',
+                                        hf_path=HF_PATH,
                                         hf_name='HSN',
                                         n_classes=21,
                                         n_workers=n_workers,
@@ -62,7 +63,7 @@ class NBPDataModule(GADMEDataModule):
 
         super().__init__(
             DatasetConfig=DatasetConfig(dataset_name='NBP',
-                                        hf_path='DBD-research-group/gadme',
+                                        hf_path=HF_PATH,
                                         hf_name='NBP',
                                         n_classes=51,
                                         n_workers=n_workers,
@@ -97,7 +98,7 @@ class NESDataModule(GADMEDataModule):
 
         super().__init__(
             DatasetConfig=DatasetConfig(dataset_name='NES',
-                                        hf_path='DBD-research-group/gadme',
+                                        hf_path=HF_PATH,
                                         hf_name='NES',
                                         n_classes=89,
                                         n_workers=n_workers,
@@ -132,7 +133,7 @@ class PERDataModule(GADMEDataModule):
 
         super().__init__(
             DatasetConfig=DatasetConfig(dataset_name='PER',
-                                        hf_path='DBD-research-group/gadme',
+                                        hf_path=HF_PATH,
                                         hf_name='PER',
                                         n_classes=132,
                                         n_workers=n_workers,
@@ -167,7 +168,7 @@ class POWDataModule(GADMEDataModule):
 
         super().__init__(
             DatasetConfig=DatasetConfig(dataset_name='POW',
-                                        hf_path='DBD-research-group/gadme',
+                                        hf_path=HF_PATH,
                                         hf_name='POW',
                                         n_classes=48,
                                         n_workers=n_workers,
@@ -202,7 +203,7 @@ class SNEDataModule(GADMEDataModule):
 
         super().__init__(
             DatasetConfig=DatasetConfig(dataset_name='SNE',
-                                        hf_path='DBD-research-group/gadme',
+                                        hf_path=HF_PATH,
                                         hf_name='SNE',
                                         n_classes=56,
                                         n_workers=n_workers,
@@ -237,7 +238,7 @@ class SSWDataModule(GADMEDataModule):
 
         super().__init__(
             DatasetConfig=DatasetConfig(dataset_name='SSW',
-                                        hf_path='DBD-research-group/gadme',
+                                        hf_path=HF_PATH,
                                         hf_name='SSW',
                                         n_classes=81,
                                         n_workers=n_workers,
@@ -272,7 +273,7 @@ class XCMDataModule(GADMEDataModule):
 
         super().__init__(
             DatasetConfig=DatasetConfig(dataset_name='XCM',
-                                        hf_path='DBD-research-group/gadme',
+                                        hf_path=HF_PATH,
                                         hf_name='XCM',
                                         n_classes=409,
                                         n_workers=n_workers,
@@ -307,7 +308,7 @@ class XCLDataModule(GADMEDataModule):
 
         super().__init__(
             DatasetConfig=DatasetConfig(dataset_name='XCL',
-                                        hf_path='DBD-research-group/gadme',
+                                        hf_path=HF_PATH,
                                         hf_name='XCL',
                                         n_classes=9734,
                                         n_workers=n_workers,
@@ -342,7 +343,7 @@ class UHHDataModule(GADMEDataModule):
 
         super().__init__(
             DatasetConfig=DatasetConfig(dataset_name='UHH',
-                                        hf_path='DBD-research-group/gadme',
+                                        hf_path=HF_PATH,
                                         hf_name='UHH',
                                         n_classes=25, # TODO UHH (hawaiian_islands) has a strange number of classes. "25 tr, 27 te" probably stands for training and test classes. But if so, what to use here? Config said 27 classes.
                                         n_workers=n_workers,
