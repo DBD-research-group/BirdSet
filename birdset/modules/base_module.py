@@ -2,7 +2,7 @@ from dataclasses import dataclass, field, asdict
 from functools import partial
 from typing import Callable, Dict, Literal, Type, Optional
 
-from birdset.modules.metrics.multilabel import cmAP, cmAP5, pcmAP
+from birdset.modules.metrics.multilabel import TopKAccuracy, cmAP, cmAP5, mAP, pcmAP
 from birdset.modules.models.efficientnet import EfficientNetClassifier
 import torch
 import math
@@ -64,8 +64,13 @@ class MetricsConfig:
             num_labels=21,
             average='macro',
             thresholds=None
-        )
-        # TODO: more default metrics
+        ),
+        'T1Accuracy': TopKAccuracy(topk= 1),
+        'T3Accuracy': TopKAccuracy(topk= 3),
+        'mAP': mAP(
+            num_labels= 21,
+            thresholds=None
+        )  
     })
     eval_complete: MetricCollection = MetricCollection({
         'cmAP5': cmAP5(
