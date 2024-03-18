@@ -2,7 +2,7 @@ import hydra
 from lightning import Callback
 from omegaconf import DictConfig
 from omegaconf import OmegaConf
-from gadme.utils import pylogger
+from birdset.utils import pylogger
 from pytorch_lightning.loggers import Logger
 from typing import Any, Callable, List, Optional
 

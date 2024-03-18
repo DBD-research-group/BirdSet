@@ -1,7 +1,7 @@
 from collections import Counter
-from gadme.datamodule.components.event_decoding import EventDecoding
-from gadme.datamodule.components.transforms import GADMETransformsWrapper
-from gadme.datamodule.components.event_mapping import XCEventMapping
+from birdset.datamodule.components.event_decoding import EventDecoding
+from birdset.datamodule.components.transforms import GADMETransformsWrapper
+from birdset.datamodule.components.event_mapping import XCEventMapping
 from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
 from datasets import DatasetDict, Dataset
 from datasets import load_dataset, Audio

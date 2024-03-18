@@ -1,5 +1,5 @@
 from datasets import Audio
-from gadme.datamodule.components.transforms import GADMETransformsWrapper
+from birdset.datamodule.components.transforms import GADMETransformsWrapper
 from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
 from datasets import load_dataset, Audio
 

@@ -9,7 +9,7 @@ from torchvision.models import (
     convnext_large,
 )
 
-from gadme.modules.models.efficientnet import generate_state_dict, update_first_cnn_layer
+from birdset.modules.models.efficientnet import generate_state_dict, update_first_cnn_layer
 
 
 ConvNextVersion = Literal[

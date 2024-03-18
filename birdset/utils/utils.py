@@ -6,9 +6,9 @@ from hydra.core.global_hydra import GlobalHydra
 from omegaconf import OmegaConf
 from pytorch_lightning.utilities import rank_zero_only
 from functools import wraps
-from gadme.modules.losses import load_loss
-from gadme.modules.metrics import load_metrics
-from gadme.utils import pylogger
+from birdset.modules.losses import load_loss
+from birdset.modules.metrics import load_metrics
+from birdset.utils import pylogger
 import argparse
 import sys
 

@@ -3,7 +3,7 @@ import hydra
 import lightning as L 
 from omegaconf import OmegaConf
 import json
-from gadme import utils
+from birdset import utils
 import pyrootutils 
 
 log = utils.get_pylogger(__name__)

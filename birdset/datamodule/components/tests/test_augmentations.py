@@ -3,7 +3,7 @@ import tempfile
 import torch
 import torchaudio
 
-from gadme.datamodule.components.augmentations import (
+from birdset.datamodule.components.augmentations import (
     AudioAugmentor,
     pad_spectrogram_width,
     RandomTimeStretch,

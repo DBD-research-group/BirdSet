@@ -2,13 +2,13 @@ from dataclasses import dataclass, field, asdict
 from functools import partial
 from typing import Callable, Dict, Literal, Type, Optional
 
-from gadme.modules.metrics.multilabel import cmAP, cmAP5, pcmAP
-from gadme.modules.models.efficientnet import EfficientNetClassifier
+from birdset.modules.metrics.multilabel import cmAP, cmAP5, pcmAP
+from birdset.modules.models.efficientnet import EfficientNetClassifier
 import torch
 import math
 import hydra
 
-from gadme.modules.losses import load_loss
+from birdset.modules.losses import load_loss
 import datasets
 
 import lightning as L

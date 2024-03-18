@@ -8,7 +8,7 @@ from torchvision.models import (
     mobilenet_v3_large,
 )
 
-from gadme.modules.models.efficientnet import generate_state_dict, update_first_cnn_layer
+from birdset.modules.models.efficientnet import generate_state_dict, update_first_cnn_layer
 
 
 MobileNetVersion = Literal[
