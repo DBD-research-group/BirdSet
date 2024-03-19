@@ -232,13 +232,13 @@ class BaseModule(L.LightningModule):
         self.class_mask = None
 
         # TODO: reimplement this
-        # if "pretrain_info" in network.model and network.model.pretrain_info is not None:
-        #     self.pretrain_dataset = network.model.pretrain_info["hf_pretrain_name"]
-        #     self.hf_path = network.model.pretrain_info["hf_path"]
-        #     self.hf_name = network.model.pretrain_info["hf_name"]
-        #     pretrain_info = datasets.load_dataset_builder(self.hf_path, self.pretrain_dataset).info.features["ebird_code"]
-        #     dataset_info = datasets.load_dataset_builder(self.hf_path, self.hf_name).info.features["ebird_code"]
-        #     self.class_mask = [pretrain_info.names.index(i) for i in dataset_info.names]
+        if hasattr(network.model, 'pretran_info') and network.model.pretrain_info is not None:
+            self.pretrain_dataset = network.model.pretrain_info["hf_pretrain_name"]
+            self.hf_path = network.model.pretrain_info["hf_path"]
+            self.hf_name = network.model.pretrain_info["hf_name"]
+            pretrain_info = datasets.load_dataset_builder(self.hf_path, self.pretrain_dataset).info.features["ebird_code"]
+            dataset_info = datasets.load_dataset_builder(self.hf_path, self.hf_name).info.features["ebird_code"]
+            self.class_mask = [pretrain_info.names.index(i) for i in dataset_info.names]
 
     def forward(self, *args, **kwargs):
         return self.model.forward(*args, **kwargs)
@@ -253,13 +253,13 @@ class BaseModule(L.LightningModule):
                 )
             # TODO: Handle the case when drop_last=True more explicitly   
 
-            scheduler = self.lr_scheduler.scheduler(
+            self.scheduler = self.lr_scheduler.scheduler(
                 optimizer=self.optimizer,
                 num_training_steps=num_training_steps,
                 num_warmup_steps=num_warmup_steps,
             )
 
-            return {"optimizer": self.optimizer, "lr_scheduler": lr_scheduler_dict}
+            return {"optimizer": self.optimizer, "lr_scheduler": self.scheduler}
 
         return {"optimizer": self.optimizer}
 
