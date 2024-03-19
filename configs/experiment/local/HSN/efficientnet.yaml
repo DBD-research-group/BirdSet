@@ -70,11 +70,10 @@ datamodule:
 callbacks:
   model_checkpoint:
     save_last: True
-    monitor: "val/cmAP"
     every_n_epochs: 3
   early_stopping:
     target_: lightning.pytorch.callbacks.EarlyStopping
-    monitor: "val/mAP"
+    monitor: "val/cmAP"
     patience: 4
     min_delta: 5e-2
     verbose: False
