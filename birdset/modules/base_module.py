@@ -16,7 +16,7 @@ import torch.nn as nn
 from torch.nn import BCEWithLogitsLoss
 from torch.nn.modules.loss import _Loss
 from torch.optim import AdamW, Optimizer, lr_scheduler 
-from transformers import get_cosine_schedule_with_warmup
+from transformers import get_scheduler, SchedulerType
 from torchmetrics import AUROC, Metric, MaxMetric, MetricCollection
 
 @dataclass
@@ -47,19 +47,37 @@ class NetworkConfig:
     normalize_spectrogram: bool = True
 
 
-# @dataclass
-# class LRSchedulerExtrasConfig:
-#     interval: str = "step"
-#     warmup_ratio: float = 0.5
+@dataclass
+class LRSchedulerExtrasConfig:
+    """
+    A dataclass for configuring the extras of the learning rate scheduler.
+
+    Attributes:
+        interval (str): The interval at which the scheduler performs its step. Defaults to "step".
+        warmup_ratio (float): The ratio of warmup steps to total steps. Defaults to 0.5.
+    """
+    interval: str = "step"
+    warmup_ratio: float = 0.5
 
 
 @dataclass
 class LRSchedulerConfig:
-    scheduler: partial[Type[lr_scheduler.LRScheduler]] = partial(
-        lr_scheduler.LambdaLR,
-        lr_lambda=lambda epoch: epoch // 30
+    """
+    A dataclass for configuring the learning rate scheduler.
+
+    Attributes:
+        scheduler (partial): The scheduler function. Defaults to a cosine scheduler with `num_cycles` set to 0.5 and `last_epoch` set to -1.
+        extras (LRSchedulerExtrasConfig): The extras configuration for the scheduler. Defaults to an instance of `LRSchedulerExtrasConfig`.
+    """
+    scheduler = partial(
+        get_scheduler,
+        name = "cosine",
+        scheduler_specific_kwargs = {
+            'num_cycles': 0.5,
+            'last_epoch': -1,
+        }
     )
-    # extras = LRSchedulerExtrasConfig()
+    extras: LRSchedulerExtrasConfig = LRSchedulerExtrasConfig()
 
 
 @dataclass
@@ -228,43 +246,17 @@ class BaseModule(L.LightningModule):
     def configure_optimizers(self):
         self.optimizer = self.optimizer(self.model.parameters())
         if self.lr_scheduler is not None:
+            # TODO: Handle the case when we do not want warmup
             num_training_steps = math.ceil((self.num_epochs * self.len_trainset) / self.batch_size * self.num_gpus)
+            num_warmup_steps = math.ceil(
+                    num_training_steps * self.lr_scheduler.extras.warmup_ratio
+                )
             # TODO: Handle the case when drop_last=True more explicitly   
 
-            # TODO: check if lr_scheduler can be called like this
             scheduler = self.lr_scheduler.scheduler(
                 optimizer=self.optimizer,
-                # num_warmup_steps=math.ceil(num_training_steps * self.lr_scheduler.extras.warmup_ratio),
-                # num_training_steps=num_training_steps
-            )
-            # is_linear_warmup = scheduler_target == "transformers.get_linear_schedule_with_warmup"
-            # is_cosine_warmup = scheduler_target == "transformers.get_cosine_schedule_with_warmup"
-
-            # if is_linear_warmup or is_cosine_warmup:
-
-            #     num_warmup_steps = math.ceil(
-            #         num_training_steps * self.lrs_params.extras.warmup_ratio
-            #     )
-
-            #     scheduler_args = {
-            #         "optimizer": self.optimizer,
-            #         "num_warmup_steps": num_warmup_steps,
-            #         "num_training_steps": num_training_steps,
-            #         "_convert_": "partial"
-            #     }
-            # else:
-            #     scheduler_args = {
-            #         "optimizer": self.optimizer,
-            #         "_convert_": "partial"
-            #     }
-
-            # instantiate hydra
-            # scheduler = hydra.utils.instantiate(self.lrs_params.scheduler, **scheduler_args)
-            lr_scheduler_dict = {"scheduler": scheduler}
-
-            # if self.lr_scheduler.extras is not None and len(self.lr_scheduler.extras) > 0:
-            #     for key, value in self.lr_scheduler.extras.items():
-            #         lr_scheduler_dict[key] = value
+                num_training_steps=num_training_steps,
+                num_warmup_steps=num_warmup_steps,
 
             return {"optimizer": self.optimizer, "lr_scheduler": lr_scheduler_dict}
 
