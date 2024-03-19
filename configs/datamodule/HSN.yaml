@@ -16,19 +16,6 @@ dataset:
   # feature_extractor:
   #   _target_: transformers.AutoFeatureExtractor.from_pretrained
   #   pretrained_model_name_or_path: ${module.network.model.checkpoint}
-  n_classes: 21
-  n_workers: 1
-  val_split: 0.2
-  task: ${module.task}
   subset: null
-  sampling_rate: ${module.network.sampling_rate}
   class_weights_loss: null
   class_weights_sampler: null
-  classlimit: 500
-  eventlimit: 5
-
-
-
-
-
-
