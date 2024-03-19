@@ -291,6 +291,15 @@ class BaseModule(L.LightningModule):
             prog_bar=True
         )
 
+        # additionaly log "train/loss" to have a fixed loss name to monitor
+        self.log(
+            f"train/loss",
+            train_loss,
+            on_step=True,
+            on_epoch=True,
+            prog_bar=False
+        )
+
         self.train_metric(preds, targets.int())
         self.log(
             f"train/{self.train_metric.__class__.__name__}",
@@ -305,13 +314,22 @@ class BaseModule(L.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         val_loss, preds, targets = self.model_step(batch, batch_idx)
-
+       
         self.log(
             f"val/{self.loss.__class__.__name__}",
             val_loss,
             on_step=True,
             on_epoch=True,
             prog_bar=True
+        )
+
+        # additionaly log "val/loss" to have a fixed loss name to monitor
+        self.log(
+            f"val/loss",
+            val_loss,
+            on_step=True,
+            on_epoch=True,
+            prog_bar=False
         )
 
         self.valid_metric(preds, targets.int())
