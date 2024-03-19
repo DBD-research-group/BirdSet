@@ -257,6 +257,7 @@ class BaseModule(L.LightningModule):
                 optimizer=self.optimizer,
                 num_training_steps=num_training_steps,
                 num_warmup_steps=num_warmup_steps,
+            )
 
             return {"optimizer": self.optimizer, "lr_scheduler": lr_scheduler_dict}
 
