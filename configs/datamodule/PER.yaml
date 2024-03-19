@@ -13,13 +13,6 @@ dataset:
   hf_path: DBD-research-group/BirdSet
   hf_name: PER
   seed: ${seed}
-  n_classes: 132
-  n_workers: 1
-  val_split: 0.2
-  task: ${module.task}
   subset: null
-  sampling_rate: ${module.network.sampling_rate}
   class_weights_loss: null
   class_weights_sampler: null
-  classlimit: 500
-  eventlimit: 5
