@@ -11,12 +11,12 @@ scipy = "^1.11.3"
 ffprobe = "^0.5"
 # --------- pytorch --------- #
 torch = [
-  {version = "^2.0.1+cu117", source = "pytorch", markers = "sys_platform == 'linux'"},
-  {version = "^2.0.1", source = "PyPI", markers = "sys_platform == 'darwin'"}
+  {version = "^2.1.2+cu121", source = "pytorch", markers = "sys_platform == 'linux'"},
+  {version = "^2.1.2", source = "PyPI", markers = "sys_platform == 'darwin'"}
 ]
 torchvision = [
-  {version = "0.15.2+cu117", source = "pytorch", markers = "sys_platform == 'linux'"},
-  {version = "^0.15.2", source = "PyPI", markers = "sys_platform == 'darwin'"}
+  {version = "0.17.1+cu121", source = "pytorch", markers = "sys_platform == 'linux'"},
+  {version = "^0.17.1", source = "PyPI", markers = "sys_platform == 'darwin'"}
 ]
 
 lightning= "^2.0"
@@ -54,7 +54,10 @@ datasets = "^2.14.6"
 audiomentations = "^0.33.0"
 torch-audiomentations = "^0.11.0"
 wandb = "^0.16.0"
-transformers = "^4.35.0"
+transformers = "^4.38.0"
+pyrootutils = "^1.0.4"
+mlflow = "^2.11.0"
+pydub = "^0.25.1"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -62,7 +65,7 @@ ipykernel = "^6.25.2"
 
 [[tool.poetry.source]]
 name = "pytorch"
-url = "https://download.pytorch.org/whl/cu117"
+url = "https://download.pytorch.org/whl/cu121"
 priority = "explicit"
 
 [[tool.poetry.source]]
@@ -72,3 +75,4 @@ priority = "primary"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
