@@ -8,6 +8,12 @@ from torch.optim import AdamW, Optimizer
 from functools import partial
 
 class MultilabelModule(BaseModule):
+    """
+    MultilabelModule is a PyTorch Lightning module for multilabel classification tasks.
+
+    Attributes:
+        prediction_table (bool): Whether to create a prediction table. Defaults to False.
+    """
     def __init__(
             self,
             network: NetworkConfig = NetworkConfig(),
