@@ -1,10 +1,5 @@
-# BirdSet Benchmark
+# BioFoundation
 
-## Results
-| <sub>Title</sub> | <sub>Notes</sub> |<sub>PER</sub> | <sub>NES</sub> | <sub>UHH</sub> | <sub>HSN</sub> | <sub>NBP</sub> | <sub>POW</sub> | <sub>SSW</sub> | <sub>SNE</sub>  | <sub>Overall</sub> | <sub>Code</sub> |
-| :----| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| <sub>**BirdSet: A Multi-Task Benchmark For Classification In Avian Bioacoustics**</sub> | | | | | | | |
-| <sub>**BIRB: A Generalization Benchmark for Information Retrieval in Bioacoustics**</sub> | | | | | | | | 
 
 ## Setup
 
@@ -17,13 +12,7 @@ git submodule update --init --recursive
 
 ### Install dependencies
 
-Either with [conda](https://docs.conda.io/en/latest/) and [pip](https://pip.pypa.io/en/stable/).
-```
-conda create -n gadme python=3.10
-pip install -e .
-```
-
-Or [poetry](https://python-poetry.org/).
+With [poetry](https://python-poetry.org/).
 ```
 mv pyproject.poetry pyproject.toml
 poetry install
