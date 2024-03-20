@@ -1,5 +1,5 @@
 #xcm
-_target_: src.datamodule.subset_datamodules.XCLDataModule
+_target_: src.datamodule.pretrain_datamodule.PretrainDataModule
 
 defaults: 
   - _self_
@@ -9,7 +9,18 @@ defaults:
 
 dataset:
   data_dir: ${paths.dataset_path}
+  dataset_name: XCL
+  hf_path: DBD-research-group/gadme
+  hf_name: XCL
   seed: ${seed}
+  n_classes: 9734
+  n_workers: 1
+  val_split: 0.05
+  task: ${module.task}
   subset: null
+  sampling_rate: ${module.network.sampling_rate}
   class_weights_loss: null
   class_weights_sampler: null
+  classlimit: 500
+  eventlimit: 5
+
