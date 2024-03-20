@@ -1,5 +1,5 @@
 #HSN nips4bplus
-_target_: src.datamodule.subset_datamodules.NBPDataModule
+_target_: src.datamodule.gadme_datamodule.GADMEDataModule
 
 defaults: 
   - _self_
@@ -9,10 +9,20 @@ defaults:
 
 dataset:
   data_dir: ${paths.dataset_path}
+  dataset_name: NBP
+  hf_path: DBD-research-group/gadme
+  hf_name: NBP
   seed: ${seed}
   # feature_extractor:
   #   _target_: transformers.AutoFeatureExtractor.from_pretrained
   #   pretrained_model_name_or_path: ${module.network.model.checkpoint}
+  n_classes: 51
+  n_workers: 1
+  val_split: 0.2
+  task: ${module.task}
   subset: null
+  sampling_rate: ${module.network.sampling_rate}
   class_weights_loss: null
   class_weights_sampler: null
+  classlimit: 500
+  eventlimit: 5
