@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "birdset"
 version = "0.1.0"
-description = ""
-authors = ["Your Name <you@example.com>"]
+description = "BirdSet: A multi-task benchmark and data pipeline for deep learning based avian bioacoustics"
+authors = ["Lukas Rauch <lukas.rauch@uni-kassel.de>", "Raphael Schwinger <rsc@informatik.uni-kiel.de>", "Moritz Wirth <moritz.wirt@uni-kassel.de>", "Rene  Heinrich <rene.heinrich@iee.fraunhofer.de>", "Jonas Lange <jla@informatik.uni-kiel.de>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
@@ -10,14 +10,8 @@ python = ">=3.10,<3.13"
 scipy = "^1.11.3"
 ffprobe = "^0.5"
 # --------- pytorch --------- #
-torch = [
-  {version = "^2.1.2+cu121", source = "pytorch", markers = "sys_platform == 'linux'"},
-  {version = "^2.1.2", source = "PyPI", markers = "sys_platform == 'darwin'"}
-]
-torchvision = [
-  {version = "0.17.1+cu121", source = "pytorch", markers = "sys_platform == 'linux'"},
-  {version = "^0.17.1", source = "PyPI", markers = "sys_platform == 'darwin'"}
-]
+torch = "^2.1"
+torchvision = "^0.17"
 
 lightning= "^2.0"
 torchmetrics= "^0.11"
@@ -63,10 +57,6 @@ pydub = "^0.25.1"
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.25.2"
 
-[[tool.poetry.source]]
-name = "pytorch"
-url = "https://download.pytorch.org/whl/cu121"
-priority = "explicit"
 
 [[tool.poetry.source]]
 name = "PyPI"
