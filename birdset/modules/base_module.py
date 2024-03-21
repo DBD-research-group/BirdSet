@@ -80,52 +80,59 @@ class LRSchedulerConfig:
     extras: LRSchedulerExtrasConfig = LRSchedulerExtrasConfig()
 
 
-@dataclass
 class MetricsConfig:
     """
-    A dataclass for configuring the metrics used during model training and evaluation.
+    A class for configuring the metrics used during model training and evaluation.
 
     Attributes:
-        main_metric (Metric): The main metric used for model training. Defaults to an instance of `cmAP`.
-        val_metric_best (Metric): The metric used for model validation. Defaults to an instance of `MaxMetric`.
-        add_metrics (MetricCollection): A collection of additional metrics used during model training. 
-            Defaults to a `MetricCollection` with 'MultilabelAUROC', 'T1Accuracy', 'T3Accuracy', and 'mAP'.
-        eval_complete (MetricCollection): A collection of metrics used during model evaluation. 
-            Defaults to a `MetricCollection` with 'cmAP5' and 'pcmAP'.
+        main_metric (Metric): The main metric used for model training.
+        val_metric_best (Metric): The metric used for model validation.
+        add_metrics (MetricCollection): A collection of additional metrics used during model training.
+        eval_complete (MetricCollection): A collection of metrics used during model evaluation.
     """
-    main_metric: Metric = cmAP(
-        num_labels = 21,
-        thresholds = None
-    )
-    val_metric_best: Metric = MaxMetric()
-    add_metrics: MetricCollection  = MetricCollection(
-        metrics ={
-        'MultilabelAUROC': AUROC(
-            task="multilabel",
-            num_labels=21,
-            average='macro',
-            thresholds=None
-        ),
-        'T1Accuracy': TopKAccuracy(topk= 1),
-        'T3Accuracy': TopKAccuracy(topk= 3),
-        'mAP': mAP(
-            num_labels= 21,
-            thresholds=None
-        )  
-    })
-    eval_complete: MetricCollection = MetricCollection({
-        'cmAP5': cmAP5(
-            num_labels=21,
-            sample_threshold=5,
-            thresholds=None
-        ),
-        'pcmAP': pcmAP(
-            num_labels=21,
-            padding_factor=5,
-            average="macro",
+
+    def __init__(
+        self,
+        num_labels: int = 21,
+    ):
+        """
+        Initializes the MetricsConfig class.
+
+        Args:
+            num_labels (int): The number of labels in the dataset. Defaults to 21 as in the HSN dataset.
+        """
+        self.main_metric: Metric = cmAP(
+            num_labels=num_labels,
             thresholds=None
         )
-    })
+        self.val_metric_best: Metric = MaxMetric()
+        self.add_metrics: MetricCollection = MetricCollection({
+            'MultilabelAUROC': AUROC(
+                task="multilabel",
+                num_labels=num_labels,
+                average='macro',
+                thresholds=None
+            ),
+            'T1Accuracy': TopKAccuracy(topk= 1),
+            'T3Accuracy': TopKAccuracy(topk= 3),
+            'mAP': mAP(
+                num_labels= 21,
+                thresholds=None
+            )  
+        })
+        self.eval_complete: MetricCollection = MetricCollection({
+            'cmAP5': cmAP5(
+                num_labels=num_labels,
+                sample_threshold=5,
+                thresholds=None
+            ),
+            'pcmAP': pcmAP(
+                num_labels=num_labels,
+                padding_factor=5,
+                average="macro",
+                thresholds=None
+            )
+        })
 
 @dataclass
 class LoggingParamsConfig:

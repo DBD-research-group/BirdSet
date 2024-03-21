@@ -1,3 +1,4 @@
+from dataclasses import asdict
 import torch
 from .base_module import BaseModule, NetworkConfig, LRSchedulerConfig, MetricsConfig, LoggingParamsConfig
 import wandb
@@ -75,11 +76,11 @@ class MultilabelModule(BaseModule):
         self.log(
             f"test/{self.test_metric.__class__.__name__}",
             self.test_metric,
-            **self.logging_params,
+            **asdict(self.logging_params),
         )
 
         self.test_add_metrics(preds, targets.int())
-        self.log_dict(self.test_add_metrics, **self.logging_params)
+        self.log_dict(self.test_add_metrics, **asdict(self.logging_params))
 
         return {"loss": test_loss, "preds": preds, "targets": targets}
     
@@ -96,7 +97,7 @@ class MultilabelModule(BaseModule):
             value = metric(test_preds, test_targets)
             log_dict[f"test/{metric_name}"] = value
 
-        self.log_dict(log_dict, **self.logging_params)
+        self.log_dict(log_dict, **asdict(self.logging_params))
 
         if self.prediction_table:
             self._wandb_prediction_table(test_preds, test_targets)
