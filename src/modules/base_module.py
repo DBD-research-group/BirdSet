@@ -1,3 +1,4 @@
+from typing import List
 import torch
 import math
 import hydra
@@ -7,6 +8,20 @@ from src.modules.metrics import load_metrics
 import datasets
 
 import lightning as L
+
+def get_num_gpu(num_gpus: int|str|List[int]) -> int:
+     # check if num_gpus is a list
+        if not isinstance(num_gpus, int) and not isinstance(num_gpus, str):
+            return len(num_gpus)
+        elif isinstance(num_gpus, str):
+            if num_gpus == "auto" or num_gpus == "-1":
+                return torch.cuda.device_count()
+            elif len(num_gpus.split(",")) > 1:
+                return len(num_gpus.split(",")) 
+            else:
+                return int(num_gpus)
+        else:    
+            return num_gpus
 
 
 class BaseModule(L.LightningModule):
@@ -25,7 +40,7 @@ class BaseModule(L.LightningModule):
             task,
             class_weights_loss,
             label_counts,
-            num_gpus):
+            num_gpus: int|str|List[int]):
 
         super(BaseModule, self).__init__()
 
@@ -38,7 +53,7 @@ class BaseModule(L.LightningModule):
         self.model = hydra.utils.instantiate(network.model) # TODO: breaks using without hydra!
         self.opt_params = optimizer
         self.lrs_params = lr_scheduler
-        self.num_gpus = num_gpus
+        self.num_gpus = get_num_gpu(num_gpus)
 
 
         self.loss = load_loss(loss, class_weights_loss, label_counts)
