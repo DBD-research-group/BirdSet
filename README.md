@@ -6,7 +6,7 @@
 | <sub>**BirdSet: A Multi-Task Benchmark For Classification In Avian Bioacoustics**</sub> | | | | | | | |
 | <sub>**BIRB: A Generalization Benchmark for Information Retrieval in Bioacoustics**</sub> | | | | | | | | 
 
-## Setup
+## Get Started
 
 ### Devcontainer
 
@@ -29,6 +29,10 @@ poetry install
 poetry shell
 ```
 
+
+
+# Minimal Working Example
+
 ## Log in to Huggingface
 
 Our datasets are shared via HuggingFace Datasets in our [HuggingFace BirdSet repository](https://huggingface.co/datasets/DBD-research-group/birdset_v1). Huggingface is a central hub for sharing and utilizing datasets and models, particularly beneficial for machine learning and data science projects. For accessing private datasets hosted on HuggingFace, you need to be authenticated. Here's how you can log in to HuggingFace:
@@ -46,7 +50,57 @@ Our datasets are shared via HuggingFace Datasets in our [HuggingFace BirdSet rep
    ```
 
    After executing this command, you'll be prompted to enter your HuggingFace credentials ([User Access Token](https://huggingface.co/docs/hub/security-tokens)). Once authenticated, your credentials will be saved locally, allowing seamless access to HuggingFace resources.
+   
+## Prepare Data
 
+```
+from birdset.datamodule.base_datamodule import DatasetConfig
+from birdset.datamodule.birdset_datamodule import BirdSetDataModule
+
+# initiate the data module
+dm = BirdSetDataModule(
+    dataset= DatasetConfig(
+        data_dir='../../data_birdset/HSN',
+        dataset_name='HSN',
+        hf_path='DBD-research-group/BirdSet',
+        hf_name='HSN',
+        n_classes=21,
+        n_workers=3,
+        val_split=0.2,
+        task="multilabel",
+        classlimit=500,
+        eventlimit=5,
+        sampling_rate=32000,
+    ),
+)
+
+# prepare the data (download dataset, ...)
+dm.prepare_data()
+
+# setup the dataloaders
+dm.setup(stage="fit")
+
+# get the dataloaders
+train_loader = dm.train_dataloader()
+```
+
+## Prepare Model and Start Training
+
+```
+from lightning import Trainer
+min_epochs = 1
+max_epochs = 5
+trainer = Trainer(min_epochs=min_epochs, max_epochs=max_epochs, accelerator="gpu", devices=1)
+
+from birdset.modules.base_module import BaseModule
+model = BaseModule(
+    len_trainset=dm.len_trainset,
+    task=dm.task,
+    batch_size=dm.train_batch_size,
+    num_epochs=max_epochs)
+
+trainer.fit(model, dm)
+```
 
 ## Logging
 Logs will be written to [Weights&Biases](https://wandb.ai/) by default.
