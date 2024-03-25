@@ -151,8 +151,6 @@ class LoggingParamsConfig:
     prog_bar: bool = True         
 
 
-
-
 class BaseModule(L.LightningModule):
     """
     BaseModule is a PyTorch Lightning module that serves as a base for all models.
@@ -212,8 +210,6 @@ class BaseModule(L.LightningModule):
         self.len_trainset = len_trainset
         self.task = task
         self.num_gpus = num_gpus
-
-
 
         self.model = self.network.model
 
@@ -291,12 +287,13 @@ class BaseModule(L.LightningModule):
             prog_bar=True
         )
 
-        self.train_metric(preds, targets.int())
-        self.log(
-            f"train/{self.train_metric.__class__.__name__}",
-            self.train_metric,
-            **asdict(self.logging_params)
-        )
+        # remove metrics from train to significantly improve training time for many classes
+        # self.train_metric(preds, targets.int())
+        # self.log(
+        #     f"train/{self.train_metric.__class__.__name__}",
+        #     self.train_metric,
+        #     **asdict(self.logging_params)
+        # )
 
         # self.train_add_metrics(preds, targets)
         # self.log_dict(self.train_add_metrics, **self.logging_params)

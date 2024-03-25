@@ -341,7 +341,7 @@ class BaseDataModuleHF(L.LightningDataModule):
         Returns:
             DatasetDict: The subsetted dataset. The keys are the names of the dataset splits and the values are the subsetted datasets.
         """
-        for split in dataset.keys():
+        for split in ["train"]:
             random_indices = random.sample(range(len(dataset[split])), size)
             dataset[split] = dataset[split].select(random_indices)
         return dataset
