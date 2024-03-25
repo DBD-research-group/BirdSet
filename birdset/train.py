@@ -7,7 +7,7 @@ from birdset import utils
 import pyrootutils 
 
 log = utils.get_pylogger(__name__)
-#rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
+
 root = pyrootutils.setup_root(
     search_from=__file__,
     indicator=[".git"],
@@ -17,14 +17,13 @@ root = pyrootutils.setup_root(
 
 _HYDRA_PARAMS = {
     "version_base":None,
-    #"config_path": "../configs",
     "config_path": str(root / "configs"),
-    "config_name": "main.yaml"
+    "config_name": "train.yaml"
 }
 
 # @utils.register_custom_resolvers(**_HYDRA_PARAMS)
 @hydra.main(**_HYDRA_PARAMS)
-def main(cfg):
+def train(cfg):
     log.info('Using config: \n%s', OmegaConf.to_yaml(cfg))
 
     log.info(f"Dataset path: <{os.path.abspath(cfg.paths.dataset_path)}>")
@@ -138,4 +137,4 @@ def main(cfg):
     utils.close_loggers()
 
 if __name__ == "__main__":    
-    main()
+    train()

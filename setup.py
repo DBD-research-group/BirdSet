@@ -11,10 +11,10 @@ from birdset import __version__
 setup(
     name='birdset',
     version=__version__,
-    description='General Avian Monitoring Evaluation',
+    description='BirdSet',
     author='Lukas Rauch',
     author_email='lukas.rauch@uni-kassel.de',
-    url='https://github.com/DBD-research-group/Bird2Vec/tree/toolbox-structure',
+    url='https://github.com/DBD-research-group/BirdSet',
     license='BSD 3-Clause',
     packages=find_packages(),
     #install_requires=requirements(),

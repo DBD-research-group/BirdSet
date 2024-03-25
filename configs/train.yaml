@@ -6,7 +6,7 @@ defaults:
   - callbacks: default
   - paths: default
   - trainer: single_gpu
-  - logger: wandb_flow
+  - logger: wandb
   - hydra: default
   - extras: default
 
@@ -19,7 +19,7 @@ ckpt_path: null
 seed: 1
 
 module:
-  network: ast
+  network: efficientnet
 logger:
   wandb:
     mode: online
