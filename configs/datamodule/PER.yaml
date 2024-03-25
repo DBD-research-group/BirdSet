@@ -1,5 +1,5 @@
 #PER amazon basin
-_target_: src.datamodule.gadme_datamodule.GADMEDataModule
+_target_: birdset.datamodule.birdset_datamodule.BirdSetDataModule
 
 defaults: 
   - _self_
@@ -10,7 +10,7 @@ defaults:
 dataset:
   data_dir: ${paths.dataset_path}
   dataset_name: PER
-  hf_path: DBD-research-group/gadme
+  hf_path: DBD-research-group/BirdSet
   hf_name: PER
   seed: ${seed}
   n_classes: 132

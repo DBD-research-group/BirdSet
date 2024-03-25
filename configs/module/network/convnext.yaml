@@ -1,5 +1,5 @@
 model:
-  _target_: src.modules.models.convnext.ConvNextClassifier
+  _target_: birdset.modules.models.convnext.ConvNextClassifier
   architecture: "convnext_tiny"
   num_classes: ${datamodule.dataset.n_classes}
   num_channels: 1

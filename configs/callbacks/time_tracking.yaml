@@ -1,2 +1,2 @@
 time_tracking:
-  _target_: src.callbacks.TimeCallback
+  _target_: birdset.callbacks.TimeCallback
