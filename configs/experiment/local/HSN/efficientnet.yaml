@@ -1,7 +1,7 @@
 # @package _global_
 #package global is neccessary!
 defaults:
-  - override /datamodule: XCM.yaml
+  - override /datamodule: HSN.yaml
   - override /module: multilabel.yaml
   - override /module/network: efficientnet.yaml
   - override /callbacks: default.yaml
@@ -12,7 +12,7 @@ defaults:
   - override /datamodule/transforms/waveform_augmentations: none.yaml
   - override /datamodule/transforms/spectrogram_augmentations: none.yaml
 
-tags: ["XCM", "efficientnet", "multilabel"]
+tags: ["HSN", "efficientnet", "multilabel"]
 seed: 2
 train: True
 test: True
@@ -37,8 +37,8 @@ module:
 
 trainer:
   min_epochs: 1
-  max_epochs: 1
-  devices: []
+  max_epochs: 40
+  devices: [1]
 
 datamodule:
   dataset:
