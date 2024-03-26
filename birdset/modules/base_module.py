@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field, asdict
 from functools import partial
-from typing import Callable, Dict, Literal, Type, Optional
+from typing import Callable, Dict, List, Literal, Type, Optional, Union
 
 from birdset.modules.metrics.multilabel import TopKAccuracy, cmAP, cmAP5, mAP, pcmAP
 from birdset.modules.models.efficientnet import EfficientNetClassifier
@@ -18,6 +18,24 @@ from torch.nn.modules.loss import _Loss
 from torch.optim import AdamW, Optimizer, lr_scheduler 
 from transformers import get_scheduler, SchedulerType
 from torchmetrics import AUROC, Metric, MaxMetric, MetricCollection
+
+def get_num_gpu(num_gpus: Union[int|str|List[int]]) -> int:
+    """
+    Returns the number of GPU`s infered from lightnings trainer devices argument.
+    https://lightning.ai/docs/pytorch/stable/api/lightning.pytorch.trainer.trainer.Trainer.html#lightning.pytorch.trainer.trainer.Trainer
+    """
+     # check if num_gpus is a list
+    if not isinstance(num_gpus, int) and not isinstance(num_gpus, str):
+        return len(num_gpus)
+    elif isinstance(num_gpus, str):
+        if num_gpus == "auto" or num_gpus == "-1":
+            return torch.cuda.device_count()
+        elif len(num_gpus.split(",")) > 1:
+            return len(num_gpus.split(",")) 
+        else:
+            return int(num_gpus)
+    else:    
+        return num_gpus
 
 @dataclass
 class NetworkConfig:
@@ -209,7 +227,7 @@ class BaseModule(L.LightningModule):
         self.batch_size = batch_size
         self.len_trainset = len_trainset
         self.task = task
-        self.num_gpus = num_gpus
+        self.num_gpus = get_num_gpu(num_gpus)
 
         self.model = self.network.model
 
