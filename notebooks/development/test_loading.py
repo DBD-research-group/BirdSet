@@ -5,9 +5,9 @@ if __name__ == "__main__":
     ds_name = "high_sierras"
     print(f"start {ds_name}")
     ds = load_dataset(
-        "dbd-research-group/gadme_v1", 
+        "dbd-research-group/birdset_v1", 
         ds_name,
-        cache_dir="~/projects/GADME/data_gadme",
+        cache_dir="~/projects/BirdSet/data_birdset",
         num_proc=3,
         download_mode='force_redownload'
     )
@@ -34,7 +34,7 @@ import pandas as pd
 
 folder = "data/xenocanto"
 meta0 = hf_hub_download(
-    repo_id="dbd-research-group/gadme_v1",
+    repo_id="dbd-research-group/birdset_v1",
     filename="train.parquet",
     revision="data",
     subfolder=folder,
@@ -42,7 +42,7 @@ meta0 = hf_hub_download(
 )
 
 meta1 = hf_hub_download(
-    repo_id="dbd-research-group/gadme_v1",
+    repo_id="dbd-research-group/birdset_v1",
     filename="test.parquet",
     revision="data",
     subfolder=folder,
@@ -50,7 +50,7 @@ meta1 = hf_hub_download(
 )
 
 # meta2 = hf_hub_download(
-#     repo_id="dbd-research-group/gadme_v1",
+#     repo_id="dbd-research-group/birdset_v1",
 #     filename="test_5s.parquet",
 #     revision="data",
 #     subfolder=folder,
@@ -66,7 +66,7 @@ import pandas as pd
 
 folder = "data/amazon_basin"
 meta_test = hf_hub_download(
-    repo_id="dbd-research-group/gadme_v1",
+    repo_id="dbd-research-group/birdset_v1",
     filename="train.parquet",
     revision="data",
     subfolder=folder,
@@ -92,7 +92,7 @@ len(df["ebird_code"].unique())
 df.head()
 #%%
 from datasets import load_dataset
-ds = load_dataset("dbd-research-group/gadme_v1", "iit")
+ds = load_dataset("dbd-research-group/birdset_v1", "iit")
 
 #%%
 import pandas as pd 

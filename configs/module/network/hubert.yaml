@@ -1,5 +1,5 @@
 model:
-  _target_: src.modules.models.hubert.HubertSequenceClassifier
+  _target_: birdset.modules.models.hubert.HubertSequenceClassifier
   checkpoint: facebook/hubert-base-ls960
   local_checkpoint: null
   num_classes: ${datamodule.dataset.n_classes}

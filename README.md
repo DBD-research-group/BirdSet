@@ -6,7 +6,7 @@
 | <sub>**BirdSet: A Multi-Task Benchmark For Classification In Avian Bioacoustics**</sub> | | | | | | | |
 | <sub>**BIRB: A Generalization Benchmark for Information Retrieval in Bioacoustics**</sub> | | | | | | | | 
 
-## Setup
+## Get Started
 
 ### Devcontainer
 
@@ -19,20 +19,23 @@ git submodule update --init --recursive
 
 Either with [conda](https://docs.conda.io/en/latest/) and [pip](https://pip.pypa.io/en/stable/).
 ```
-conda create -n gadme python=3.10
+conda create -n birdset python=3.10
 pip install -e .
 ```
 
 Or [poetry](https://python-poetry.org/).
 ```
-mv pyproject.poetry pyproject.toml
 poetry install
 poetry shell
 ```
 
+
+
+# Minimal Working Example
+
 ## Log in to Huggingface
 
-Our datasets are shared via HuggingFace Datasets in our [HuggingFace GADME repository](https://huggingface.co/datasets/DBD-research-group/gadme_v1). Huggingface is a central hub for sharing and utilizing datasets and models, particularly beneficial for machine learning and data science projects. For accessing private datasets hosted on HuggingFace, you need to be authenticated. Here's how you can log in to HuggingFace:
+Our datasets are shared via HuggingFace Datasets in our [HuggingFace BirdSet repository](https://huggingface.co/datasets/DBD-research-group/birdset_v1). Huggingface is a central hub for sharing and utilizing datasets and models, particularly beneficial for machine learning and data science projects. For accessing private datasets hosted on HuggingFace, you need to be authenticated. Here's how you can log in to HuggingFace:
 
 1. **Install HuggingFace CLI**: If you haven't already, you need to install the HuggingFace CLI (Command Line Interface). This tool enables you to interact with HuggingFace services directly from your terminal. You can install it using pip:
 
@@ -47,7 +50,57 @@ Our datasets are shared via HuggingFace Datasets in our [HuggingFace GADME repos
    ```
 
    After executing this command, you'll be prompted to enter your HuggingFace credentials ([User Access Token](https://huggingface.co/docs/hub/security-tokens)). Once authenticated, your credentials will be saved locally, allowing seamless access to HuggingFace resources.
+   
+## Prepare Data
 
+```
+from birdset.datamodule.base_datamodule import DatasetConfig
+from birdset.datamodule.birdset_datamodule import BirdSetDataModule
+
+# initiate the data module
+dm = BirdSetDataModule(
+    dataset= DatasetConfig(
+        data_dir='../../data_birdset/HSN',
+        dataset_name='HSN',
+        hf_path='DBD-research-group/BirdSet',
+        hf_name='HSN',
+        n_classes=21,
+        n_workers=3,
+        val_split=0.2,
+        task="multilabel",
+        classlimit=500,
+        eventlimit=5,
+        sampling_rate=32000,
+    ),
+)
+
+# prepare the data (download dataset, ...)
+dm.prepare_data()
+
+# setup the dataloaders
+dm.setup(stage="fit")
+
+# get the dataloaders
+train_loader = dm.train_dataloader()
+```
+
+## Prepare Model and Start Training
+
+```
+from lightning import Trainer
+min_epochs = 1
+max_epochs = 5
+trainer = Trainer(min_epochs=min_epochs, max_epochs=max_epochs, accelerator="gpu", devices=1)
+
+from birdset.modules.base_module import BaseModule
+model = BaseModule(
+    len_trainset=dm.len_trainset,
+    task=dm.task,
+    batch_size=dm.train_batch_size,
+    num_epochs=max_epochs)
+
+trainer.fit(model, dm)
+```
 
 ## Logging
 Logs will be written to [Weights&Biases](https://wandb.ai/) by default.
@@ -60,7 +113,7 @@ To enhance model performance we mix in additional background noise from download
 Our experiments are defined in the `configs/experiment` folder. To run an experiment, use the following command:
 
 ```
-python src/main.py experiment=EXPERIMENT_NAME
+python birdset/main.py experiment=EXPERIMENT_NAME
 ```
 
 
@@ -85,11 +138,11 @@ This repository is inspired by the [Yet Another Lightning Hydra Template](https:
 │   |
 │   ├── main.yaml               <- Main config
 │
-├── data_gadme                  <- Project data
-├── dataset                     <- Code to build the GADME dataset
+├── data_birdset                  <- Project data
+├── dataset                     <- Code to build the BirdSet dataset
 ├── notebooks                   <- Jupyter notebooks.
 │
-├── src                         <- Source code
+├── birdset                         <- Source code
 │   ├── augmentations           <- Augmentations
 │   ├── callbacks               <- Additional callbacks
 │   ├── datamodules             <- Lightning datamodules
@@ -108,17 +161,17 @@ This repository is inspired by the [Yet Another Lightning Hydra Template](https:
 
 # Data pipeline
 
-Our datasets are shared via HuggingFace Datasets in our [GADME repository](https://huggingface.co/datasets/DBD-research-group/gadme_v1).
+Our datasets are shared via HuggingFace Datasets in our [BirdSet repository](https://huggingface.co/datasets/DBD-research-group/birdset_v1).
 First log in to HuggingFace with:
 ```bash
 huggingface-cli login
 ```
 
-For a detailed guide to using the GADME data pipeline and its many configuration options, see our comprehensive [GADME Data Pipeline Tutorial](notebooks/tutorials/gadme-pipeline_tutorial.ipynb).
+For a detailed guide to using the BirdSet data pipeline and its many configuration options, see our comprehensive [BirdSet Data Pipeline Tutorial](notebooks/tutorials/birdset-pipeline_tutorial.ipynb).
 
 ## Datamodule
 
-The datamodules are defined in `src/datamodule` and configurations are stored under `configs/datamodule`.
+The datamodules are defined in `birdset/datamodule` and configurations are stored under `configs/datamodule`.
 `base_datamodule` is the main class that can be inherited for specific datasets. It is responsible for preparing the data in the function `prepare_data` and loading the data in the function `setup`. `prepare_data` downloads the dataset, applies preprocessing, creates validation splits and saves the data to disk. `setup` initiates the dataloaders and configures data transformations.
 
 The following steps are performed in `prepare_data`:

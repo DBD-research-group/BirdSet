@@ -1,5 +1,5 @@
 #SSW
-_target_: src.datamodule.gadme_datamodule.GADMEDataModule
+_target_: birdset.datamodule.birdset_datamodule.BirdSetDataModule
 defaults:
   - _self_
   - transforms: bird_default.yaml
@@ -9,7 +9,7 @@ defaults:
 dataset:
   data_dir: ${paths.dataset_path}
   dataset_name: sierra_nevada
-  hf_path: DBD-research-group/gadme_v1_1
+  hf_path: DBD-research-group/birdset_v1_1
   hf_name: sierra_nevada
   seed: ${seed}
   n_classes: 57

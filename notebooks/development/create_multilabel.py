@@ -6,8 +6,8 @@ import pandas as pd
 
 ds = load_dataset(
         name="amazon_basin",
-        path="DBD-research-group/gadme_v1",
-        cache_dir="/home/lukas/projects/GADME/data_gadme",
+        path="DBD-research-group/birdset_v1",
+        cache_dir="/home/lukas/projects/BirdSet/data_birdset",
         num_proc=5
     )
 
@@ -105,7 +105,7 @@ df_new= exp_df.join(exploded_df)
 # %%
 len(exp_df[exp_df["start_time"]==0])
 #%%
-filtered_df= df_scape[(df_scape['start_time'] >= 700) & (df_scape["filepath"]=="/home/lukas/projects/GADME/data_gadme/downloads/extracted/cff8b1273408353c7165fc9b8da624bdbad585ddd6fc7bb7aab245cc2f543629/data/zenodo/PER/PER_001_S01_20190116_100007Z.ogg")]
+filtered_df= df_scape[(df_scape['start_time'] >= 700) & (df_scape["filepath"]=="/home/lukas/projects/BirdSet/data_birdset/downloads/extracted/cff8b1273408353c7165fc9b8da624bdbad585ddd6fc7bb7aab245cc2f543629/data/zenodo/PER/PER_001_S01_20190116_100007Z.ogg")]
 
 filtered_df.head(10)
 #%%
@@ -113,13 +113,13 @@ filtered_df["filepath"].nunique()
 #%%
 exp_df[
     (exp_df["start_time"] == 845) &
-    (exp_df["filepath"] == "/home/lukas/projects/GADME/data_gadme/downloads/extracted/cff8b1273408353c7165fc9b8da624bdbad585ddd6fc7bb7aab245cc2f543629/data/zenodo/PER/PER_001_S01_20190116_100007Z.ogg")
+    (exp_df["filepath"] == "/home/lukas/projects/BirdSet/data_birdset/downloads/extracted/cff8b1273408353c7165fc9b8da624bdbad585ddd6fc7bb7aab245cc2f543629/data/zenodo/PER/PER_001_S01_20190116_100007Z.ogg")
 ]["ebird_code"]
 #%%
-filtered_df.loc[filtered_df["filepath"]=="/home/lukas/projects/GADME/data_gadme/downloads/extracted/cff8b1273408353c7165fc9b8da624bdbad585ddd6fc7bb7aab245cc2f543629/data/zenodo/PER/PER_001_S01_20190116_100007Z.ogg"]
+filtered_df.loc[filtered_df["filepath"]=="/home/lukas/projects/BirdSet/data_birdset/downloads/extracted/cff8b1273408353c7165fc9b8da624bdbad585ddd6fc7bb7aab245cc2f543629/data/zenodo/PER/PER_001_S01_20190116_100007Z.ogg"]
 
 #%%
-df_scape[(df_scape["ebird_code"]==18) & (df_scape["filepath"]=="/home/lukas/projects/GADME/data_gadme/downloads/extracted/cff8b1273408353c7165fc9b8da624bdbad585ddd6fc7bb7aab245cc2f543629/data/zenodo/PER/PER_001_S01_20190116_100007Z.ogg")]
+df_scape[(df_scape["ebird_code"]==18) & (df_scape["filepath"]=="/home/lukas/projects/BirdSet/data_birdset/downloads/extracted/cff8b1273408353c7165fc9b8da624bdbad585ddd6fc7bb7aab245cc2f543629/data/zenodo/PER/PER_001_S01_20190116_100007Z.ogg")]
 #%%
 filtered_df.head(5)
 #%%

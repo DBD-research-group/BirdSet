@@ -1,26 +1,22 @@
 # Please add requirements for installation here
-audiomentations==0.32.0
-ipython==8.14.0
+audiomentations==0.34.1
+ipython==8.18.1
 librosa==0.10.1
-notebook==7.0.2
-numpy==1.24.4
-torchaudio
-torchvision
+numpy==1.26.2
+torchaudio==2.1.1
 torch_audiomentations==0.11.0
-torch>=2.0.0
-lightning>=2.0.2
-torchmetrics>=0.11.4
-torchvision>=0.15.1
-tensorboard>=2.12.2
-numpy>=1.22.4
-matplotlib>=3.7.1
-scikit-learn>=1.2.2
-tqdm>=4.65.0
-Pillow>=8.4.0
-transformers>=4.29.1
-datasets>=2.12.0
+torch==2.1.1
+lightning==2.1.2
+torchmetrics==1.2.0
+torchvision==0.16.1
+scikit-learn==1.3.2
+tqdm==4.66.1
+pillow==10.1.0
+pandas==2.1.3
+transformers==4.38.2
+datasets==2.18.0
 hydra-core == 1.3.2
 hydra_colorlog == 1.2.0
-#rootuils == 1.0.7
+#rootuils #== 1.0.7
 wandb ==  0.16.0
 rich==13.7.0
