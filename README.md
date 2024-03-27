@@ -113,7 +113,7 @@ To enhance model performance we mix in additional background noise from download
 Our experiments are defined in the `configs/experiment` folder. To run an experiment, use the following command:
 
 ```
-python birdset/main.py experiment=EXPERIMENT_NAME
+python birdset/train.py experiment=EXPERIMENT_NAME
 ```
 
 

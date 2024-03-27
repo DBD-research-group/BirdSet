@@ -43,13 +43,18 @@ metrics:
       num_classes: ${datamodule.dataset.n_classes}  
     balanced_acc_top5:
       _target_: birdset.modules.metrics.BalancedAccuracyTop5
-      num_classes: ${datamodule.dataset.n_classes}  
-    # auroc:
-    #   _target_: "torchmetrics.classification.AUROC"
-    #   task: "multiclass"
-    #   num_labels: ${datamodule.dataset.n_classes}
-    #   average: "macro"
-    #   thresholds: null
+      num_classes: ${datamodule.dataset.n_classes}
+    auroc:
+      _target_: "torchmetrics.classification.AUROC"
+      task: "multiclass"
+      num_labels: ${datamodule.dataset.n_classes}
+      average: "macro"
+      thresholds: null
+    ece:
+      _target_: "torchmetrics.classification.MulticlassCalibrationError"
+      num_classes: ${datamodule.dataset.n_classes}
+      num_bins: 10
+      norm: "l1"
   # eval_complete:
   #   pcmap:
   #     _target_: birdset.modules.metrics.pcmAP

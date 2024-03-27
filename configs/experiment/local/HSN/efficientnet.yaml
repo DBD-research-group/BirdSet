@@ -20,7 +20,7 @@ test: True
 logger:
   wandb:
     tags: ${tags}
-    group: "XCM_train_efficientnet"
+    group: "HSN_train_efficientnet"
     mode: offline
 
 module:
