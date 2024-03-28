@@ -37,7 +37,7 @@ module:
 
 trainer:
   min_epochs: 1
-  max_epochs: 200
+  max_epochs: 2
 
 datamodule:
   dataset:

@@ -7,3 +7,6 @@ model:
   pretrained: True
 torch_compile: False
 model_type: 'vision'
+sampling_rate: 32_000
+normalize_waveform: null
+normalize_spectrogram: True
