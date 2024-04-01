@@ -1,6 +1,50 @@
 import torch 
 import warnings
 import torchmetrics
+from torchmetrics.classification import MulticlassAUROC, MulticlassCalibrationError, MulticlassAveragePrecision
+from torchmetrics import Metric, MaxMetric, MetricCollection
+
+
+class MulticlassMetricsConfig():
+    def __init__(self, num_labels: int = 21):
+        """
+        Initializes the MulticlassMetricsConfig class.
+
+        Args:
+            num_labels (int): The number of labels in the dataset. Defaults to 21 as in the HSN dataset.
+        """
+        self.main_metric: Metric = BalancedAccuracy(
+            num_classes=num_labels,
+            adjusted=False
+        )
+        self.val_metric_best: Metric = MaxMetric()
+        self.add_metrics: MetricCollection = MetricCollection({
+            'MulticlassAUROC': MulticlassAUROC(
+                num_classes=num_labels,
+                average='macro',
+                thresholds=None
+            ),
+            'ECE': MulticlassCalibrationError(
+                num_classes=num_labels,
+                n_bins=10,
+                norm='l1'
+            ),
+            'MulticlassAUPR': MulticlassAveragePrecision(
+                num_classes=num_labels,
+                average='macro',
+                thresholds=None
+            )
+        })
+        self.eval_complete: MetricCollection = MetricCollection({
+            'BA': BalancedAccuracy(
+                num_classes=num_labels,
+                adjusted=False
+            ),
+            'BA5': BalancedAccuracyTop5(
+                num_classes=num_labels,
+                adjusted=False
+            )
+        })
 
 class BalancedAccuracy(torchmetrics.Metric):
     def __init__(self, adjusted=False, num_classes=None):

@@ -10,51 +10,54 @@ num_gpus: ${trainer.devices}
 
 optimizer:
   _target_: torch.optim.AdamW
+  _partial_: true
   lr: 1e-5
   weight_decay: 0.01
 
 loss:
-  _target_: torch.nn.CrossEntropyLoss
+  _target_: torch.nn.BCEWithLogitsLoss
   
-lr_scheduler:
-  scheduler:
-    _target_: transformers.get_cosine_schedule_with_warmup
-  extras:
-    interval: step
-    warmup_ratio: 0.05
+# lr_scheduler:
+#   scheduler:
+#     _target_: transformers.get_cosine_schedule_with_warmup
+#   extras:
+#     interval: step
+#     warmup_ratio: 0.05
 
 metrics: 
-  main: 
-    _target_: "torchmetrics.classification.Accuracy"
-    task: "multiclass"
-    num_classes: ${datamodule.dataset.n_classes}
-    top_k: 1
-  val_best: 
-    _target_: "torchmetrics.MaxMetric"
-  additional: 
-    cmap:
-      _target_: "torchmetrics.classification.AveragePrecision"
-      num_classes: ${datamodule.dataset.n_classes}  
-      task: "multiclass"
-      average: macro
-      thresholds: null
-    balanced_acc: 
-      _target_: birdset.modules.metrics.BalancedAccuracy
-      num_classes: ${datamodule.dataset.n_classes}  
-    balanced_acc_top5:
-      _target_: birdset.modules.metrics.BalancedAccuracyTop5
-      num_classes: ${datamodule.dataset.n_classes}
-    auroc:
-      _target_: "torchmetrics.classification.AUROC"
-      task: "multiclass"
-      num_labels: ${datamodule.dataset.n_classes}
-      average: "macro"
-      thresholds: null
-    ece:
-      _target_: "torchmetrics.classification.MulticlassCalibrationError"
-      num_classes: ${datamodule.dataset.n_classes}
-      num_bins: 10
-      norm: "l1"
+  _target_: birdset.modules.metrics.multiclass.MulticlassMetricsConfig
+  num_labels: ${datamodule.dataset.n_classes}
+  # main_metric: 
+  #   _target_: "torchmetrics.classification.Accuracy"
+  #   task: "multiclass"
+  #   num_classes: ${datamodule.dataset.n_classes}
+  #   top_k: 1
+  # val_metric_best: 
+  #   _target_: "torchmetrics.MaxMetric"
+  # add_metrics: 
+  #   cmap:
+  #     _target_: "torchmetrics.classification.AveragePrecision"
+  #     num_classes: ${datamodule.dataset.n_classes}  
+  #     task: "multiclass"
+  #     average: macro
+  #     thresholds: null
+  #   balanced_acc: 
+  #     _target_: birdset.modules.metrics.BalancedAccuracy
+  #     num_classes: ${datamodule.dataset.n_classes}  
+  #   balanced_acc_top5:
+  #     _target_: birdset.modules.metrics.BalancedAccuracyTop5
+  #     num_classes: ${datamodule.dataset.n_classes}
+  #   auroc:
+  #     _target_: "torchmetrics.classification.MulticlassAUROC"
+  #     task: "multiclass"
+  #     num_classes: ${datamodule.dataset.n_classes}
+  #     average: "macro"
+  #     thresholds: null
+  #   ece:
+  #     _target_: "torchmetrics.classification.MulticlassCalibrationError"
+  #     num_classes: ${datamodule.dataset.n_classes}
+  #     num_bins: 10
+  #     norm: "l1"
   # eval_complete:
   #   pcmap:
   #     _target_: birdset.modules.metrics.pcmAP
@@ -71,8 +74,8 @@ metrics:
 
 
 output_activation: 
-  _target_: "torch.softmax"
-  dim: 1
+  _target_: "torch.sigmoid"
+  _partial_: true
 
 logging_params:
   on_step: False

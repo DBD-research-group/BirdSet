@@ -1,22 +1,19 @@
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, asdict
 from functools import partial
-from typing import Callable, Dict, List, Literal, Type, Optional, Union
+from typing import Callable, List, Literal, Type, Optional, Union
 
-from birdset.modules.metrics.multilabel import TopKAccuracy, cmAP, cmAP5, mAP, pcmAP
 from birdset.modules.models.efficientnet import EfficientNetClassifier
 import torch
 import math
-import hydra
 
-from birdset.modules.losses import load_loss
 import datasets
 
 import lightning as L
 import torch.nn as nn
 from torch.nn import BCEWithLogitsLoss
 from torch.nn.modules.loss import _Loss
-from torch.optim import AdamW, Optimizer, lr_scheduler 
-from transformers import get_scheduler, SchedulerType
+from torch.optim import AdamW, Optimizer 
+from transformers import get_scheduler
 from torchmetrics import AUROC, Metric, MaxMetric, MetricCollection
 
 def get_num_gpu(num_gpus: Union[int|str|List[int]]) -> int:
@@ -119,37 +116,11 @@ class MetricsConfig:
         Args:
             num_labels (int): The number of labels in the dataset. Defaults to 21 as in the HSN dataset.
         """
-        self.main_metric: Metric = cmAP(
-            num_labels=num_labels,
-            thresholds=None
-        )
+        self.main_metric: Metric = MaxMetric()
         self.val_metric_best: Metric = MaxMetric()
         self.add_metrics: MetricCollection = MetricCollection({
-            'MultilabelAUROC': AUROC(
-                task="multilabel",
-                num_labels=num_labels,
-                average='macro',
-                thresholds=None
-            ),
-            'T1Accuracy': TopKAccuracy(topk= 1),
-            'T3Accuracy': TopKAccuracy(topk= 3),
-            'mAP': mAP(
-                num_labels= 21,
-                thresholds=None
-            )  
         })
         self.eval_complete: MetricCollection = MetricCollection({
-            'cmAP5': cmAP5(
-                num_labels=num_labels,
-                sample_threshold=5,
-                thresholds=None
-            ),
-            'pcmAP': pcmAP(
-                num_labels=num_labels,
-                padding_factor=5,
-                average="macro",
-                thresholds=None
-            )
         })
 
 @dataclass
