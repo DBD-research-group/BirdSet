@@ -12,6 +12,7 @@ wandb/
 output_birdset/
 *.hydra
 *.ogg
+*.ogg
 
 data/*
 
@@ -22,9 +23,6 @@ output/*
 data_birdset/*
 data_gadme/*
 data_birdset
-notebooks/dev/*
-dataset_/*
-
 
 birdset/output/*
 # Byte-compiled / optimized / DLL files

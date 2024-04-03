@@ -62,6 +62,20 @@ class NetworkConfig:
     normalize_waveform: bool = False
     normalize_spectrogram: bool = True
 
+
+# @dataclass
+# class LRSchedulerExtrasConfig:
+#     """
+#     A dataclass for configuring the extras of the learning rate scheduler.
+
+#     Attributes:
+#         interval (str): The interval at which the scheduler performs its step. Defaults to "step".
+#         warmup_ratio (float): The ratio of warmup steps to total steps. Defaults to 0.5.
+#     """
+#     interval: str = "step"
+#     warmup_ratio: float = 0.05
+
+
 @dataclass
 class LRSchedulerConfig:
     """
@@ -83,6 +97,7 @@ class LRSchedulerConfig:
     interval: str = "step"
     warmup_ratio: float = 0.05
 
+    #extras: LRSchedulerExtrasConfig = LRSchedulerExtrasConfig()
 @dataclass
 class LoggingParamsConfig:
     """
