@@ -43,6 +43,10 @@ datamodule:
     class_weights_sampler: null
     classlimit: 600
     eventlimit: 3
+  transforms:
+    preprocessing:
+      resizer:
+        target_width: 1_024
 
 
   loaders:
@@ -72,4 +76,3 @@ callbacks:
   model_checkpoint:
     save_last: True
     every_n_epochs: 3
-
