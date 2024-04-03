@@ -65,17 +65,17 @@ class NetworkConfig:
     normalize_spectrogram: bool = True
 
 
-@dataclass
-class LRSchedulerExtrasConfig:
-    """
-    A dataclass for configuring the extras of the learning rate scheduler.
+# @dataclass
+# class LRSchedulerExtrasConfig:
+#     """
+#     A dataclass for configuring the extras of the learning rate scheduler.
 
-    Attributes:
-        interval (str): The interval at which the scheduler performs its step. Defaults to "step".
-        warmup_ratio (float): The ratio of warmup steps to total steps. Defaults to 0.5.
-    """
-    interval: str = "step"
-    warmup_ratio: float = 0.5
+#     Attributes:
+#         interval (str): The interval at which the scheduler performs its step. Defaults to "step".
+#         warmup_ratio (float): The ratio of warmup steps to total steps. Defaults to 0.5.
+#     """
+#     interval: str = "step"
+#     warmup_ratio: float = 0.05
 
 
 @dataclass
@@ -95,9 +95,12 @@ class LRSchedulerConfig:
             'last_epoch': -1,
         }
     )
-    extras: LRSchedulerExtrasConfig = LRSchedulerExtrasConfig()
 
+    interval: str = "step"
+    warmup_ratio: float = 0.05
 
+    #extras: LRSchedulerExtrasConfig = LRSchedulerExtrasConfig()
+    
 class MetricsConfig:
     """
     A class for configuring the metrics used during model training and evaluation.
@@ -219,6 +222,7 @@ class BaseModule(L.LightningModule):
         self.loss = loss
         self.optimizer = optimizer
         self.lr_scheduler = lr_scheduler
+        self.warmup_ratio = 0.05
         self.metrics = metrics
         self.logging_params = logging_params
 
@@ -270,7 +274,7 @@ class BaseModule(L.LightningModule):
             # TODO: Handle the case when we do not want warmup
             num_training_steps = math.ceil((self.num_epochs * self.len_trainset) / self.batch_size * self.num_gpus)
             num_warmup_steps = math.ceil(
-                    num_training_steps * self.lr_scheduler.extras.warmup_ratio
+                    num_training_steps * self.lr_scheduler.warmup_ratio
                 )
             # TODO: Handle the case when drop_last=True more explicitly   
 
@@ -280,7 +284,12 @@ class BaseModule(L.LightningModule):
                 num_warmup_steps=num_warmup_steps,
             )
 
-            return {"optimizer": self.optimizer, "lr_scheduler": self.scheduler}
+            scheduler_dict = {
+                "scheduler": self.scheduler,
+                "interval": self.lr_scheduler.interval,
+                "warmup_ratio":self.lr_scheduler.warmup_ratio}                      
+
+            return {"optimizer": self.optimizer, "lr_scheduler": scheduler_dict}
 
         return {"optimizer": self.optimizer}
 

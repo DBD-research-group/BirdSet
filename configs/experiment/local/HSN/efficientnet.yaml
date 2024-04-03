@@ -21,7 +21,7 @@ logger:
   wandb:
     tags: ${tags}
     group: "XCM_train_efficientnet"
-    mode: offline
+    mode: online
 
 module:
   optimizer:
@@ -38,7 +38,7 @@ module:
 trainer:
   min_epochs: 1
   max_epochs: 40
-  devices: [1]
+  #devices: [1]
 
 datamodule:
   dataset:
