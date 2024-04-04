@@ -15,7 +15,7 @@ defaults:
 tags: ["HSN", "efficientnet", "multilabel"]
 seed: 2
 train: True
-test: False
+test: True
 
 logger:
   wandb:
@@ -29,18 +29,20 @@ module:
     lr: 5e-4
     weight_decay: 5e-4
   loss:
-  #  _target_: src.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
+  #  _target_: birdset.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
     _target_: torch.nn.BCEWithLogitsLoss 
-  #_target_: src.modules.losses.focal_loss.MultiLabelFocalLoss
+  #_target_: birdset.modules.losses.focal_loss.MultiLabelFocalLoss
   network: 
-    torch_compile: True
+    torch_compile: False
 
 trainer:
   min_epochs: 1
-  max_epochs: 200
+  max_epochs: 40
+  #devices: [1]
 
 datamodule:
   dataset:
+    subset: 2000
     val_split: 0.2
     class_weights_loss: null
     class_weights_sampler: null
@@ -49,32 +51,24 @@ datamodule:
     
   loaders:
     train:
-      batch_size: 128
+      batch_size: 32
       shuffle: True
-      num_workers: 32
+      num_workers: 16
       drop_last: True
     valid:
-      batch_size: 128
-      num_workers: 32
+      batch_size: 32
+      num_workers: 16
       shuffle: False
     test:
-      batch_size: 128
-      num_workers: 32
+      batch_size: 32
+      num_workers: 16
       shuffle: False
 
   mapper: 
     biggest_cluster: True
     no_call: False
-  
+
 callbacks:
   model_checkpoint:
     save_last: True
     every_n_epochs: 3
-  early_stopping:
-    target_: lightning.pytorch.callbacks.EarlyStopping
-    monitor: "val/mAP"
-    patience: 4
-    min_delta: 5e-2
-    verbose: False
-    check_finite: True
-

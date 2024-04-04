@@ -1,6 +1,6 @@
 model_name: "resnet18"
 model:
-  _target_: src.modules.models.resnet.ResNetClassifier
+  _target_: birdset.modules.models.resnet.ResNetClassifier
   baseline_architecture: 'resnet18'
   num_classes: 50
   num_channels: 1

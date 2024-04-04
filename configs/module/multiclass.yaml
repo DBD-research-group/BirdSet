@@ -1,4 +1,4 @@
-_target_: src.modules.base_module.BaseModule
+_target_: birdset.modules.base_module.BaseModule
 
 defaults:
   - _self_
@@ -39,10 +39,10 @@ metrics:
       average: macro
       thresholds: null
     balanced_acc: 
-      _target_: src.modules.metrics.BalancedAccuracy
+      _target_: birdset.modules.metrics.BalancedAccuracy
       num_classes: ${datamodule.dataset.n_classes}  
     balanced_acc_top5:
-      _target_: src.modules.metrics.BalancedAccuracyTop5
+      _target_: birdset.modules.metrics.BalancedAccuracyTop5
       num_classes: ${datamodule.dataset.n_classes}  
     # auroc:
     #   _target_: "torchmetrics.classification.AUROC"
@@ -52,13 +52,13 @@ metrics:
     #   thresholds: null
   # eval_complete:
   #   pcmap:
-  #     _target_: src.modules.metrics.pcmAP
+  #     _target_: birdset.modules.metrics.pcmAP
   #     num_labels: ${datamodule.dataset.n_classes}
   #     padding_factor: 5
   #     average: macro
   #     thresholds: null
   #   cmap5:
-  #     _target_: src.modules.metrics.cmAP
+  #     _target_: birdset.modules.metrics.cmAP
   #     num_labels: ${datamodule.dataset.n_classes}
   #     sample_threshold: 5
   #     average: macro

@@ -20,14 +20,14 @@ import pandas as pd
 
 
 #############################################
-_BIRDSET_CITATION = """\
+_BirdSet_CITATION = """\
 @article{rauch2024,
     title = {BirdSet: A Multi-Task Benchmark For Avian Diversity Monitoring},
     author={Rauch, Lukas and Schwinger, Raphael and Wirth, Moritz and Lange, Jonas and Heinrich, René},
     year={2024}
 }
 """
-_BIRDSET_DESCRIPTION = """\
+_BirdSet_DESCRIPTION = """\
 This dataset offers a unified, well-structured platform for avian bioacoustics and consists of various tasks. \
 By creating a set of tasks, BirdSet enables an overall performance score for models and uncovers their limitations \
 in certain areas.
@@ -189,9 +189,9 @@ class BirdSet(datasets.GeneratorBasedBuilder):
 
     def _info(self):
         return datasets.DatasetInfo(
-            description = _BIRDSET_DESCRIPTION + self.config.description,
+            description = _BirdSet_DESCRIPTION + self.config.description,
             features = self.config.features,
-            citation=self.config.citation + "\n" + _BIRDSET_CITATION,
+            citation=self.config.citation + "\n" + _BirdSet_CITATION,
         )
 
     def _split_generators(self, dl_manager):

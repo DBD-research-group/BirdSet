@@ -1,5 +1,5 @@
 model:
-  _target_: src.modules.models.efficientnet.EfficientNetClassifier
+  _target_: birdset.modules.models.efficientnet.EfficientNetClassifier
   architecture: "efficientnet_b1"
   num_classes: ${datamodule.dataset.n_classes}
   num_channels: 1

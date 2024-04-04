@@ -12,7 +12,7 @@ defaults:
   #- override /datamodule/transforms/spectrogram_augmentations: none.yaml
   #- override /datamodule/transforms/waveform_augmentations: none.yaml
 
-#ckpt_path: "/home/lrauch/projects/GADME/src/output/train/runs/xenocanto_m_withoutnd/eat/2024-01-23_145247/checkpoints"
+#ckpt_path: "/home/lrauch/projects/BirdSet/birdset/output/train/runs/xenocanto_m_withoutnd/eat/2024-01-23_145247/checkpoints"
 train: True
 test: True
 
@@ -32,12 +32,12 @@ module:
     lr: 5e-4
     weight_decay: 5e-4
   loss:
-  #  _target_: src.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
+  #  _target_: birdset.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
     _target_: torch.nn.BCEWithLogitsLoss 
   network:
     torch_compile: False
-    model: 
-      checkpoint: /home/lrauch/mnt/train/runs/XCM/efficientnet/2024-02-27_175354/callback_checkpoints/efficientnet_XCM_146.ckpt
+    # model: 
+    #   checkpoint: /home/lrauch/mnt/train/runs/XCM/efficientnet/2024-02-27_175354/callback_checkpoints/efficientnet_XCM_146.ckpt
 
 
 

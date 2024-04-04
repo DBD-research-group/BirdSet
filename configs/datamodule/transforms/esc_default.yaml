@@ -1,4 +1,4 @@
-_target_: src.datamodule.components.transforms.GADMETransformsWrapper
+_target_: birdset.datamodule.components.transforms.BirdSetTransformsWrapper
 sampling_rate: ${module.network.sampling_rate}
 model_type: ${module.network.model_type}
 task: ${datamodule.dataset.task}
