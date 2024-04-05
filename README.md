@@ -110,12 +110,16 @@ To enhance model performance we mix in additional background noise from download
 
 ## Run experiments
 
-Our experiments are defined in the `configs/experiment` folder. To run an experiment, use the following command:
+Our experiments are defined in the `configs/experiment` folder. To run an experiment, use the following command in the directory of the repository:
 
+``` bash
+python src/main.py experiment="EXPERIMENT_PATH"
 ```
-python birdset/main.py experiment=EXPERIMENT_NAME
-```
+Replace `EXPERIMENT_PATH` with the path to the disired experiment YAML config originating from the `experiment` directory. For example, here's a command for training an EfficientNet on HSN: 
 
+``` bash
+python src/main.py experiment="local/HSN/efficientnet.yaml"
+```
 
 
 ## Project structure
@@ -188,7 +192,6 @@ The following steps are performed in `setup`:
 ## Transformations
 
 Data transformations are referred to data transformations that are applied to the data during training. They include e.g. augmentations. The transformations are added to the huggingface dataset with [`set_transform`](https://huggingface.co/docs/datasets/main/en/package_reference/main_classes#datasets.Dataset.set_transform).
-
 
 
 
