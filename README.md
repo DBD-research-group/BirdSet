@@ -53,7 +53,7 @@ Our datasets are shared via HuggingFace Datasets in our [HuggingFace BirdSet rep
    ```
 
    After executing this command, you'll be prompted to enter your HuggingFace credentials ([User Access Token](https://huggingface.co/docs/hub/security-tokens)). Once authenticated, your credentials will be saved locally, allowing seamless access to HuggingFace resources. -->
-   
+[Tutorial Notebook](https://github.com/DBD-research-group/BirdSet/blob/main/notebooks/tutorials/birdset-pipeline_tutorial.ipynb)
 ## Prepare Data
 
 ```
