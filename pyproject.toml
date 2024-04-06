@@ -57,6 +57,7 @@ pydub = "^0.25.1"
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.25.2"
 plumbum = "^1.8.2"
+jsonlines = "^4.0.0"
 
 
 [[tool.poetry.source]]
