@@ -1,7 +1,7 @@
 model:
-  _target_: src.modules.models.resnet.ResNetClassifier
+  _target_: birdset.modules.models.resnet.ResNetClassifier
   baseline_architecture: 'resnet18'
-  num_classes: 21
+  num_classes: ${datamodule.dataset.n_classes}
   num_channels: 1
   pretrained: True
 
