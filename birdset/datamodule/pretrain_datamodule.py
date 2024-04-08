@@ -70,11 +70,19 @@ class PretrainDataModule(BaseDataModuleHF):
             if self.dataset_config.class_weights_loss or self.dataset_config.class_weights_sampler:
                 self.num_train_labels = self._count_labels((dataset["train"]["ebird_code"]))
             
-            if self.dataset_config.classlimit:
+            if self.dataset_config.classlimit and not self.dataset_config.eventlimit:
                 dataset["train"] = self._limit_classes(
                     dataset=dataset["train"],
                     label_name="ebird_code",
-                    limit=self.dataset_config.classlimit)
+                    limit=self.dataset_config.classlimit
+                )
+            elif self.dataset_config.classlimit or self.dataset_config.eventlimit:
+                dataset["train"] = self._smart_sampling(
+                    dataset=dataset["train"],
+                    label_name="ebird_code",
+                    class_limit=self.dataset_config.classlimit,
+                    event_limit=self.dataset_config.eventlimit
+                )
 
             dataset = dataset.rename_column("ebird_code", "labels")
 
@@ -93,11 +101,20 @@ class PretrainDataModule(BaseDataModuleHF):
 
             dataset = dataset.rename_column("ebird_code_multilabel", "labels")
 
+            if self.dataset_config.classlimit or self.dataset_config.eventlimit:
+                logging.info(">> Smart Sampling") #!TODO: implement custom caching?
+                dataset["train"] = self._smart_sampling(
+                    dataset=dataset["train"],
+                    label_name="ebird_code",
+                    class_limit=self.dataset_config.classlimit,
+                    event_limit=self.dataset_config.eventlimit
+                )
+
             logging.info(">> One-hot-encode classes")
             dataset = dataset.map(
                 self._classes_one_hot,
                 batched=True,
-                batch_size=350,
+                batch_size=500,
                 load_from_cache_file=False,
                 num_proc=1,
             )
