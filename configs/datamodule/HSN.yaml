@@ -1,5 +1,5 @@
 #HSN high_sierras
-_target_: src.datamodule.gadme_datamodule.GADMEDataModule
+_target_: birdset.datamodule.birdset_datamodule.BirdSetDataModule
 
 defaults: 
   - _self_

@@ -19,7 +19,7 @@ module:
     lr: 2e-5
   network:
     model:
-     checkpoint: "/home/lrauch/projects/GADME/src/output/train/runs/xenocanto_m_withoutnd/ast/2024-01-03_170946/hfmodel"
+     checkpoint: "/home/lrauch/projects/BirdSet/birdset/output/train/runs/xenocanto_m_withoutnd/ast/2024-01-03_170946/hfmodel"
 
 trainer:
   min_epochs: 1
