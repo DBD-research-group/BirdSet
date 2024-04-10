@@ -2,7 +2,7 @@ _target_: birdset.modules.base_module.BaseModule
 
 defaults:
   - _self_
-  - network: wav2vec2.yaml
+  - network: efficientnet.yaml
   
 task: multiclass
 class_weights_loss: ${datamodule.dataset.class_weights_loss}
@@ -10,40 +10,21 @@ num_gpus: ${trainer.devices}
 
 optimizer:
   _target_: torch.optim.AdamW
+  _partial_: true
   lr: 1e-5
   weight_decay: 0.01
 
 loss:
   _target_: torch.nn.CrossEntropyLoss
-  
-lr_scheduler:
-  scheduler:
-    _target_: transformers.get_cosine_schedule_with_warmup
-  extras:
-    interval: step
-    warmup_ratio: 0.05
 
-metrics: 
-  main: 
-    _target_: "torchmetrics.classification.Accuracy"
-    task: "multiclass"
-    num_classes: ${datamodule.dataset.n_classes}
-    top_k: 1
-  val_best: 
-    _target_: "torchmetrics.MaxMetric"
-  additional: 
-    cmap:
-      _target_: "torchmetrics.classification.AveragePrecision"
-      num_classes: ${datamodule.dataset.n_classes}  
-      task: "multiclass"
-      average: macro
-      thresholds: null
-    balanced_acc: 
-      _target_: birdset.modules.metrics.BalancedAccuracy
-      num_classes: ${datamodule.dataset.n_classes}  
-    balanced_acc_top5:
-      _target_: birdset.modules.metrics.BalancedAccuracyTop5
-      num_classes: ${datamodule.dataset.n_classes}  
+metrics:
+  _target_: birdset.modules.base_module.MultiClassMetricsConfig
+  num_labels: ${datamodule.dataset.n_classes}
+  
+  
+lr_scheduler: null
+
+
     # auroc:
     #   _target_: "torchmetrics.classification.AUROC"
     #   task: "multiclass"
@@ -67,6 +48,7 @@ metrics:
 
 output_activation: 
   _target_: "torch.softmax"
+  _partial_: true
   dim: 1
 
 logging_params:
