@@ -5,7 +5,6 @@ defaults:
   - network: efficientnet.yaml
   
 task: multiclass
-class_weights_loss: ${datamodule.dataset.class_weights_loss}
 num_gpus: ${trainer.devices}
 
 optimizer:
@@ -18,41 +17,11 @@ loss:
   _target_: torch.nn.CrossEntropyLoss
 
 metrics:
-  _target_: birdset.modules.base_module.MultiClassMetricsConfig
+  _target_: birdset.modules.metrics.multiclass.MulticlassMetricsConfig
   num_labels: ${datamodule.dataset.n_classes}
   
-  
-lr_scheduler: null
-
-
-    # auroc:
-    #   _target_: "torchmetrics.classification.AUROC"
-    #   task: "multiclass"
-    #   num_labels: ${datamodule.dataset.n_classes}
-    #   average: "macro"
-    #   thresholds: null
-  # eval_complete:
-  #   pcmap:
-  #     _target_: birdset.modules.metrics.pcmAP
-  #     num_labels: ${datamodule.dataset.n_classes}
-  #     padding_factor: 5
-  #     average: macro
-  #     thresholds: null
-  #   cmap5:
-  #     _target_: birdset.modules.metrics.cmAP
-  #     num_labels: ${datamodule.dataset.n_classes}
-  #     sample_threshold: 5
-  #     average: macro
-  #     thresholds: null
-
 
 output_activation: 
   _target_: "torch.softmax"
   _partial_: true
   dim: 1
-
-logging_params:
-  on_step: False
-  on_epoch: True
-  sync_dist: False
-  prog_bar: True  
