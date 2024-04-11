@@ -3,7 +3,7 @@ task_name: debug
 
 defaults:
   - override /module: multilabel.yaml
-  - override /module/network: efficientnet.yaml
+  - override /module/network: ast.yaml
   - override /datamodule: HSN.yaml
   #- override /callbacks: default.yaml 
   - override /trainer: single_gpu.yaml
@@ -13,7 +13,7 @@ defaults:
   #- override /datamodule/transforms/waveform_augmentations: none.yaml
 
 #ckpt_path: "/home/lrauch/projects/BirdSet/birdset/output/train/runs/xenocanto_m_withoutnd/eat/2024-01-23_145247/checkpoints"
-train: True
+train: False
 test: True
 
 extras: 
@@ -38,6 +38,13 @@ module:
     torch_compile: False
     # model: 
     #   checkpoint: /home/lrauch/mnt/train/runs/XCM/efficientnet/2024-02-27_175354/callback_checkpoints/efficientnet_XCM_146.ckpt
+    model:
+      local_checkpoint: /home/lrauch/mnt/train/runs/XCM/ast/2024-04-03_133040/callback_checkpoints/last.ckpt
+      pretrain_info:
+        hf_path: DBD-research-group/BirdSet
+        hf_name: HSN
+        hf_pretrain_name: XCM
+
 
 
 

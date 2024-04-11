@@ -35,7 +35,8 @@ class MultilabelModule(BaseModule):
             class_weights_loss: Optional[bool] = None,
             label_counts: int = 21,
             num_gpus: int = 1,
-            prediction_table: bool = False
+            prediction_table: bool = False,
+            pretrain_info = None
             ):
     
         self.prediction_table = prediction_table
@@ -54,7 +55,8 @@ class MultilabelModule(BaseModule):
             class_weights_loss=class_weights_loss,
             label_counts=label_counts,
             batch_size=batch_size,
-            num_gpus=num_gpus
+            num_gpus=num_gpus,
+            pretrain_info=pretrain_info
         )
 
     def test_step(self, batch, batch_idx):
