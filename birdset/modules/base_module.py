@@ -136,7 +136,7 @@ class MetricsConfig:
             'T1Accuracy': TopKAccuracy(topk= 1),
             'T3Accuracy': TopKAccuracy(topk= 3),
             'mAP': mAP(
-                num_labels= 21,
+                num_labels= num_labels,
                 thresholds=None
             )  
         })
@@ -263,9 +263,9 @@ class BaseModule(L.LightningModule):
             self.pretrain_dataset = self.pretrain_info["hf_pretrain_name"]
             self.hf_path = self.pretrain_info["hf_path"]
             self.hf_name = self.pretrain_info["hf_name"]
-            pretrain_info = datasets.load_dataset_builder(self.hf_path, self.pretrain_dataset).info.features["ebird_code"]
-            dataset_info = datasets.load_dataset_builder(self.hf_path, self.hf_name).info.features["ebird_code"]
-            self.class_mask = [pretrain_info.names.index(i) for i in dataset_info.names]
+            pretrain_classlabels = datasets.load_dataset_builder(self.hf_path, self.pretrain_dataset).info.features["ebird_code"]
+            dataset_classlabels = datasets.load_dataset_builder(self.hf_path, self.hf_name).info.features["ebird_code"]
+            self.class_mask = [pretrain_classlabels.names.index(i) for i in dataset_classlabels.names]
 
     def forward(self, *args, **kwargs):
         return self.model.forward(*args, **kwargs)

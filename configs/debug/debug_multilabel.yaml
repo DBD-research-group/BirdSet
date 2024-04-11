@@ -4,7 +4,7 @@ task_name: debug
 defaults:
   - override /module: multilabel.yaml
   - override /module/network: ast.yaml
-  - override /datamodule: HSN.yaml
+  - override /datamodule: POW.yaml
   #- override /callbacks: default.yaml 
   - override /trainer: single_gpu.yaml
   - override /datamodule/transforms: bird_default_multilabel.yaml
@@ -42,7 +42,7 @@ module:
       local_checkpoint: /home/lrauch/mnt/train/runs/XCM/ast/2024-04-03_133040/callback_checkpoints/last.ckpt
       pretrain_info:
         hf_path: DBD-research-group/BirdSet
-        hf_name: HSN
+        hf_name: POW
         hf_pretrain_name: XCM
 
 

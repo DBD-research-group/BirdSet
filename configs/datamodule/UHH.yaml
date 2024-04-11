@@ -1,5 +1,5 @@
 #UHH hawaiian islands
-_target_: src.datamodule.birdset_datamodule.BirdSetDataModule
+_target_: birdset.datamodule.birdset_datamodule.BirdSetDataModule
 
 defaults: 
   - _self_
