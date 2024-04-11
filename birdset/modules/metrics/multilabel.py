@@ -1,15 +1,25 @@
 import torch
 import torchmetrics
 from torchmetrics.classification.average_precision import MultilabelAveragePrecision
-from birdset.modules.base_module import MetricsConfig
 from torchmetrics import Metric
 from torchmetrics import AUROC, Metric, MaxMetric, MetricCollection
 
-class MultilabelMetricsConfig(MetricsConfig):
-    def __init__(self, num_labels: int = 21):
-        """
-        Initializes the MultilabelMetricsConfig class.
+class MultilabelMetricsConfig:
+    """
+    A class for configuring the metrics used during model training and evaluation.
+    Attributes:
+        main_metric (Metric): The main metric used for model training.
+        val_metric_best (Metric): The metric used for model validation.
+        add_metrics (MetricCollection): A collection of additional metrics used during model training.
+        eval_complete (MetricCollection): A collection of metrics used during model evaluation.
+    """
 
+    def __init__(
+        self,
+        num_labels: int = 21,
+    ):
+        """
+        Initializes the MetricsConfig class.
         Args:
             num_labels (int): The number of labels in the dataset. Defaults to 21 as in the HSN dataset.
         """
@@ -21,11 +31,6 @@ class MultilabelMetricsConfig(MetricsConfig):
         self.add_metrics: MetricCollection = MetricCollection({
             'MultilabelAUROC': AUROC(
                 task="multilabel",
-                num_labels=num_labels,
-                average='macro',
-                thresholds=None
-            ),
-            'MultilabelAUPR': MultilabelAveragePrecision(
                 num_labels=num_labels,
                 average='macro',
                 thresholds=None

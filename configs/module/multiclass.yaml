@@ -2,10 +2,9 @@ _target_: birdset.modules.base_module.BaseModule
 
 defaults:
   - _self_
-  - network: wav2vec2.yaml
+  - network: efficientnet.yaml
   
 task: multiclass
-class_weights_loss: ${datamodule.dataset.class_weights_loss}
 num_gpus: ${trainer.devices}
 
 optimizer:
@@ -15,70 +14,14 @@ optimizer:
   weight_decay: 0.01
 
 loss:
-  _target_: torch.nn.BCEWithLogitsLoss
-  
-# lr_scheduler:
-#   scheduler:
-#     _target_: transformers.get_cosine_schedule_with_warmup
-#   extras:
-#     interval: step
-#     warmup_ratio: 0.05
+  _target_: torch.nn.CrossEntropyLoss
 
-metrics: 
+metrics:
   _target_: birdset.modules.metrics.multiclass.MulticlassMetricsConfig
   num_labels: ${datamodule.dataset.n_classes}
-  # main_metric: 
-  #   _target_: "torchmetrics.classification.Accuracy"
-  #   task: "multiclass"
-  #   num_classes: ${datamodule.dataset.n_classes}
-  #   top_k: 1
-  # val_metric_best: 
-  #   _target_: "torchmetrics.MaxMetric"
-  # add_metrics: 
-  #   cmap:
-  #     _target_: "torchmetrics.classification.AveragePrecision"
-  #     num_classes: ${datamodule.dataset.n_classes}  
-  #     task: "multiclass"
-  #     average: macro
-  #     thresholds: null
-  #   balanced_acc: 
-  #     _target_: birdset.modules.metrics.BalancedAccuracy
-  #     num_classes: ${datamodule.dataset.n_classes}  
-  #   balanced_acc_top5:
-  #     _target_: birdset.modules.metrics.BalancedAccuracyTop5
-  #     num_classes: ${datamodule.dataset.n_classes}
-  #   auroc:
-  #     _target_: "torchmetrics.classification.MulticlassAUROC"
-  #     task: "multiclass"
-  #     num_classes: ${datamodule.dataset.n_classes}
-  #     average: "macro"
-  #     thresholds: null
-  #   ece:
-  #     _target_: "torchmetrics.classification.MulticlassCalibrationError"
-  #     num_classes: ${datamodule.dataset.n_classes}
-  #     num_bins: 10
-  #     norm: "l1"
-  # eval_complete:
-  #   pcmap:
-  #     _target_: birdset.modules.metrics.pcmAP
-  #     num_labels: ${datamodule.dataset.n_classes}
-  #     padding_factor: 5
-  #     average: macro
-  #     thresholds: null
-  #   cmap5:
-  #     _target_: birdset.modules.metrics.cmAP
-  #     num_labels: ${datamodule.dataset.n_classes}
-  #     sample_threshold: 5
-  #     average: macro
-  #     thresholds: null
-
+  
 
 output_activation: 
-  _target_: "torch.sigmoid"
+  _target_: "torch.softmax"
   _partial_: true
-
-logging_params:
-  on_step: False
-  on_epoch: True
-  sync_dist: False
-  prog_bar: True  
+  dim: 1
