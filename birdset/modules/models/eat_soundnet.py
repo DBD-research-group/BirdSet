@@ -125,7 +125,8 @@ class SoundNet(nn.Module):
             factors: List[int] = [4, 4, 4, 4],
             n_classes: int | None = None,
             dim_feedforward: int = 512 ,
-            checkpoint: str | None = None
+            checkpoint: str | None = None,
+            pretrain_info= None
                  ):
         super().__init__()
         self.checkpoint = checkpoint
@@ -176,7 +177,7 @@ class SoundNet(nn.Module):
 
             output_layers = ["tf.fc.weight", "tf.fc.bias"]
             filtered_state_dict = {k: v for k, v in state_dict.items() if k not in output_layers}
-            self.load_state_dict(filtered_state_dict, strict=False)
+            self.load_state_dict(filtered_state_dict, strict=True)
 
     def _init_weights(self, m):
         if isinstance(m, nn.Conv1d):
