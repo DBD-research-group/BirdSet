@@ -62,8 +62,7 @@ class NetworkConfig:
     torch_compile: bool = False
     sample_rate: int = 32000
     normalize_waveform: bool = False
-    normalize_spectrogram: bool = True
-
+    normalize_spectrogram: bool = True    
 
 # @dataclass
 # class LRSchedulerExtrasConfig:
@@ -137,7 +136,7 @@ class MetricsConfig:
             'T1Accuracy': TopKAccuracy(topk= 1),
             'T3Accuracy': TopKAccuracy(topk= 3),
             'mAP': mAP(
-                num_labels= 21,
+                num_labels= num_labels,
                 thresholds=None
             )  
         })
@@ -211,7 +210,8 @@ class BaseModule(L.LightningModule):
             task: Literal['multiclass', 'multilabel'] = "multilabel",
             class_weights_loss: Optional[bool] = None,
             label_counts: int = 21,
-            num_gpus: int = 1
+            num_gpus: int = 1,
+            pretrain_info = None
             ):
 
         super(BaseModule, self).__init__()
@@ -234,6 +234,7 @@ class BaseModule(L.LightningModule):
         self.num_gpus = get_num_gpu(num_gpus)
 
         self.model = self.network.model
+        self.pretrain_info = pretrain_info
 
         # configure main metric
         self.train_metric = self.metrics.main_metric.clone()
@@ -257,13 +258,14 @@ class BaseModule(L.LightningModule):
         self.class_mask = None
 
         # TODO: reimplement this
-        if hasattr(network.model, 'pretran_info') and network.model.pretrain_info is not None:
-            self.pretrain_dataset = network.model.pretrain_info["hf_pretrain_name"]
-            self.hf_path = network.model.pretrain_info["hf_path"]
-            self.hf_name = network.model.pretrain_info["hf_name"]
-            pretrain_info = datasets.load_dataset_builder(self.hf_path, self.pretrain_dataset).info.features["ebird_code"]
-            dataset_info = datasets.load_dataset_builder(self.hf_path, self.hf_name).info.features["ebird_code"]
-            self.class_mask = [pretrain_info.names.index(i) for i in dataset_info.names]
+        if self.pretrain_info is not None:
+            print("Masking Logits")
+            self.pretrain_dataset = self.pretrain_info["hf_pretrain_name"]
+            self.hf_path = self.pretrain_info["hf_path"]
+            self.hf_name = self.pretrain_info["hf_name"]
+            pretrain_classlabels = datasets.load_dataset_builder(self.hf_path, self.pretrain_dataset).info.features["ebird_code"]
+            dataset_classlabels = datasets.load_dataset_builder(self.hf_path, self.hf_name).info.features["ebird_code"]
+            self.class_mask = [pretrain_classlabels.names.index(i) for i in dataset_classlabels.names]
 
     def forward(self, *args, **kwargs):
         return self.model.forward(*args, **kwargs)
