@@ -3,18 +3,19 @@ task_name: debug
 
 defaults:
   - override /module: multilabel.yaml
-  - override /module/network: ast.yaml
-  - override /datamodule: POW.yaml
+  - override /module/network: eat_soundnet.yaml
+  - override /datamodule: XCM.yaml
   #- override /callbacks: default.yaml 
   - override /trainer: single_gpu.yaml
+ # - override /datamodule/transforms: bird_default_multilabel.yaml
   - override /datamodule/transforms: bird_default_multilabel.yaml
   - override /callbacks: cluster.yaml
   #- override /datamodule/transforms/spectrogram_augmentations: none.yaml
   #- override /datamodule/transforms/waveform_augmentations: none.yaml
 
 #ckpt_path: "/home/lrauch/projects/BirdSet/birdset/output/train/runs/xenocanto_m_withoutnd/eat/2024-01-23_145247/checkpoints"
-train: False
-test: True
+train: True
+test: False
 
 extras: 
   ignore_warnings: False
@@ -38,14 +39,13 @@ module:
     torch_compile: False
     # model: 
     #   checkpoint: /home/lrauch/mnt/train/runs/XCM/efficientnet/2024-02-27_175354/callback_checkpoints/efficientnet_XCM_146.ckpt
-    model:
-      local_checkpoint: /home/lrauch/mnt/train/runs/XCM/ast/2024-04-03_133040/callback_checkpoints/last.ckpt
-      pretrain_info:
-        hf_path: DBD-research-group/BirdSet
-        hf_name: POW
-        hf_pretrain_name: XCM
-
-
+    # model:
+    #   checkpoint: /home/lrauch/EAT-base_epoch30.pt
+      # local_checkpoint: /home/lrauch/mnt/train/runs/XCM/ast/2024-04-03_133040/callback_checkpoints/last.ckpt
+      # pretrain_info:
+      #   hf_path: DBD-research-group/BirdSet
+      #   hf_name: POW
+      #   hf_pretrain_name: XCM
 
 
 trainer: 
