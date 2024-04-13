@@ -3,7 +3,7 @@ from typing import Dict, Optional
 import datasets
 import torch
 from torch import nn
-from transformers import AutoConfig, MobileNetV2Model
+from transformers import AutoConfig, MobileNetV2ForImageClassification
 
 
 class MobileNetClassifier(nn.Module):
@@ -79,7 +79,7 @@ class MobileNetClassifier(nn.Module):
                     for key, weight in state_dict.items()
                 }
 
-            self.model = MobileNetV2Model.from_pretrained(
+            self.model = MobileNetV2ForImageClassification.from_pretrained(
                 self.checkpoint,
                 num_labels=self.num_classes,
                 num_channels=self.num_channels,
@@ -93,7 +93,7 @@ class MobileNetClassifier(nn.Module):
                 num_labels=self.num_classes,
                 num_channels=self.num_channels,
             )
-            self.model = MobileNetV2Model(config)
+            self.model = MobileNetV2ForImageClassification(config)
 
     def forward(
         self, input_values: torch.Tensor, labels: Optional[torch.Tensor] = None
@@ -108,7 +108,8 @@ class MobileNetClassifier(nn.Module):
         Returns:
             torch.Tensor: The output of the MobileNet model.
         """
-        logits = self.model(input_values).logits
+        output = self.model(input_values)
+        logits = output.logits
 
         return logits
 

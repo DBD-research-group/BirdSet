@@ -3,7 +3,7 @@ from typing import Dict, Optional
 import datasets
 import torch
 from torch import nn
-from transformers import AutoConfig, EfficientNetModel
+from transformers import AutoConfig, EfficientNetForImageClassification
 
 
 class EfficientNetClassifier(nn.Module):
@@ -78,7 +78,7 @@ class EfficientNetClassifier(nn.Module):
                     for key, weight in state_dict.items()
                 }
 
-            self.model = EfficientNetModel.from_pretrained(
+            self.model = EfficientNetForImageClassification.from_pretrained(
                 self.checkpoint,
                 num_labels=self.num_classes,
                 num_channels=self.num_channels,
@@ -92,7 +92,7 @@ class EfficientNetClassifier(nn.Module):
                 num_labels=self.num_classes,
                 num_channels=self.num_channels,
             )
-            self.model = EfficientNetModel(config)
+            self.model = EfficientNetForImageClassification(config)
 
     def forward(
         self, input_values: torch.Tensor, labels: Optional[torch.Tensor] = None
@@ -107,7 +107,8 @@ class EfficientNetClassifier(nn.Module):
         Returns:
             torch.Tensor: The output of the EfficientNet model.
         """
-        logits = self.model(input_values).logits
+        output = self.model(input_values)
+        logits = output.logits
 
         return logits
 
