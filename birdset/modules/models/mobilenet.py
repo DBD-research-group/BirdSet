@@ -89,7 +89,7 @@ class MobileNetClassifier(nn.Module):
             )
         else:
             config = AutoConfig.from_pretrained(
-                "facebook/convnext-base-224-22k",
+                "google/mobilenet_v2_1.4_224",
                 num_labels=self.num_classes,
                 num_channels=self.num_channels,
             )
