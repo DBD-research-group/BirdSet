@@ -1,21 +1,9 @@
-from typing import Literal, Optional
+from typing import Dict, Optional
 
+import datasets
 import torch
 from torch import nn
-from torchvision.models import (
-    mobilenet_v2,
-    mobilenet_v3_small,
-    mobilenet_v3_large,
-)
-
-from birdset.modules.models.efficientnet import generate_state_dict, update_first_cnn_layer
-
-
-MobileNetVersion = Literal[
-    "mobilenet_v2",
-    "mobilenet_v3_small",
-    "mobilenet_v3_large",
-]
+from transformers import AutoConfig, MobileNetV2Model
 
 
 class MobileNetClassifier(nn.Module):
@@ -23,7 +11,6 @@ class MobileNetClassifier(nn.Module):
     MobileNet model for audio classification.
 
     Attributes:
-        architecture (MobileNetVersion): The version of MobileNet to use.
         num_classes (int): The number of classes for the output layer.
         num_channels (int): The number of input channels.
         checkpoint (Optional[str]): Path to a checkpoint for loading pre-trained weights.
@@ -31,10 +18,12 @@ class MobileNetClassifier(nn.Module):
 
     def __init__(
         self,
-        architecture: MobileNetVersion,
         num_classes: int,
         num_channels: int = 1,
         checkpoint: Optional[str] = None,
+        local_checkpoint: Optional[str] = None,
+        cache_dir: Optional[str] = None,
+        pretrain_info: Optional[Dict] = None,
     ):
         """
         Initialize the MobileNet model.
@@ -47,10 +36,27 @@ class MobileNetClassifier(nn.Module):
         """
         super().__init__()
 
-        self.architecture = architecture
-        self.num_classes = num_classes
+        if pretrain_info:
+            self.hf_path = pretrain_info.hf_path
+            self.hf_name = (
+                pretrain_info.hf_name
+                if not pretrain_info.hf_pretrain_name
+                else pretrain_info.hf_pretrain_name
+            )
+            self.num_classes = len(
+                datasets.load_dataset_builder(self.hf_path, self.hf_name)
+                .info.features["ebird_code"]
+                .names
+            )
+        else:
+            self.hf_path = None
+            self.hf_name = None
+            self.num_classes = num_classes
+
         self.num_channels = num_channels
         self.checkpoint = checkpoint
+        self.local_checkpoint = local_checkpoint
+        self.cache_dir = cache_dir
 
         self.model = None
 
@@ -60,33 +66,34 @@ class MobileNetClassifier(nn.Module):
         """Initializes the MobileNet model based on specified attributes.
 
         Returns:
-            nn.Module: The initialized MobileNet model.
+            nn.Module: The initialized ConvNext model.
         """
-        # Initialize model based on the backbone architecture
-        if self.architecture == "mobilenet_v2":
-            mobilenet_model = mobilenet_v2(
-                pretrained=False, num_classes=self.num_classes
-            )
-        elif self.architecture == "mobilenet_v3_small":
-            mobilenet_model = mobilenet_v3_small(
-                pretrained=False, num_classes=self.num_classes
-            )
-        elif self.architecture == "mobilenet_v3_large":
-            mobilenet_model = mobilenet_v3_large(
-                pretrained=False, num_classes=self.num_classes
+
+        state_dict = None
+
+        if self.checkpoint:
+            if self.local_checkpoint:
+                state_dict = torch.load(self.local_checkpoint)["state_dict"]
+                state_dict = {
+                    key.replace("model.model.", ""): weight
+                    for key, weight in state_dict.items()
+                }
+
+            self.model = MobileNetV2Model.from_pretrained(
+                self.checkpoint,
+                num_labels=self.num_classes,
+                num_channels=self.num_channels,
+                cache_dir=self.cache_dir,
+                state_dict=state_dict,
+                ignore_mismatched_sizes=True,
             )
         else:
-            raise ValueError(f"Unsupported MobileNet version: {self.architecture}")
-
-        # Update the first layer to match num_channels if needed
-        update_first_cnn_layer(model=mobilenet_model, num_channels=self.num_channels)
-
-        # Load checkpoint if provided
-        if self.checkpoint:
-            state_dict = load_state_dict(self.checkpoint)
-            mobilenet_model.load_state_dict(state_dict, strict=False)
-
-        self.model = mobilenet_model
+            config = AutoConfig.from_pretrained(
+                "facebook/convnext-base-224-22k",
+                num_labels=self.num_classes,
+                num_channels=self.num_channels,
+            )
+            self.model = MobileNetV2Model(config)
 
     def forward(
         self, input_values: torch.Tensor, labels: Optional[torch.Tensor] = None

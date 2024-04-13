@@ -62,7 +62,7 @@ class EfficientNetClassifier(nn.Module):
         self._initialize_model()
 
     def _initialize_model(self) -> nn.Module:
-        """Initializes the ConvNext model based on specified attributes.
+        """Initializes the EfficientNet model based on specified attributes.
 
         Returns:
             nn.Module: The initialized ConvNext model.
