@@ -3,7 +3,7 @@ from typing import Dict, Optional
 import datasets
 import torch
 from torch import nn
-from transformers import AutoConfig, ConvNextModel
+from transformers import AutoConfig, ConvNextForImageClassification
 
 
 class ConvNextClassifier(nn.Module):
@@ -79,7 +79,7 @@ class ConvNextClassifier(nn.Module):
                     for key, weight in state_dict.items()
                 }
 
-            self.model = ConvNextModel.from_pretrained(
+            self.model = ConvNextForImageClassification.from_pretrained(
                 self.checkpoint,
                 num_labels=self.num_classes,
                 num_channels=self.num_channels,
@@ -93,7 +93,7 @@ class ConvNextClassifier(nn.Module):
                 num_labels=self.num_classes,
                 num_channels=self.num_channels,
             )
-            self.model = ConvNextModel(config)
+            self.model = ConvNextForImageClassification(config)
 
     def forward(
         self, input_values: torch.Tensor, labels: Optional[torch.Tensor] = None
@@ -108,7 +108,8 @@ class ConvNextClassifier(nn.Module):
         Returns:
             torch.Tensor: The output of the ConvNext model.
         """
-        logits = self.model(input_values).logits
+        output = self.model(input_values)
+        logits = output.logits
 
         return logits
 
