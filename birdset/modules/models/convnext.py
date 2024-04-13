@@ -1,23 +1,9 @@
-from typing import Literal, Optional
+from typing import Dict, Optional
 
+import datasets
 import torch
 from torch import nn
-from torchvision.models import (
-    convnext_tiny,
-    convnext_small,
-    convnext_base,
-    convnext_large,
-)
-
-from birdset.modules.models.efficientnet import generate_state_dict, update_first_cnn_layer
-
-
-ConvNextVersion = Literal[
-    "convnext_tiny",
-    "convnext_small",
-    "convnext_base",
-    "convnext_large",
-]
+from transformers import AutoConfig, ConvNextModel
 
 
 class ConvNextClassifier(nn.Module):
@@ -33,26 +19,44 @@ class ConvNextClassifier(nn.Module):
 
     def __init__(
         self,
-        architecture: ConvNextVersion,
         num_classes: int,
         num_channels: int = 1,
         checkpoint: Optional[str] = None,
+        local_checkpoint: Optional[str] = None,
+        cache_dir: Optional[str] = None,
+        pretrain_info: Optional[Dict] = None,
     ):
         """
         Initialize the ConvNext model.
 
         Args:
-        architecture (ConvNextVersion): The version of the ConvNext architecture.
         num_classes (int): The number of classes for classification.
         num_channels (int): The number of input channels. Default is 1.
         checkpoint (Optional[str]): Path to a checkpoint for loading pre-trained weights. Default is None.
         """
         super().__init__()
 
-        self.architecture = architecture
-        self.num_classes = num_classes
+        if pretrain_info:
+            self.hf_path = pretrain_info.hf_path
+            self.hf_name = (
+                pretrain_info.hf_name
+                if not pretrain_info.hf_pretrain_name
+                else pretrain_info.hf_pretrain_name
+            )
+            self.num_classes = len(
+                datasets.load_dataset_builder(self.hf_path, self.hf_name)
+                .info.features["ebird_code"]
+                .names
+            )
+        else:
+            self.hf_path = None
+            self.hf_name = None
+            self.num_classes = num_classes
+
         self.num_channels = num_channels
         self.checkpoint = checkpoint
+        self.local_checkpoint = local_checkpoint
+        self.cache_dir = cache_dir
 
         self.model = None
 
@@ -64,35 +68,32 @@ class ConvNextClassifier(nn.Module):
         Returns:
             nn.Module: The initialized ConvNext model.
         """
-        # Initialize model based on the backbone architecture
-        if self.architecture == "convnext_tiny":
-            convnext_model = convnext_tiny(
-                pretrained=False, num_classes=self.num_classes
-            )
-        elif self.architecture == "convnext_small":
-            convnext_model = convnext_small(
-                pretrained=False, num_classes=self.num_classes
-            )
-        elif self.architecture == "convnext_base":
-            convnext_model = convnext_base(
-                pretrained=False, num_classes=self.num_classes
-            )
-        elif self.architecture == "convnext_large":
-            convnext_model = convnext_large(
-                pretrained=False, num_classes=self.num_classes
+
+        state_dict = None
+
+        if self.checkpoint:
+            if self.local_checkpoint:
+                state_dict = torch.load(self.local_checkpoint)["state_dict"]
+                state_dict = {
+                    key.replace("model.model.", ""): weight
+                    for key, weight in state_dict.items()
+                }
+
+            self.model = ConvNextModel.from_pretrained(
+                self.checkpoint,
+                num_labels=self.num_classes,
+                num_channels=self.num_channels,
+                cache_dir=self.cache_dir,
+                state_dict=state_dict,
+                ignore_mismatched_sizes=True,
             )
         else:
-            raise ValueError(f"Unsupported ConvNext version: {self.architecture}")
-
-        # Update the first layer to match num_channels if needed
-        update_first_cnn_layer(model=convnext_model, num_channels=self.num_channels)
-
-        # Load checkpoint if provided
-        if self.checkpoint:
-            state_dict = load_state_dict(self.checkpoint)
-            convnext_model.load_state_dict(state_dict, strict=False)
-
-        self.model = convnext_model
+            config = AutoConfig.from_pretrained(
+                "facebook/convnext-base-224-22k",
+                num_labels=self.num_classes,
+                num_channels=self.num_channels,
+            )
+            self.model = ConvNextModel(config)
 
     def forward(
         self, input_values: torch.Tensor, labels: Optional[torch.Tensor] = None
