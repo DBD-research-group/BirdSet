@@ -112,7 +112,7 @@ class MobileNetClassifier(nn.Module):
 
         return logits
 
-@torch.inference_mode()
+    @torch.inference_mode()
     def get_logits(self, dataloader, device):
         pass
 
