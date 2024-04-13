@@ -10,7 +10,7 @@ defaults:
   - override /hydra: default.yaml
 
 tags: ["XCM", "convnext", "multilabel"]
-seed: 42
+seed: 2
 train: True
 test: False
 
@@ -31,13 +31,23 @@ module:
     weight_decay: 5e-4
 
 datamodule:
+  dataset:
+    val_split: 0.2
+    class_weights_loss: null
+    class_weights_sampler: null
+    classlimit: null
+    eventlimit: null
+
   loaders:
     train:
       batch_size: 64
+      num_workers: 32
     valid:
       batch_size: 64
+      num_workers: 32
     test:
       batch_size: 64
+      num_workers: 32
 
 callbacks:
   model_checkpoint:
