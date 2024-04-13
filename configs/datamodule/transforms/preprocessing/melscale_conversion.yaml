@@ -1,5 +1,5 @@
 melscale_conversion:
   _target_: torchaudio.transforms.MelScale
-  n_mels: 128
+  n_mels: 256
   sample_rate: ${module.network.sampling_rate}
-  n_stft: 513 # n_fft//2+1!!! how to include in code
+  n_stft: 1025 # n_fft//2+1!!! how to include in code
