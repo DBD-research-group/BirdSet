@@ -3,9 +3,10 @@ model:
   num_classes: ${datamodule.dataset.n_classes}
   tfhub_version: 4
   train_classifier: False
-  label_path: ${paths.root_dir}/dataset/perch/label.csv
-  restrict_logits: True  
-  dataset_info_path: /home/lrauch/projects/BirdSet/data_birdset/HSN/HSN_processed_2_14993c47380e9f0f/train/dataset_info.json
+  restrict_logits: True
+  label_path: ${paths.root_dir}/resources/perch/label_updated.csv
+  hf_path: ${datamodule.dataset.hf_path}
+  hf_name: ${datamodule.dataset.hf_name}
   task: ${module.task}
 
 model_name: perch
@@ -13,4 +14,4 @@ model_type: waveform
 torch_compile: False
 sampling_rate: 32_000
 normalize_spectrogram: False
-normalize_waveform: null
+normalize_waveform: "instance_peak_normalization"
