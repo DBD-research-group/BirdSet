@@ -101,15 +101,18 @@ class PerchModel(nn.Module):
         if self.restrict_logits:
             # Load the class list from the CSV file
             pretrain_classlabels = pd.read_csv(self.label_path)
-            # Extract the 'ebird2021' column as a numpy array
-            pretrain_classlabels = pretrain_classlabels["ebird2021"].values
-            pretrain_classlabels = dict(enumerate(pretrain_classlabels))
+            # Extract the 'ebird2021' column as a list
+            pretrain_classlabels = pretrain_classlabels["ebird2021"].tolist()
 
-            dataset_classlabels = datasets.load_dataset_builder(
+            # Load dataset information
+            dataset_info = datasets.load_dataset_builder(
                 self.hf_path, self.hf_name
-            ).info.features["ebird_code"]
+            ).info
+            dataset_classlabels = dataset_info.features["ebird_code"].names
+
+            # Create the class mask
             self.class_mask = [
-                pretrain_classlabels.names.index(i) for i in dataset_classlabels.names
+                pretrain_classlabels.index(i) for i in dataset_classlabels
             ]
 
     @tf.function  # Decorate with tf.function to compile into a callable TensorFlow graph
