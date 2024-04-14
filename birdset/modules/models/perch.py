@@ -60,9 +60,14 @@ class PerchModel(nn.Module):
         self.train_classifier = train_classifier
         self.restrict_logits = restrict_logits
         self.label_path = label_path
-        self.hf_path = pretrain_info["hf_path"]
-        self.hf_name = pretrain_info["hf_name"]
         self.task = task
+
+        if pretrain_info:
+            self.hf_path = pretrain_info["hf_path"]
+            self.hf_name = pretrain_info["hf_name"]
+        else:
+            self.hf_path = None
+            self.hf_name = None
 
         # Define a linear classifier to use on top of the embeddings
         # self.classifier = nn.Linear(
@@ -98,6 +103,7 @@ class PerchModel(nn.Module):
             pretrain_classlabels = pd.read_csv(self.label_path)
             # Extract the 'ebird2021' column as a numpy array
             pretrain_classlabels = pretrain_classlabels["ebird2021"].values
+            pretrain_classlabels = dict(enumerate(pretrain_classlabels))
 
             dataset_classlabels = datasets.load_dataset_builder(
                 self.hf_path, self.hf_name
