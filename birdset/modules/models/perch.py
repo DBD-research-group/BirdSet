@@ -1,4 +1,4 @@
-from typing import Optional, Tuple
+from typing import Dict, Optional, Tuple
 
 import datasets
 import pandas as pd
@@ -36,8 +36,7 @@ class PerchModel(nn.Module):
         train_classifier: bool = False,
         restrict_logits: bool = False,
         label_path: Optional[str] = None,
-        hf_path: Optional[str] = None,
-        hf_name: Optional[str] = None,
+        pretrain_info: Optional[Dict] = None,
         task: Optional[str] = None,
     ) -> None:
         """
@@ -61,8 +60,8 @@ class PerchModel(nn.Module):
         self.train_classifier = train_classifier
         self.restrict_logits = restrict_logits
         self.label_path = label_path
-        self.hf_path = hf_path
-        self.hf_name = hf_name
+        self.hf_path = pretrain_info["hf_path"]
+        self.hf_name = pretrain_info["hf_name"]
         self.task = task
 
         # Define a linear classifier to use on top of the embeddings
