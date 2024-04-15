@@ -4,6 +4,7 @@ model:
   num_classes: ${datamodule.dataset.n_classes}
   num_channels: 1
   checkpoint: null
+  pretrain_info: null
 
 model_name: efficientnet
 model_type: vision

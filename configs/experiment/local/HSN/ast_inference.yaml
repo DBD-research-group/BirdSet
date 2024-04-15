@@ -1,7 +1,7 @@
 # @package _global_
 #package global is neccessary!
 defaults:
-  - override /datamodule: HSN.yaml
+  - override /datamodule: UHH.yaml
   - override /module: multilabel.yaml
   - override /module/network: ast.yaml
   - override /callbacks: default.yaml
@@ -12,7 +12,7 @@ defaults:
   - override /datamodule/transforms/spectrogram_augmentations: none.yaml
   - override /datamodule/transforms/waveform_augmentations: none.yaml
 
-tags: ["HSN", "ast", "multilabel", "inference"]
+tags: ["UHH", "ast", "multilabel", "inference"]
 seed: 2
 train: False
 test: True
@@ -35,12 +35,12 @@ module:
   #_target_: birdset.modules.losses.focal_loss.MultiLabelFocalLoss
   network:
     torch_compile: False
-    # model:
-    #   local_checkpoint: /home/lrauch/mnt/train/runs/XCM/ast/2024-04-03_133040/callback_checkpoints/last.ckpt
-    #   pretrain_info:
-    #     hf_path: DBD-research-group/BirdSet
-    #     hf_name: HSN
-    #     hf_pretrain_name: XCM
+    model:
+      local_checkpoint: /home/lrauch/mnt/train/runs/XCM/ast/2024-04-03_133040/callback_checkpoints/last.ckpt
+      pretrain_info:
+        hf_path: DBD-research-group/BirdSet
+        hf_name: UHH
+        hf_pretrain_name: XCM
 
 trainer:
   min_epochs: 1
