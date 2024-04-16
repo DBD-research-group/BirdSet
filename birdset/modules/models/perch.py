@@ -110,9 +110,17 @@ class PerchModel(nn.Module):
             ).info
             dataset_classlabels = dataset_info.features["ebird_code"].names
 
-            # Create the class mask
+            # # Create the class mask
+            # self.class_mask = [
+            #     pretrain_classlabels.index(i) for i in dataset_classlabels
+            # ]
+
+            # Find the common labels using set intersection
+            common_labels = set(pretrain_classlabels).intersection(dataset_classlabels)
+
+            # Create the class mask for only the common labels
             self.class_mask = [
-                pretrain_classlabels.index(i) for i in dataset_classlabels
+                pretrain_classlabels.index(label) for label in common_labels
             ]
 
     @tf.function  # Decorate with tf.function to compile into a callable TensorFlow graph
