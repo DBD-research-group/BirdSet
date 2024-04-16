@@ -126,7 +126,7 @@ python birdset/train.py experiment="EXPERIMENT_PATH"
 Replace `EXPERIMENT_PATH` with the path to the disired experiment YAML config originating from the `experiment` directory. For example, here's a command for training an EfficientNet on HSN: 
 
 ``` bash
-python bridset/train.py experiment="local/HSN/efficientnet.yaml"
+python birdset/train.py experiment="local/HSN/efficientnet.yaml"
 ```
 
 
