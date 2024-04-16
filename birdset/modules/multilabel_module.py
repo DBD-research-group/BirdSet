@@ -34,7 +34,8 @@ class MultilabelModule(BaseModule):
             batch_size: int = 32,
             task: Literal['multiclass', 'multilabel'] = "multilabel",
             num_gpus: int = 1,
-            prediction_table: bool = False
+            prediction_table: bool = False,
+            pretrain_info = None
             ):
     
         self.prediction_table = prediction_table
@@ -51,7 +52,8 @@ class MultilabelModule(BaseModule):
             len_trainset=len_trainset,
             task=task,
             batch_size=batch_size,
-            num_gpus=num_gpus
+            num_gpus=num_gpus,
+            pretrain_info=pretrain_info
         )
 
     def test_step(self, batch, batch_idx):

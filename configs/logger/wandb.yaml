@@ -1,7 +1,7 @@
 wandb:
   _target_: pytorch_lightning.loggers.WandbLogger
   name: ${module.network.model_name}_${datamodule.dataset.dataset_name}#${seed}_${start_time}
-  save_dir: "${paths.log_dir}"
+  save_dir: ${paths.log_dir}
   mode: offline
   id: null # pass correct id to resume experiment!
   project: "birdset"
