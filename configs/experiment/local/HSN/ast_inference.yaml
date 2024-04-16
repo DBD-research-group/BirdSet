@@ -1,7 +1,7 @@
 # @package _global_
 #package global is neccessary!
 defaults:
-  - override /datamodule: HSN.yaml
+  - override /datamodule: UHH.yaml
   - override /module: multilabel.yaml
   - override /module/network: ast.yaml
   - override /callbacks: default.yaml
@@ -12,14 +12,10 @@ defaults:
   - override /datamodule/transforms/spectrogram_augmentations: none.yaml
   - override /datamodule/transforms/waveform_augmentations: none.yaml
 
-tags: ["HSN", "efficientnet", "multilabel"]
+tags: ["UHH", "ast", "multilabel", "inference"]
 seed: 2
-train: True
+train: False
 test: True
-
-logger: 
-  wandb: 
-    mode: disabled
 
 # logger:
 #   wandb:
@@ -39,10 +35,16 @@ module:
   #_target_: birdset.modules.losses.focal_loss.MultiLabelFocalLoss
   network:
     torch_compile: False
+    model:
+      local_checkpoint: /home/lrauch/mnt/train/runs/XCM/ast/2024-04-03_133040/callback_checkpoints/last.ckpt
+      pretrain_info:
+        hf_path: DBD-research-group/BirdSet
+        hf_name: UHH
+        hf_pretrain_name: XCM
 
 trainer:
   min_epochs: 1
-  max_epochs: 200
+  max_epochs: 1
 
 datamodule:
   dataset:
@@ -51,20 +53,24 @@ datamodule:
     class_weights_sampler: null
     classlimit: 600
     eventlimit: 4
+  transforms:
+    preprocessing:
+      resizer:
+        target_width: 1_024
 
   loaders:
     train:
-      batch_size: 16
+      batch_size: 48
       shuffle: True
       num_workers: 18
       drop_last: True
       pin_memory: True
     valid:
-      batch_size: 16
+      batch_size: 48
       num_workers: 18
       shuffle: False
     test:
-      batch_size: 16
+      batch_size: 48
       num_workers: 18
       shuffle: False
 
