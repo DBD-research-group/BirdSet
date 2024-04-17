@@ -112,6 +112,7 @@ class EfficientNetClassifier(nn.Module):
         num_classes: int,
         num_channels: int = 1,
         checkpoint: Optional[str] = None,
+        pretrain_info = None
     ):
         """
         Initialize the EfficientNet model.

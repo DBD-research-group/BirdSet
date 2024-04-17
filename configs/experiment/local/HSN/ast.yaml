@@ -12,16 +12,16 @@ defaults:
   - override /datamodule/transforms/spectrogram_augmentations: none.yaml
   - override /datamodule/transforms/waveform_augmentations: none.yaml
 
-tags: ["HSN", "efficientnet", "multilabel"]
+tags: ["HSN", "ast", "multilabel"]
 seed: 2
 train: True
 test: True
 
-# logger:
-#   wandb:
-#     tags: ${tags}
-#     group: "HSN_train_efficientnet"
-#     mode: online
+logger:
+  wandb:
+    tags: ${tags}
+    group: "HSN_train_efficientnet"
+    mode: disabled
     #version: pretraineatxcm_2 #to resume train run # needs to be tested
 
 module:
@@ -47,6 +47,7 @@ datamodule:
     class_weights_sampler: null
     classlimit: 600
     eventlimit: 4
+    subset: 1000
 
   loaders:
     train:
