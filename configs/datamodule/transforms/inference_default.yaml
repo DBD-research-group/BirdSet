@@ -1,0 +1,18 @@
+_target_: birdset.datamodule.components.transforms.BirdSetTransformsWrapper
+sampling_rate: ${module.network.sampling_rate}
+model_type: ${module.network.model_type}
+task: ${datamodule.dataset.task}
+max_length: 5
+
+defaults:
+  - _self_
+  - preprocessing: default.yaml 
+  - waveform_augmentations: none.yaml
+  - spectrogram_augmentations: none.yaml
+  - decoding: bird_event_decoder.yaml
+  - feature_extractor: default_aug.yaml
+  - nocall_sampler: default.yaml
+  
+
+
+
