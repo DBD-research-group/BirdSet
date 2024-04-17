@@ -69,22 +69,30 @@ class MobileNetClassifier(nn.Module):
             nn.Module: The initialized ConvNext model.
         """
 
-        state_dict = None
+        adjusted_state_dict = None
 
         if self.checkpoint:
             if self.local_checkpoint:
                 state_dict = torch.load(self.local_checkpoint)["state_dict"]
-                state_dict = {
-                    key.replace("model.model.", ""): weight
-                    for key, weight in state_dict.items()
-                }
+
+                # Update this part to handle the necessary key replacements
+                adjusted_state_dict = {}
+                for key, value in state_dict.items():
+                    # Handle 'model.model.' prefix
+                    new_key = key.replace("model.model.", "")
+
+                    # Handle 'model._orig_mod.model.' prefix
+                    new_key = new_key.replace("model._orig_mod.model.", "")
+
+                    # Assign the adjusted key
+                    adjusted_state_dict[new_key] = value
 
             self.model = MobileNetV2ForImageClassification.from_pretrained(
                 self.checkpoint,
                 num_labels=self.num_classes,
                 num_channels=self.num_channels,
                 cache_dir=self.cache_dir,
-                state_dict=state_dict,
+                state_dict=adjusted_state_dict,
                 ignore_mismatched_sizes=True,
             )
         else:
