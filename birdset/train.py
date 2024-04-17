@@ -67,6 +67,7 @@ def train(cfg):
         num_epochs=cfg.trainer.max_epochs, #?
         len_trainset=datamodule.len_trainset,
         batch_size=datamodule.loaders_config.train.batch_size,
+        pretrain_info=cfg.module.network.model.pretrain_info
     )
 
     object_dict = {
