@@ -3,7 +3,7 @@
 defaults:
   - override /datamodule: HSN.yaml
   - override /module: multilabel.yaml
-  - override /module/network: efficientnet.yaml
+  - override /module/network: ast.yaml
   - override /callbacks: default.yaml
   - override /trainer: single_gpu.yaml
   - override /datamodule/transforms: bird_default_multilabel.yaml
@@ -17,11 +17,15 @@ seed: 2
 train: True
 test: True
 
-logger:
-  wandb:
-    tags: ${tags}
-    group: "HSN_train_efficientnet"
+logger: 
+  wandb: 
     mode: disabled
+
+# logger:
+#   wandb:
+#     tags: ${tags}
+#     group: "HSN_train_efficientnet"
+#     mode: online
     #version: pretraineatxcm_2 #to resume train run # needs to be tested
 
 module:
@@ -51,17 +55,17 @@ datamodule:
 
   loaders:
     train:
-      batch_size: 48
+      batch_size: 16
       shuffle: True
       num_workers: 18
       drop_last: True
       pin_memory: True
     valid:
-      batch_size: 48
+      batch_size: 16
       num_workers: 18
       shuffle: False
     test:
-      batch_size: 48
+      batch_size: 16
       num_workers: 18
       shuffle: False
 
@@ -73,4 +77,3 @@ callbacks:
   model_checkpoint:
     save_last: True
     every_n_epochs: 3
-

@@ -126,7 +126,7 @@ class SoundNet(nn.Module):
             n_classes: int | None = None,
             dim_feedforward: int = 512 ,
             checkpoint: str | None = None,
-            pretrain_info= None
+            pretrain_info = None
                  ):
         super().__init__()
         self.checkpoint = checkpoint
