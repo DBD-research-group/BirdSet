@@ -1,5 +1,5 @@
-#HSN
-_target_: birdset.datamodule.pretrain_datamodule.PretrainDataModule
+#POW powdermill nature
+_target_: birdset.datamodule.inference_datamodule.InferenceDataModule
 
 defaults: 
   - _self_
@@ -9,13 +9,13 @@ defaults:
 
 dataset:
   data_dir: ${paths.dataset_path}
-  dataset_name: xenocanto_m_withoutnd
-  hf_path: DBD-research-group/birdset_v1
-  hf_name: xenocanto_M_withoutnd
+  dataset_name: POW
+  hf_path: DBD-research-group/BirdSet
+  hf_name: POW
   seed: ${seed}
-  n_classes: 410
-  n_workers: 3
-  val_split: 0.05
+  n_classes: 48
+  n_workers: 1
+  val_split: 0.2
   task: ${module.task}
   subset: null
   sampling_rate: ${module.network.sampling_rate}
@@ -23,10 +23,3 @@ dataset:
   class_weights_sampler: null
   classlimit: 500
   eventlimit: 5
-
-
-
-
-
-
-
