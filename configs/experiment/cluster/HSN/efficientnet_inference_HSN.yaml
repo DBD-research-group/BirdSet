@@ -2,14 +2,14 @@
 defaults:
   - override /datamodule: HSN.yaml
   - override /module: multilabel.yaml
-  - override /module/network: convnext.yaml
+  - override /module/network: efficientnet.yaml
   - override /callbacks: default.yaml
   - override /trainer: single_gpu.yaml
   - override /datamodule/transforms: bird_default_multilabel.yaml
   - override /paths: default.yaml
   - override /hydra: default.yaml
 
-tags: ["HSN", "convnext", "inference", "multilabel"]
+tags: ["HSN", "efficientnet", "inference", "multilabel"]
 seed: 2
 train: False
 test: True
@@ -17,7 +17,7 @@ test: True
 logger:
   wandb:
     tags: ${tags}
-    group: "HSN_inference_convnext"
+    group: "HSN_inference_efficientnet"
     mode: online
 
 datamodule:
