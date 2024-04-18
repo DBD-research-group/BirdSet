@@ -1,42 +1,36 @@
 # @package _global_
 #package global is neccessary!
 defaults:
-  - override /datamodule: NBP.yaml
+  - override /datamodule: /inference/NBP_inf.yaml
   - override /module: multilabel.yaml
   - override /module/network: ast.yaml
-  - override /callbacks: default.yaml
   - override /trainer: single_gpu.yaml
-  - override /datamodule/transforms: bird_default_multilabel.yaml
-  - override /paths: default.yaml
-  - override /hydra: default.yaml
-  - override /datamodule/transforms/spectrogram_augmentations: none.yaml
-  - override /datamodule/transforms/waveform_augmentations: none.yaml
+  - override /datamodule/transforms: inference_default.yaml
+  - override /paths: cluster.yaml
+  - override /hydra: cluster.yaml
+
+#override for inference
+# datamodule:
+#   _target_: birdset.datamodule.inference_datamodule.InferenceDataModule
 
 tags: ["NBP", "ast", "multilabel", "inference"]
 seed: 2
-train: False
+
 test: True
 
-# logger:
-#   wandb:
-#     tags: ${tags}
-#     group: "HSN_train_efficientnet"
-#     mode: online
+logger:
+  wandb:
+    tags: ${tags}
+    group: "NBP_inference_ast_xcm"
+    mode: online
     #version: pretraineatxcm_2 #to resume train run # needs to be tested
 
 module:
-  optimizer:
-    _target_: torch.optim.AdamW
-    lr: 5e-4
-    weight_decay: 5e-4
-  loss:
-  #  _target_: birdset.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
-    _target_: torch.nn.BCEWithLogitsLoss 
-  #_target_: birdset.modules.losses.focal_loss.MultiLabelFocalLoss
   network:
     torch_compile: False
     model:
-      local_checkpoint: /home/lrauch/mnt/train/runs/XCM/ast/2024-04-03_133040/callback_checkpoints/last.ckpt
+      #local_checkpoint: /home/lrauch/mnt/train/runs/XCM/ast/2024-04-03_133040/callback_checkpoints/last.ckpt
+      local_checkpoint : /mnt/work/bird2vec/birdset_logs/train/runs/XCM/ast/22024-04-15_111606/callback_checkpoints/last.ckpt
       pretrain_info:
         hf_path: DBD-research-group/BirdSet
         hf_name: NBP
@@ -47,39 +41,14 @@ trainer:
   max_epochs: 1
 
 datamodule:
-  dataset:
-    val_split: 0.1
-    class_weights_loss: null
-    class_weights_sampler: null
-    classlimit: 600
-    eventlimit: 4
   transforms:
     preprocessing:
       resizer:
         target_width: 1_024
 
   loaders:
-    train:
-      batch_size: 48
-      shuffle: True
-      num_workers: 18
-      drop_last: True
-      pin_memory: True
-    valid:
-      batch_size: 48
-      num_workers: 18
-      shuffle: False
     test:
-      batch_size: 48
-      num_workers: 18
+      batch_size: 64
+      num_workers: 24
       shuffle: False
-
-  mapper: 
-    biggest_cluster: True
-    no_call: False
-  
-callbacks:
-  model_checkpoint:
-    save_last: True
-    every_n_epochs: 3
 
