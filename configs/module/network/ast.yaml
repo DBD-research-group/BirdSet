@@ -3,7 +3,7 @@ model:
   checkpoint: MIT/ast-finetuned-audioset-10-10-0.4593
   local_checkpoint: null
   num_classes: ${datamodule.dataset.n_classes}
-  cache_dir: ${paths.dataset_path}/models/
+  cache_dir: ${paths.model_path}
   pretrain_info:
     hf_path: ${datamodule.dataset.hf_path}
     hf_name: ${datamodule.dataset.hf_name}

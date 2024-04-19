@@ -1,5 +1,5 @@
-#PER
-_target_: birdset.datamodule.birdset_datamodule.BirdSetDataModule
+#HSN nips4bplus
+_target_: birdset.datamodule.inference_datamodule.InferenceDataModule
 
 defaults: 
   - _self_
@@ -9,21 +9,17 @@ defaults:
 
 dataset:
   data_dir: ${paths.dataset_path}
-  dataset_name: amazon_basin
-  hf_path: DBD-research-group/birdset_v1
-  hf_name: amazon_basin
+  dataset_name: NBP
+  hf_path: DBD-research-group/BirdSet
+  hf_name: NBP
   seed: ${seed}
-  n_classes: 133
-  n_workers: 3
+  n_classes: 51
+  n_workers: 1
   val_split: 0.2
   task: ${module.task}
   subset: null
   sampling_rate: ${module.network.sampling_rate}
+  class_weights_loss: null
+  class_weights_sampler: null
   classlimit: 500
   eventlimit: 5
-
-
-
-
-
-

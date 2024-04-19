@@ -6,8 +6,8 @@ defaults:
   - override /module/network: ast.yaml
   - override /trainer: single_gpu.yaml
   - override /datamodule/transforms: inference_default.yaml
-  - override /paths: default.yaml
-  - override /hydra: default.yaml
+  - override /paths: cluster.yaml
+  - override /hydra: cluster.yaml
 
 #override for inference
 # datamodule:
@@ -30,7 +30,7 @@ module:
     torch_compile: False
     model:
       #local_checkpoint: /home/lrauch/mnt/train/runs/XCM/ast/2024-04-03_133040/callback_checkpoints/last.ckpt
-      local_checkpoint : /home/lrauch/mnt/train/runs/XCM/ast/22024-04-15_111606/callback_checkpoints/last.ckpt
+      local_checkpoint : /mnt/work/bird2vec/birdset_logs/train/runs/XCM/ast/22024-04-15_111606/callback_checkpoints/last.ckpt
       pretrain_info:
         hf_path: DBD-research-group/BirdSet
         hf_name: HSN

@@ -1,4 +1,5 @@
-_target_: birdset.datamodule.birdset_datamodule.BirdSetDataModule
+#UHH hawaiian islands
+_target_: birdset.datamodule.inference_datamodule.InferenceDataModule
 
 defaults: 
   - _self_
@@ -8,19 +9,17 @@ defaults:
 
 dataset:
   data_dir: ${paths.dataset_path}
-  dataset_name: powdermill_nature
-  hf_path: DBD-research-group/birdset_v1
-  hf_name: powdermill_nature
+  dataset_name: UHH
+  hf_path: DBD-research-group/BirdSet
+  hf_name: UHH
   seed: ${seed}
-  n_classes: 49
-  n_workers: 3
+  n_classes: 27
+  n_workers: 1
   val_split: 0.2
   task: ${module.task}
   subset: null
   sampling_rate: ${module.network.sampling_rate}
+  class_weights_loss: null
+  class_weights_sampler: null
   classlimit: 500
   eventlimit: 5
-
-
-
-

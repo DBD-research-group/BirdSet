@@ -1,7 +1,7 @@
 # @package _global_
 #package global is neccessary!
 defaults:
-  - override /datamodule: HSN.yaml
+  - override /datamodule: SNE.yaml
   - override /module: multilabel.yaml
   - override /module/network: ast.yaml
   - override /callbacks: cluster.yaml 
@@ -10,7 +10,7 @@ defaults:
   - override /paths: cluster.yaml
   - override /hydra: cluster.yaml
 
-tags: ["subset_HSN", "ast", "multilabel", "5event"]
+tags: ["subset_SNE", "ast", "multilabel", "5event"]
 seed: 2
 train: True
 test: True
@@ -18,7 +18,7 @@ test: True
 logger:
   wandb:
     tags: ${tags}
-    group: "HSN_subset_ast"
+    group: "SNE_subset_ast"
     mode: online
     version: subset_ast_${start_time} #to resume train run # needs to be tested
 
@@ -33,7 +33,7 @@ module:
     torch_compile: False
     # pretrain_info:
     #   hf_path: DBD-research-group/BirdSet
-    #   hf_name: HSN
+    #   hf_name: SNE
     #   hf_pretrain_name: null
 
 trainer:
