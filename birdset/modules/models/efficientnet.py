@@ -68,8 +68,6 @@ class EfficientNetClassifier(nn.Module):
             nn.Module: The initialized ConvNext model.
         """
 
-        state_dict = None
-
         adjusted_state_dict = None
 
         if self.checkpoint:
