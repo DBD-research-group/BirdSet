@@ -52,10 +52,12 @@ class NetworkConfig:
         normalize_spectrogram (bool): Whether to normalize the spectrogram data. Defaults to True.
     """
     model: nn.Module = EfficientNetClassifier(
-        architecture="efficientnet_b1",
         num_classes=21,
         num_channels=1,
-        checkpoint=None
+        checkpoint=None,
+        local_checkpoint=None,
+        cache_dir=None,
+        pretrain_info=None,
     )
     model_name: str = "efficientnet"
     model_type: Literal['vision', 'waveform'] = "vision"

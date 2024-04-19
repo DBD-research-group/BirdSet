@@ -2,14 +2,14 @@
 defaults:
   - override /datamodule: XCM.yaml
   - override /module: multilabel.yaml
-  - override /module/network: efficientnet.yaml
+  - override /module/network: mobilenet.yaml
   - override /callbacks: default.yaml
   - override /trainer: single_gpu.yaml
   - override /datamodule/transforms: bird_default_multilabel.yaml
   - override /paths: default.yaml
   - override /hydra: default.yaml
 
-tags: ["XCM", "efficientnet", "multilabel"]
+tags: ["XCM", "mobilenet", "multilabel"]
 seed: 2
 train: True
 test: False
@@ -17,7 +17,7 @@ test: False
 logger:
   wandb:
     tags: ${tags}
-    group: "XCM_train_efficientnet"
+    group: "XCM_train_mobilenet"
     mode: online
 
 trainer:

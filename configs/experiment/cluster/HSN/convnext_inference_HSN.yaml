@@ -1,34 +1,24 @@
 # @package _global_
 defaults:
-  - override /datamodule: XCM.yaml
+  - override /datamodule: HSN.yaml
   - override /module: multilabel.yaml
-  - override /module/network: efficientnet.yaml
+  - override /module/network: convnext.yaml
   - override /callbacks: default.yaml
   - override /trainer: single_gpu.yaml
   - override /datamodule/transforms: bird_default_multilabel.yaml
   - override /paths: default.yaml
   - override /hydra: default.yaml
 
-tags: ["XCM", "efficientnet", "multilabel"]
+tags: ["HSN", "convnext", "inference", "multilabel"]
 seed: 2
-train: True
-test: False
+train: False
+test: True
 
 logger:
   wandb:
     tags: ${tags}
-    group: "XCM_train_efficientnet"
+    group: "HSN_inference_convnext"
     mode: online
-
-trainer:
-  min_epochs: 1
-  max_epochs: 30
-
-module:
-  optimizer:
-    _target_: torch.optim.AdamW
-    lr: 5e-4
-    weight_decay: 5e-4
 
 datamodule:
   dataset:
@@ -48,8 +38,3 @@ datamodule:
     test:
       batch_size: 64
       num_workers: 32
-
-callbacks:
-  model_checkpoint:
-    save_top_k: -1
-    every_n_epochs: 5
