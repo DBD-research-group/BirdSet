@@ -1,5 +1,5 @@
 spectrogram_conversion:
   _target_: torchaudio.transforms.Spectrogram
-  n_fft: 2048
-  hop_length: 256
+  n_fft: 1024
+  hop_length: 320
   power: 2.0
