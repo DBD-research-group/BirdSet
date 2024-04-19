@@ -70,6 +70,10 @@ class InferenceDataModule(BaseDataModuleHF):
                 load_from_cache_file=False,
                 num_proc=1,
             )
+
+        dataset["test"] = dataset["test"].select_columns(
+            ["filepath", "labels", "detected_events", "start_time", "end_time"]
+        )
         return dataset
 
     def prepare_data(self):
