@@ -6,5 +6,7 @@ defaults:
   
 normalize_waveform: ${module.network.normalize_waveform}
 normalize_spectrogram: ${module.network.normalize_spectrogram}
-mean: -15.854 # Mean of XCM: -15.854 ; Mean of XCL: -19.107
-std: 12.911 # Standard deviation of XCM: 12.911 ; Standard deviation of XCL: 13.098
+mean: -4.268
+std: 4.569
+#mean: -15.854 # Mean of XCM: -15.854 ; Mean of XCL: -19.107
+#std: 12.911 # Standard deviation of XCM: 12.911 ; Standard deviation of XCL: 13.098
