@@ -1,7 +1,7 @@
 # @package _global_
 #package global is neccessary!
 defaults:
-  - override /datamodule: PER.yaml
+  - override /datamodule: XCL.yaml
   - override /module: multilabel.yaml
   - override /module/network: ast.yaml
   - override /callbacks: cluster.yaml 
@@ -10,19 +10,17 @@ defaults:
   - override /paths: cluster.yaml
   - override /hydra: cluster.yaml
 
-tags: ["subset_PER", "ast", "multilabel", "5event"]
+tags: ["pretrain_xencanto_l", "ast", "multilabel"]
 seed: 2
 train: True
-test: True
-
-ckpt_path: /mnt/work/bird2vec/birdset_logs/train/runs/PER/ast/52024-04-15_150556/callback_checkpoints/last.ckpt
+test: False
 
 logger:
   wandb:
     tags: ${tags}
-    group: "PER_subset_ast"
+    group: "pretrain_ast_XCL"
     mode: online
-    version: subset_ast_2024-04-15_150556 #to resume train run # needs to be tested
+    version: pretrain_ast_${start_time} #to resume train run # needs to be tested
 
 module:
   optimizer:
@@ -33,22 +31,18 @@ module:
   #_target_: birdset.modules.losses.focal_loss.MultiLabelFocalLoss
   network:
     torch_compile: False
-    # pretrain_info:
-    #   hf_path: DBD-research-group/BirdSet
-    #   hf_name: PER
-    #   hf_pretrain_name: null
 
 trainer:
   min_epochs: 1
-  max_epochs: 15
+  max_epochs: 12
 
 datamodule:
   dataset:
     val_split: 0.2
     class_weights_loss: null
     class_weights_sampler: null
-    classlimit: 600
-    eventlimit: 5
+    classlimit: 500
+    eventlimit: 1
   transforms:
     preprocessing:
       resizer:
