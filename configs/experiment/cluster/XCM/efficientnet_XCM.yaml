@@ -1,16 +1,15 @@
 # @package _global_
-#package global is neccessary!
 defaults:
   - override /datamodule: XCM.yaml
   - override /module: multilabel.yaml
   - override /module/network: efficientnet.yaml
-  - override /callbacks: cluster.yaml
+  - override /callbacks: default.yaml
   - override /trainer: single_gpu.yaml
   - override /datamodule/transforms: bird_default_multilabel.yaml
-  - override /paths: cluster.yaml
-  - override /hydra: cluster.yaml
+  - override /paths: default.yaml
+  - override /hydra: default.yaml
 
-tags: ["HSN", "efficientnet", "multilabel", "pretraining"]
+tags: ["XCM", "efficientnet", "multilabel"]
 seed: 2
 train: True
 test: False
@@ -18,57 +17,39 @@ test: False
 logger:
   wandb:
     tags: ${tags}
-    group: "XCM_pretrain_efficientnet"
+    group: "XCM_train_efficientnet"
     mode: online
-    version: pretrain_effnet_${start_time}
-    #version: pretraineatxcm_2 #to resume train run # needs to be tested
+
+trainer:
+  min_epochs: 1
+  max_epochs: 30
 
 module:
   optimizer:
     _target_: torch.optim.AdamW
     lr: 5e-4
     weight_decay: 5e-4
-  loss:
-  #  _target_: birdset.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
-    _target_: torch.nn.BCEWithLogitsLoss 
-  #_target_: birdset.modules.losses.focal_loss.MultiLabelFocalLoss
-  network: 
-    torch_compile: True
-
-trainer:
-  min_epochs: 1
-  max_epochs: 150
 
 datamodule:
   dataset:
-    val_split: 0.1
+    val_split: 0.2
     class_weights_loss: null
     class_weights_sampler: null
-    classlimit: 600
-    eventlimit: 3
+    classlimit: null
+    eventlimit: null
 
   loaders:
     train:
-      batch_size: 256
-      shuffle: True
+      batch_size: 64
       num_workers: 32
-      drop_last: True
-      pin_memory: False
     valid:
-      batch_size: 256
+      batch_size: 64
       num_workers: 32
-      shuffle: False
     test:
-      batch_size: 256
+      batch_size: 64
       num_workers: 32
-      shuffle: False
 
-  mapper: 
-    biggest_cluster: True
-    no_call: False
-  
 callbacks:
   model_checkpoint:
-    save_last: True
-    every_n_epochs: 3
-
+    save_top_k: -1
+    every_n_epochs: 5

@@ -1,9 +1,11 @@
 import torch
 import torch.nn as nn
+import datasets
 from transformers import AutoModelForAudioClassification, AutoConfig
 from transformers import ASTForAudioClassification
-import datasets
+from birdset.utils import pylogger
 
+log = pylogger.get_pylogger(__name__)
 
 class ASTSequenceClassifier(nn.Module):
     def __init__(self, checkpoint: str, local_checkpoint: str | None, num_classes: int, cache_dir: str | None, pretrain_info):
@@ -19,11 +21,11 @@ class ASTSequenceClassifier(nn.Module):
 
         self.cache_dir = cache_dir
 
-
         state_dict = None
 
         if self.checkpoint:
             if local_checkpoint:
+                log.info(f">> Loading state dict from local checkpoint: {local_checkpoint}")
                 state_dict = torch.load(local_checkpoint)["state_dict"]
                 state_dict = {key.replace('model.model.', ''): weight for key, weight in state_dict.items()}
 
@@ -35,7 +37,7 @@ class ASTSequenceClassifier(nn.Module):
                 ignore_mismatched_sizes=True
             )
         else:
-            config = AutoConfig.from_pretrained("MIT/ast-finetuned-audioset-10-10-0.4593", num_labels=self.num_classes)
+            config = AutoConfig.from_pretrained(self.checkpoint, num_labels=self.num_classes)
             self.model = ASTForAudioClassification(config)
         
     def forward(self, input_values, attention_mask=None, labels=None, return_hidden_state=False):

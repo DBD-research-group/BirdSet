@@ -1,21 +1,23 @@
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, field, asdict
 from functools import partial
-from typing import Callable, List, Literal, Type, Optional, Union
+from typing import Callable, Dict, List, Literal, Type, Optional, Union
 
-from birdset.modules.metrics.multiclass import MulticlassMetricsConfig
-from birdset.modules.metrics.multilabel import MultilabelMetricsConfig
+from birdset.modules.metrics.multilabel import TopKAccuracy, cmAP, cmAP5, mAP, pcmAP
 from birdset.modules.models.efficientnet import EfficientNetClassifier
 import torch
 import math
+import hydra
 
+from birdset.modules.losses import load_loss
 import datasets
 
 import lightning as L
 import torch.nn as nn
-from torch.nn import CrossEntropyLoss
+from torch.nn import BCEWithLogitsLoss
 from torch.nn.modules.loss import _Loss
-from torch.optim import AdamW, Optimizer 
-from transformers import get_scheduler
+from torch.optim import AdamW, Optimizer, lr_scheduler 
+from transformers import get_scheduler, SchedulerType
+from torchmetrics import AUROC, Metric, MaxMetric, MetricCollection
 
 def get_num_gpu(num_gpus: Union[int|str|List[int]]) -> int:
     """
@@ -50,17 +52,32 @@ class NetworkConfig:
         normalize_spectrogram (bool): Whether to normalize the spectrogram data. Defaults to True.
     """
     model: nn.Module = EfficientNetClassifier(
-        architecture="efficientnet_b1",
         num_classes=21,
         num_channels=1,
-        checkpoint=None
+        checkpoint=None,
+        local_checkpoint=None,
+        cache_dir=None,
+        pretrain_info=None,
     )
     model_name: str = "efficientnet"
     model_type: Literal['vision', 'waveform'] = "vision"
     torch_compile: bool = False
     sample_rate: int = 32000
     normalize_waveform: bool = False
-    normalize_spectrogram: bool = True
+    normalize_spectrogram: bool = True    
+
+# @dataclass
+# class LRSchedulerExtrasConfig:
+#     """
+#     A dataclass for configuring the extras of the learning rate scheduler.
+
+#     Attributes:
+#         interval (str): The interval at which the scheduler performs its step. Defaults to "step".
+#         warmup_ratio (float): The ratio of warmup steps to total steps. Defaults to 0.5.
+#     """
+#     interval: str = "step"
+#     warmup_ratio: float = 0.05
+
 
 @dataclass
 class LRSchedulerConfig:
@@ -83,6 +100,62 @@ class LRSchedulerConfig:
     interval: str = "step"
     warmup_ratio: float = 0.05
 
+    #extras: LRSchedulerExtrasConfig = LRSchedulerExtrasConfig()
+    
+class MetricsConfig:
+    """
+    A class for configuring the metrics used during model training and evaluation.
+
+    Attributes:
+        main_metric (Metric): The main metric used for model training.
+        val_metric_best (Metric): The metric used for model validation.
+        add_metrics (MetricCollection): A collection of additional metrics used during model training.
+        eval_complete (MetricCollection): A collection of metrics used during model evaluation.
+    """
+
+    def __init__(
+        self,
+        num_labels: int = 21,
+    ):
+        """
+        Initializes the MetricsConfig class.
+
+        Args:
+            num_labels (int): The number of labels in the dataset. Defaults to 21 as in the HSN dataset.
+        """
+        self.main_metric: Metric = cmAP(
+            num_labels=num_labels,
+            thresholds=None
+        )
+        self.val_metric_best: Metric = MaxMetric()
+        self.add_metrics: MetricCollection = MetricCollection({
+            'MultilabelAUROC': AUROC(
+                task="multilabel",
+                num_labels=num_labels,
+                average='macro',
+                thresholds=None
+            ),
+            'T1Accuracy': TopKAccuracy(topk= 1),
+            'T3Accuracy': TopKAccuracy(topk= 3),
+            'mAP': mAP(
+                num_labels= num_labels,
+                thresholds=None
+            )  
+        })
+        self.eval_complete: MetricCollection = MetricCollection({
+            'cmAP5': cmAP5(
+                num_labels=num_labels,
+                sample_threshold=5,
+                thresholds=None
+            ),
+            'pcmAP': pcmAP(
+                num_labels=num_labels,
+                padding_factor=5,
+                average="macro",
+                thresholds=None
+            )
+        })
+
 @dataclass
 class LoggingParamsConfig:
     """
@@ -102,7 +175,7 @@ class LoggingParamsConfig:
 
 class BaseModule(L.LightningModule):
     """
-    BaseModule is a PyTorch Lightning module that serves as a base for all models. The default parameters are used for the task of 'multiclass' classification. See MultiLabelModule for 'multilabel' classification.
+    BaseModule is a PyTorch Lightning module that serves as a base for all models.
 
     Attributes:
         network (NetworkConfig): Configuration for the network.
@@ -116,30 +189,31 @@ class BaseModule(L.LightningModule):
         len_trainset (int): The length of the training set.
         batch_size (int): The batch size for training.
         task (str): The task type, can be either 'multiclass' or 'multilabel'.
+        class_weights_loss (bool, optional): Whether to use class weights for the loss function.
+        label_counts (int): The number of labels.
         num_gpus (int): The number of GPUs to use for training.
     """
     def __init__(
             self,
             network: NetworkConfig = NetworkConfig(),
-            output_activation: Callable[[torch.Tensor], torch.Tensor] = partial(
-                torch.softmax,
-                dim=1
-            ),
-            loss: _Loss = CrossEntropyLoss(),
+            output_activation: Callable[[torch.Tensor], torch.Tensor] = torch.sigmoid,
+            loss: _Loss = BCEWithLogitsLoss(),
             optimizer: partial[Type[Optimizer]] = partial(
                 AdamW,
                 lr=1e-5,
                 weight_decay=0.01,
             ),
             lr_scheduler: Optional[LRSchedulerConfig] = LRSchedulerConfig(),
-            metrics: MulticlassMetricsConfig | MultilabelMetricsConfig = MulticlassMetricsConfig(),
+            metrics: MetricsConfig = MetricsConfig(),
             logging_params: LoggingParamsConfig = LoggingParamsConfig(),
             num_epochs: int = 50,
             len_trainset: int = 13878, # set to property from datamodule
             batch_size: int = 32,
-            task: Literal['multiclass', 'multilabel'] = "multiclass",
+            task: Literal['multiclass', 'multilabel'] = "multilabel",
+            class_weights_loss: Optional[bool] = None,
+            label_counts: int = 21,
             num_gpus: int = 1,
-            pretrain_info = None,
+            pretrain_info = None
             ):
 
         super(BaseModule, self).__init__()
@@ -186,7 +260,7 @@ class BaseModule(L.LightningModule):
         self.class_mask = None
 
         # TODO: reimplement this
-        if self.pretrain_info and self.pretrain_info.get("hf_pretain_name"):
+        if self.pretrain_info and self.pretrain_info.get("hf_pretrain_name"):
             print("Masking Logits")
             self.pretrain_dataset = self.pretrain_info["hf_pretrain_name"]
             self.hf_path = self.pretrain_info["hf_path"]

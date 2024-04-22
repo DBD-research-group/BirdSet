@@ -1,6 +1,6 @@
 background_noise:
   #_target_: torch_audiomentations.AddBackgroundNoise
-  _target_: datamodule.components.augmentations.AddBackgroundNoise
+  _target_: birdset.datamodule.components.augmentations.AddBackgroundNoise
   p: 0.5
   min_snr_in_db: 3
   max_snr_in_db: 30

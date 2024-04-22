@@ -1,0 +1,5 @@
+low_pass_filter:
+  _target_: torch_audiomentations.LowPassFilter
+  p: 0.2
+  min_cutoff_freq: 150.0
+  max_cutoff_freq: 7500.0
