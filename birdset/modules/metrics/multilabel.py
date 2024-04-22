@@ -1,12 +1,13 @@
 import torch
 import torchmetrics
 from torchmetrics.classification.average_precision import MultilabelAveragePrecision
-from torchmetrics import Metric
-from torchmetrics import AUROC, Metric, MaxMetric, MetricCollection
+from torchmetrics import AUROC, MaxMetric, Metric, MetricCollection
+from torchmetrics.utilities.data import dim_zero_cat
 
 class MultilabelMetricsConfig:
     """
     A class for configuring the metrics used during model training and evaluation.
+
     Attributes:
         main_metric (Metric): The main metric used for model training.
         val_metric_best (Metric): The metric used for model validation.
@@ -20,6 +21,7 @@ class MultilabelMetricsConfig:
     ):
         """
         Initializes the MetricsConfig class.
+
         Args:
             num_labels (int): The number of labels in the dataset. Defaults to 21 as in the HSN dataset.
         """

@@ -60,27 +60,7 @@ class NetworkConfig:
     torch_compile: bool = False
     sample_rate: int = 32000
     normalize_waveform: bool = False
-    normalize_spectrogram: bool = True    
-
-
-# @dataclass
-# class LRSchedulerExtrasConfig:
-#     """
-#     A dataclass for configuring the extras of the learning rate scheduler.
-
-#     Attributes:
-#         interval (str): The interval at which the scheduler performs its step. Defaults to "step".
-#         warmup_ratio (float): The ratio of warmup steps to total steps. Defaults to 0.5.
-#     """
-#     interval: str = "step"
-#     warmup_ratio: float = 0.05
-#     Attributes:
-#         interval (str): The interval at which the scheduler performs its step. Defaults to "step".
-#         warmup_ratio (float): The ratio of warmup steps to total steps. Defaults to 0.5.
-#     """
-#     interval: str = "step"
-#     warmup_ratio: float = 0.05
-
+    normalize_spectrogram: bool = True
 
 @dataclass
 class LRSchedulerConfig:
@@ -103,7 +83,6 @@ class LRSchedulerConfig:
     interval: str = "step"
     warmup_ratio: float = 0.05
 
-    #extras: LRSchedulerExtrasConfig = LRSchedulerExtrasConfig()
 @dataclass
 class LoggingParamsConfig:
     """
@@ -158,11 +137,9 @@ class BaseModule(L.LightningModule):
             num_epochs: int = 50,
             len_trainset: int = 13878, # set to property from datamodule
             batch_size: int = 32,
-            task: Literal['multiclass', 'multilabel'] = "multilabel",
-            class_weights_loss: Optional[bool] = None,
-            label_counts: int = 21,
+            task: Literal['multiclass', 'multilabel'] = "multiclass",
             num_gpus: int = 1,
-            pretrain_info = None
+            pretrain_info = None,
             ):
 
         super(BaseModule, self).__init__()
