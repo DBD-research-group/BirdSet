@@ -94,18 +94,19 @@ class PerchModel(nn.Module):
         #     model = hub.load(model_url)
 
         physical_devices = tf.config.list_physical_devices('GPU')
-        tf.config.experimental.set_memory_growth(physical_devices[0], True)
+        for device in physical_devices:
+            tf.config.experimental.set_memory_growth(device, True)
+
         tf.config.optimizer.set_jit(True)
         self.model = hub.load(model_url)
 
-        # Load the class list from the CSV file
-        class_mapping_df = pd.read_csv(self.label_path)
-        # Extract the 'ebird2021' column as a numpy array
-        class_mapping = class_mapping_df["ebird2021"].values
-        # Convert the class mapping to a dictionary {index: "label"}
-        self.class_mapping = dict(enumerate(class_mapping))
-
         if self.restrict_logits:
+            # Load the class list from the CSV file
+            class_mapping_df = pd.read_csv(self.label_path)
+            # Extract the 'ebird2021' column as a numpy array
+            class_mapping = class_mapping_df["ebird2021"].values
+            # Convert the class mapping to a dictionary {index: "label"}
+            self.class_mapping = dict(enumerate(class_mapping))
             self.target_indices = self.restrict_logits_to_target_classes()
 
     @tf.function  # Decorate with tf.function to compile into a callable TensorFlow graph
