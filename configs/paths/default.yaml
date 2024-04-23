@@ -8,6 +8,7 @@ output_dir: ${hydra:runtime.output_dir}
 # data directory
 #dataset_path: ${paths.root_dir}/data_birdset
 dataset_path: ${paths.root_dir}/data_birdset/${datamodule.dataset.dataset_name}
+model_path: ${paths.root_dir}/data_birdset/models/
 background_path: ${paths.root_dir}/data_birdset/background_noise/
 
 # logging directory, has to be static to work properly

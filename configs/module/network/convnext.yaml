@@ -1,9 +1,14 @@
 model:
   _target_: birdset.modules.models.convnext.ConvNextClassifier
-  architecture: "convnext_tiny"
   num_classes: ${datamodule.dataset.n_classes}
   num_channels: 1
-  checkpoint: null
+  checkpoint: facebook/convnext-base-224-22k
+  local_checkpoint: null
+  cache_dir: ${paths.dataset_path}/models/
+  pretrain_info:
+    hf_path: ${datamodule.dataset.hf_path}
+    hf_name: ${datamodule.dataset.hf_name}
+    hf_pretrain_name: null
 
 model_name: convnext
 model_type: vision

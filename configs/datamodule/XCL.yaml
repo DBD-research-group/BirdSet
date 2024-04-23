@@ -13,7 +13,7 @@ dataset:
   hf_path: DBD-research-group/BirdSet
   hf_name: XCL
   seed: ${seed}
-  n_classes: 9734
+  n_classes: 9736
   n_workers: 1
   val_split: 0.05
   task: ${module.task}
