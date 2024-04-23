@@ -1,6 +1,7 @@
 from dataclasses import asdict
 import torch
-from .base_module import BaseModule, NetworkConfig, LRSchedulerConfig, MetricsConfig, LoggingParamsConfig
+from .base_module import BaseModule, NetworkConfig, LRSchedulerConfig, LoggingParamsConfig
+from birdset.modules.metrics.multilabel import MultilabelMetricsConfig
 import wandb
 from typing import Callable, Literal, Type, Optional
 from torch.nn import BCEWithLogitsLoss
@@ -26,14 +27,12 @@ class MultilabelModule(BaseModule):
                 weight_decay=0.01,
             ),
             lr_scheduler: Optional[LRSchedulerConfig] = LRSchedulerConfig(),
-            metrics: MetricsConfig = MetricsConfig(),
+            metrics: MultilabelMetricsConfig = MultilabelMetricsConfig(),
             logging_params: LoggingParamsConfig = LoggingParamsConfig(),
             num_epochs: int = 50,
             len_trainset: int = 13878, # set to property from datamodule
             batch_size: int = 32,
             task: Literal['multiclass', 'multilabel'] = "multilabel",
-            class_weights_loss: Optional[bool] = None,
-            label_counts: int = 21,
             num_gpus: int = 1,
             prediction_table: bool = False,
             pretrain_info = None
@@ -52,8 +51,6 @@ class MultilabelModule(BaseModule):
             num_epochs=num_epochs,
             len_trainset=len_trainset,
             task=task,
-            class_weights_loss=class_weights_loss,
-            label_counts=label_counts,
             batch_size=batch_size,
             num_gpus=num_gpus,
             pretrain_info=pretrain_info
