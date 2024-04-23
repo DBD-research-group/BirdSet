@@ -40,7 +40,7 @@ class MultilabelMetricsConfig:
             'T1Accuracy': TopKAccuracy(topk= 1),
             'T3Accuracy': TopKAccuracy(topk= 3),
             'mAP': mAP(
-                num_labels= 21,
+                num_labels= num_labels,
                 thresholds=None
             )  
         })
