@@ -1,4 +1,5 @@
 from typing import List
+from birdset.utils import pylogger
 import numpy as np
 import torch
 import torch.nn as nn
@@ -6,6 +7,8 @@ import torch.nn.functional as F
 import lightning as L
 from dataclasses import dataclass, field
 import warnings 
+import datasets
+log = pylogger.get_pylogger(__name__)
 
 class ResBlock1dTF(nn.Module):
     def __init__(self, dim, dilation=1, kernel_size=3):
@@ -125,11 +128,21 @@ class SoundNet(nn.Module):
             factors: List[int] = [4, 4, 4, 4],
             n_classes: int | None = None,
             dim_feedforward: int = 512 ,
-            checkpoint: str | None = None,
+            local_checkpoint: str | None = None,
             pretrain_info = None
                  ):
         super().__init__()
-        self.checkpoint = checkpoint
+        if local_checkpoint:
+            log.info(f">> Loading state dict from local checkpoint: {local_checkpoint}")
+            state_dict = torch.load(local_checkpoint)["state_dict"]
+            state_dict = {key.replace('model.model.', ''): weight for key, weight in state_dict.items()}
+        if pretrain_info is not None:
+            self.hf_path = pretrain_info.hf_path
+            self.hf_name = pretrain_info.hf_name if not pretrain_info.hf_pretrain_name else pretrain_info.hf_pretrain_name
+            self.num_classes = len(
+                datasets.load_dataset_builder(self.hf_path, self.hf_name).info.features["ebird_code"].names)
+        else:
+            self.num_classes = n_classes
 
         ds_fac = np.prod(np.array(factors)) * 4
         clip_length = seq_len // ds_fac
@@ -159,11 +172,8 @@ class SoundNet(nn.Module):
         self.down2 = nn.Sequential(*model)
         self.project = nn.Conv1d(nf, embed_dim, 1)
         self.clip_length = clip_length
-        self.tf = TAggregate(embed_dim=embed_dim, clip_length=clip_length, n_layers=n_layers, nhead=nhead, n_classes=n_classes, dim_feedforward=dim_feedforward)
+        self.tf = TAggregate(embed_dim=embed_dim, clip_length=clip_length, n_layers=n_layers, nhead=nhead, n_classes=self.num_classes, dim_feedforward=dim_feedforward)
         self.apply(self._init_weights)
-
-        if self.checkpoint:
-            self.load_state_dict_from_file(self.checkpoint)
 
     def load_state_dict_from_file(self, file_path):
         state_dict = torch.load(file_path)

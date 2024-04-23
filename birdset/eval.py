@@ -3,6 +3,7 @@ import hydra
 import json
 import pyrootutils
 import lightning as L 
+from omegaconf import OmegaConf
 
 from birdset import utils 
 
@@ -23,6 +24,7 @@ log = utils.get_pylogger(__name__)
 
 @hydra.main(**_HYDRA_PARAMS)
 def eval(cfg):
+    log.info('Using config: \n%s', OmegaConf.to_yaml(cfg))
     log.info("Starting Evaluation")
     log.info(f"Dataset path: <{os.path.abspath(cfg.paths.dataset_path)}>")
     os.makedirs(cfg.paths.dataset_path, exist_ok=True)
@@ -48,7 +50,6 @@ def eval(cfg):
         num_epochs=cfg.trainer.max_epochs, #?
         len_trainset=datamodule.len_trainset,
         batch_size=datamodule.loaders_config.train.batch_size,
-        label_counts=datamodule.num_train_labels,
         pretrain_info=cfg.module.network.model.pretrain_info
     )
 
