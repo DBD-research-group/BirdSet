@@ -50,10 +50,12 @@ class NetworkConfig:
         normalize_spectrogram (bool): Whether to normalize the spectrogram data. Defaults to True.
     """
     model: nn.Module = EfficientNetClassifier(
-        architecture="efficientnet_b1",
         num_classes=21,
         num_channels=1,
-        checkpoint=None
+        checkpoint=None,
+        local_checkpoint=None,
+        cache_dir=None,
+        pretrain_info=None,
     )
     model_name: str = "efficientnet"
     model_type: Literal['vision', 'waveform'] = "vision"
@@ -186,7 +188,7 @@ class BaseModule(L.LightningModule):
         self.class_mask = None
 
         # TODO: reimplement this
-        if self.pretrain_info and self.pretrain_info.get("hf_pretain_name"):
+        if self.pretrain_info and self.pretrain_info.get("hf_pretrain_name"):
             print("Masking Logits")
             self.pretrain_dataset = self.pretrain_info["hf_pretrain_name"]
             self.hf_path = self.pretrain_info["hf_path"]

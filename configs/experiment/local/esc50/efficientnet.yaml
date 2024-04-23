@@ -1,0 +1,58 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - override /datamodule: esc50.yaml
+  - override /module: multiclass.yaml
+  - override /module/network: efficientnet.yaml
+  - override /callbacks: multiclass.yaml
+  - override /trainer: single_gpu.yaml
+  - override /paths: default.yaml
+  - override /hydra: default.yaml
+
+
+tags: ["esc50", "efficientnet", "multiclass"]
+seed: 1
+train: True
+test: True
+
+logger:
+  wandb:
+    tags: ${tags}
+    group: "esc50_train_efficientnet"
+    mode: online
+
+module:
+  optimizer:
+    _target_: torch.optim.AdamW
+    lr: 5e-4
+    weight_decay: 5e-4
+  network: 
+    pretrain_info: Null
+    torch_compile: False
+
+trainer:
+  min_epochs: 1
+  max_epochs: 5
+  #devices: [1]
+
+datamodule:  
+  loaders:
+    train:
+      batch_size: 32
+      shuffle: True
+      num_workers: 16
+      drop_last: True
+    valid:
+      batch_size: 32
+      num_workers: 16
+      shuffle: False
+    test:
+      batch_size: 32
+      num_workers: 16
+      shuffle: False
+
+
+callbacks:
+  model_checkpoint:
+    save_last: True
+    every_n_epochs: 3

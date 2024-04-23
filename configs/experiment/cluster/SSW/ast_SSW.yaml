@@ -15,14 +15,15 @@ seed: 2
 train: True
 test: True
 
-ckpt_path: /mnt/work/bird2vec/birdset_logs/train/runs/SSW/ast/12024-04-16_201603/callback_checkpoints/last.ckpt
+#ckpt_path: /mnt/work/bird2vec/birdset_logs/train/runs/SSW/ast/12024-04-16_201603/callback_checkpoints/last.ckpt
 
 logger:
   wandb:
     tags: ${tags}
     group: "SSW_subset_ast"
     mode: online
-    version: subset_ast_2024-04-16_201603 #to resume train run # needs to be tested
+    version: subset_ast_${start_time} 
+   # version: subset_ast_2024-04-16_201603 #to resume train run # needs to be tested
 
 module:
   optimizer:
