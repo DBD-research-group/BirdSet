@@ -95,8 +95,8 @@ min_epochs = 1
 max_epochs = 5
 trainer = Trainer(min_epochs=min_epochs, max_epochs=max_epochs, accelerator="gpu", devices=1)
 
-from birdset.modules.base_module import BaseModule
-model = BaseModule(
+from birdset.modules.multilabel_module import MultilabelModule
+model = MultilabelModule(
     len_trainset=dm.len_trainset,
     task=dm.task,
     batch_size=dm.train_batch_size,
