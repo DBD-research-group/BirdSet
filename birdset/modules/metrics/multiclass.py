@@ -31,7 +31,7 @@ class MulticlassMetricsConfig:
         self.val_metric_best: torchmetrics.Metric =torchmetrics.MaxMetric()
      
         self.add_metrics: torchmetrics.MetricCollection = torchmetrics.MetricCollection({
-            'F2': torchmetrics.F1Score(
+            'F1': torchmetrics.F1Score(
                 task="multiclass",
                 num_classes=num_labels,
             ),
