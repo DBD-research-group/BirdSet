@@ -1,0 +1,82 @@
+_target_: birdset.modules.embedding_module.EmbeddingModule
+
+defaults:
+  - _self_
+  #- embedding_model: perch_logreg.yaml
+
+embedding_model:
+  _target_: birdset.modules.models.perch.PerchModel
+  num_classes: ${datamodule.dataset.n_classes}
+  tfhub_version: 4
+  train_classifier: False
+  label_path: ${paths.root_dir}/dataset/perch/label.csv
+
+network:
+  model:
+    _target_: "torch.nn.Linear"
+    in_features: 1280 # From perch
+    out_features: ${datamodule.dataset.n_classes}
+
+  model_name: perch_classifier
+  model_type: waveform
+  torch_compile: False
+  sampling_rate: 32_000 #${embedding_model.sampling_rate}
+  normalize_spectrogram: False
+  normalize_waveform: null  
+
+task: multiclass
+class_weights_loss: ${datamodule.dataset.class_weights_loss}
+num_gpus: ${trainer.devices}
+
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 1e-5
+  _partial_: true
+  weight_decay: 0.01
+
+loss:
+  _target_: torch.nn.BCEWithLogitsLoss
+  
+lr_scheduler:
+  scheduler:
+    _target_: transformers.get_cosine_schedule_with_warmup
+  extras:
+    interval: step
+    warmup_ratio: 0.05
+
+metrics: 
+  main: # Is used by Ghani et al
+    _target_: "torchmetrics.classification.Accuracy"
+    task: "multiclass"
+    num_classes: ${datamodule.dataset.n_classes}
+    top_k: 1
+  val_best: 
+    _target_: "torchmetrics.MaxMetric"
+  additional: 
+    cmap:
+      _target_: "torchmetrics.classification.AveragePrecision"
+      num_classes: ${datamodule.dataset.n_classes}  
+      task: "multiclass"
+      average: macro
+      thresholds: null
+    balanced_acc: 
+      _target_: birdset.modules.metrics.BalancedAccuracy
+      num_classes: ${datamodule.dataset.n_classes}  
+    balanced_acc_top5:
+      _target_: birdset.modules.metrics.BalancedAccuracyTop5
+      num_classes: ${datamodule.dataset.n_classes}  
+    auroc: # Is used by Ghani et al 
+      _target_: "torchmetrics.classification.AUROC"
+      task: "multiclass"
+      num_labels: ${datamodule.dataset.n_classes}
+      average: "macro"
+      thresholds: null
+
+output_activation: 
+  _target_: "torch.sigmoid" # Use sigmoid like Ghani et al
+
+logging_params:
+  on_step: False
+  on_epoch: True
+  sync_dist: False
+  prog_bar: True  

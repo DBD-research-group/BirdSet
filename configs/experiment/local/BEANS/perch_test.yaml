@@ -2,20 +2,19 @@
 #package global is neccessary!
 defaults:
   - override /datamodule: beans.yaml
-  - override /module: multilabel.yaml
-  - override /module/network: perch_logreg.yaml
+  - override /module: embedding.yaml
   - override /callbacks: default.yaml
   - override /trainer: single_gpu.yaml
-  - override /datamodule/transforms: bird_default_multilabel.yaml
   - override /paths: default.yaml
   - override /hydra: default.yaml
-  - override /datamodule/transforms/waveform_augmentations: none.yaml
+  - override /datamodule/transforms: bird_default_multiclass.yaml # Here the audio is transformed to a spectrogram
+  - override /datamodule/transforms/waveform_augmentations: none.yaml # No augmentations for now
   - override /datamodule/transforms/spectrogram_augmentations: none.yaml
 
-tags: ["BEANS", "perch", "multilabel", "Ghani"]
+tags: ["BEANS", "Ghani", "embeddings", "perch", "multiclass"]
 seed: 2
 train: True
-test: False
+test: True
 
 logger:
   wandb:
@@ -26,6 +25,9 @@ logger:
 module:
   optimizer:
     lr: 1e-5
+    
+  output_activation: 
+    _target_: "torch.sigmoid" # Use sigmoid like Ghani et al
 
 trainer:
   min_epochs: 1

@@ -13,7 +13,7 @@ dataset:
   hf_path: DBD-research-group/beans_watkins
   hf_name: default
   seed: ${seed}
-  n_classes: 31
+  n_classes: 31 # Overwrite through experiment
   n_workers: 1
   val_split: null # Split is done in the dataset
   task: ${module.task}

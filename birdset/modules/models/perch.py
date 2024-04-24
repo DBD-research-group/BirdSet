@@ -9,8 +9,9 @@ import torch
 from torch import nn
 
 from utils import get_label_to_class_mapping_from_metadata
+from .embedding_abstract import EmbeddingModel
 
-class PerchModel(nn.Module):
+class PerchModel(nn.Module, EmbeddingModel):
     """
     A PyTorch model for bird vocalization classification, integrating a TensorFlow Hub model.
 
@@ -88,6 +89,7 @@ class PerchModel(nn.Module):
         """
         Load the model from TensorFlow Hub.
         """
+        print("YEAHHH\n")
         model_url = f"{self.PERCH_TF_HUB_URL}/{self.tfhub_version}"
         #self.model = hub.load(model_url)
         # with tf.device('/CPU:0'):

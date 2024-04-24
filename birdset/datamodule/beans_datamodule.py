@@ -18,10 +18,19 @@ class BEANSDataModule(BaseDataModuleHF):
             mapper=mapper
         )
 
+    def _preprocess_data(self, dataset):
+        """
+        Preprocess the data. For BEANS we will just return the dataset as it is.
+        """
+
+
+        return dataset
+
+
 
     def _load_data(self,decode: bool = True):    
         """
-        Load audio dataset from Hugging Face Datasets. For BEANS the audio column is named path so we will rename it to audio.
+        Load audio dataset from Hugging Face Datasets. For BEANS the audio column is named path so we will rename it to audio and we have to do one-hot encoding for the labels.
 
         Returns HF dataset with audio column casted to Audio feature, containing audio data as numpy array and sampling rate.
         """
@@ -42,17 +51,16 @@ class BEANSDataModule(BaseDataModuleHF):
         if self.dataset_config.subset:
             dataset = self._fast_dev_subset(dataset, self.dataset_config.subset)
 
+        # Rename some columns and remove unnamed column (Leftover from BEANS processing)
         dataset = dataset.rename_column("path", "audio")
         dataset = dataset.rename_column("label", "labels")
         dataset = dataset.remove_columns('Unnamed: 0')
 
-        # Then we have to map the label to integers if they are strings
+        # Then we have to map the label to integers if they are strings (One-hot encoding)
         if isinstance(dataset[list(dataset.keys())[0]]["labels"][0], str):
             labels = set()
             for split in dataset.keys():
                 labels.update(dataset[split]["labels"])
-            
-            print(len(labels))
 
             label_to_id = {lbl: i for i, lbl in enumerate(labels)}
 
@@ -64,6 +72,7 @@ class BEANSDataModule(BaseDataModuleHF):
 
             dataset = dataset.map(label_to_id_fn)
         
+        # Normal casting
         dataset = dataset.cast_column(
             column="audio",
             feature=Audio(
