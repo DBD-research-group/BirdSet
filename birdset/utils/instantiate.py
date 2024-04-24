@@ -59,5 +59,11 @@ def instantiate_loggers(logger_cfg):
         if isinstance(lg_conf, DictConfig) and "_target_" in lg_conf:
             log.info(f"Instantiate logger <{lg_conf._target_}>")
             logger.append(hydra.utils.instantiate(lg_conf))
+
+    try:
+        log.info(f"Wandb version to resume training: {logger_cfg.wandb.version}")
+    
+    except:
+        log.info("Wandb not used")
     
     return logger

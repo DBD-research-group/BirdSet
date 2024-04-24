@@ -41,8 +41,8 @@ datamodule:
     val_split: 0.2
     class_weights_loss: null
     class_weights_sampler: null
-    classlimit: 600
-    eventlimit: 3
+    classlimit: null
+    eventlimit: null
   transforms:
     preprocessing:
       resizer:
@@ -68,11 +68,10 @@ datamodule:
       shuffle: False
 
   mapper: 
-   
     biggest_cluster: True
     no_call: False
   
 callbacks:
   model_checkpoint:
     save_last: True
-    every_n_epochs: 3
+    every_n_epochs: 5
