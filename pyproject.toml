@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "birdset"
-version = "0.1.0"
+version = "0.1.1"
 description = "BirdSet: A multi-task benchmark and data pipeline for deep learning based avian bioacoustics"
 authors = ["Lukas Rauch <lukas.rauch@uni-kassel.de>", "Raphael Schwinger <rsc@informatik.uni-kiel.de>", "Moritz Wirth <moritz.wirt@uni-kassel.de>", "Rene  Heinrich <rene.heinrich@iee.fraunhofer.de>", "Jonas Lange <jla@informatik.uni-kiel.de>"]
 readme = "README.md"

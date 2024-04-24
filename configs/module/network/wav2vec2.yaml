@@ -3,7 +3,7 @@ model:
   checkpoint: facebook/wav2vec2-base
   local_checkpoint: null
   num_classes: ${datamodule.dataset.n_classes}
-  cache_dir: ${paths.dataset_path}/models
+  cache_dir: ${paths.model_path}
 
   pretrain_info:
     hf_path: ${datamodule.dataset.hf_path}

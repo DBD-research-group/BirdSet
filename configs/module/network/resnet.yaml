@@ -1,9 +1,13 @@
-model_name: "resnet18"
 model:
   _target_: birdset.modules.models.resnet.ResNetClassifier
   baseline_architecture: 'resnet18'
-  num_classes: 50
+  num_classes: ${datamodule.dataset.n_classes}
   num_channels: 1
   pretrained: True
+
+model_name: resnet18
+model_type: vision
 torch_compile: False
-model_type: 'vision'
+sampling_rate: 32_000
+normalize_waveform: null
+normalize_spectrogram: True
