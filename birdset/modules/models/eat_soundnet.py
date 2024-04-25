@@ -132,10 +132,7 @@ class SoundNet(nn.Module):
             pretrain_info = None
                  ):
         super().__init__()
-        if local_checkpoint:
-            log.info(f">> Loading state dict from local checkpoint: {local_checkpoint}")
-            state_dict = torch.load(local_checkpoint)["state_dict"]
-            state_dict = {key.replace('model.model.', ''): weight for key, weight in state_dict.items()}
+
         if pretrain_info is not None:
             self.hf_path = pretrain_info.hf_path
             self.hf_name = pretrain_info.hf_name if not pretrain_info.hf_pretrain_name else pretrain_info.hf_pretrain_name
@@ -174,20 +171,23 @@ class SoundNet(nn.Module):
         self.clip_length = clip_length
         self.tf = TAggregate(embed_dim=embed_dim, clip_length=clip_length, n_layers=n_layers, nhead=nhead, n_classes=self.num_classes, dim_feedforward=dim_feedforward)
         self.apply(self._init_weights)
+        if local_checkpoint:
+            log.info(f">> Loading state dict from local checkpoint: {local_checkpoint}")
+            self.start.load_state_dict(self.load_state_dict_from_file(local_checkpoint, model_name='start'))
+            self.down.load_state_dict(self.load_state_dict_from_file(local_checkpoint, model_name='down'))
+            self.down2.load_state_dict(self.load_state_dict_from_file(local_checkpoint, model_name='down2'))
+            self.project.load_state_dict(self.load_state_dict_from_file(local_checkpoint, model_name='project'))
+            self.tf.load_state_dict(self.load_state_dict_from_file(local_checkpoint, model_name='tf'))
 
-    def load_state_dict_from_file(self, file_path):
+    def load_state_dict_from_file(self, file_path, model_name= 'model'):
         state_dict = torch.load(file_path)
+        state_dict = torch.load(file_path)["state_dict"]
+        # select only models where the key starts with `model.` + model_name + `.`
+        state_dict = {key: weight for key, weight in state_dict.items() if key.startswith('model.' + model_name + '.')}
+        state_dict = {key.replace('model.' + model_name + '.', ''): weight for key, weight in state_dict.items()}
 
-        try: 
-            self.load_state_dict(state_dict)
-        
-        except RuntimeError as e: 
-            warnings.warn(f"There is a mismatch between the state_dict and the model layers: {e}."
-                          "The mismatched layers are ignored")
+        return state_dict
 
-            output_layers = ["tf.fc.weight", "tf.fc.bias"]
-            filtered_state_dict = {k: v for k, v in state_dict.items() if k not in output_layers}
-            self.load_state_dict(filtered_state_dict, strict=True)
 
     def _init_weights(self, m):
         if isinstance(m, nn.Conv1d):
