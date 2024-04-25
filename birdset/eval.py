@@ -24,7 +24,7 @@ log = utils.get_pylogger(__name__)
 
 @hydra.main(**_HYDRA_PARAMS)
 def eval(cfg):
-    log.info('Using config: \n%s', OmegaConf.to_yaml(cfg))
+    # log.info('Using config: \n%s', OmegaConf.to_yaml(cfg))
     log.info("Starting Evaluation")
     log.info(f"Dataset path: <{os.path.abspath(cfg.paths.dataset_path)}>")
     os.makedirs(cfg.paths.dataset_path, exist_ok=True)
