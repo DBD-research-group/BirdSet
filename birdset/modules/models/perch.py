@@ -40,6 +40,7 @@ class PerchModel(nn.Module, EmbeddingModel):
         label_path: Optional[str] = None,
         pretrain_info: Optional[Dict] = None,
         task: Optional[str] = None,
+        gpu_to_use: int = 0,
     ) -> None:
         """
         Initializes the PerchModel with configuration for loading the TensorFlow Hub model,
@@ -52,6 +53,8 @@ class PerchModel(nn.Module, EmbeddingModel):
             train_classifier: If True, a classifier is added on top of the model embeddings.
             restrict_logits: If True, output logits are restricted to target classes based on dataset info.
             task: The classification task type ('multiclass' or 'multilabel'), used with `dataset_info_path`.
+            pretrain_info: A dictionary containing information about the pretraining of the model.
+            gpu_to_use: The GPU index to use for the model.
         """
         super().__init__()
         self.model = None  # Placeholder for the loaded model
@@ -63,6 +66,7 @@ class PerchModel(nn.Module, EmbeddingModel):
         self.restrict_logits = restrict_logits
         self.label_path = label_path
         self.task = task
+        self.gpu_to_use = gpu_to_use
 
         if pretrain_info:
             self.hf_path = pretrain_info["hf_path"]
@@ -90,15 +94,14 @@ class PerchModel(nn.Module, EmbeddingModel):
         """
         Load the model from TensorFlow Hub.
         """
-        print("YEAHHH\n")
+
         model_url = f"{self.PERCH_TF_HUB_URL}/{self.tfhub_version}"
         # self.model = hub.load(model_url)
         # with tf.device('/CPU:0'):
         #     model = hub.load(model_url)
-
         physical_devices = tf.config.list_physical_devices('GPU')
-        for device in physical_devices:
-            tf.config.experimental.set_memory_growth(device, True)
+        tf.config.experimental.set_visible_devices(physical_devices[self.gpu_to_use], 'GPU')
+        tf.config.experimental.set_memory_growth(physical_devices[self.gpu_to_use], True)
 
         tf.config.optimizer.set_jit(True)
         self.model = hub.load(model_url)

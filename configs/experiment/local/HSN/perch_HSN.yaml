@@ -31,7 +31,7 @@ module:
 trainer: 
   max_epochs: 50
   accelerator: gpu
-  devices: 1
+  devices: [0]
 
 datamodule:
   dataset:

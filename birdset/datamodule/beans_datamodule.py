@@ -65,8 +65,8 @@ class BEANSDataModule(BaseDataModuleHF):
             label_to_id = {lbl: i for i, lbl in enumerate(labels)}
 
             def label_to_id_fn(example):
-                l = [0] * len(labels)
-                l[label_to_id[example["labels"]]] = 1
+                l = [0.0] * len(labels)
+                l[label_to_id[example["labels"]]] = 1.0
                 example["labels"] = l
                 return example
 
