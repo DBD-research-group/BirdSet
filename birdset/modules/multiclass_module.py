@@ -6,7 +6,7 @@ from torch.nn.modules.loss import _Loss
 from torch.optim import AdamW, Optimizer
 from functools import partial
 
-class MultilabelModule(BaseModule):
+class MulticlassModule(BaseModule):
     """
     MulticlassModule is a PyTorch Lightning module for multiclass classification tasks.
 
