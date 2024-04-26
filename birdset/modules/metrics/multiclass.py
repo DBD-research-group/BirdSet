@@ -1,6 +1,7 @@
 import torch 
 import warnings
 import torchmetrics
+from torchmetrics.classification import MulticlassAUROC, MulticlassCalibrationError, MulticlassAveragePrecision
 
 class MulticlassMetricsConfig:
     """
@@ -34,6 +35,21 @@ class MulticlassMetricsConfig:
                 task="multiclass",
                 num_classes=num_labels,
             ),
+            'MulticlassAUROC': MulticlassAUROC(
+                num_classes=num_labels,
+                average='macro',
+                thresholds=None
+            ),
+            'ECE': MulticlassCalibrationError(
+                num_classes=num_labels,
+                n_bins=10,
+                norm='l1'
+            ),
+            'MulticlassAUPR': MulticlassAveragePrecision(
+                num_classes=num_labels,
+                average='macro',
+                thresholds=None
+            )
         })
         self.eval_complete: torchmetrics.MetricCollection = torchmetrics.MetricCollection({
             'acc': torchmetrics.Accuracy(
