@@ -1,4 +1,3 @@
-import torch
 from .base_module import BaseModule, NetworkConfig, LRSchedulerConfig, LoggingParamsConfig
 from birdset.modules.metrics.multiclass import MulticlassMetricsConfig
 from typing import Callable, Literal, Type, Optional
