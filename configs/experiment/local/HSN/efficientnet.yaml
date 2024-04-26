@@ -9,8 +9,8 @@ defaults:
   - override /datamodule/transforms: bird_default_multilabel.yaml
   - override /paths: default.yaml
   - override /hydra: default.yaml
-  - override /datamodule/transforms/waveform_augmentations: none.yaml
-  - override /datamodule/transforms/spectrogram_augmentations: none.yaml
+#  - override /datamodule/transforms/waveform_augmentations: none.yaml  # auskommentiert eva
+#  - override /datamodule/transforms/spectrogram_augmentations: none.yaml # auskommentiert eva
 
 tags: ["HSN", "efficientnet", "multilabel"]
 seed: 2
@@ -20,7 +20,7 @@ test: True
 logger:
   wandb:
     tags: ${tags}
-    group: "XCM_train_efficientnet"
+    group: "XCM_train_efficientnet" 
     mode: online
 
 module:
@@ -33,16 +33,16 @@ module:
     _target_: torch.nn.BCEWithLogitsLoss 
   #_target_: birdset.modules.losses.focal_loss.MultiLabelFocalLoss
   network: 
-    torch_compile: False
+    torch_compile: True # False > True eva
 
 trainer:
   min_epochs: 1
-  max_epochs: 40
+  max_epochs: 100  # 40 > 15 eva  # 15 -> 100 eva
   #devices: [1]
 
 datamodule:
   dataset:
-    subset: 2000
+    # subset: 2000  # auskommentiert eva
     val_split: 0.2
     class_weights_loss: null
     class_weights_sampler: null
@@ -51,17 +51,17 @@ datamodule:
     
   loaders:
     train:
-      batch_size: 32
+      batch_size: 64  # 32 geändert eva
       shuffle: True
-      num_workers: 16
+      num_workers: 32 # 16 geändert eva
       drop_last: True
     valid:
-      batch_size: 32
-      num_workers: 16
+      batch_size: 64 # 32 geändert eva
+      num_workers: 32 # 16 geändert eva
       shuffle: False
     test:
-      batch_size: 32
-      num_workers: 16
+      batch_size: 64 # 32 geändert eva
+      num_workers: 32 # 16 geändert eva
       shuffle: False
 
   mapper: 

@@ -92,7 +92,7 @@ class EfficientNetClassifier(nn.Module):
                 num_channels=self.num_channels,
                 cache_dir=self.cache_dir,
                 state_dict=adjusted_state_dict,
-                ignore_mismatched_sizes=True,
+                ignore_mismatched_sizes=False,
             )
         else:
             config = AutoConfig.from_pretrained(
