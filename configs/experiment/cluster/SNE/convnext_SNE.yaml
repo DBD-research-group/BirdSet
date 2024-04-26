@@ -1,15 +1,15 @@
 # @package _global_
 defaults:
-  - override /datamodule: HSN.yaml
+  - override /datamodule: SNE.yaml
   - override /module: multilabel.yaml
-  - override /module/network: efficientnet.yaml
+  - override /module/network: convnext.yaml
   - override /callbacks: cluster.yaml
   - override /trainer: single_gpu.yaml
   - override /datamodule/transforms: bird_default_multilabel.yaml
   - override /paths: cluster.yaml
   - override /hydra: cluster.yaml
 
-tags: ["HSN", "efficientnet", "multilabel"]
+tags: ["SNE", "convnext", "multilabel"]
 seed: 2
 train: True
 test: True
@@ -17,9 +17,9 @@ test: True
 logger:
   wandb:
     tags: ${tags}
-    group: "HSN_subset_effnet"
+    group: "SNE_subset_convnext"
     mode: online
-    version: subset_ast_${seed}_${start_time}
+    version: subset_convnext_${seed}_${start_time}
 
 trainer:
   min_epochs: 1

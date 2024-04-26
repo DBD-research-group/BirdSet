@@ -1,6 +1,6 @@
 # @package _global_
 defaults:
-  - override /datamodule: HSN.yaml
+  - override /datamodule: NBP.yaml
   - override /module: multilabel.yaml
   - override /module/network: efficientnet.yaml
   - override /callbacks: cluster.yaml
@@ -9,7 +9,7 @@ defaults:
   - override /paths: cluster.yaml
   - override /hydra: cluster.yaml
 
-tags: ["HSN", "efficientnet", "multilabel"]
+tags: ["NBP", "efficientnet", "multilabel"]
 seed: 2
 train: True
 test: True
@@ -17,7 +17,7 @@ test: True
 logger:
   wandb:
     tags: ${tags}
-    group: "HSN_subset_effnet"
+    group: "NBP_subset_effnet"
     mode: online
     version: subset_ast_${seed}_${start_time}
 

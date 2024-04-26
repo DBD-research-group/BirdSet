@@ -14,13 +14,15 @@ tags: ["pretrain_xencanto_l", "ast", "multilabel"]
 seed: 2
 train: True
 test: False
+#ckpt_path: /mnt/work/bird2vec/birdset_logs/train/runs/PER/ast/52024-04-15_150556/callback_checkpoints/last.ckpt
 
 logger:
   wandb:
     tags: ${tags}
     group: "pretrain_ast_XCL"
     mode: online
-    version: pretrain_ast_${start_time} #to resume train run # needs to be tested
+    version: pretrain_ast${seed}_${start_time}
+ #to resume train run # needs to be tested
 
 module:
   optimizer:
@@ -35,6 +37,7 @@ module:
 trainer:
   min_epochs: 1
   max_epochs: 12
+  limit_val_batches: 0 
 
 datamodule:
   dataset:
@@ -51,20 +54,20 @@ datamodule:
 
   loaders:
     train:
-      batch_size: 14
+      batch_size: 12
       shuffle: True
-      num_workers: 16
+      num_workers: 12
       drop_last: True
       prefetch_factor: 2
 
     valid:
-      batch_size: 20
-      num_workers: 16
+      batch_size: 12
+      num_workers: 12
       shuffle: False
     
     test:
-      batch_size: 20
-      num_workers: 16
+      batch_size: 12
+      num_workers: 12
       shuffle: False
 
   mapper: 
@@ -73,5 +76,11 @@ datamodule:
   
 callbacks:
   model_checkpoint:
-    save_last: True
-    every_n_epochs: 5
+    #save_last: True
+    #every_n_epochs: 5
+    every_n_train_steps: 10_000
+    save_top_k: -1
+    monitor: null
+    filename: 'checkpoint-{epoch:02d}-{step:06d}'
+
+    
