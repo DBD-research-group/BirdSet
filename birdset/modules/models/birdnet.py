@@ -3,59 +3,39 @@ from typing import Dict, Optional, Tuple
 
 import datasets
 import pandas as pd
-import tensorflow as tf
-import tensorflow_hub as hub
 import torch
+import tensorflow as tf
 from torch import nn
 
 
-class PerchModel(nn.Module):
-    """
-    A PyTorch model for bird vocalization classification, integrating a TensorFlow Hub model.
-
-    Attributes:
-        PERCH_TF_HUB_URL (str): URL to the TensorFlow Hub model for bird vocalization.
-        EMBEDDING_SIZE (int): The size of the embeddings produced by the TensorFlow Hub model.
-        num_classes (int): The number of classes to classify into.
-        tfhub_version (str): The version of the TensorFlow Hub model to use.
-        train_classifier (bool): Whether to train a classifier on top of the embeddings.
-        restrict_logits (bool): Whether to restrict output logits to target classes only.
-        dataset_info_path (Optional[str]): Path to the dataset information file for target class filtering.
-        model: The loaded TensorFlow Hub model (loaded dynamically).
-        classifier (Optional[nn.Linear]): A linear classifier layer on top of the embeddings.
-    """
-
-    # Constants for the model URL and embedding size
-    PERCH_TF_HUB_URL = "https://tfhub.dev/google/bird-vocalization-classifier"
-    EMBEDDING_SIZE = 1280
+class BirdNetModel(nn.Module):
+    # Constants for the model embedding size
+    EMBEDDING_SIZE = 1024
 
     def __init__(
         self,
         num_classes: int,
-        tfhub_version: str,
+        model_path: str,
         train_classifier: bool = False,
         restrict_logits: bool = False,
         label_path: Optional[str] = None,
         pretrain_info: Optional[Dict] = None,
     ) -> None:
         """
-        Initializes the PerchModel with configuration for loading the TensorFlow Hub model,
-        an optional classifier, and setup for target class restriction based on dataset info.
+        Initialize the BirdNetModel.
 
         Args:
-            num_classes: The number of output classes for the classifier.
-            tfhub_version: The version identifier of the TensorFlow Hub model to load.
-            label_path: Path to a CSV file containing the class information for the Perch model.
-            train_classifier: If True, a classifier is added on top of the model embeddings.
-            restrict_logits: If True, output logits are restricted to target classes based on dataset info.
+            num_classes (int): The number of output classes for the classifier.
+            model_path (str): The path to the TensorFlow BirdNet model/checkpoint.
         """
         super().__init__()
+
         self.model = None  # Placeholder for the loaded model
         self.class_mask = None
         self.class_indices = None
 
         self.num_classes = num_classes
-        self.tfhub_version = tfhub_version
+        self.model_path = model_path
         self.train_classifier = train_classifier
         self.restrict_logits = restrict_logits
         self.label_path = label_path
@@ -86,15 +66,10 @@ class PerchModel(nn.Module):
         """
         Load the model from TensorFlow Hub.
         """
-        model_url = f"{self.PERCH_TF_HUB_URL}/{self.tfhub_version}"
-        # self.model = hub.load(model_url)
-        # with tf.device('/CPU:0'):
-        #     model = hub.load(model_url)
-
         physical_devices = tf.config.list_physical_devices("GPU")
         tf.config.experimental.set_memory_growth(physical_devices[0], True)
         tf.config.optimizer.set_jit(True)
-        self.model = hub.load(model_url)
+        self.model = tf.saved_model.load(self.model_path)  # Load the BirdNet model
 
         if self.restrict_logits:
             # Load the class list from the CSV file
@@ -129,19 +104,22 @@ class PerchModel(nn.Module):
             if missing_labels:
                 logging.warning(f"Missing labels in pretrained model: {missing_labels}")
 
-    @tf.function  # Decorate with tf.function to compile into a callable TensorFlow graph
+    @tf.function  # Decorate with tf.function
     def run_tf_model(self, input_tensor: tf.Tensor) -> dict:
         """
-        Run the TensorFlow model and get outputs.
+        Run the TensorFlow BirdNet model and get outputs.
 
         Args:
-            input_tensor (tf.Tensor): The input tensor for the model.
+            input_tensor (tf.Tensor): The input tensor for the BirdNet model in TensorFlow format.
 
         Returns:
-            dict: A dictionary of model outputs.
+            dict: A dictionary containing 'embeddings' and 'logits' TensorFlow tensors.
         """
-
-        return self.model.signatures["serving_default"](inputs=input_tensor)
+        logits = self.model.signatures["basic"](inputs=input_tensor)["scores"]
+        embeddings = self.model.signatures["embeddings"](inputs=input_tensor)[
+            "embeddings"
+        ]
+        return {"embeddings": embeddings, "logits": logits}
 
     def forward(
         self, input_values: torch.Tensor, labels: Optional[torch.Tensor] = None
@@ -190,14 +168,14 @@ class PerchModel(nn.Module):
             Tuple[torch.Tensor, torch.Tensor]: A tuple of two tensors (embeddings, logits).
         """
 
-        input_tensor = input_tensor.reshape([-1, input_tensor.shape[-1]])
+        # input_tensor = input_tensor.reshape([-1, input_tensor.shape[-1]])
 
         # Run the model and get the outputs using the optimized TensorFlow function
         outputs = self.run_tf_model(input_tensor=input_tensor)
 
         # Extract embeddings and logits, convert them to PyTorch tensors
-        embeddings = torch.from_numpy(outputs["output_1"].numpy())
-        logits = torch.from_numpy(outputs["output_0"].numpy())
+        embeddings = torch.from_numpy(outputs["embeddings"].numpy())
+        logits = torch.from_numpy(outputs["logits"].numpy())
 
         if self.class_mask:
             # Initialize full_logits to a large negative value for penalizing non-present classes
