@@ -79,22 +79,24 @@ class EmbeddingMetricsConfig(MulticlassMetricsConfig):
                 task="multiclass",
                 num_classes=num_labels,
                 average='macro',
-                thresholds=None
-            ) 
+            )
         })
         self.eval_complete: torchmetrics.MetricCollection = torchmetrics.MetricCollection({
             'acc': torchmetrics.Accuracy(
             task="multiclass",
             num_classes=num_labels,
             top_k=1
-        ),
-            'AUROC': torchmetrics.AUROC(
-                task="multiclass",
-                num_classes=num_labels,
-                average='macro',
-                thresholds=None
             )
-        })        
+        })  
+
+class AUROCMetricWrapper(torchmetrics.AUROC):
+    def update(self, preds: torch.Tensor, target: torch.Tensor) -> None:
+        # Convert one-hot encoded target labels to class labels
+        class_labels = torch.argmax(target, dim=1)
+        # Call the original update method with class labels
+        super().update(preds, class_labels)
+        print("HIIII!")
+
 
 class BalancedAccuracy(torchmetrics.Metric):
     def __init__(self, adjusted=False, num_classes=None):

@@ -11,3 +11,4 @@ torch_compile: False
 sampling_rate: 48_000
 normalize_spectrogram: False
 normalize_waveform: null
+embedding_size: 1024

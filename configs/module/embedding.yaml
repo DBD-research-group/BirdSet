@@ -9,13 +9,13 @@ defaults:
 network:
   model:
     _target_: "torch.nn.Linear"
-    in_features: 1280 # From perch
+    in_features: ${module.embedding_model.embedding_size}
     out_features: ${datamodule.dataset.n_classes}
 
   model_name: perch_classifier
   model_type: waveform
   torch_compile: False
-  sampling_rate: 32_000 #${embedding_model.sampling_rate}
+  sampling_rate: ${module.embedding_model.sampling_rate}
   normalize_spectrogram: False
   normalize_waveform: null  
 
@@ -30,7 +30,8 @@ optimizer:
   weight_decay: 0.01
 
 loss:
-  _target_: torch.nn.BCEWithLogitsLoss
+  _target_: birdset.modules.embedding_module.BCEWithLogitsLoss
+  num_classes: ${datamodule.dataset.n_classes}
 
 metrics: 
   _target_: birdset.modules.metrics.multiclass.EmbeddingMetricsConfig # Temporary solution 

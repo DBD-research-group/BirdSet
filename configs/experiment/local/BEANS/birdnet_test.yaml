@@ -11,7 +11,7 @@ defaults:
   - override /datamodule/transforms/waveform_augmentations: none.yaml # No augmentations for now
   - override /datamodule/transforms/spectrogram_augmentations: none.yaml
 
-tags: ["BEANS", "Ghani", "embeddings", "perch", "multiclass"]
+tags: ["BEANS", "Ghani", "embeddings", "birdnet", "multiclass"]
 seed: 2
 train: True
 test: True
@@ -30,16 +30,16 @@ module:
     _target_: "torch.sigmoid" # Use sigmoid like Ghani et al
 
 trainer:
-  devices: [1]
+  devices: [0]
   min_epochs: 1
-  max_epochs: 50
+  max_epochs: 2
 
 datamodule:
   dataset:
-    dataset_name: beans_bats
-    hf_path: DBD-research-group/beans_bats
+    dataset_name: beans_watkins
+    hf_path: DBD-research-group/beans_watkins
     hf_name: default
-    n_classes: 10
+    n_classes: 31
     
   loaders:
     train:

@@ -1,10 +1,11 @@
 import torch
+import torch.nn.functional as F
 from dataclasses import dataclass
 from birdset.modules.base_module import BaseModule, NetworkConfig, LRSchedulerConfig, LoggingParamsConfig
 from birdset.modules.metrics.multiclass import MulticlassMetricsConfig
 from birdset.modules.metrics.multilabel import MultilabelMetricsConfig
 from typing import Callable, Literal, Type, Optional, Union
-from torch.nn import BCEWithLogitsLoss, Module
+from torch.nn import Module, CrossEntropyLoss
 from torch.nn.modules.loss import _Loss
 from torch.optim import AdamW, Optimizer
 from functools import partial
@@ -18,6 +19,22 @@ class EmbeddingModuleConfig(NetworkConfig):
     """
     model: Union[EmbeddingModel, Module] = None # Model for extracting the embeddings
 
+class BCEWithLogitsLoss(torch.nn.BCEWithLogitsLoss):
+    """
+    Because BCE need one-hot encoding but most metrics don't we use a wrapper here!
+
+    Attributes:
+        num_classes (int): Number of classes in the dataset
+    """
+    def __init__(self, num_classes):
+        super(BCEWithLogitsLoss, self).__init__()
+        self.num_classes = num_classes
+
+    def forward(self, logits, target_labels):
+        # Convert integer labels to one-hot encoding
+        target_one_hot = F.one_hot(target_labels, num_classes=self.num_classes).float()
+        # Call the forward method of the parent class
+        return super().forward(logits, target_one_hot)
 
 class EmbeddingModule(BaseModule):
     """
@@ -30,7 +47,7 @@ class EmbeddingModule(BaseModule):
             self,
             network: NetworkConfig = NetworkConfig(),
             output_activation: Callable[[torch.Tensor], torch.Tensor] = torch.sigmoid,
-            loss: _Loss = BCEWithLogitsLoss(),
+            loss: _Loss = CrossEntropyLoss(),
             optimizer: partial[Type[Optimizer]] = partial(
                 AdamW,
                 lr=1e-5,
@@ -68,7 +85,7 @@ class EmbeddingModule(BaseModule):
     # Use the embedding model to get the embeddings and pass them to the classifier model
     def forward(self, *args, **kwargs):
         # Get embeddings
-        input_values = kwargs['input_values'] # Extracnt input tensor
+        input_values = kwargs['input_values'] # Extract input tensor
         device = input_values.device # Get the device of the input tensor 
         input_values = input_values.cpu().numpy()  # Move the tensor to the CPU and convert it to a NumPy array.
         embeddings, _ = self.embedding_model.get_embeddings(input_values)

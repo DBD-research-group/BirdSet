@@ -57,20 +57,23 @@ class BEANSDataModule(BaseDataModuleHF):
         dataset = dataset.remove_columns('Unnamed: 0')
 
         # Then we have to map the label to integers if they are strings (One-hot encoding)
-        if isinstance(dataset[list(dataset.keys())[0]]["labels"][0], str):
-            labels = set()
-            for split in dataset.keys():
-                labels.update(dataset[split]["labels"])
+        labels = set()
+        for split in dataset.keys():
+            labels.update(dataset[split]["labels"])
 
-            label_to_id = {lbl: i for i, lbl in enumerate(labels)}
+        label_to_id = {lbl: i for i, lbl in enumerate(labels)}
 
-            def label_to_id_fn(example):
-                l = [0.0] * len(labels)
-                l[label_to_id[example["labels"]]] = 1.0
-                example["labels"] = l
-                return example
+        def label_to_id_hot(row):
+            l = [0.0] * len(labels)
+            l[label_to_id[row["labels"]]] = 1.0
+            row["labels"] = l
+            return row
 
-            dataset = dataset.map(label_to_id_fn)
+        def label_to_id_fn(row):
+            row["labels"] = label_to_id[row["labels"]]
+            return row
+
+        dataset = dataset.map(label_to_id_fn)
         
         # Normal casting
         dataset = dataset.cast_column(
