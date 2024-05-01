@@ -16,6 +16,12 @@ seed: 2
 train: False
 test: True
 
+dataset:
+  transforms:
+    decoding:
+      max_len: 3.0
+      extracted_interval: 3
+
 logger:
   wandb:
     tags: ${tags}

@@ -143,6 +143,9 @@ class BirdNetModel(nn.Module):
         # Move the tensor to the CPU and convert it to a NumPy array.
         input_values = input_values.cpu().numpy()
 
+        # Convert NumPy array to TensorFlow tensor
+        input_values = tf.convert_to_tensor(input_values, dtype=tf.float32)
+
         # Get embeddings from the Perch model and move to the same device as input_values
         embeddings, logits = self.get_embeddings(input_tensor=input_values)
 
