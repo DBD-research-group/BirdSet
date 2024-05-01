@@ -1,7 +1,7 @@
 model: 
   _target_: birdset.modules.models.birdnet.BirdNetModel
   num_classes: ${datamodule.dataset.n_classes}
-  model_path: null
+  model_path: ${paths.root_dir}/resources/birdnet/BirdNET_GLOBAL_6K_V2.4_Model # Can be downloaded here: https://github.com/kahst/BirdNET-Analyzer/tree/main/checkpoints/V2.4
   train_classifier: False
   restrict_logits: True
   label_path: ${paths.root_dir}/resources/birdnet/label_ebird.csv
