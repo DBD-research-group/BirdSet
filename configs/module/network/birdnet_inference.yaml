@@ -13,6 +13,6 @@ model:
 model_name: birdnet
 model_type: waveform
 torch_compile: False
-sampling_rate: 1_000
+sampling_rate: 48_000
 normalize_spectrogram: False
 normalize_waveform: null
