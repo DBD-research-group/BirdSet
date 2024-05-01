@@ -3,6 +3,7 @@
 defaults:
   - override /datamodule: beans.yaml
   - override /module: embedding.yaml
+  - override /module/embedding_model: ../network/birdnet.yaml
   - override /callbacks: default.yaml
   - override /trainer: single_gpu.yaml
   - override /paths: default.yaml
@@ -32,14 +33,14 @@ module:
 trainer:
   devices: [0]
   min_epochs: 1
-  max_epochs: 2
+  max_epochs: 20
 
 datamodule:
   dataset:
-    dataset_name: beans_watkins
-    hf_path: DBD-research-group/beans_watkins
+    dataset_name: beans_bats
+    hf_path: DBD-research-group/beans_bats
     hf_name: default
-    n_classes: 31
+    n_classes: 10
     
   loaders:
     train:
@@ -64,4 +65,5 @@ callbacks:
   model_checkpoint:
     save_last: True
     every_n_epochs: 3
+    monitor: "val/BCEWithLogitsLoss"
 

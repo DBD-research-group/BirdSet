@@ -12,12 +12,12 @@ network:
     in_features: ${module.embedding_model.embedding_size}
     out_features: ${datamodule.dataset.n_classes}
 
-  model_name: perch_classifier
-  model_type: waveform
-  torch_compile: False
+  model_name: ${module.embedding_model.model_name}_embedding # Most values are just taken from embedding model as it is the first part
+  model_type: ${module.embedding_model.model_type}
+  torch_compile: ${module.embedding_model.torch_compile}
   sampling_rate: ${module.embedding_model.sampling_rate}
-  normalize_spectrogram: False
-  normalize_waveform: null  
+  normalize_spectrogram: ${module.embedding_model.normalize_spectrogram}
+  normalize_waveform: ${module.embedding_model.normalize_waveform} 
 
 task: multiclass
 #class_weights_loss: ${datamodule.dataset.class_weights_loss}
@@ -30,6 +30,7 @@ optimizer:
   weight_decay: 0.01
 
 loss:
+  #_target_: torch.nn.CrossEntropyLoss
   _target_: birdset.modules.embedding_module.BCEWithLogitsLoss
   num_classes: ${datamodule.dataset.n_classes}
 

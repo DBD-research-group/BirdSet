@@ -5,10 +5,11 @@ model:
   train_classifier: True
   model_path: ${paths.root_dir}/checkpoints/birdnet/BirdNET_GLOBAL_6K_V2.4_Model
 
-model_name: birdnet_embedding
-model_type: waveform
+model_name: birdnet
+model_type: vision
 torch_compile: False
 sampling_rate: 48_000
 normalize_spectrogram: False
-normalize_waveform: null
+normalize_waveform: False
 embedding_size: 1024
+length: 3 # 6 seconds but multiple windows, ghani says 3
