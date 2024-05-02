@@ -10,8 +10,9 @@ python = ">=3.10,<3.12"
 scipy = "^1.11.3"
 ffprobe = "^0.5"
 # --------- pytorch --------- #
-torch = "2.0.1"
-torchvision = "^0.15.2"
+torch = {version = "=2.0.1+cu118", source = "pytorch_gpu"}
+torchvision = {version = "=0.15.2+cu118", source = "pytorch_gpu"}
+torchaudio = {version = "=2.0.2+cu118", source = "pytorch_gpu"}
 lightning = "^2.2.2"
 torchmetrics= "^0.11"
 
@@ -67,6 +68,12 @@ kaggle = "^1.6.11"
 [[tool.poetry.source]]
 name = "PyPI"
 priority = "primary"
+
+
+[[tool.poetry.source]]
+name = "pytorch_gpu"
+url = "https://download.pytorch.org/whl/cu118"
+priority = "explicit"
 
 [build-system]
 requires = ["poetry-core"]
