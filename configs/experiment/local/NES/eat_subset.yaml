@@ -13,13 +13,15 @@ tags: ["subset_NES", "eat", "multilabel", "5event"]
 seed: 1
 train: True
 test: True
+# chkpt_path: /workspace/logs/train/runs/NES/eat/2024-04-18_102307/callback_checkpoints/eat_NES_34.ckpt
  
 logger:
   wandb:
     tags: ${tags}
     group: "NES_subset_eat"
     mode: online
-    version: subset_eat_${seed}_${start_time} #to resume train run # needs to be tested
+    # version: subset_eat_${seed}_${start_time} #to resume train run # needs to be tested
+    # version: subset_eat_1_2024-04-18_102307
  
 module:
   optimizer:
@@ -39,7 +41,7 @@ module:
 trainer:
   min_epochs: 1
   max_epochs: 50
-  devices: [0]
+  devices: [1]
  
 datamodule:
   dataset:
@@ -79,5 +81,3 @@ callbacks:
   model_checkpoint:
     save_last: True
     every_n_epochs: 5
-    monitor: null
-    save_top_k: -1
