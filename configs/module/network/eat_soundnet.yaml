@@ -9,7 +9,6 @@ model:
   factors: [4, 4, 4, 4]
   n_classes: ${datamodule.dataset.n_classes}
   dim_feedforward: 512
-  checkpoint: null
   pretrain_info: null
   
 torch_compile: False

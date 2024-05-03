@@ -12,7 +12,7 @@ defaults:
   - override /datamodule/transforms/spectrogram_augmentations: none.yaml
   - override /datamodule/transforms/waveform_augmentations: none.yaml
 
-tags: ["HSN", "efficientnet", "multilabel"]
+tags: ["HSN", "ast", "multilabel"]
 seed: 2
 train: True
 test: True
@@ -51,6 +51,7 @@ datamodule:
     class_weights_sampler: null
     classlimit: 600
     eventlimit: 4
+    subset: 1000
 
   loaders:
     train:
@@ -76,4 +77,3 @@ callbacks:
   model_checkpoint:
     save_last: True
     every_n_epochs: 3
-
