@@ -14,7 +14,7 @@ tags: ["pretrain_xencanto_l", "ast", "multilabel"]
 seed: 2
 train: True
 test: False
-#ckpt_path: /mnt/work/bird2vec/birdset_logs/train/runs/PER/ast/52024-04-15_150556/callback_checkpoints/last.ckpt
+#ckpt_path: /mnt/work/bird2vec/birdset_logs/train/runs/XCL/ast/22024-04-21_145201/callback_checkpoints/checkpoint-09-990000.ckpt
 
 logger:
   wandb:
@@ -22,6 +22,7 @@ logger:
     group: "pretrain_ast_XCL"
     mode: online
     version: pretrain_ast${seed}_${start_time}
+    #version: pretrain_ast2_2024-04-21_145201
  #to resume train run # needs to be tested
 
 module:
@@ -41,11 +42,12 @@ trainer:
 
 datamodule:
   dataset:
-    val_split: 0.2
+    val_split: null
     class_weights_loss: null
     class_weights_sampler: null
     classlimit: 500
     eventlimit: 1
+    #direct_fingerprint: /mnt/work/bird2vec/birdset_hf_download/XCL/XCL_processed_2_2765dbe1bfb6bd9b
   transforms:
     preprocessing:
       resizer:
@@ -78,9 +80,13 @@ callbacks:
   model_checkpoint:
     #save_last: True
     #every_n_epochs: 5
-    every_n_train_steps: 10_000
+    #every_n_train_steps: 20_000
     save_top_k: -1
+    #save_top_k: 5
     monitor: null
-    filename: 'checkpoint-{epoch:02d}-{step:06d}'
+    save_on_train_epoch_end: True
+    every_n_epochs: 1
+    #filename: 'checkpoint-{epoch:02d}-{step:06d}'
+    filename: 'checkpoint-{epoch:02d}'
 
     
