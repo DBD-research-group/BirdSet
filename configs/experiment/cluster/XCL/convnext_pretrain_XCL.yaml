@@ -1,29 +1,30 @@
 # @package _global_
 defaults:
-  - override /datamodule: HSN.yaml
+  - override /datamodule: XCL.yaml
   - override /module: multilabel.yaml
-  - override /module/network: efficientnet.yaml
+  - override /module/network: convnext.yaml
   - override /callbacks: cluster.yaml
   - override /trainer: single_gpu.yaml
   - override /datamodule/transforms: bird_default_multilabel.yaml
   - override /paths: cluster.yaml
   - override /hydra: cluster.yaml
 
-tags: ["HSN", "efficientnet", "multilabel"]
+tags: ["XCL", "convnext", "multilabel"]
 seed: 2
 train: True
-test: True
+test: False
 
 logger:
   wandb:
     tags: ${tags}
-    group: "HSN_subset_effnet"
+    group: pretrain_convnext_XCL
     mode: online
-    version: subset_ast_${seed}_${start_time}
+    version: "pretrain_convnext${seed}_${start_time}"
 
 trainer:
   min_epochs: 1
   max_epochs: 30
+  limit_val_batches: 0 # skip validation step in pretraining
 
 module:
   optimizer:
@@ -38,25 +39,27 @@ datamodule:
     val_split: 0.2
     class_weights_loss: null
     class_weights_sampler: null
-    classlimit: 600
-    eventlimit: 5
+    classlimit: 500
+    eventlimit: 1
+    direct_fingerprint: /mnt/work/bird2vec/birdset_hf_download/XCL/XCL_processed_2_2765dbe1bfb6bd9b
 
   loaders:
     train:
       batch_size: 64
       num_workers: 24
-    valid:
-      batch_size: 256
-      num_workers: 24
-    test:
-      batch_size: 256
-      num_workers: 24
-
-  mapper:
-    biggest_cluster: True
-    no_call: True
+    # valid:
+    #   batch_size: 64
+    #   num_workers: 24
+    # test:
+    #   batch_size: 64
+    #   num_workers: 24
 
 callbacks:
   model_checkpoint:
-    save_last: True
-    every_n_epochs: 5
+    #save_last: True
+    #every_n_epochs: 5
+    every_n_train_steps: 10_000
+    save_top_k: -1
+    #save_top_k: 5
+    monitor: null
+    filename: 'checkpoint-{epoch:02d}-{step:06d}'

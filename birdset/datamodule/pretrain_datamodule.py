@@ -2,11 +2,14 @@ from collections import Counter
 from birdset.datamodule.components.event_decoding import EventDecoding
 from birdset.datamodule.components.transforms import BirdSetTransformsWrapper
 from birdset.datamodule.components.event_mapping import XCEventMapping
+from birdset.utils import pylogger
 from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
 from datasets import DatasetDict, Dataset
-from datasets import load_dataset, Audio
+from datasets import load_dataset, Audio, load_from_disk
 import logging
 import torch
+import os
+log = pylogger.get_pylogger(__name__)
 
 
 class PretrainDataModule(BaseDataModuleHF):
@@ -23,6 +26,35 @@ class PretrainDataModule(BaseDataModuleHF):
             transforms=transforms,
             mapper=mapper
         )
+
+    def prepare_data(self):
+        if self.dataset_config.direct_fingerprint:
+
+            if self._prepare_done:
+                log.info("Skip preparing.")
+                return
+            path = self.dataset_config.direct_fingerprint
+            log.info(f"Loading an already sharded dataset from local path: {path}")
+            dataset = load_from_disk(os.path.join(path, "train"))
+            self.len_trainset = len(dataset)
+            self._prepare_done = True
+        else:
+            return super().prepare_data()
+    
+    def _get_dataset(self, split):
+        if self.dataset_config.direct_fingerprint:
+            path = self.dataset_config.direct_fingerprint
+            dataset = load_from_disk(os.path.join(path, split))
+
+            self.transforms.set_mode(split)
+            if split == "train": # we need this for sampler, cannot be done later because set_transform
+                self.train_label_list = dataset["labels"]
+
+            dataset.set_transform(self.transforms, output_all_columns=False) 
+        
+            return dataset
+        else:
+            return super()._get_dataset(split)
 
     def _load_data(self, decode: bool = False):
         """

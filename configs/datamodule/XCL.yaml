@@ -23,4 +23,5 @@ dataset:
   class_weights_sampler: null
   classlimit: 500
   eventlimit: 5
+  direct_fingerprint: null
 
