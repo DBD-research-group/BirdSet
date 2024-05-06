@@ -68,7 +68,7 @@ class DatasetConfig:
     class_weights_sampler: Optional[bool] = None
     classlimit: Optional[int] = None
     eventlimit: Optional[int] = None
-
+    direct_fingerprint: Optional[str] = None
 
 @dataclass
 class LoaderConfig:
