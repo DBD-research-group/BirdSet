@@ -84,7 +84,7 @@ class PretrainDataModule(BaseDataModuleHF):
             ),
         )
 
-        return dataset
+        return dataset       
     
     def _preprocess_data(self, dataset):
         if self.dataset_config.task == "multiclass":
@@ -126,7 +126,7 @@ class PretrainDataModule(BaseDataModuleHF):
                 self.event_mapper,
                 remove_columns=["audio"],
                 batched=True,
-                batch_size=350,
+                batch_size=500,
                 load_from_cache_file=False,
                 num_proc=1,
             )
@@ -162,14 +162,21 @@ class PretrainDataModule(BaseDataModuleHF):
         return dataset
 
     def _create_splits(self, dataset: DatasetDict | Dataset):
-        # no test set 
-        split = dataset["train"].train_test_split(
-            self.dataset_config.val_split, shuffle=True, seed=self.dataset_config.seed
-        )
+       
+        if self.dataset_config.get("val_split"):
+            # no test set 
+            split = dataset["train"].train_test_split(
+                self.dataset_config.val_split, shuffle=True, seed=self.dataset_config.seed
+            )
 
-        return DatasetDict({
-            "train": split["train"],
-            "valid": split["test"]
-        })
+            return DatasetDict({
+                "train": split["train"],
+                "valid": split["test"]
+            })
+        else:
+            return dataset 
+        
+
+
 
     

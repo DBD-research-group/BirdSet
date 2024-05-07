@@ -36,7 +36,7 @@ module:
 
 datamodule:
   dataset:
-    val_split: 0.2
+    val_split: null
     class_weights_loss: null
     class_weights_sampler: null
     classlimit: 500
