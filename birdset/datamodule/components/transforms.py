@@ -160,7 +160,7 @@ class BaseTransforms:
             labels = torch.tensor(labels, dtype=torch.float16)
         
         elif self.task =="multiclass":
-            labels = labels
+            labels = torch.tensor(labels, dtype=torch.int64)
         
         return labels
     
