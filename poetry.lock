@@ -285,6 +285,20 @@ doc = ["doc8", "sphinx (>=7.0.0)", "sphinx-autobuild", "sphinx-autodoc-typehints
 test = ["dateparser (==1.*)", "pre-commit", "pytest", "pytest-cov", "pytest-mock", "pytz (==2021.1)", "simplejson (==3.*)"]
 
 [[package]]
+name = "asdfghjkl"
+version = "0.1a2"
+description = "ASDL: Automatic Second-order Differentiation (for Fisher, Gradient covariance, Hessian, Jacobian, and Kernel) Library"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "asdfghjkl-0.1a2-py3-none-any.whl", hash = "sha256:5afd941765df8482e255ad7001ccf60ad61ae6ebc46266f27c803d5daa3a6ac4"},
+    {file = "asdfghjkl-0.1a2.tar.gz", hash = "sha256:731bde1b4f19f2a370a9b284a06fd64bb897fb1beec2d8c5a8b7fa36b34e9f98"},
+]
+
+[package.dependencies]
+torch = ">=1.7.0"
+
+[[package]]
 name = "asttokens"
 version = "2.4.1"
 description = "Annotate AST trees with source code positions"
@@ -404,6 +418,28 @@ files = [
 
 [package.extras]
 dev = ["freezegun (>=1.0,<2.0)", "pytest (>=6.0)", "pytest-cov"]
+
+[[package]]
+name = "backpack-for-pytorch"
+version = "1.6.0"
+description = "BackPACK: Packing more into backprop"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "backpack-for-pytorch-1.6.0.tar.gz", hash = "sha256:af6495b71bacf82a1c7cab01aa85bebabccfe74d87d89f108ea72a4a0d384de3"},
+    {file = "backpack_for_pytorch-1.6.0-py3-none-any.whl", hash = "sha256:ac708dbb86dbb36f70fc81a1ccb1df5c7ba46d62bc9d10239d4b0e406ba41a6f"},
+]
+
+[package.dependencies]
+einops = ">=0.3.0,<1.0.0"
+torch = ">=1.9.0"
+torchvision = ">=0.7.0"
+unfoldNd = ">=0.2.0,<1.0.0"
+
+[package.extras]
+docs = ["matplotlib", "memory-profiler", "sphinx-gallery", "sphinx-rtd-theme", "tabulate"]
+lint = ["black", "darglint", "flake8", "flake8-bugbear", "flake8-comprehensions", "flake8-tidy-imports", "isort", "mccabe", "pep8-naming", "pycodestyle", "pydocstyle", "pyflakes"]
+test = ["coveralls", "pytest (>=4.5.0,<5.0.0)", "pytest-benchmark (>=3.2.2,<4.0.0)", "pytest-cov", "pytest-optional-tests (>=0.1.1)", "scipy"]
 
 [[package]]
 name = "beautifulsoup4"
@@ -1004,6 +1040,17 @@ files = [
 six = ">=1.4.0"
 
 [[package]]
+name = "einops"
+version = "0.8.0"
+description = "A new flavour of deep learning operations"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "einops-0.8.0-py3-none-any.whl", hash = "sha256:9572fb63046264a862693b0a87088af3bdc8c068fde03de63453cbbde245465f"},
+    {file = "einops-0.8.0.tar.gz", hash = "sha256:63486517fed345712a8385c100cb279108d9d47e6ae59099b07657e983deae85"},
+]
+
+[[package]]
 name = "entrypoints"
 version = "0.4"
 description = "Discover and load entry points from installed packages."
@@ -1334,6 +1381,28 @@ gitdb = ">=4.0.1,<5"
 
 [package.extras]
 test = ["black", "coverage[toml]", "ddt (>=1.1.1,!=1.4.3)", "mock", "mypy", "pre-commit", "pytest (>=7.3.1)", "pytest-cov", "pytest-instafail", "pytest-mock", "pytest-sugar"]
+
+[[package]]
+name = "gpytorch"
+version = "1.11"
+description = "An implementation of Gaussian Processes in Pytorch"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "gpytorch-1.11-py3-none-any.whl", hash = "sha256:188bfdbcafcb8f754382e54dc19bd21a86220aaf3ec1587cb8cbb7808876c4ef"},
+    {file = "gpytorch-1.11.tar.gz", hash = "sha256:72fbb72b8965e37e7bd53c5f17d08747a404d048e80ec9d9983dee51685d2760"},
+]
+
+[package.dependencies]
+linear-operator = ">=0.5.0"
+scikit-learn = "*"
+
+[package.extras]
+dev = ["pre-commit", "twine", "ufmt"]
+examples = ["ipython", "jupyter", "matplotlib", "scipy", "torchvision", "tqdm"]
+keops = ["pykeops (>=1.1.1)"]
+pyro = ["pyro-ppl (>=1.8)"]
+test = ["flake8 (==4.0.1)", "flake8-print (==4.0.0)", "nbval", "pytest"]
 
 [[package]]
 name = "graphene"
@@ -1843,6 +1912,21 @@ files = [
 ]
 
 [[package]]
+name = "jaxtyping"
+version = "0.2.28"
+description = "Type annotations and runtime checking for shape and dtype of JAX arrays, and PyTrees."
+optional = false
+python-versions = "~=3.9"
+files = [
+    {file = "jaxtyping-0.2.28-py3-none-any.whl", hash = "sha256:4a54eb964087cd46463d9a86c805b4e4f5c20cce5f22049d6f35a26d9f105bd3"},
+    {file = "jaxtyping-0.2.28.tar.gz", hash = "sha256:cd20bf1558a90c6d77c589354e35670ecc5b94925ef45bf1c020fde7b44fac8d"},
+]
+
+[package.dependencies]
+numpy = ">=1.20.0"
+typeguard = "2.13.3"
+
+[[package]]
 name = "jedi"
 version = "0.19.1"
 description = "An autocompletion tool for Python that can be used for text editors."
@@ -2343,6 +2427,92 @@ files = [
 ]
 
 [[package]]
+name = "kornia"
+version = "0.7.2"
+description = "Open Source Differentiable Computer Vision Library for PyTorch"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "kornia-0.7.2-py2.py3-none-any.whl", hash = "sha256:411e09ccdc4efde351f90a81f35a6eb9fad3bcf58ac037cbec4d41a8364dd039"},
+    {file = "kornia-0.7.2.tar.gz", hash = "sha256:f834ccd51188d071ed286a6727471c94344ea2a718903cc6f0e56a92f9c66ac5"},
+]
+
+[package.dependencies]
+kornia-rs = ">=0.1.0"
+packaging = "*"
+torch = ">=1.9.1"
+
+[package.extras]
+dev = ["coverage", "mypy", "numpy", "onnx", "pre-commit (>=2)", "pydocstyle", "pytest (==8.1.1)", "pytest-timeout", "requests"]
+docs = ["PyYAML (>=5.1)", "furo", "kornia-moons", "matplotlib", "opencv-python", "sphinx", "sphinx-autodoc-defaultargs", "sphinx-autodoc-typehints", "sphinx-copybutton (>=0.3)", "sphinx-design", "sphinx-notfound-page", "sphinxcontrib-bibtex", "sphinxcontrib-gtagjs", "sphinxcontrib-youtube"]
+x = ["accelerate", "onnxruntime-gpu (>=1.16)"]
+
+[[package]]
+name = "kornia-rs"
+version = "0.1.3"
+description = "Low level implementations for computer vision in Rust"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "kornia_rs-0.1.3-cp310-cp310-macosx_10_12_x86_64.whl", hash = "sha256:e57fa6c44dcaf896e2b3d9afad0e67b0c6615f5274c3c48d12fe37f4ae6f2a9b"},
+    {file = "kornia_rs-0.1.3-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:530771c49b74fe70fa794ef2d5b9976c993e4dcb976b08608471949e4ef56e87"},
+    {file = "kornia_rs-0.1.3-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:0b8ef31b823c07b8ff30587c163ca280145ae867192a86ac4505bc73ae4be9a4"},
+    {file = "kornia_rs-0.1.3-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:ce91aa5fa6d8068c33ba53bdf3cf943cb53ad8b14b06b2812dd10f104b61a161"},
+    {file = "kornia_rs-0.1.3-cp310-none-win_amd64.whl", hash = "sha256:a3fdbec853c963722abdd421ff0ecc7ebc5eb1754cdf66cbe06ce32a0e6a804a"},
+    {file = "kornia_rs-0.1.3-cp311-cp311-macosx_10_12_x86_64.whl", hash = "sha256:5b26d97b5b763893449cbfd154fa9edc6eeaf51980654c810ca9f5a0180fa762"},
+    {file = "kornia_rs-0.1.3-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:ce2750720a9677a3900a7ba8a9ba5a8a4d6f60e30380ae0e41d3a2bf81c150b2"},
+    {file = "kornia_rs-0.1.3-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:c464114e526089ab56b29004156b559226d429285d72857aa4b89d34dbe02b22"},
+    {file = "kornia_rs-0.1.3-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:cf20019bf3dc4af3742c41bbfbf7f2bc62fbf25b4e0e651663dee7332a73ec5f"},
+    {file = "kornia_rs-0.1.3-cp311-none-win_amd64.whl", hash = "sha256:24f547aa8c0f70951c36f80d396ec0dbf56a81ccb9ab7444b77d9c4b2d707939"},
+    {file = "kornia_rs-0.1.3-cp312-cp312-macosx_10_12_x86_64.whl", hash = "sha256:30a2ca3a23e8eb6b9fd503adb16a1cc3147cf2a1498e501ca9db6b779ec8430d"},
+    {file = "kornia_rs-0.1.3-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:e11649b25b402dc315998f654eb78ffbc55ba844436754b84b8781301f5219eb"},
+    {file = "kornia_rs-0.1.3-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:027a2c7b43d75d41287ddcc365fd574024f2b3ab3a25427e9f3aa380d407702d"},
+    {file = "kornia_rs-0.1.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6576c59e32a1721d53ca9712dbe62184f99e5967ca9532df4d5c0fcd762833c5"},
+    {file = "kornia_rs-0.1.3-cp312-none-win_amd64.whl", hash = "sha256:0e0a2efd31bda9ba0c934b1359bb92834b1e9ccbf67f32445c9c56677f1109e0"},
+    {file = "kornia_rs-0.1.3-cp37-cp37m-macosx_10_12_x86_64.whl", hash = "sha256:fa4e473907788807a8f9cc12e023f2c98a56cfda91fa5e4e12c309173be56fcf"},
+    {file = "kornia_rs-0.1.3-cp37-cp37m-macosx_11_0_arm64.whl", hash = "sha256:543ce2d78c1f994bf9c4a573d031a17544a52a3861dc11290282b08cd3dec132"},
+    {file = "kornia_rs-0.1.3-cp37-cp37m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:ebe498932ff56964f8a0b1ffc19061efe830a768bd88b6e7b33e71e739259b1d"},
+    {file = "kornia_rs-0.1.3-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:bd9985169610d262771ebe6665314b25d520ed999f39bb4078723c75f5b0b66c"},
+    {file = "kornia_rs-0.1.3-cp37-none-win_amd64.whl", hash = "sha256:5f032064b731cee7270701641b3760af96344896e981ff24384431e649ab5781"},
+    {file = "kornia_rs-0.1.3-cp38-cp38-macosx_10_12_x86_64.whl", hash = "sha256:f97d6bc019ce84a5ef310c92f8bf4d30dcf06e43a75434cd05d46e16862b03cf"},
+    {file = "kornia_rs-0.1.3-cp38-cp38-macosx_11_0_arm64.whl", hash = "sha256:1be4c499f481f628d018a96ef6267411b05a9946636acbe0272bce3d04ab0831"},
+    {file = "kornia_rs-0.1.3-cp38-cp38-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:98a8c061c7fd5daa1a6002f07409fabd69946d34d908e614a26b7631c40e9c24"},
+    {file = "kornia_rs-0.1.3-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:8465436de7120560f6cc0baadef601764778f7f0c649d362520acb591fe21354"},
+    {file = "kornia_rs-0.1.3-cp38-none-win_amd64.whl", hash = "sha256:c2a50a171d4de3d13f9823ae38476b73b3f8fa1e27f06caf2515cc8dfae4ebb8"},
+    {file = "kornia_rs-0.1.3-cp39-cp39-macosx_10_12_x86_64.whl", hash = "sha256:7cfac9a37e433610e921b220aea6447ea3e7c6c9c7a8731641ad990419163340"},
+    {file = "kornia_rs-0.1.3-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:8804834e0d4087cd36dcd123fbb45613bf99d760b1082c9d44c811a5aae35e51"},
+    {file = "kornia_rs-0.1.3-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:4ee5e8db42e15c8aee1b0c11e52f5eac2a4b5c33f375651829c9de4ec2e90976"},
+    {file = "kornia_rs-0.1.3-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:9f2f22e0b22c2ac8fc6366e6c1e7e30d726e7a836c21c551f20818066fe47a81"},
+    {file = "kornia_rs-0.1.3-cp39-none-win_amd64.whl", hash = "sha256:bf7fa9fa33f3bcb12b7dc2f20d0d599eb6231ee237734c7ca91e8b9da6e4f273"},
+    {file = "kornia_rs-0.1.3.tar.gz", hash = "sha256:e299d110774fc10f82c547fb04b1b8bf450a0514010324e7be06206d2179ceaf"},
+]
+
+[package.extras]
+dev = ["jax[cpu]", "kornia (>=0.7.2)", "numpy (==1.23.0)", "pytest"]
+
+[[package]]
+name = "laplace-torch"
+version = "0.1a2"
+description = "laplace - Laplace approximations for deep learning"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "laplace-torch-0.1a2.tar.gz", hash = "sha256:9e9329ad7463eddd3a8c9c0b3647800a8f200886d941ba90a3b664739e4a8500"},
+    {file = "laplace_torch-0.1a2-py3-none-any.whl", hash = "sha256:d4b512f6e423f83514532ef5419cccdee74cd5dfe31d0e8f95cf5f5460cee7a1"},
+]
+
+[package.dependencies]
+asdfghjkl = "*"
+backpack-for-pytorch = "*"
+torch = "*"
+torchaudio = "*"
+torchvision = "*"
+
+[package.extras]
+docs = ["matplotlib", "pdoc3"]
+tests = ["coveralls", "pytest", "pytest-cov", "scipy"]
+
+[[package]]
 name = "lazy-loader"
 version = "0.3"
 description = "lazy_loader"
@@ -2448,6 +2618,37 @@ strategies = ["bitsandbytes (==0.41.0)", "deepspeed (>=0.8.2,<=0.9.3)"]
 test = ["click (==8.1.7)", "cloudpickle (>=1.3,<3.0)", "coverage (==7.3.1)", "fastapi", "httpx (==0.25.0)", "onnx (>=0.14.0,<2.0)", "onnxruntime (>=0.15.0,<2.0)", "pandas", "pandas (>1.0,<3.0)", "playwright (==1.38.0)", "polars", "psutil (<6.0)", "pyarrow", "pympler", "pytest (==7.4.0)", "pytest-asyncio (==0.21.1)", "pytest-cov (==4.1.0)", "pytest-doctestplus (==1.0.0)", "pytest-random-order (==1.1.0)", "pytest-rerunfailures (==12.0)", "pytest-timeout (==2.1.0)", "pytest-xdist (==3.3.1)", "requests-mock (==1.11.0)", "scikit-learn (>0.22.1,<2.0)", "setuptools (<69.0)", "tensorboard (>=2.9.1,<3.0)", "tensorboardX (>=2.2,<3.0)", "torchmetrics (>=0.7.0,<2.0)", "trio (<0.22.0)", "uvicorn", "viztracer"]
 
 [[package]]
+name = "lightning-uq-box"
+version = "0.1.0"
+description = "Lighning-UQ-Box: A toolbox for uncertainty quantification in deep learning"
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "lightning-uq-box-0.1.0.tar.gz", hash = "sha256:ce44860db75b4fbe487a009bee91c886be2e1835edee93479a6a8633ef2152b1"},
+    {file = "lightning_uq_box-0.1.0-py3-none-any.whl", hash = "sha256:c5fdb42d31b1d36f32da6000212d6d2df7127bfd3db20750fa7879355fd16fcb"},
+]
+
+[package.dependencies]
+einops = ">=0.3"
+gpytorch = ">=1.11"
+kornia = ">=0.6.9"
+laplace-torch = ">=0.1a2"
+lightning = ">=2.1.1"
+matplotlib = ">=3.3.3"
+numpy = ">=1.19.3"
+pandas = ">=1.1.3"
+scikit-learn = ">=1.3"
+timm = ">=0.9.2"
+torch = ">=2.0"
+torchmetrics = ">=1.2"
+torchseg = ">=0.0.1a1"
+torchvision = ">=0.16.1"
+uncertainty-toolbox = ">=0.1.1"
+
+[package.extras]
+dev = ["black[jupyter] (>=21.8)", "flake8 (>=3.8)", "hydra-core (>=1.3.2)", "ipykernel (>=6.29.3)", "ipywidgets (>=7)", "isort[colors] (>=5.8)", "jupytext (>=1.15.2)", "myst-parser (>=2.0)", "nbsphinx (>=0.8.5)", "omegaconf (>=2.3.0)", "pydocstyle[toml] (>=6.1)", "pytest (>=7.3)", "pytest-cov (>=4)", "pytest-lazy-fixture (>=0.6)", "pyupgrade (>=2.8)", "sphinx (>=4,<7)", "sphinx-book-theme (>=1.0.1)", "sphinx-togglebutton (>=0.3.2)"]
+
+[[package]]
 name = "lightning-utilities"
 version = "0.11.0"
 description = "Lightning toolbox for across the our ecosystem."
@@ -2467,6 +2668,28 @@ typing-extensions = "*"
 cli = ["fire"]
 docs = ["requests (>=2.0.0)"]
 typing = ["mypy (>=1.0.0)", "types-setuptools"]
+
+[[package]]
+name = "linear-operator"
+version = "0.5.2"
+description = "A linear operator implementation, primarily designed for finite-dimensional positive definite operators (i.e. kernel matrices)."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "linear_operator-0.5.2-py3-none-any.whl", hash = "sha256:26defe85e3c924f24d49117bf78afaf0207f6847877903309dc9bf40a46d08a7"},
+    {file = "linear_operator-0.5.2.tar.gz", hash = "sha256:5cd9099bca5b9f1e57017a4153526df7410561a46aedd47096c8da642159b90d"},
+]
+
+[package.dependencies]
+jaxtyping = ">=0.2.9"
+scipy = "*"
+torch = ">=1.11"
+typeguard = ">=2.13.3,<2.14.0"
+
+[package.extras]
+dev = ["pre-commit", "setuptools-scm", "twine", "ufmt"]
+docs = ["myst-parser", "setuptools-scm", "six", "sphinx", "sphinx-autodoc-typehints", "sphinx-rtd-theme", "uncompyle6"]
+test = ["flake8 (==5.0.4)", "flake8-print (==5.0.0)", "pytest"]
 
 [[package]]
 name = "llvmlite"
@@ -3699,6 +3922,20 @@ identify = ">=1.0.0"
 nodeenv = ">=0.11.1"
 pyyaml = ">=5.1"
 virtualenv = ">=20.10.0"
+
+[[package]]
+name = "pretty-errors"
+version = "1.2.25"
+description = "Prettifies Python exception output to make it legible."
+optional = false
+python-versions = "*"
+files = [
+    {file = "pretty_errors-1.2.25-py3-none-any.whl", hash = "sha256:8ce68ccd99e0f2a099265c8c1f1c23b7c60a15d69bb08816cb336e237d5dc983"},
+    {file = "pretty_errors-1.2.25.tar.gz", hash = "sha256:a16ba5c752c87c263bf92f8b4b58624e3b1e29271a9391f564f12b86e93c6755"},
+]
+
+[package.dependencies]
+colorama = "*"
 
 [[package]]
 name = "prettytable"
@@ -5394,6 +5631,24 @@ files = [
 ]
 
 [[package]]
+name = "timm"
+version = "0.9.16"
+description = "PyTorch Image Models"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "timm-0.9.16-py3-none-any.whl", hash = "sha256:bf5704014476ab011589d3c14172ee4c901fd18f9110a928019cac5be2945914"},
+    {file = "timm-0.9.16.tar.gz", hash = "sha256:891e54f375d55adf31a71ab0c117761f0e472f9f3971858ecdd1e7376b7071e6"},
+]
+
+[package.dependencies]
+huggingface_hub = "*"
+pyyaml = "*"
+safetensors = "*"
+torch = "*"
+torchvision = "*"
+
+[[package]]
 name = "tinycss2"
 version = "1.2.1"
 description = "A tiny CSS parser"
@@ -5684,28 +5939,53 @@ torch = "2.2.1"
 
 [[package]]
 name = "torchmetrics"
-version = "0.11.4"
+version = "1.4.0"
 description = "PyTorch native Metrics"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "torchmetrics-0.11.4-py3-none-any.whl", hash = "sha256:45f892f3534e91f3ad9e2488d1b05a93b7cb76b7d037969435a41a1f24750d9a"},
-    {file = "torchmetrics-0.11.4.tar.gz", hash = "sha256:1fe45a14b44dd65d90199017dd5a4b5a128d56a8a311da7916c402c18c671494"},
+    {file = "torchmetrics-1.4.0-py3-none-any.whl", hash = "sha256:18599929a0fff7d4b840a3f9a7700054121850c378caaf7206f4161c0a5dc93c"},
+    {file = "torchmetrics-1.4.0.tar.gz", hash = "sha256:0b1e5acdcc9beb05bfe369d3d56cfa5b143f060ebfd6079d19ccc59ba46465b3"},
 ]
 
 [package.dependencies]
-numpy = ">=1.17.2"
-packaging = "*"
-torch = ">=1.8.1"
+lightning-utilities = ">=0.8.0"
+numpy = ">1.20.0"
+packaging = ">17.1"
+pretty-errors = "1.2.25"
+torch = ">=1.10.0"
 
 [package.extras]
-all = ["lpips (<=0.1.4)", "nltk (>=3.6)", "pycocotools (>2.0.0)", "pystoi (<=0.3.3)", "regex (>=2021.9.24)", "scipy (>1.0.0)", "torch-fidelity (<=0.3.0)", "torchvision (>=0.8)", "tqdm (>=4.41.0)", "transformers (>=4.10.0)"]
-audio = ["pystoi (<=0.3.3)"]
+all = ["SciencePlots (>=2.0.0)", "ipadic (>=1.0.0)", "matplotlib (>=3.3.0)", "mecab-python3 (>=1.0.6)", "mypy (==1.9.0)", "nltk (>=3.6)", "piq (<=0.8.0)", "pycocotools (>2.0.0)", "pystoi (>=0.3.0)", "regex (>=2021.9.24)", "scipy (>1.0.0)", "sentencepiece (>=0.2.0)", "torch (==2.3.0)", "torch-fidelity (<=0.4.0)", "torchaudio (>=0.10.0)", "torchvision (>=0.8)", "tqdm (>=4.41.0)", "transformers (>4.4.0)", "transformers (>=4.10.0)", "types-PyYAML", "types-emoji", "types-protobuf", "types-requests", "types-setuptools", "types-six", "types-tabulate"]
+audio = ["pystoi (>=0.3.0)", "torchaudio (>=0.10.0)"]
 detection = ["pycocotools (>2.0.0)", "torchvision (>=0.8)"]
-image = ["lpips (<=0.1.4)", "scipy (>1.0.0)", "torch-fidelity (<=0.3.0)", "torchvision (>=0.8)"]
-multimodal = ["transformers (>=4.10.0)"]
-test = ["bert-score (==0.3.13)", "cloudpickle (>1.3)", "coverage (>5.2)", "dython (<=0.7.3)", "fast-bss-eval (>=0.1.0)", "fire (<=0.5.0)", "huggingface-hub (<0.7)", "jiwer (>=2.3.0)", "kornia (>=0.6.7)", "mir-eval (>=0.6)", "mypy (==0.982)", "netcal (>1.0.0)", "pandas (>1.0.0)", "phmdoctest (>=1.1.1)", "psutil (<=5.9.4)", "pypesq (>1.2)", "pytest (>=6.0.0)", "pytest-cov (>2.10)", "pytest-doctestplus (>=0.9.0)", "pytest-rerunfailures (>=10.0)", "pytest-timeout (<=2.1.0)", "pytorch-msssim (==0.2.1)", "requests (<=2.28.2)", "rouge-score (>0.1.0)", "sacrebleu (>=2.0.0)", "scikit-image (>0.17.1)", "scikit-learn (>1.0)", "scipy (>1.0.0)", "torch-complex (<=0.4.3)", "transformers (>4.4.0)", "types-PyYAML", "types-emoji", "types-protobuf", "types-requests", "types-setuptools", "types-six", "types-tabulate"]
-text = ["nltk (>=3.6)", "regex (>=2021.9.24)", "tqdm (>=4.41.0)"]
+dev = ["SciencePlots (>=2.0.0)", "bert-score (==0.3.13)", "dython (<=0.7.5)", "fairlearn", "fast-bss-eval (>=0.1.0)", "faster-coco-eval (>=1.3.3)", "huggingface-hub (<0.23)", "ipadic (>=1.0.0)", "jiwer (>=2.3.0)", "kornia (>=0.6.7)", "lpips (<=0.1.4)", "matplotlib (>=3.3.0)", "mecab-ko (>=1.0.0)", "mecab-ko-dic (>=1.0.0)", "mecab-python3 (>=1.0.6)", "mir-eval (>=0.6)", "monai (==1.3.0)", "mypy (==1.9.0)", "netcal (>1.0.0)", "nltk (>=3.6)", "numpy (<1.25.0)", "pandas (>1.0.0)", "pandas (>=1.4.0)", "piq (<=0.8.0)", "pycocotools (>2.0.0)", "pystoi (>=0.3.0)", "pytorch-msssim (==1.0.0)", "regex (>=2021.9.24)", "rouge-score (>0.1.0)", "sacrebleu (>=2.3.0)", "scikit-image (>=0.19.0)", "scipy (>1.0.0)", "sentencepiece (>=0.2.0)", "sewar (>=0.4.4)", "statsmodels (>0.13.5)", "torch (==2.3.0)", "torch-complex (<=0.4.3)", "torch-fidelity (<=0.4.0)", "torchaudio (>=0.10.0)", "torchvision (>=0.8)", "tqdm (>=4.41.0)", "transformers (>4.4.0)", "transformers (>=4.10.0)", "types-PyYAML", "types-emoji", "types-protobuf", "types-requests", "types-setuptools", "types-six", "types-tabulate"]
+image = ["scipy (>1.0.0)", "torch-fidelity (<=0.4.0)", "torchvision (>=0.8)"]
+multimodal = ["piq (<=0.8.0)", "transformers (>=4.10.0)"]
+text = ["ipadic (>=1.0.0)", "mecab-python3 (>=1.0.6)", "nltk (>=3.6)", "regex (>=2021.9.24)", "sentencepiece (>=0.2.0)", "tqdm (>=4.41.0)", "transformers (>4.4.0)"]
+typing = ["mypy (==1.9.0)", "torch (==2.3.0)", "types-PyYAML", "types-emoji", "types-protobuf", "types-requests", "types-setuptools", "types-six", "types-tabulate"]
+visual = ["SciencePlots (>=2.0.0)", "matplotlib (>=3.3.0)"]
+
+[[package]]
+name = "torchseg"
+version = "0.0.1a4"
+description = "TorchSeg: Semantic Segmentation models for PyTorch"
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "torchseg-0.0.1a4-py3-none-any.whl", hash = "sha256:2e10bbb8c9c079770c8cd0c34c898a699db06414e2674498f07d6473085e4463"},
+    {file = "torchseg-0.0.1a4.tar.gz", hash = "sha256:4742551753599af92f9f85e5ca6b149b474ffd458bad1aad6b3aad246a3bf4ea"},
+]
+
+[package.dependencies]
+einops = ">=0.7.0"
+timm = ">=0.9.12"
+torch = ">=1.13"
+
+[package.extras]
+all = ["torchseg[style,tests]"]
+style = ["black[jupyter] (>=21.8)", "flake8 (>=3.8)", "isort[colors] (>=5.8)", "pyupgrade (>=2.8)"]
+tests = ["pytest (>=7.3)", "pytest-cov (>=4)"]
 
 [[package]]
 name = "torchvision"
@@ -5896,6 +6176,21 @@ tests = ["autopep8", "flake8", "isort", "numpy", "pytest", "scipy (>=1.7.1)", "t
 tutorials = ["matplotlib", "pandas", "tabulate", "torch"]
 
 [[package]]
+name = "typeguard"
+version = "2.13.3"
+description = "Run-time type checker for Python"
+optional = false
+python-versions = ">=3.5.3"
+files = [
+    {file = "typeguard-2.13.3-py3-none-any.whl", hash = "sha256:5e3e3be01e887e7eafae5af63d1f36c849aaa94e3a0112097312aabfa16284f1"},
+    {file = "typeguard-2.13.3.tar.gz", hash = "sha256:00edaa8da3a133674796cf5ea87d9f4b4c367d77476e185e80251cc13dfbb8c4"},
+]
+
+[package.extras]
+doc = ["sphinx-autodoc-typehints (>=1.2.0)", "sphinx-rtd-theme"]
+test = ["mypy", "pytest", "typing-extensions"]
+
+[[package]]
 name = "types-python-dateutil"
 version = "2.9.0.20240316"
 description = "Typing stubs for python-dateutil"
@@ -5927,6 +6222,43 @@ files = [
     {file = "tzdata-2024.1-py2.py3-none-any.whl", hash = "sha256:9068bc196136463f5245e51efda838afa15aaeca9903f49050dfa2679db4d252"},
     {file = "tzdata-2024.1.tar.gz", hash = "sha256:2674120f8d891909751c38abcdfd386ac0a5a1127954fbc332af6b5ceae07efd"},
 ]
+
+[[package]]
+name = "uncertainty-toolbox"
+version = "0.1.1"
+description = "Uncertainty Toolbox: a python toolbox for predictive uncertainty quantification, calibration, metrics, and visualization."
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "uncertainty-toolbox-0.1.1.tar.gz", hash = "sha256:d9389112bd431edc8b6e44c5b12405dea8f86063ff9b79f0bb178e5ac76bcfa5"},
+    {file = "uncertainty_toolbox-0.1.1-py3-none-any.whl", hash = "sha256:9aebd0ab174f15a06f1c63c6172dd24ace2b7a4ba5610c3ee5a186bf5669cf24"},
+]
+
+[package.dependencies]
+matplotlib = ">=3.2.2"
+numpy = ">=1.19.0"
+scikit-learn = ">=0.23.1"
+scipy = ">=1.5.0"
+tqdm = ">=4.54.0"
+
+[[package]]
+name = "unfoldnd"
+version = "0.2.1"
+description = "N-dimensional unfold (im2col) and fold (col2im) in PyTorch"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "unfoldNd-0.2.1-py3-none-any.whl", hash = "sha256:5d9a7f23e9004127486eb8c58f18025529b106ad407e6271ab57f13d910a7458"},
+    {file = "unfoldNd-0.2.1.tar.gz", hash = "sha256:3d91e0e6006d1ab45702db4b36f28e6150aef11c96d46331a273efe963e5efef"},
+]
+
+[package.dependencies]
+numpy = "*"
+torch = "*"
+
+[package.extras]
+lint = ["black", "darglint", "flake8", "flake8-bugbear", "flake8-comprehensions", "flake8-tidy-imports", "isort", "mccabe", "pep8-naming", "pycodestyle", "pydocstyle", "pyflakes"]
+test = ["coveralls", "pytest", "pytest-cov", "pytest-optional-tests"]
 
 [[package]]
 name = "uri-template"
@@ -6351,4 +6683,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.13"
-content-hash = "553c1f44ec5dd27ae18c90b82bf3bece95803ceca021af60e3ba6b90becccdb3"
+content-hash = "7ef60cf2049341e8d2e73d3a566faccbdd09e9df0d5daa430428c0c1437b5b19"
