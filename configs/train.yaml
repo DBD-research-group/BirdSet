@@ -1,7 +1,7 @@
 # @package _global_
 defaults:
   - _self_
-  - datamodule: high_sierras
+  - datamodule: HSN.yaml #high_sierras
   - module: multilabel
   - callbacks: default
   - paths: default
