@@ -2,6 +2,7 @@ import os
 import hydra
 import lightning as L 
 from omegaconf import OmegaConf
+from omegaconf.errors import ConfigAttributeError
 import json
 from birdset import utils
 import pyrootutils 
@@ -60,6 +61,12 @@ def train(cfg):
         cfg.trainer, callbacks= callbacks, logger=logger
     )
 
+    pretrain_info = None
+    try:
+        pretrain_info = cfg.module.network.model.pretrain_info
+    except ConfigAttributeError:
+        log.info("pretrain_info does not exist using None instead")
+
     # Setup model 
     log.info(f"Instantiate model <{cfg.module.network.model._target_}>")     
     model = hydra.utils.instantiate(
@@ -67,8 +74,7 @@ def train(cfg):
         num_epochs=cfg.trainer.max_epochs, #?
         len_trainset=datamodule.len_trainset,
         batch_size=datamodule.loaders_config.train.batch_size,
-        label_counts=datamodule.num_train_labels,
-        pretrain_info=cfg.module.network.model.pretrain_info
+        pretrain_info=pretrain_info
     )
 
     object_dict = {
