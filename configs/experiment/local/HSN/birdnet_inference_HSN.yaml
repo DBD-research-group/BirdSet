@@ -11,21 +11,15 @@ defaults:
   - override /paths: default.yaml
   - override /hydra: default.yaml
 
-tags: ["HSN", "perch", "multilabel"]
+tags: ["HSN", "birdnet", "multilabel"]
 seed: 2
 train: False
 test: True
 
-dataset:
-  transforms:
-    decoding:
-      max_len: 3.0
-      extracted_interval: 3
-
 logger:
   wandb:
     tags: ${tags}
-    group: "HSN_test_perch_inference"
+    group: "HSN_test_birdnet_inference"
     mode: online
 
   loaders:
