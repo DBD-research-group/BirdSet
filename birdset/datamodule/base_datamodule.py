@@ -389,9 +389,12 @@ class BaseDataModuleHF(L.LightningDataModule):
         if not self.train_dataset and not self.val_dataset:
             if stage == "fit":
                 log.info("fit")
+ 
+                if self.dataset_config.get("val_split"):
+                    self.val_dataset = self._get_dataset("valid")
+ 
                 self.train_dataset = self._get_dataset("train")
-                self.val_dataset = self._get_dataset("valid")
-
+ 
         if not self.test_dataset:
             if stage == "test":
                 log.info("test")
@@ -435,7 +438,7 @@ class BaseDataModuleHF(L.LightningDataModule):
 
     def _smart_sampling(self, dataset, label_name, class_limit, event_limit):
         class_limit = class_limit if class_limit else -float("inf")
-        dataset = dataset.map(lambda x: self._unique_identifier(x, label_name))
+        dataset = dataset.map(lambda x: self._unique_identifier(x, label_name)) #TODO: what are we doing here
         df = pd.DataFrame(dataset)
         path_label_count = df.groupby(["id", label_name], as_index=False).size()
         path_label_count = path_label_count.set_index("id")
