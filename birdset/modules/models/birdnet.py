@@ -184,7 +184,7 @@ class BirdNetModel(nn.Module):
             # Process each segment
             for start in start_indices:
                 end = start + max_length
-                segment = input_tensor[start:end]
+                segment = input_tensor[:, start:end]
                 output = self.run_tf_model(input_tensor=segment)
                 outputs.append(output)
 
