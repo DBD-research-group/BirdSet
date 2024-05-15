@@ -69,7 +69,7 @@ class DatasetConfig:
     classlimit: Optional[int] = None
     eventlimit: Optional[int] = None
     direct_fingerprint: Optional[str] = None
-
+    
 @dataclass
 class LoaderConfig:
     """
@@ -278,6 +278,8 @@ class BaseDataModuleHF(L.LightningDataModule):
             return DatasetDict({"train": split_1["train"], "valid": split_2["train"], "test": split_2["test"]})
         elif isinstance(dataset, DatasetDict):
             # check if dataset has train, valid, test splits
+            if "train" in dataset.keys() and "valid" in dataset.keys():
+                 return dataset
             if "train" in dataset.keys() and "valid" in dataset.keys() and "test" in dataset.keys():
                 return dataset
             if "train" in dataset.keys() and "test" in dataset.keys():
@@ -285,9 +287,6 @@ class BaseDataModuleHF(L.LightningDataModule):
                     self.dataset_config.val_split, shuffle=True, seed=self.dataset_config.seed
                 )
                 return DatasetDict({"train": split["train"], "valid": split["test"], "test": dataset["test"]})
-            # if dataset has only one key, split it into train, valid, test
-            elif "train" in dataset.keys() and "test" not in dataset.keys():
-                return self._create_splits(dataset["train"])
             else: 
                 return self._create_splits(dataset[list(dataset.keys())[0]])
 
@@ -389,10 +388,7 @@ class BaseDataModuleHF(L.LightningDataModule):
         if not self.train_dataset and not self.val_dataset:
             if stage == "fit":
                 log.info("fit")
- 
-                if self.dataset_config.get("val_split"):
-                    self.val_dataset = self._get_dataset("valid")
- 
+                self.val_dataset = self._get_dataset("valid")
                 self.train_dataset = self._get_dataset("train")
  
         if not self.test_dataset:
