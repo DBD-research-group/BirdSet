@@ -10,17 +10,17 @@ defaults:
   - override /hydra: cluster.yaml
 
 tags: ["XCL", "efficientnet", "multilabel"]
-seed: 1
+seed: 2
 train: True
 test: False
-ckpt_path: /mnt/work/bird2vec/birdset_logs/train/runs/XCL/efficientnet/12024-05-10_180319/callback_checkpoints/checkpoint-11.ckpt
+#ckpt_path: /mnt/work/bird2vec/birdset_logs/train/runs/XCL/efficientnet/12024-05-10_180319/callback_checkpoints/checkpoint-11.ckpt
 
 logger:
   wandb:
     tags: ${tags}
     group: pretrain_effnet_XCL
     mode: online
-    version: "pretrain_effnet1_2024-05-10_180319"
+    version: pretrain_effnet${seed}_${start_time}
 
 trainer:
   min_epochs: 1
@@ -42,7 +42,17 @@ datamodule:
     class_weights_sampler: null
     classlimit: 500
     eventlimit: 1
-    direct_fingerprint: /scratch/birdset/XCL/XCL_processed_1_362dee0b0d9936df
+    #direct_fingerprint: /scratch/birdset/XCL/XCL_processed_1_362dee0b0d9936df
+  transforms:
+    preprocessing:
+      spectrogram_conversion: 
+        n_fft: 2048
+        hop_length: 320
+        power: 2.0
+      melscale_conversion:
+        n_mels: 256
+        n_stft: 1025
+
 
   loaders:
     train:

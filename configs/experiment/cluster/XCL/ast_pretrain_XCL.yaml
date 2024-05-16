@@ -7,11 +7,11 @@ defaults:
   - override /callbacks: cluster.yaml 
   - override /trainer: single_gpu.yaml
   - override /datamodule/transforms: bird_default_multilabel.yaml
-  - override /paths: cluster.yaml
+  - override /paths: cluster_pretrain.yaml
   - override /hydra: cluster.yaml
 
 tags: ["pretrain_xencanto_l", "ast", "multilabel"]
-seed: 2
+seed: 3
 train: True
 test: False
 #ckpt_path: /mnt/work/bird2vec/birdset_logs/train/runs/XCL/ast/22024-04-21_145201/callback_checkpoints/checkpoint-09-990000.ckpt

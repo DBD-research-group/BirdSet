@@ -40,7 +40,7 @@ datamodule:
     class_weights_loss: null
     class_weights_sampler: null
     classlimit: 500
-    eventlimit: 1
+    eventlimit: 2
     #direct_fingerprint: /mnt/work/bird2vec/birdset_hf_download/XCL/XCL_processed_2_2765dbe1bfb6bd9b
     #direct_fingerprint: /scratch/birdset/XCL/XCL_processed_2_b4c281556969864e
 
