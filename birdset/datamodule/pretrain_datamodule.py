@@ -9,6 +9,7 @@ from datasets import load_dataset, Audio, load_from_disk
 import logging
 import torch
 import os
+from copy import deepcopy
 log = pylogger.get_pylogger(__name__)
 
 
@@ -46,11 +47,12 @@ class PretrainDataModule(BaseDataModuleHF):
             path = self.dataset_config.direct_fingerprint
             dataset = load_from_disk(os.path.join(path, split))
 
-            self.transforms.set_mode(split)
+            transforms = deepcopy(self.transforms)
+            transforms.set_mode(split)
             if split == "train": # we need this for sampler, cannot be done later because set_transform
                 self.train_label_list = dataset["labels"]
 
-            dataset.set_transform(self.transforms, output_all_columns=False) 
+            dataset.set_transform(transforms, output_all_columns=False)
         
             return dataset
         else:
@@ -157,6 +159,9 @@ class PretrainDataModule(BaseDataModuleHF):
 
         dataset["train"] = dataset["train"].select_columns(
             ["filepath", "labels", "detected_events", "start_time", "end_time", "no_call_events"]
+        )
+        dataset["valid"] = dataset["valid"].select_columns(
+            ["filepath", "labels", "detected_events", "start_time", "end_time"]
         )
 
         return dataset
