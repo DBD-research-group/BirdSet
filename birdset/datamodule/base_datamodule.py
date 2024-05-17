@@ -7,6 +7,7 @@ from collections import Counter
 from tqdm import tqdm
 import lightning as L
 import pandas as pd
+from copy import deepcopy
 
 from datasets import load_dataset, load_from_disk, Audio, DatasetDict, Dataset, IterableDataset, IterableDatasetDict
 from torch.utils.data import DataLoader
@@ -348,17 +349,18 @@ class BaseDataModuleHF(L.LightningDataModule):
         """
         Get Dataset from disk and add run-time transforms to a specified split.
         """
-        
+
         dataset = load_from_disk(os.path.join(self.disk_save_path, split))
 
-        self.transforms.set_mode(split)
+        transforms = deepcopy(self.transforms)
+        transforms.set_mode(split)
 
-        if split == "train": # we need this for sampler, cannot be done later because set_transform
+        if split == "train":  # we need this for sampler, cannot be done later because set_transform
             self.train_label_list = dataset["labels"]
 
         # add run-time transforms to dataset
-        dataset.set_transform(self.transforms, output_all_columns=False) 
-        
+        dataset.set_transform(transforms, output_all_columns=False)
+
         return dataset
     
     def _create_weighted_sampler(self):
