@@ -189,7 +189,8 @@ class BirdNetModel(nn.Module):
         Get predictions from BirdNet model including both logits and embeddings.
         ...
         """
-
+        
+        input_tensor = input_tensor.reshape([-1, input_tensor.shape[-1]])
         # Run the TensorFlow BirdNet model using the optimized function
         outputs = self.run_tf_model(input_tensor=input_tensor)
 

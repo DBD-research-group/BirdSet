@@ -6,10 +6,10 @@ model:
   model_path: ${paths.root_dir}/checkpoints/birdnet/BirdNET_GLOBAL_6K_V2.4_Model
 
 model_name: birdnet
-model_type: vision
+model_type: waveform
 torch_compile: False
-sampling_rate: 48_000
+sampling_rate: 28_800
 normalize_spectrogram: False
 normalize_waveform: False
 embedding_size: 1024
-length: 3 # 6 seconds but multiple windows, ghani says 3
+length: 3 # 6 seconds but multiple windows (no), ghani says 3
