@@ -73,7 +73,11 @@ class BEANSDataModule(BaseDataModuleHF):
             row["labels"] = label_to_id[row["labels"]]
             return row
 
-        dataset = dataset.map(label_to_id_fn)
+        function = label_to_id_hot
+        if self.dataset_config.task == 'multiclass':
+            function = label_to_id_fn
+
+        dataset = dataset.map(function)
         
         # Normal casting
         dataset = dataset.cast_column(

@@ -3,16 +3,15 @@
 defaults:
   - override /datamodule: beans.yaml
   - override /module: embedding.yaml
-  - override /module/embedding_model: ../network/birdnet.yaml
   - override /callbacks: default.yaml
   - override /trainer: single_gpu.yaml
   - override /paths: default.yaml
   - override /hydra: default.yaml
-  - override /datamodule/transforms: bird_default_multiclass.yaml # Here the audio is transformed to a spectrogram
+  - override /datamodule/transforms: bird_default_multilabel.yaml # Here the audio is transformed to a spectrogram
   - override /datamodule/transforms/waveform_augmentations: none.yaml # No augmentations for now
   - override /datamodule/transforms/spectrogram_augmentations: none.yaml
 
-tags: ["BEANS", "Ghani", "embeddings", "birdnet", "multiclass"]
+tags: ["BEANS", "Ghani", "embeddings", "perch", "multilabel"]
 seed: 2
 train: True
 test: True
@@ -24,23 +23,28 @@ logger:
     mode: online
 
 module:
+  task: multilabel
   optimizer:
     lr: 1e-5
-    
+
+  metrics:
+    _target_: birdset.modules.metrics.multilabel.MultilabelMetricsConfig
+    num_labels: ${datamodule.dataset.n_classes}
+
   output_activation: 
     _target_: "torch.sigmoid" # Use sigmoid like Ghani et al
 
 trainer:
-  devices: [0]
+  devices: [1]
   min_epochs: 1
   max_epochs: 20
 
 datamodule:
   dataset:
-    dataset_name: beans_bats
-    hf_path: DBD-research-group/beans_bats
+    dataset_name: beans_watkins
+    hf_path: DBD-research-group/beans_watkins
     hf_name: default
-    n_classes: 10
+    n_classes: 31
     
   loaders:
     train:
@@ -66,4 +70,3 @@ callbacks:
     save_last: True
     every_n_epochs: 3
     monitor: "val/BCEWithLogitsLoss"
-

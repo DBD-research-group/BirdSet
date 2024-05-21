@@ -30,9 +30,7 @@ optimizer:
   weight_decay: 0.01
 
 loss:
-  #_target_: torch.nn.CrossEntropyLoss
-  _target_: birdset.modules.embedding_module.BCEWithLogitsLoss
-  num_classes: ${datamodule.dataset.n_classes}
+  _target_: torch.nn.BCEWithLogitsLoss   
 
 metrics: 
   _target_: birdset.modules.metrics.multiclass.EmbeddingMetricsConfig # Temporary solution 
