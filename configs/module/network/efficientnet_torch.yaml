@@ -1,0 +1,30 @@
+model:
+  _target_: birdset.modules.models.efficientnet_torch.EfficientNetClassifier
+  architecture: "efficientnet_b1"
+  num_classes: ${datamodule.dataset.n_classes}
+  num_channels: 1
+  checkpoint: null
+  pretrain_info:
+    hf_path: ${datamodule.dataset.hf_path}
+    hf_name: ${datamodule.dataset.hf_name}
+    hf_pretrain_name: null
+
+model_name: efficientnet
+model_type: vision
+torch_compile: False
+sampling_rate: 32_000
+normalize_waveform: null
+normalize_spectrogram: True
+
+
+
+
+
+
+
+
+
+
+
+
+
