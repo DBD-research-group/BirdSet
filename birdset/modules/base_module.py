@@ -4,6 +4,7 @@ from typing import Callable, List, Literal, Type, Optional, Union
 
 from birdset.modules.metrics.multiclass import MulticlassMetricsConfig
 from birdset.modules.metrics.multilabel import MultilabelMetricsConfig
+from birdset.modules.metrics.multilabel import MultilabelMetricsConfig as MetricsConfig # Depricated: to be still be compatible with models trained with MetricsConfig located at base_module.MetricsConfig
 from birdset.modules.models.efficientnet import EfficientNetClassifier
 import torch
 import math
