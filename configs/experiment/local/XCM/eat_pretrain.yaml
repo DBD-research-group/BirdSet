@@ -10,7 +10,7 @@ defaults:
   - override /paths: default.yaml
   - override /hydra: default.yaml
 
-tags: ["pretrain_xencanto_m", "eat", "multilabel"]
+tags: ["XCM", "eat", "multilabel"]
 seed: 1
 train: True
 test: False
@@ -35,16 +35,16 @@ module:
 
 trainer:
   min_epochs: 1
-  max_epochs: 130
-  devices: [0]
+  max_epochs: 50
+  devices: [2]
 
 datamodule:
   dataset:
-    val_split: 0.15
     class_weights_loss: null
     class_weights_sampler: null
     classlimit: null
     eventlimit: null
+    direct_fingerprint: null
   transforms:
     preprocessing:
         normalize_waveform: instance_normalization
