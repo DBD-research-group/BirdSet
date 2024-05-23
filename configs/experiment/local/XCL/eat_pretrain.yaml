@@ -10,7 +10,7 @@ defaults:
   - override /paths: default.yaml
   - override /hydra: default.yaml
 tags: ["XCL", "eat", "multilabel"]
-seed: 1
+seed: 3
 train: True
 test: False
 
@@ -45,7 +45,7 @@ datamodule:
     class_weights_sampler: null
     classlimit: 500
     eventlimit: 1
-    # direct_fingerprint: /workspace/data_birdset/XCL/XCL_processed_1_6e2f66f806b8130e
+    direct_fingerprint: /workspace/data_birdset/XCL/XCL_processed_3_aa89e67c5e6bad3a
   transforms:
     preprocessing:
         normalize_waveform: instance_normalization
@@ -53,12 +53,25 @@ datamodule:
 
   loaders:
     train:
-      batch_size: 128
+      batch_size: 64
+      shuffle: True
       num_workers: 16
+      drop_last: True
+      prefetch_factor: 2
+
+    valid:
+      batch_size: 64
+      num_workers: 16
+      shuffle: False
+    
+    test:
+      batch_size: 12
+      num_workers: 12
+      shuffle: False
+
 
 
   mapper: 
-   
     biggest_cluster: True
     no_call: False
   
