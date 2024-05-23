@@ -1,0 +1,57 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - override /datamodule: /inference/HSN_inf.yaml
+  - override /module: multilabel.yaml
+  - override /module/network: efficientnet.yaml
+  - override /trainer: single_gpu.yaml
+  - override /datamodule/transforms: inference_default.yaml
+  - override /paths: default.yaml
+  - override /hydra: default.yaml
+
+#override for inference
+# datamodule:
+#   _target_: birdset.datamodule.inference_datamodule.InferenceDataModule
+
+tags: ["HSN", "efficientnet", "multilabel", "inference"]
+seed: 1
+ckpt_path: /workspace/logs/train/runs/HSN/efficientnet/2024-05-23_122744/callback_checkpoints/last.ckpt
+
+test: True
+
+logger:
+  wandb:
+    tags: ${tags}
+    group: "playground"
+    mode: online
+    # version: pretrain_xcl_eat_${seed}_${start_time} #to resume train run # needs to be tested
+    #version: pretraineatxcm_2 #to resume train run # needs to be tested
+
+module:
+  network:
+    torch_compile: False
+    model:
+      #local_checkpoint: /home/lrauch/mnt/train/runs/XCM/ast/2024-04-03_133040/callback_checkpoints/last.ckpt
+      local_checkpoint : /workspace/logs/train/runs/HSN/efficientnet/2024-05-23_122744/callback_checkpoints/last.ckpt
+      pretrain_info:
+        hf_path: DBD-research-group/BirdSet
+        hf_name: HSN
+        hf_pretrain_name: HSN
+
+trainer:
+  min_epochs: 1
+  max_epochs: 1
+  devices: [1]
+  limit_val_batches: 0
+
+datamodule:
+  transforms:
+    preprocessing:
+        normalize_waveform: instance_normalization
+
+  loaders:
+    test:
+      batch_size: 64
+      num_workers: 24
+      shuffle: False
+
