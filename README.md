@@ -11,13 +11,6 @@
 
 ## Get Started
 
-### Devcontainer
-
-You can use the [devcontainer](https://code.visualstudio.com/docs/devcontainers/containers) configured as as git submodule:
-```bash
-git submodule update --init --recursive
-```
-
 ### Install dependencies
 
 Either with [conda](https://docs.conda.io/en/latest/) and [pip](https://pip.pypa.io/en/stable/).
@@ -26,12 +19,18 @@ conda create -n birdset python=3.10
 pip install -e .
 ```
 
+### Devcontainer
+
+You can use the [devcontainer](https://code.visualstudio.com/docs/devcontainers/containers) configured as as git submodule:
+```bash
+git submodule update --init --recursive
+```
+
 Or [poetry](https://python-poetry.org/).
 ```
 poetry install
 poetry shell
 ```
-
 
 
 # Minimal Working Example
