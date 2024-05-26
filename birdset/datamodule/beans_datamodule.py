@@ -2,6 +2,8 @@ from birdset.datamodule.components.transforms import BirdSetTransformsWrapper
 from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
 from datasets import load_dataset, IterableDataset, IterableDatasetDict, DatasetDict, Audio, Dataset
 import logging
+from birdset.utils import pylogger
+log = pylogger.get_pylogger(__name__)
 
 class BEANSDataModule(BaseDataModuleHF):
     def __init__(
@@ -20,9 +22,18 @@ class BEANSDataModule(BaseDataModuleHF):
 
     def _preprocess_data(self, dataset):
         """
-        Preprocess the data. For BEANS we will just return the dataset as it is.
+        Preprocess the data. If multilabel is the task we will one hot encode.
         """
 
+        if self.dataset_config.task == 'multilabel':
+            log.info(">> One-hot-encode classes")
+            dataset = dataset.map(
+                self._classes_one_hot,
+                batched=True,
+                batch_size=500,
+                load_from_cache_file=True,
+                num_proc=self.dataset_config.n_workers,
+            )
 
         return dataset
 
@@ -30,7 +41,7 @@ class BEANSDataModule(BaseDataModuleHF):
 
     def _load_data(self,decode: bool = True):    
         """
-        Load audio dataset from Hugging Face Datasets. For BEANS the audio column is named path so we will rename it to audio and we have to do one-hot encoding for the labels.
+        Load audio dataset from Hugging Face Datasets. For BEANS the audio column is named path so we will rename it to audio and also rename labels column and remove unamed.
 
         Returns HF dataset with audio column casted to Audio feature, containing audio data as numpy array and sampling rate.
         """
@@ -56,29 +67,21 @@ class BEANSDataModule(BaseDataModuleHF):
         dataset = dataset.rename_column("label", "labels")
         dataset = dataset.remove_columns('Unnamed: 0')
 
-        # Then we have to map the label to integers if they are strings (One-hot encoding)
-        labels = set()
-        for split in dataset.keys():
-            labels.update(dataset[split]["labels"])
+        # Then we have to map the label to integers if they are strings
+        if isinstance(dataset['train'][0]['labels'],str):
+            labels = set()
+            for split in dataset.keys():
+                labels.update(dataset[split]["labels"])
 
-        label_to_id = {lbl: i for i, lbl in enumerate(labels)}
+            label_to_id = {lbl: i for i, lbl in enumerate(labels)}
 
-        def label_to_id_hot(row):
-            l = [0.0] * len(labels)
-            l[label_to_id[row["labels"]]] = 1.0
-            row["labels"] = l
-            return row
 
-        def label_to_id_fn(row):
-            row["labels"] = label_to_id[row["labels"]]
-            return row
+            def label_to_id_fn(row):
+                row["labels"] = label_to_id[row["labels"]]
+                return row
 
-        function = label_to_id_hot
-        if self.dataset_config.task == 'multiclass':
-            function = label_to_id_fn
+            dataset = dataset.map(label_to_id_fn, num_proc=self.dataset_config.n_workers)
 
-        dataset = dataset.map(function)
-        
         # Normal casting
         dataset = dataset.cast_column(
             column="audio",
