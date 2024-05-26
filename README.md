@@ -55,7 +55,7 @@ Our datasets are shared via HuggingFace Datasets in our [HuggingFace BirdSet rep
 [Tutorial Notebook](https://github.com/DBD-research-group/BirdSet/blob/main/notebooks/tutorials/birdset-pipeline_tutorial.ipynb)
 ## Prepare Data
 
-```
+```python
 from birdset.datamodule.base_datamodule import DatasetConfig
 from birdset.datamodule.birdset_datamodule import BirdSetDataModule
 
@@ -88,7 +88,7 @@ train_loader = dm.train_dataloader()
 
 ## Prepare Model and Start Training
 
-```
+```python
 from lightning import Trainer
 min_epochs = 1
 max_epochs = 5
@@ -108,7 +108,7 @@ trainer.fit(model, dm)
 | <sub>Title</sub> | <sub>Notes</sub> |<sub>PER</sub> | <sub>NES</sub> | <sub>UHH</sub> | <sub>HSN</sub> | <sub>NBP</sub> | <sub>POW</sub> | <sub>SSW</sub> | <sub>SNE</sub>  | <sub>Overall</sub> | <sub>Code</sub> |
 | :----| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | <sub>**BirdSet: A Multi-Task Benchmark For Classification In Avian Bioacoustics**</sub> | | | | | | | |
-| <sub>**BIRB: A Generalization Benchmark for Information Retrieval in Bioacoustics**</sub> | |0.70 |0.90 |0.75 |0.86 | |0.83 |  0.62 | 0.69 | | |
+| <sub>**BIRB: A Generalization Benchmark for Information Retrieval in Bioacoustics**</sub> | | | | | | | |  | | | |
 ## Logging
 Logs will be written to [Weights&Biases](https://wandb.ai/) by default.
 
