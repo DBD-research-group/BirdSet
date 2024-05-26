@@ -1,5 +1,4 @@
-# BirdSet ![logo](https://github.com/DBD-research-group/BirdSet/blob/main/resources/perch/birdsetsymbol.png)
-
+# BirdSet 
 
 [![python](https://img.shields.io/badge/-Python_3.10-blue?logo=python&logoColor=white)](https://github.com/pre-commit/pre-commit)
 <a href="https://pytorch.org/get-started/locally/"><img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-ee4c2c?logo=pytorch&logoColor=white"></a>
@@ -8,6 +7,7 @@
 <a href="https://github.com/DBD-research-group/BirdSet"><img alt="GitHub: github.com/DBD-research-group/BirdSet " src="https://img.shields.io/badge/-BirdSet-017F2F?style=flat&logo=github&labelColor=gray"></a>
 [![arXiv](https://img.shields.io/badge/arXiv-1234.56789-b31b1b.svg)](https://arxiv.org/abs/2403.10380)
 
+![logo](https://github.com/DBD-research-group/BirdSet/blob/main/resources/perch/birdsetsymbol.png)
 
 ## Get Started
 
