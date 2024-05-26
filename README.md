@@ -1,4 +1,4 @@
-# BirdSet 
+# BirdSet ![logo](https://github.com/DBD-research-group/BirdSet/blob/main/resources/perch/birdsetsymbol.png)
 
 
 [![python](https://img.shields.io/badge/-Python_3.10-blue?logo=python&logoColor=white)](https://github.com/pre-commit/pre-commit)
