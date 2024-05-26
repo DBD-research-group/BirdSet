@@ -1,27 +1,22 @@
-# Standard library imports
 import glob
 import math
-import os
 import random
 import warnings
 from pathlib import Path
-from typing import List, Optional, Text, TypedDict, Union
+from typing import List, Text, TypedDict, Union
 import torch.nn as nn
 # Related third-party imports
 import audiomentations
 import librosa
 import numpy as np
 import soundfile as sf
-import torch
 import torch.nn.functional as F
 import torchaudio
 import torchvision
 from torchaudio import transforms
 import torch_audiomentations
-from torch_audiomentations.core.transforms_interface import BaseWaveformTransform, EmptyPathException
-from torch_audiomentations.utils.dsp import calculate_rms
+from torch_audiomentations.core.transforms_interface import EmptyPathException
 from torch_audiomentations.utils.file import find_audio_files_in_paths
-from torch_audiomentations.utils.object_dict import ObjectDict
 
 from typing import Optional
 import torch
@@ -564,7 +559,7 @@ class BackgroundNoise(AudioTransforms):
     def _decode(self, path, start, end):
         sr = sf.info(path).samplerate
         if start is not None and end is not None:
-            if end - start < self.min_length:  # TODO: improve, eg. edge cases, more dynamic loading
+            if end - start < self.min_length:
                 end = start + self.min_length
             if self.max_length and end - start > self.max_length:
                 end = start + self.max_length
@@ -575,7 +570,7 @@ class BackgroundNoise(AudioTransforms):
         audio, _ = sf.read(path, start=start, stop=end)
 
         if audio.ndim != 1:
-            audio = audio.swapaxes(1, 0) ###!TODO: why??
+            audio = audio.swapaxes(1, 0)
             audio = librosa.to_mono(audio)
 
         return audio
@@ -750,14 +745,12 @@ class NoCallMixer():
     n_classes : int
         The total number of distinct classes in the dataset. This parameter should align with the rest of your dataset and model configuration.
     """
-    def __init__(self, directory, p, sampling_rate, n_classes, length=5):
+    def __init__(self, directory, p, sampling_rate, length=5, *args, **kwargs):
         self.p = p
         self.sampling_rate = sampling_rate
         self.length = length 
 
         self.paths = self.get_all_file_paths(directory)
-        self.no_call_tensor = torch.zeros(n_classes)
-        #self.no_call_tensor[0] = 1 # !TODO: [ensure that no_call is 0!!
 
     def get_all_file_paths(self, directory):
         pattern = os.path.join(directory, '**', '*')
@@ -768,6 +761,7 @@ class NoCallMixer():
         return absolute_file_paths
 
     def __call__(self, input_values, labels):
+        b, c = labels.shape
         for idx in range(len(input_values)):
             if random.random() < self.p: 
                 selected_path = random.choice(self.paths)
@@ -797,8 +791,7 @@ class NoCallMixer():
 
 
                 input_values[idx] = audio
-                labels[idx] = self.no_call_tensor 
-        
+                labels[idx] = torch.zeros(c)
         return input_values, labels
 
     
@@ -817,8 +810,8 @@ The optional "channel" key can be used to indicate a specific channel.
 """
 
 # TODO: Remove this when it is the default
-torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE = False
-torchaudio.set_audio_backend("soundfile")
+# torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE = False
+# torchaudio.set_audio_backend("soundfile")
 
 
 class Audio:
@@ -1230,7 +1223,8 @@ class AddBackgroundNoise(BaseWaveformTransform):
             sample_rate=sample_rate,
             targets=targets,
             target_rate=target_rate,
-        )            
+        )
+
 
 class PowerToDB(nn.Module):
     def __init__(self, ref=1.0, amin=1e-10, top_db=80.0):

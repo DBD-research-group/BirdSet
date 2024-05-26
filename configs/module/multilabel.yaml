@@ -17,7 +17,7 @@ optimizer:
 
 metrics:
   _target_: birdset.modules.base_module.MetricsConfig
-  num_labels: ${datamodule.dataset.n_classes}
+  #num_labels: ${datamodule.dataset.n_classes}
   
 
 loss:

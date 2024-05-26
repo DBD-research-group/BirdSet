@@ -2,6 +2,7 @@ import os
 import hydra
 import json
 import pyrootutils
+from omegaconf import open_dict
 import lightning as L 
 
 from birdset import utils 
@@ -42,7 +43,10 @@ def eval(cfg):
     datamodule = hydra.utils.instantiate(cfg.datamodule)
     datamodule.prepare_data()
 
-    log.info(f"Instantiate model <{cfg.module.network.model._target_}>")     
+    log.info(f"Instantiate model <{cfg.module.network.model._target_}>")
+    with open_dict(cfg):
+        cfg.module.metrics["num_labels"] = datamodule.num_classes
+        cfg.module.network.model["num_classes"] = datamodule.num_classes
     model = hydra.utils.instantiate(
         cfg.module,
         num_epochs=cfg.trainer.max_epochs, #?

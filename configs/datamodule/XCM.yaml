@@ -13,7 +13,6 @@ dataset:
   hf_path: DBD-research-group/BirdSet
   hf_name: XCM
   seed: ${seed}
-  n_classes: 411
   n_workers: 1
   val_split: null
   task: ${module.task}

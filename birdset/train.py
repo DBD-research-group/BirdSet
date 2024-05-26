@@ -1,7 +1,7 @@
 import os 
 import hydra
 import lightning as L 
-from omegaconf import OmegaConf
+from omegaconf import OmegaConf, open_dict
 import json
 from birdset import utils
 import pyrootutils 
@@ -61,10 +61,13 @@ def train(cfg):
     )
 
     # Setup model 
-    log.info(f"Instantiate model <{cfg.module.network.model._target_}>")     
+    log.info(f"Instantiate model <{cfg.module.network.model._target_}>")
+    with open_dict(cfg):
+        cfg.module.metrics["num_labels"] = datamodule.num_classes
+        cfg.module.network.model["num_classes"] = datamodule.num_classes
     model = hydra.utils.instantiate(
         cfg.module,
-        num_epochs=cfg.trainer.max_epochs, #?
+        num_epochs=cfg.trainer.max_epochs,
         len_trainset=datamodule.len_trainset,
         batch_size=datamodule.loaders_config.train.batch_size,
         label_counts=datamodule.num_train_labels,
