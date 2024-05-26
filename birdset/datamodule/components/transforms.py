@@ -181,7 +181,6 @@ class BaseTransforms:
 
         return batch
 
-
 class BirdSetTransformsWrapper(BaseTransforms):
     """
     A class to handle audio transformations for different model types and modes.
@@ -446,7 +445,7 @@ class BirdSetTransformsWrapper(BaseTransforms):
         return audio_augmented
    
     def _prepare_call(self):
-        if self.mode in ("test", "predict", "valid"):
+        if self.mode in ("valid", "test", "predict"):
             self.wave_aug = None
             self.spec_aug = None
             self.nocall_sampler = None
