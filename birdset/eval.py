@@ -49,7 +49,7 @@ def eval(cfg):
         cfg.module.network.model["num_classes"] = datamodule.num_classes
     model = hydra.utils.instantiate(
         cfg.module,
-        num_epochs=cfg.trainer.max_epochs, #?
+        num_epochs=cfg.trainer.max_epochs,
         len_trainset=datamodule.len_trainset,
         batch_size=datamodule.loaders_config.train.batch_size,
         label_counts=datamodule.num_train_labels,
