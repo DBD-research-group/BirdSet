@@ -44,7 +44,7 @@ def log_hyperparameters(object_dict):
     hparams["tags"] = cfg.get("tags")
     hparams["ckpt_path"] = cfg.get("ckpt_path")
     hparams["seed"] = cfg.get("seed")
-
+    #if isinstance(trainer.logger, list)
     #trainer.logger.experiment.config.update(hparams, allow_val_change=True)
     trainer.logger.log_hyperparams(OmegaConf.to_container(cfg))
     #trainer.logger.log_hyperparams(hparams)

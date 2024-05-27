@@ -4,7 +4,9 @@ import lightning as L
 from omegaconf import OmegaConf, open_dict
 import json
 from birdset import utils
-import pyrootutils 
+import pyrootutils
+from pathlib import Path
+
 
 log = utils.get_pylogger(__name__)
 
@@ -48,7 +50,8 @@ def train(cfg):
 
     # Setup logger
     log.info(f"Instantiate logger")
-    logger = utils.instantiate_loggers(cfg.get("logger")) 
+    logger = utils.instantiate_loggers(cfg.get("logger"))
+    logger.append(utils.TBLogger(Path(cfg.paths.log_dir)))
 
     # Setup callbacks
     log.info(f"Instantiate callbacks")
@@ -57,7 +60,7 @@ def train(cfg):
     # Training
     log.info(f"Instantiate trainer <{cfg.trainer._target_}>")
     trainer = hydra.utils.instantiate(
-        cfg.trainer, callbacks= callbacks, logger=logger
+        cfg.trainer, callbacks=callbacks, logger=logger
     )
 
     # Setup model 
