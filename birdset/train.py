@@ -7,7 +7,6 @@ from birdset import utils
 import pyrootutils
 from pathlib import Path
 
-
 log = utils.get_pylogger(__name__)
 
 root = pyrootutils.setup_root(
