@@ -57,7 +57,9 @@ def eval(cfg):
     )
 
     log.info(f"Instantiate logger")
-    logger = utils.instantiate_loggers(cfg.get("logger")) 
+    logger = utils.instantiate_loggers(cfg.get("logger"))
+    # override standard TF logger to handle rare logger error
+    logger.append(utils.TBLogger(Path(cfg.paths.log_dir)))
 
     trainer = hydra.utils.instantiate(
         cfg.trainer, logger=logger
