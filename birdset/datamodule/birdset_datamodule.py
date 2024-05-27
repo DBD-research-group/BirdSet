@@ -68,6 +68,14 @@ class BirdSetDataModule(BaseDataModuleHF):
         self.event_mapper = mapper
 
     def _load_data(self, decode: bool = False):
+        """
+        Loads the data.
+        This method loads the data by calling the superclass's _load_data method.
+        Args:
+            decode (bool, optional): Whether to decode the data. Defaults to False.
+        Returns:
+            The loaded data.
+        """
         return super()._load_data(decode=decode)
 
     def _preprocess_data(self, dataset):
@@ -129,7 +137,7 @@ class BirdSetDataModule(BaseDataModuleHF):
                 batched=True,
                 batch_size=300,
                 num_proc=self.dataset_config.n_workers,
-                desc="event mapping data"
+                desc="Event Mapping"
             )
 
             dataset = dataset.rename_column("ebird_code_multilabel", "labels")
