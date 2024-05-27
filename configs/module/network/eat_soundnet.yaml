@@ -7,7 +7,7 @@ model:
   n_layers: 4
   nhead: 8
   factors: [4, 4, 4, 4]
-  n_classes: ${datamodule.dataset.n_classes}
+  n_classes: null
   dim_feedforward: 512
   checkpoint: null
   pretrain_info: null

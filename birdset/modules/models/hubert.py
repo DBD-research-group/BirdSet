@@ -2,19 +2,35 @@ import torch
 import torch.nn as nn
 from transformers import AutoModelForAudioClassification, AutoConfig
 import datasets
+from birdset.configs import PretrainInfoConfig
 
 
 class HubertSequenceClassifier(nn.Module):
-    def __init__(self, checkpoint: str, local_checkpoint: str | None, num_classes: int, cache_dir: str | None, pretrain_info):
+    def __init__(self,
+                 checkpoint: str,
+                 num_classes: int = None,
+                 local_checkpoint: str = None,
+                 cache_dir: str = None,
+                 pretrain_info: PretrainInfoConfig = None):
+        """
+        Note: Either num_classes or pretrain_info must be given
+        Args:
+            checkpoint: huggingface checkpoint path of any model of correct type
+            num_classes: number of classification heads to be used in the model
+            local_checkpoint: local path to checkpoint file
+            cache_dir: specified cache dir to save model files at
+            pretrain_info: hf_path and hf_name of info will be used to infer if num_classes is None
+        """
         super(HubertSequenceClassifier, self).__init__()
 
         self.checkpoint = checkpoint
-        # self.num_classes = num_classes
 
-        self.hf_path = pretrain_info.hf_path
-        self.hf_name = pretrain_info.hf_name if not pretrain_info.hf_pretrain_name else pretrain_info.hf_pretrain_name
-        self.num_classes = len(
-            datasets.load_dataset_builder(self.hf_path, self.hf_name).info.features["ebird_code"].names)
+        if num_classes:  # either num_classes if provided or pretrain info
+            self.num_classes = num_classes
+        else:
+            self.hf_path = pretrain_info.hf_path
+            self.hf_name = pretrain_info.hf_name if not pretrain_info.hf_pretrain_name else pretrain_info.hf_pretrain_name
+            self.num_classes = len(datasets.load_dataset_builder(self.hf_path, self.hf_name).info.features["ebird_code"].names)
 
         self.cache_dir = cache_dir
 
@@ -82,6 +98,7 @@ class HubertSequenceClassifier(nn.Module):
     @torch.inference_mode()
     def get_representations(self, dataloader, device):
         pass
+
 
 class HubertSequenceClassifierRandomInit(HubertSequenceClassifier):
 

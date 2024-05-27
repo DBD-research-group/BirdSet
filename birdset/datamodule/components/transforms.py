@@ -1,12 +1,11 @@
-from dataclasses import dataclass
-from typing import Any, Dict, Literal, Optional
+from typing import Literal
 from birdset import utils
 
 import numpy as np
 from omegaconf import DictConfig
 from birdset.datamodule.components.feature_extraction import DefaultFeatureExtractor
 from birdset.datamodule.components.event_decoding import EventDecoding
-from birdset.datamodule.components.augmentations import Compose, NoCallMixer, PowerToDB
+from birdset.datamodule.components.augmentations import NoCallMixer, PowerToDB
 
 import torch
 
@@ -14,8 +13,11 @@ from birdset.datamodule.components.resize import Resizer
 import torch_audiomentations
 from torchaudio.transforms import Spectrogram, MelScale
 import torchvision
+
 log = utils.get_pylogger(__name__)
 
+
+# TODO not a dataclass
 class PreprocessingConfig:
     """
     A class used to configure the preprocessing steps for the audio data.
@@ -68,8 +70,7 @@ class PreprocessingConfig:
         self.normalize_waveform = normalize_waveform
         self.mean = mean
         self.std = std
-    
-    
+
 
 class BaseTransforms:
     """
@@ -262,7 +263,7 @@ class BirdSetTransformsWrapper(BaseTransforms):
         if self.wave_aug: 
             input_values, labels = self._waveform_augmentation(input_values, labels)
         
-        if self.nocall_sampler: 
+        if self.nocall_sampler and self.task == "multilabel":
             input_values, labels = self.nocall_sampler(input_values, labels) 
         
         if self.preprocessing is not None:
@@ -449,7 +450,8 @@ class BirdSetTransformsWrapper(BaseTransforms):
             self.spec_aug = None
             self.nocall_sampler = None
         return
-    
+
+
 class EmbeddingTransforms(BaseTransforms):
     def __init__(self, task: Literal['multiclass', 'multilabel'] = "multiclass", sampling_rate: int = 3200, max_length: int = 5, decoding: EventDecoding | None = None, feature_extractor: DefaultFeatureExtractor | None = None) -> None:
         super().__init__(task, sampling_rate, max_length, decoding, feature_extractor)

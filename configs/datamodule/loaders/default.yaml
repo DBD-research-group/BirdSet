@@ -1,6 +1,6 @@
-_target_: birdset.datamodule.base_datamodule.LoadersConfig
+_target_: birdset.datamodule.LoadersConfig
 train:
-  _target_: birdset.datamodule.base_datamodule.LoaderConfig
+  _target_: birdset.datamodule.LoaderConfig
   batch_size: 8
   shuffle: True
   num_workers: 4
@@ -9,7 +9,7 @@ train:
   pin_memory: False
 
 valid:
-  _target_: birdset.datamodule.base_datamodule.LoaderConfig
+  _target_: birdset.datamodule.LoaderConfig
   batch_size: 8
   shuffle: False
   num_workers: 4
@@ -18,7 +18,7 @@ valid:
   pin_memory: False
 
 test:
-  _target_: birdset.datamodule.base_datamodule.LoaderConfig
+  _target_: birdset.datamodule.LoaderConfig
   batch_size: 8
   shuffle: False
   num_workers: 4
