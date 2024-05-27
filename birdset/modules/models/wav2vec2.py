@@ -42,8 +42,7 @@ class Wav2vec2SequenceClassifier(nn.Module):
         if local_checkpoint:
             log.info(f">> Loading state dict from local checkpoint: {local_checkpoint}")
             state_dict = torch.load(local_checkpoint)["state_dict"]
-            if state_dict.keys()[0].startswith("model.model."):
-                state_dict = {key.replace('model.model.', ''): weight for key, weight in state_dict.items()}
+            state_dict = {key.replace('model.model.', ''): weight for key, weight in state_dict.items()}
 
         self.model = AutoModelForAudioClassification.from_pretrained(
             self.checkpoint,

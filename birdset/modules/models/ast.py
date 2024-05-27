@@ -39,8 +39,7 @@ class ASTSequenceClassifier(nn.Module):
         if local_checkpoint:  # TODO only loads a pretrained model from a local checkpoint else a randomly init model???
             log.info(f">> Loading state dict from local checkpoint: {local_checkpoint}")
             state_dict = torch.load(local_checkpoint)["state_dict"]
-            if state_dict.keys()[0].startswith("model.model."):
-                state_dict = {key.replace('model.model.', ''): weight for key, weight in state_dict.items()}
+            state_dict = {key.replace('model.model.', ''): weight for key, weight in state_dict.items()}
 
             self.model = ASTForAudioClassification.from_pretrained(
                 self.checkpoint,
