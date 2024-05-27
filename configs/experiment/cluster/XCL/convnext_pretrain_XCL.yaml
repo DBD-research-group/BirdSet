@@ -36,16 +36,17 @@ module:
 
 datamodule:
   dataset:
-    val_split: 0.2
+    val_split: null
     class_weights_loss: null
     class_weights_sampler: null
     classlimit: 500
-    eventlimit: 1
-    direct_fingerprint: /mnt/work/bird2vec/birdset_hf_download/XCL/XCL_processed_2_2765dbe1bfb6bd9b
+    eventlimit: 2
+    #direct_fingerprint: /mnt/work/bird2vec/birdset_hf_download/XCL/XCL_processed_2_2765dbe1bfb6bd9b
+    #direct_fingerprint: /scratch/birdset/XCL/XCL_processed_2_b4c281556969864e
 
   loaders:
     train:
-      batch_size: 64
+      batch_size: 48
       num_workers: 24
     # valid:
     #   batch_size: 64
@@ -58,8 +59,11 @@ callbacks:
   model_checkpoint:
     #save_last: True
     #every_n_epochs: 5
-    every_n_train_steps: 10_000
+    #every_n_train_steps: 20_000
     save_top_k: -1
     #save_top_k: 5
     monitor: null
-    filename: 'checkpoint-{epoch:02d}-{step:06d}'
+    save_on_train_epoch_end: True
+    every_n_epochs: 1
+    #filename: 'checkpoint-{epoch:02d}-{step:06d}'
+    filename: 'checkpoint-{epoch:02d}'

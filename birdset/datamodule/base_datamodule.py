@@ -7,6 +7,7 @@ from collections import Counter
 from tqdm import tqdm
 import lightning as L
 import pandas as pd
+from copy import deepcopy
 
 from datasets import load_dataset, load_from_disk, Audio, DatasetDict, Dataset, IterableDataset, IterableDatasetDict
 from torch.utils.data import DataLoader
@@ -69,7 +70,7 @@ class DatasetConfig:
     classlimit: Optional[int] = None
     eventlimit: Optional[int] = None
     direct_fingerprint: Optional[str] = None
-
+    
 @dataclass
 class LoaderConfig:
     """
@@ -278,6 +279,8 @@ class BaseDataModuleHF(L.LightningDataModule):
             return DatasetDict({"train": split_1["train"], "valid": split_2["train"], "test": split_2["test"]})
         elif isinstance(dataset, DatasetDict):
             # check if dataset has train, valid, test splits
+            if "train" in dataset.keys() and "valid" in dataset.keys():
+                 return dataset
             if "train" in dataset.keys() and "valid" in dataset.keys() and "test" in dataset.keys():
                 return dataset
             if "train" in dataset.keys() and "test" in dataset.keys():
@@ -285,9 +288,6 @@ class BaseDataModuleHF(L.LightningDataModule):
                     self.dataset_config.val_split, shuffle=True, seed=self.dataset_config.seed
                 )
                 return DatasetDict({"train": split["train"], "valid": split["test"], "test": dataset["test"]})
-            # if dataset has only one key, split it into train, valid, test
-            elif "train" in dataset.keys() and "test" not in dataset.keys():
-                return self._create_splits(dataset["train"])
             else: 
                 return self._create_splits(dataset[list(dataset.keys())[0]])
 
@@ -349,17 +349,18 @@ class BaseDataModuleHF(L.LightningDataModule):
         """
         Get Dataset from disk and add run-time transforms to a specified split.
         """
-        
+
         dataset = load_from_disk(os.path.join(self.disk_save_path, split))
 
-        self.transforms.set_mode(split)
+        transforms = deepcopy(self.transforms)
+        transforms.set_mode(split)
 
-        if split == "train": # we need this for sampler, cannot be done later because set_transform
+        if split == "train":  # we need this for sampler, cannot be done later because set_transform
             self.train_label_list = dataset["labels"]
 
         # add run-time transforms to dataset
-        dataset.set_transform(self.transforms, output_all_columns=False) 
-        
+        dataset.set_transform(transforms, output_all_columns=False)
+
         return dataset
     
     def _create_weighted_sampler(self):
@@ -389,9 +390,9 @@ class BaseDataModuleHF(L.LightningDataModule):
         if not self.train_dataset and not self.val_dataset:
             if stage == "fit":
                 log.info("fit")
-                self.train_dataset = self._get_dataset("train")
                 self.val_dataset = self._get_dataset("valid")
-
+                self.train_dataset = self._get_dataset("train")
+ 
         if not self.test_dataset:
             if stage == "test":
                 log.info("test")
@@ -435,7 +436,7 @@ class BaseDataModuleHF(L.LightningDataModule):
 
     def _smart_sampling(self, dataset, label_name, class_limit, event_limit):
         class_limit = class_limit if class_limit else -float("inf")
-        dataset = dataset.map(lambda x: self._unique_identifier(x, label_name))
+        dataset = dataset.map(lambda x: self._unique_identifier(x, label_name)) #TODO: what are we doing here
         df = pd.DataFrame(dataset)
         path_label_count = df.groupby(["id", label_name], as_index=False).size()
         path_label_count = path_label_count.set_index("id")
