@@ -27,12 +27,12 @@ class ASTSequenceClassifier(nn.Module):
         super(ASTSequenceClassifier, self).__init__()
 
         self.checkpoint = checkpoint
-        if num_classes:
-            self.num_classes = num_classes
-        else:
+        if pretrain_info:  # either num_classes if provided or pretrain info
             self.hf_path = pretrain_info.hf_path
             self.hf_name = pretrain_info.hf_name if not pretrain_info.hf_pretrain_name else pretrain_info.hf_pretrain_name
             self.num_classes = len(datasets.load_dataset_builder(self.hf_path, self.hf_name).info.features["ebird_code"].names)
+        else:
+            self.num_classes = num_classes
 
         self.cache_dir = cache_dir
 
