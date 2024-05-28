@@ -1,0 +1,89 @@
+# eva
+
+# @package _global_
+# package global is necessary!
+
+defaults:
+  - override /datamodule: HSN.yaml
+  - override /module: multilabel.yaml
+  - override /module/network: wav2vec2.yaml  # Unterschied zu ast_HSN.yaml
+  - override /callbacks: default.yaml
+  - override /trainer: single_gpu.yaml
+  - override /datamodule/transforms: bird_default_multilabel.yaml
+  - override /paths: default.yaml  # neu in birdset, eva
+  - override /hydra: default.yaml  # neu in birdset, eva
+
+tags: ["multilabel", "HSN", "W2V2"]
+seed: 2
+#ckpt_path: /mnt/work/bird2vec/logs_mw/checkpoints/XCM/Wav2vec2/Wav2vec2_XCM_30_0.005.ckpt
+#train: False
+logger:
+  wandb:
+    tags: ${tags}
+    # group: "HSN_W2V2"
+    group: "hsn_w2v2_multilabel"
+    mode: online
+    #version: test_ws_ #to resume train run # needs to be tested
+
+#paths:
+#  output_dir: /mnt/work/bird2vec/logs_mw/output
+#  dataset_path: /mnt/work/bird2vec/logs_mw/data_gadme
+#  log_dir: /mnt/work/bird2vec/logs_mw/gadme_logs/
+
+module:
+  optimizer:
+    lr: 3e-5
+  loss:
+  # _target_: src.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
+    _target_: torch.nn.BCEWithLogitsLoss
+  # _target_: src.modules.losses.focal_loss.MultiLabelFocalLoss
+  network:
+    model:
+      _target_: src.modules.models.wav2vec2.Wav2vec2SequenceClassifier # a path to the pyton calls eg. foo.bar.name
+      # local_checkpoint: None
+      #local_checkpoint: /mnt/work/bird2vec/logs_mw/checkpoints/XCM/Wav2vec2/Wav2vec2_XCM_30_0.005.ckpt
+    model_name: Wav2vec2XCMPretrain30e # the end of model_path eg. name
+    #torch_compile: True
+    
+trainer:
+  min_epochs: 1
+  max_epochs: 30
+  
+callbacks:
+  model_checkpoint:
+    monitor: ${replace:"val/__loss__"}
+#    dirpath: /mnt/work/bird2vec/logs_mw/checkpoints/${datamodule.dataset.hf_name}/${module.network.model_name}
+    filename: ${module.network.model_name}_${datamodule.dataset.dataset_name}_{epoch:02d}_{${replace:"val/__loss__"}:.3f}
+    save_last: False
+    save_top_k: 0
+    mode: "min"
+    
+datamodule:
+  _target_: src.datamodule.pretrain_datamodule.PretrainDataModule
+  dataset:
+    # hf_path: /mnt/work/bird2vec/data/huggingface_hub/gadme/main/gadme.py
+    val_split: 0.1
+    n_classes: 21
+    classlimit: 500
+    eventlimit: 1
+    
+  loaders:
+    train:
+      batch_size: 32
+      shuffle: True
+      num_workers: 24
+      drop_last: False
+      prefetch_factor: 5
+    valid:
+      batch_size: 32
+      num_workers: 24
+    test:
+      batch_size: 32
+      num_workers: 24
+      
+  transforms:
+    decoding:
+      min_len: 0.05
+    preprocessing:
+      normalize_waveform: "instance_normalization"
+      use_spectrogram: False

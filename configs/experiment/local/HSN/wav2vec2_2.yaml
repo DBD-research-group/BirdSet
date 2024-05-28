@@ -1,0 +1,89 @@
+# @package _global_
+# package global is necessary!
+defaults:
+  - override /datamodule: HSN.yaml
+  - override /module: multilabel.yaml
+  - override /module/network: wav2vec2.yaml
+  - override /callbacks: default.yaml
+  - override /trainer: single_gpu.yaml
+  - override /datamodule/transforms: bird_default_multilabel.yaml
+#  - override /paths: cluster.yaml  # auskommmentiert eva
+  - override /paths: default.yaml  # neu eva
+#  - override /datamodule/transforms/waveform_augmentations: none.yaml
+
+tags: ["multilabel", "HSN", "W2V2", "600", "5", "subset"]
+seed: 2
+#ckpt_path: /mnt/work/bird2vec/logs_mw/checkpoints/XCM/Wav2vec2/Wav2vec2_XCM_30_0.005.ckpt
+#train: False
+
+logger:
+  wandb:
+    tags: ${tags}
+    group: "hsn_w2v2_multilabel"  # vorher "HSN_subset_W2V2"  geändert eva
+    mode: online  # vorher offline geändert eva
+    #version: test_ws_ #to resume train run # needs to be tested
+
+#paths:  # auskommmentiert eva
+  #output_dir: /mnt/work/bird2vec/logs_mw/output  # auskommmentiert eva
+  #dataset_path: /mnt/work/bird2vec/logs_mw/data_gadme
+  #dataset_path: /scratch/mwirth/{dataset.}  # auskommmentiert eva
+
+  #log_dir: /mnt/work/bird2vec/logs_mw/gadme_logs/  # auskommmentiert eva
+
+
+module:
+  optimizer:
+    lr: 3e-5
+  loss:
+  # _target_: src.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
+    _target_: torch.nn.BCEWithLogitsLoss
+  # _target_: src.modules.losses.focal_loss.MultiLabelFocalLoss
+  network:
+    model:
+      _target_: birdset.modules.models.wav2vec2.Wav2vec2SequenceClassifier # a path to the pyton calls eg. foo.bar.name
+      #local_checkpoint: /mnt/work/bird2vec/logs_mw/checkpoints/XCM/Wav2vec2/Wav2vec2_XCM_30_0.005.ckpt
+    model_name: Wav2vec2 # the end of model_path eg. name
+    #torch_compile: True
+
+trainer:
+  min_epochs: 1
+  max_epochs: 30
+
+callbacks:
+  #model_checkpoint:  # auskommentiert eva
+  #  monitor: val/BCEWithLogitsLoss  # auskommentiert eva
+    # dirpath: /mnt/work/bird2vec/logs_mw/checkpoints/${datamodule.dataset.hf_name}/${module.network.model_name}  # auskommentiert eva 
+   # filename: ${module.network.model_name}_${datamodule.dataset.dataset_name}_{epoch:02d}
+    #save_last: False  # auskommentiert eva
+    #save_top_k: 0  # auskommentiert eva
+    #mode: "min"  # auskommentiert eva
+
+  model_checkpoint:
+    save_last: True
+    every_n_epochs: 1
+    save_top_k: -1
+
+datamodule:
+  #_target_: birdset.datamodule.pretrain_datamodule.PretrainDataModule
+  dataset:
+    #hf_path: /mnt/work/bird2vec/data/huggingface_hub/gadme/main/gadme.py
+    val_split: 0.2
+    classlimit: 600
+    eventlimit: 5
+  loaders:
+    train:
+      batch_size: 50
+      shuffle: True
+      num_workers: 16
+      drop_last: True
+      prefetch_factor: 5
+    valid:
+      batch_size: 50
+      num_workers: 16
+    test:
+      batch_size: 50
+      num_workers: 16
+  transforms:
+    preprocessing:
+      normalize_waveform: "instance_normalization"
+      use_spectrogram: False

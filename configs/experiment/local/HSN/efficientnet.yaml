@@ -52,7 +52,8 @@ datamodule:
   loaders:
     train:
       batch_size: 64  # 32 geändert eva
-      shuffle: True
+      # shuffle: True  # für Training eva
+      shuffle: False  # für XAI ipynb eva
       num_workers: 32 # 16 geändert eva
       drop_last: True
     valid:

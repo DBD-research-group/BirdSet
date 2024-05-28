@@ -1,0 +1,53 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - override /datamodule: HSN.yaml
+  - override /module: multiclass.yaml
+  - override /module/network: wav2vec2.yaml
+  - override /callbacks: default.yaml 
+  - override /trainer: single_gpu.yaml
+
+
+tags: ["wav2vec2", "xai", "HSN", "augment"]
+seed: 2
+
+module:
+  optimizer:
+    lr: 5e-4
+
+trainer:
+  min_epochs: 1
+  max_epochs: 10
+
+
+
+# datamodule für xai:
+datamodule:
+  dataset:
+    val_split: 0.2
+    class_weights_loss: null
+    class_weights_sampler: null
+    classlimit: 600
+    eventlimit: 3
+    
+  loaders:
+    train:
+      batch_size: 64
+      shuffle: False 
+      num_workers: 32 
+      drop_last: True
+    valid:
+      batch_size: 64 
+      num_workers: 32 
+      shuffle: False
+    test:
+      batch_size: 64 
+      num_workers: 32
+      shuffle: False
+
+
+logger:
+  wandb:
+    tags: ${tags}
+    group: "HSN"
+    mode: online
