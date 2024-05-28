@@ -5,6 +5,8 @@ import logging
 from birdset.utils import pylogger
 log = pylogger.get_pylogger(__name__)
 
+detection_sets = ['beans_dcase', 'beans_enabirds', 'beans_hiceas', 'beans_rfcx', 'beans_gibbons']
+
 class BEANSDataModule(BaseDataModuleHF):
     def __init__(
             self,
@@ -62,26 +64,38 @@ class BEANSDataModule(BaseDataModuleHF):
         if self.dataset_config.subset:
             dataset = self._fast_dev_subset(dataset, self.dataset_config.subset)
 
-        # Rename some columns and remove unnamed column (Leftover from BEANS processing)
-        dataset = dataset.rename_column("path", "audio")
-        dataset = dataset.rename_column("label", "labels")
-        dataset = dataset.remove_columns('Unnamed: 0')
 
-        # Then we have to map the label to integers if they are strings
-        if isinstance(dataset['train'][0]['labels'],str):
+        if self.dataset_config.dataset_name not in detection_sets:
+            # Rename some columns and remove unnamed column (Leftover from BEANS processing)
+            
+            dataset = dataset.rename_column("label", "labels")
+            dataset = dataset.remove_columns('Unnamed: 0')
+
+            # Then we have to map the label to integers if they are strings
+            #if isinstance(dataset['train'][0]['labels'],str):
+            
             labels = set()
             for split in dataset.keys():
                 labels.update(dataset[split]["labels"])
 
             label_to_id = {lbl: i for i, lbl in enumerate(labels)}
 
+            def label_to_id_fn(batch):
+                for i in range(len(batch['labels'])):
+                    batch['labels'][i] = label_to_id[batch['labels'][i]]
+                return batch
 
-            def label_to_id_fn(row):
-                row["labels"] = label_to_id[row["labels"]]
-                return row
+        
+            dataset = dataset.map(
+                label_to_id_fn,
+                batched=True,
+                batch_size=500,
+                load_from_cache_file=True,
+                num_proc=self.dataset_config.n_workers,
+            )
 
-            dataset = dataset.map(label_to_id_fn, num_proc=self.dataset_config.n_workers)
 
+        dataset = dataset.rename_column("path", "audio")
         # Normal casting
         dataset = dataset.cast_column(
             column="audio",
