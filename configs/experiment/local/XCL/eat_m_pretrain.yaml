@@ -1,16 +1,16 @@
 # @package _global_
 #package global is neccessary!
 defaults:
-  - override /datamodule: XCM.yaml
+  - override /datamodule: XCL.yaml
   - override /module: multilabel.yaml
-  - override /module/network: eat_soundnet.yaml
+  - override /module/network: eat_m_soundnet.yaml
   - override /callbacks: default.yaml
   - override /trainer: single_gpu.yaml
   - override /datamodule/transforms: bird_default_multilabel.yaml
   - override /paths: default.yaml
   - override /hydra: default.yaml
 
-tags: ["XCM", "eat", "multilabel"]
+tags: ["XCL", "eat-m", "multilabel"]
 seed: 1
 train: True
 test: False
@@ -18,7 +18,7 @@ test: False
 logger:
   wandb:
     tags: ${tags}
-    group: "pretrain_eat_XCM"
+    group: "pretrain_eat_m_XCL"
     mode: online
     version: pretrain_eat_${seed}_${start_time} #to resume train run # needs to be tested
 
@@ -44,7 +44,7 @@ datamodule:
     class_weights_sampler: null
     classlimit: null
     eventlimit: null
-    direct_fingerprint: null
+    direct_fingerprint: /workspace/data_birdset/XCL/XCL_processed_3_aa89e67c5e6bad3a
   transforms:
     preprocessing:
         normalize_waveform: instance_normalization
