@@ -65,9 +65,7 @@ def train(cfg):
 
     # Setup model 
     log.info(f"Instantiate model <{cfg.module.network.model._target_}>")
-    with open_dict(cfg):
-        cfg.module.metrics["num_labels"] = datamodule.num_classes
-        cfg.module.network.model["num_classes"] = datamodule.num_classes
+
     model = hydra.utils.instantiate(
         cfg.module,
         num_epochs=cfg.trainer.max_epochs,
@@ -76,6 +74,10 @@ def train(cfg):
         label_counts=datamodule.num_train_labels,
         pretrain_info=cfg.module.network.model.pretrain_info
     )
+    with open_dict(cfg):
+        cfg.module.metrics["num_labels"] = model.num_classes
+        #cfg.module.network.model["num_classes"] = datamodule.num_classes
+    print("cfg num_classes", cfg.module.metrics["num_labels"])
 
     object_dict = {
         "cfg": cfg, 
