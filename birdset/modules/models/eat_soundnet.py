@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Literal
 from birdset.utils import pylogger
 import numpy as np
 import torch
@@ -129,9 +129,11 @@ class SoundNet(nn.Module):
             n_classes: int | None = None,
             dim_feedforward: int = 512 ,
             local_checkpoint: str | None = None,
-            pretrain_info = None
-                 ):
+            pretrain_info = None,
+            device: str = 'cuda:0'
+                ):
         super().__init__()
+        self.device = device
 
         if pretrain_info is not None:
             self.hf_path = pretrain_info.hf_path
@@ -180,8 +182,7 @@ class SoundNet(nn.Module):
             self.tf.load_state_dict(self.load_state_dict_from_file(local_checkpoint, model_name='tf'))
 
     def load_state_dict_from_file(self, file_path, model_name= 'model'):
-        state_dict = torch.load(file_path)
-        state_dict = torch.load(file_path)["state_dict"]
+        state_dict = torch.load(file_path, map_location=self.device)["state_dict"]
         # select only models where the key starts with `model.` + model_name + `.`
         state_dict = {key: weight for key, weight in state_dict.items() if key.startswith('model.' + model_name + '.')}
         state_dict = {key.replace('model.' + model_name + '.', ''): weight for key, weight in state_dict.items()}
