@@ -11,18 +11,13 @@ defaults:
   - override /datamodule/transforms/waveform_augmentations: none.yaml
   - override /datamodule/transforms/spectrogram_augmentations: none.yaml
 
-chkpt_path: D:\Programmierzeugs\BirdSet\logs\train\runs\XCM\efficientnet\2024-06-04_124743\callback_checkpoints\checkpoint-01.ckpt
+ckpt_path: null
 
 tags: ["XCM", "POW_inf", "efficientnet", "multilabel"]
 seed: 1
-train: False
 test: True
 
 logger: null
-
-paths:
-  #dataset_path: ${paths.root_dir}/data_birdset/${datamodule.dataset.dataset_name}
-  dataset_path: J:/IES/data_birdset/${datamodule.dataset.dataset_name}
 
 trainer:
   min_epochs: 1
@@ -37,7 +32,7 @@ module:
   network:
     torch_compile: False
     model:
-      local_checkpoint: ${chkpt_path}
+      local_checkpoint: ${ckpt_path}
       pretrain_info:
         hf_pretrain_name: XCM
 
