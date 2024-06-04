@@ -200,25 +200,25 @@ class BaseModule(L.LightningModule):
             prog_bar=True
         )
 
-        self.valid_metric(preds, targets.int())
-        self.log(
-            f"val/{self.valid_metric.__class__.__name__}",
-            self.valid_metric,
-            **asdict(self.logging_params),
-        )
+        # self.valid_metric(preds, targets.int())
+        # self.log(
+        #     f"val/{self.valid_metric.__class__.__name__}",
+        #     self.valid_metric,
+        #     **asdict(self.logging_params),
+        # )
 
         # self.valid_add_metrics(preds, targets.int())
         # self.log_dict(self.valid_add_metrics, **asdict(self.logging_params))
         return {"loss": val_loss, "preds": preds, "targets": targets}
 
-    def on_validation_epoch_end(self):
-        valid_metric = self.valid_metric.compute()  # get current valid metric
-        self.valid_metric_best(valid_metric)  # update best so far valid metric
-
-        self.log(
-            f"val/{self.valid_metric.__class__.__name__}_best",
-            self.valid_metric_best.compute(),
-        )
+    # def on_validation_epoch_end(self):
+    #     valid_metric = self.valid_metric.compute()  # get current valid metric
+    #     self.valid_metric_best(valid_metric)  # update best so far valid metric
+    #
+    #     self.log(
+    #         f"val/{self.valid_metric.__class__.__name__}_best",
+    #         self.valid_metric_best.compute(),
+    #     )
 
     def test_step(self, batch, batch_idx):
         test_loss, preds, targets = self.model_step(batch, batch_idx)
