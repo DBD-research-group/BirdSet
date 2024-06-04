@@ -3,6 +3,7 @@
 defaults:
   - override /datamodule: beans.yaml
   - override /module: embedding.yaml
+  - override /module/embedding_model: ../network/birdnet.yaml
   - override /callbacks: default.yaml
   - override /trainer: single_gpu.yaml
   - override /paths: default.yaml
@@ -11,7 +12,7 @@ defaults:
   - override /datamodule/transforms/waveform_augmentations: none.yaml # No augmentations for now
   - override /datamodule/transforms/spectrogram_augmentations: none.yaml
 
-tags: ["BEANS", "Ghani", "embeddings", "perch", "multilabel"]
+tags: ["BEANS", "Ghani", "embeddings", "birdnet", "multilabel"]
 seed: 2
 train: True
 test: True
@@ -27,7 +28,7 @@ module:
   optimizer:
     lr: 1e-5
   loss:
-    _target_: torch.nn.BCEWithLogitsLoss  
+    _target_: torch.nn.BCEWithLogitsLoss
 
   metrics:
     _target_: birdset.modules.metrics.multilabel.MultilabelMetricsConfig
@@ -39,7 +40,7 @@ module:
 trainer:
   devices: [1]
   min_epochs: 1
-  max_epochs: 20
+  max_epochs: 10
 
 datamodule:
   dataset:

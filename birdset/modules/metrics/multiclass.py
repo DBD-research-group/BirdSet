@@ -71,17 +71,29 @@ class EmbeddingMetricsConfig(MulticlassMetricsConfig):
         self.val_metric_best: torchmetrics.Metric =torchmetrics.MaxMetric()
      
         self.add_metrics: torchmetrics.MetricCollection = torchmetrics.MetricCollection({
-            'F1': torchmetrics.F1Score(
-                task="multiclass",
-                num_classes=num_labels,
+            'T1Accuracy': torchmetrics.Accuracy(
+            task="multiclass",
+            num_classes=num_labels,
+            #average='macro',
+            top_k=1
+            ),
+            'T3Accuracy': torchmetrics.Accuracy(
+            task="multiclass",
+            num_classes=num_labels,
+            #average='macro',
+            top_k=3
             ),
             'AUROC': torchmetrics.AUROC(
                 task="multiclass",
                 num_classes=num_labels,
                 average='macro',
+            ),
+            'F1': torchmetrics.F1Score(
+                task="multiclass",
+                num_classes=num_labels,
             )
         })
-        self.eval_complete: torchmetrics.MetricCollection = torchmetrics.MetricCollection({
+        self.eval_complete: torchmetrics.MetricCollection = torchmetrics.MetricCollection({ # Only used in multilabel module 
             'acc': torchmetrics.Accuracy(
             task="multiclass",
             num_classes=num_labels,
@@ -95,7 +107,6 @@ class AUROCMetricWrapper(torchmetrics.AUROC):
         class_labels = torch.argmax(target, dim=1)
         # Call the original update method with class labels
         super().update(preds, class_labels)
-        print("HIIII!")
 
 
 class BalancedAccuracy(torchmetrics.Metric):

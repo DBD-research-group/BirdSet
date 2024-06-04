@@ -30,7 +30,7 @@ optimizer:
   weight_decay: 0.01
 
 loss:
-  _target_: torch.nn.BCEWithLogitsLoss   
+  _target_: torch.nn.CrossEntropyLoss
 
 metrics: 
   _target_: birdset.modules.metrics.multiclass.EmbeddingMetricsConfig # Temporary solution 

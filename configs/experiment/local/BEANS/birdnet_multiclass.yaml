@@ -27,9 +27,9 @@ module:
   optimizer:
     lr: 1e-5
   
-  loss:
-    _target_: birdset.modules.embedding_module.BCEWithLogitsLoss
-    num_classes: ${datamodule.dataset.n_classes}  
+  #loss:
+    #_target_: birdset.modules.embedding_module.BCEWithLogitsLoss
+    #num_classes: ${datamodule.dataset.n_classes}  
     
   output_activation: 
     _target_: "torch.sigmoid" # Use sigmoid like Ghani et al
@@ -69,5 +69,5 @@ callbacks:
   model_checkpoint:
     save_last: True
     every_n_epochs: 3
-    monitor: "val/BCEWithLogitsLoss"
+    monitor: "val/CrossEntropyLoss"
 
