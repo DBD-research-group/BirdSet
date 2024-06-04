@@ -1,0 +1,57 @@
+# @package _global_
+defaults:
+  - override /datamodule: inference/POW_inf.yaml
+  - override /module: multilabel.yaml
+  - override /module/network: efficientnet.yaml
+  - override /callbacks: default.yaml
+  - override /trainer: single_gpu.yaml
+  - override /paths: default.yaml
+  - override /hydra: default.yaml
+  - override /datamodule/transforms: bird_default_multilabel.yaml
+  - override /datamodule/transforms/waveform_augmentations: none.yaml
+  - override /datamodule/transforms/spectrogram_augmentations: none.yaml
+
+chkpt_path: D:\Programmierzeugs\BirdSet\logs\train\runs\XCM\efficientnet\2024-06-04_124743\callback_checkpoints\checkpoint-01.ckpt
+
+tags: ["XCM", "POW_inf", "efficientnet", "multilabel"]
+seed: 1
+train: False
+test: True
+
+logger: null
+
+paths:
+  #dataset_path: ${paths.root_dir}/data_birdset/${datamodule.dataset.dataset_name}
+  dataset_path: J:/IES/data_birdset/${datamodule.dataset.dataset_name}
+
+trainer:
+  min_epochs: 1
+  max_epochs: 1
+  accelerator: "auto"
+
+module:
+  optimizer:
+    _target_: torch.optim.AdamW
+    lr: 5e-4
+    weight_decay: 5e-4
+  network:
+    torch_compile: False
+    model:
+      local_checkpoint: ${chkpt_path}
+      pretrain_info:
+        hf_pretrain_name: XCM
+
+datamodule:
+  dataset:
+    val_split: 0.2
+    class_weights_loss: null
+    class_weights_sampler: null
+    classlimit: null
+    subset: 2000
+    eventlimit: null
+    direct_fingerprint: null
+  loaders:
+    valid:
+      batch_size: 48
+      num_workers: 20
+      shuffle: False
