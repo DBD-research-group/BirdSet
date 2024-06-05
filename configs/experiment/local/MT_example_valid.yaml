@@ -13,6 +13,9 @@ defaults:
 
 ckpt_path: null
 
+paths:
+  dataset_path: J:/IES/data_birdset/${datamodule.dataset.dataset_name} 
+
 tags: ["XCM", "POW_inf", "efficientnet", "multilabel"]
 seed: 1
 test: True
@@ -46,7 +49,7 @@ datamodule:
     eventlimit: null
     direct_fingerprint: null
   loaders:
-    valid:
+    test:
       batch_size: 48
       num_workers: 20
       shuffle: False
