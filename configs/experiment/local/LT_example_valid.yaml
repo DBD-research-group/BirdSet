@@ -46,7 +46,7 @@ datamodule:
     eventlimit: null
     direct_fingerprint: null
   loaders:
-    valid:
+    test:
       batch_size: 48
       num_workers: 20
       shuffle: False
