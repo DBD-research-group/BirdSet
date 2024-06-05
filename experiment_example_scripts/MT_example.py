@@ -1,8 +1,8 @@
 import json
 import subprocess
+import hydra
 import pyrootutils
 from pathlib import Path
-from birdset import utils
 
 root = pyrootutils.setup_root(
     search_from=__file__,
@@ -11,8 +11,16 @@ root = pyrootutils.setup_root(
     dotenv=True,
 )
 
-def main():
-    subprocess.run("python " + str(root / "birdset/train.py") + " experiment=\"local/MT_example_train.yaml\"", shell=True)
+
+_HYDRA_PARAMS = {
+    "version_base":None,
+    "config_path": str(root / "configs/experiment/local"),
+    "config_name": "MT_example.yaml"
+}
+
+@hydra.main(**_HYDRA_PARAMS)
+def main(cfg):
+    subprocess.run("python " + str(root / "birdset/train.py") + f" experiment={cfg.train_cfg_path}", shell=True)
 
     log_path = str(root / "logs/train/runs/XCM/efficientnet")
     validation_log_path = str(root / "logs/train/runs/POW/efficientnet")
@@ -21,7 +29,7 @@ def main():
 
     best_checkpoint = ("", float("inf"))
     for checkpoint in checkpoints:
-        subprocess.run("python " + str(root / "birdset/eval.py") + f" experiment=\"local/MT_example_valid.yaml\" ckpt_path={checkpoint}", shell=True)
+        subprocess.run("python " + str(root / "birdset/eval.py") + f" experiment={cfg.valid_cfg_path} ckpt_path={checkpoint}", shell=True)
 
         latest_log = max(Path(validation_log_path).glob("*"), key=lambda file: file.stat().st_ctime)
         with open(str(latest_log / "finalmetrics.json")) as json_data:
