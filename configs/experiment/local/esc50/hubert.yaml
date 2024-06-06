@@ -1,0 +1,53 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - override /datamodule: esc50.yaml
+  - override /module: multiclass.yaml
+  - override /module/network: hubert.yaml
+  - override /callbacks: multiclass.yaml
+  - override /trainer: single_gpu.yaml
+  - override /paths: default.yaml
+  - override /hydra: default.yaml
+
+
+tags: ["esc50", "hubert", "augment"]
+seed: 2
+
+#train: False
+test: True
+
+module:
+  optimizer:
+    lr: 1e-5
+  #network:
+    #model:
+      #local_checkpoint: ${paths.root_dir}/logs/train/runs/esc50/hubert/2024-06-06_112738/callback_checkpoints/hubert_esc50_19.ckpt  
+
+
+trainer:
+  devices: [0]
+  min_epochs: 1
+  max_epochs: 20
+
+datamodule:
+  dataset:
+    val_split: 0.1
+  loaders:
+    train:
+      batch_size: 32
+      shuffle: True
+      num_workers: 6
+      drop_last: False
+      prefetch_factor: 4
+
+    valid:
+      batch_size: 20
+    test:
+      batch_size: 20
+
+logger:
+  wandb:
+    tags: ${tags}
+    group: "esc50"
+    mode: online
+
