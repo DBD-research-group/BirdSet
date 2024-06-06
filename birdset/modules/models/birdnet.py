@@ -189,6 +189,8 @@ class BirdNetModel(nn.Module):
         Get predictions from BirdNet model including both logits and embeddings.
         ...
         """
+        device = input_tensor.device # Get the device of the input tensor 
+        input_tensor = input_tensor.cpu().numpy()  # Move the tensor to the CPU and convert it to a NumPy array.
         
         input_tensor = input_tensor.reshape([-1, input_tensor.shape[-1]])
         # Run the TensorFlow BirdNet model using the optimized function
@@ -197,5 +199,7 @@ class BirdNetModel(nn.Module):
         # Convert the TensorFlow tensors to PyTorch tensors.
         embeddings = torch.from_numpy(outputs["embeddings"].numpy())
         logits = torch.from_numpy(outputs["logits"].numpy())
-
+        embeddings = embeddings.to(device)
+        logits = logits.to(device)
+        
         return embeddings, logits

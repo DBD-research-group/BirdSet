@@ -175,6 +175,8 @@ class PerchModel(nn.Module, EmbeddingModel):
         Returns:
             Tuple[torch.Tensor, torch.Tensor]: A tuple of two tensors (embeddings, logits).
         """
+        device = input_tensor.device # Get the device of the input tensor 
+        input_tensor = input_tensor.cpu().numpy()  # Move the tensor to the CPU and convert it to a NumPy array.
 
         input_tensor = input_tensor.reshape([-1, input_tensor.shape[-1]])
 
@@ -184,7 +186,9 @@ class PerchModel(nn.Module, EmbeddingModel):
         # Extract embeddings and logits, convert them to PyTorch tensors
         embeddings = torch.from_numpy(outputs["output_1"].numpy())
         logits = torch.from_numpy(outputs["output_0"].numpy())
-
+        embeddings = embeddings.to(device)
+        logits = logits.to(device)
+        
         if self.class_mask:
             logits = logits[:, self.class_mask]
 
