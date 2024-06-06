@@ -1,4 +1,5 @@
 from huggingface_hub import hf_hub_download
+import hydra
 from pydub import AudioSegment
 import tarfile
 import os
@@ -21,13 +22,22 @@ def ogg2wav(filepath, output_dir):
     # save wav file
     audio.export(os.path.join(output_dir, filename + ".wav"), format="wav")
 
-def main():
+
+_HYDRA_PARAMS = {
+    "version_base":None,
+    "config_path": str(root / "configs"),
+    "config_name": "background_data_download.yaml"
+}
+
+@hydra.main(**_HYDRA_PARAMS)
+def main(cfg):
     repo_id = "DBD-research-group/BirdSet" 
     filenames = ["dcase18_shard_0001.tar.gz", "dcase18_shard_0002.tar.gz", "dcase18_shard_0003.tar.gz"]
     subfolder = "dcase18"
     revision = "data"
     repo_type = "dataset"
-    download_dir = str(root / "data_birdset/background_noise")
+
+    download_dir = cfg.paths.background_path
     unpacking_dir = download_dir + "/dcase18_unpacked/"
     output_dir = download_dir + "/dcase18_wav"
 
