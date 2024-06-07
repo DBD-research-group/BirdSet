@@ -86,10 +86,7 @@ class EmbeddingModule(BaseModule):
     def forward(self, *args, **kwargs):
         # Get embeddings
         input_values = kwargs['input_values'] # Extract input tensor
-        device = input_values.device # Get the device of the input tensor 
-        input_values = input_values.cpu().numpy()  # Move the tensor to the CPU and convert it to a NumPy array.
         embeddings, _ = self.embedding_model.get_embeddings(input_values)
-        embeddings = embeddings.to(device) # Move the tensor back to device 
 
         # Pass embeddings through the classifier to get the final output
         embeddings = embeddings.view(embeddings.size(0), -1) # Transform for the classifier
