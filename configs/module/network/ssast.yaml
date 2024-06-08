@@ -4,6 +4,9 @@ model:
   model_size: base
   label_dim: ${datamodule.dataset.n_classes}
   pretrain_stage: False
+  fstride: 10
+  tstride: 10
+  input_tdim: 500
   
 
 
