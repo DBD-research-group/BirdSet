@@ -1,0 +1,66 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - override /datamodule: HSN.yaml
+  - override /module: multilabel.yaml
+  - override /module/network: efficientnet.yaml
+  - override /callbacks: default.yaml
+  - override /trainer: single_gpu.yaml
+  - override /datamodule/transforms: bird_default_multilabel.yaml
+  - override /paths: default.yaml
+  - override /hydra: default.yaml
+  - override /datamodule/transforms/waveform_augmentations: none.yaml
+  - override /datamodule/transforms/spectrogram_augmentations: none.yaml
+
+tags: ["HSN", "efficientnet", "multilabel"]
+seed: 2
+train: True
+test: True
+
+logger: null
+
+module:
+  optimizer:
+    _target_: torch.optim.AdamW
+    lr: 5e-4
+    weight_decay: 5e-4
+  network: 
+    torch_compile: False
+
+trainer:
+  min_epochs: 1
+  max_epochs: 10
+  accelerator: "auto"
+
+datamodule:
+  dataset:
+    subset: 2000
+    val_split: 0.2
+    class_weights_loss: null
+    class_weights_sampler: null
+    classlimit: 500
+    eventlimit: 5
+    
+  loaders:
+    train:
+      batch_size: 32
+      shuffle: True
+      num_workers: 16
+      drop_last: True
+    valid:
+      batch_size: 32
+      num_workers: 16
+      shuffle: False
+    test:
+      batch_size: 32
+      num_workers: 16
+      shuffle: False
+
+  mapper: 
+    biggest_cluster: True
+    no_call: False
+
+callbacks:
+  model_checkpoint:
+    save_last: True
+    every_n_epochs: 3

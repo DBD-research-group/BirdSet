@@ -29,11 +29,16 @@ class TBLogger(loggers.TensorBoardLogger):
     @rank_zero_only
     def log_hyperparams(self, params: Dict[str, any], metrics : Dict[str, any] | None = None):
         if isinstance(params, dict):
-            network = params.pop("network") # network is of class NetworkConfig
-            params["model_name"] = network.model_name
-            params["model_type"] = network.model_type
-            params["torch_compile"] = network.torch_compile
-            params["sampling_rate"] = network.sampling_rate
-            params["normalize_waverform"] = network.normalize_waveform
-            params["normalize_spectrogram"] = network.normalize_spectrogram
+            try:
+                network = params.pop("network") # network is of class NetworkConfig
+                params["model_name"] = network.model_name
+                params["model_type"] = network.model_type
+                params["torch_compile"] = network.torch_compile
+                params["sampling_rate"] = network.sampling_rate
+                params["normalize_waverform"] = network.normalize_waveform
+                params["normalize_spectrogram"] = network.normalize_spectrogram
+            except KeyError:
+                network = params["module"].pop("network")
+                network.pop("model")
+                params.update(network)
         return super().log_hyperparams(params, metrics)
