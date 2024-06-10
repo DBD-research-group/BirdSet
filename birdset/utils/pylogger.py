@@ -1,7 +1,6 @@
 import logging
 from pytorch_lightning.utilities import rank_zero_only
 from pytorch_lightning import loggers
-from pytorch_lightning.utilities import rank_zero_only
 from typing import Dict
 
 
