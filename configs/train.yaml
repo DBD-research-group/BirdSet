@@ -6,7 +6,7 @@ defaults:
   - callbacks: default
   - paths: default
   - trainer: single_gpu
-  - logger: wandb
+  - logger: wandb_default
   - hydra: default
   - extras: default
 
