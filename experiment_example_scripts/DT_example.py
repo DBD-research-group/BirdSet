@@ -8,6 +8,7 @@ root = pyrootutils.setup_root(
     dotenv=True,
 )
 
+
 def main():
     subprocess.run("python " + str(root / "birdset/train.py") + " experiment=\"local/DT_example.yaml\"", shell=True)    
 
