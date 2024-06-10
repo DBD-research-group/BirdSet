@@ -10,21 +10,22 @@ defaults:
   - override /hydra: default.yaml
  
 tags: ["XCL", "efficientnet", "multilabel"]
-seed: 2
+seed: 5
 train: True
 test: False
-ckpt_path: /workspace/logs/train/runs/XCL/efficientnet/2024-06-01_134656/callback_checkpoints/checkpoint-09.ckpt
+# ckpt_path: /workspace/logs/train/runs/XCL/efficientnet/2024-06-01_134656/callback_checkpoints/checkpoint-09.ckpt
 logger:
   wandb:
     tags: ${tags}
     group: pretrain_effnet_XCL_specchange
     mode: online
-    # version: pretrain_effnet${seed}_${start_time}
-    version: pretrain_effnet2_2024-06-01_134656
+    version: pretrain_effnet${seed}_${start_time}
+    # version: pretrain_effnet2_2024-06-01_134656
    
 trainer:
   min_epochs: 1
-  max_epochs: 30
+  max_epochs: 20
+  precision: 32
   limit_val_batches: 0 # skip validation step in pretraining
  
 module:
