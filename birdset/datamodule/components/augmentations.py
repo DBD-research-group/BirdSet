@@ -742,8 +742,6 @@ class NoCallMixer():
         The sampling rate at which the audio data should be processed. This parameter should align with the rest of your dataset and model configuration.
     length : int
         The length of the audio samples. This parameter should align with the rest of your dataset and model configuration.
-    n_classes : int
-        The total number of distinct classes in the dataset. This parameter should align with the rest of your dataset and model configuration.
     """
     def __init__(self, directory, p, sampling_rate, length=5, *args, **kwargs):
         self.p = p
