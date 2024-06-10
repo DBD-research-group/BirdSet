@@ -36,6 +36,7 @@ def main():
     for filename in filenames:
         with tarfile.open(filename, "r:gz") as tar:
             tar.extractall(path=output_directory)
+        os.remove(filename)
 
     print("Extraction complete. No-Call samples ready.")
 
