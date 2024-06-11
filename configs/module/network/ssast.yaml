@@ -4,9 +4,9 @@ model:
   model_size: base
   label_dim: ${datamodule.dataset.n_classes}
   pretrain_stage: False
-  fstride: 10
-  tstride: 10
-  input_tdim: 500
+  fstride: 10 # The stride of patch spliting on the frequency dimension, for 16*16 patchs, fstride=16 means no overlap, fstride=10 means overlap of 6.
+  tstride: 10 # The stride of patch spliting on the time dimension, for 16*16 patchs, tstride=16 means no overlap, tstride=10 means overlap of 6.
+  input_tdim: 500 # The number of time frames of the input spectrogram.
   
 
 
@@ -17,7 +17,7 @@ torch_compile: False
 sampling_rate: 32_000
 normalize_spectrogram: True
 normalize_waveform: "instance_normalization"
-embedding_size: 768
+embedding_size: 768 # Needs to be adjusted if the other params are changed
 
 
 
