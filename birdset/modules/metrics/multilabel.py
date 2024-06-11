@@ -4,60 +4,6 @@ from torchmetrics.classification.average_precision import MultilabelAveragePreci
 from torchmetrics import AUROC, MaxMetric, Metric, MetricCollection
 from torchmetrics.utilities.data import dim_zero_cat
 
-class MultilabelMetricsConfig:
-    """
-    A class for configuring the metrics used during model training and evaluation.
-
-    Attributes:
-        main_metric (Metric): The main metric used for model training.
-        val_metric_best (Metric): The metric used for model validation.
-        add_metrics (MetricCollection): A collection of additional metrics used during model training.
-        eval_complete (MetricCollection): A collection of metrics used during model evaluation.
-    """
-
-    def __init__(
-        self,
-        num_labels: int = 21,
-    ):
-        """
-        Initializes the MetricsConfig class.
-
-        Args:
-            num_labels (int): The number of labels in the dataset. Defaults to 21 as in the HSN dataset.
-        """
-        self.main_metric: Metric = cmAP(
-            num_labels=num_labels,
-            thresholds=None
-        )
-        self.val_metric_best: Metric = MaxMetric()
-        self.add_metrics: MetricCollection = MetricCollection({
-            'MultilabelAUROC': AUROC(
-                task="multilabel",
-                num_labels=num_labels,
-                average='macro',
-                thresholds=None
-            ),
-            'T1Accuracy': TopKAccuracy(topk= 1),
-            'T3Accuracy': TopKAccuracy(topk= 3),
-            'mAP': mAP(
-                num_labels= num_labels,
-                thresholds=None
-            )  
-        })
-        self.eval_complete: MetricCollection = MetricCollection({
-            'cmAP5': cmAP5(
-                num_labels=num_labels,
-                sample_threshold=5,
-                thresholds=None
-            ),
-            'pcmAP': pcmAP(
-                num_labels=num_labels,
-                padding_factor=5,
-                average="macro",
-                thresholds=None
-            )
-        })
-
 class cmAP5(Metric):
     def __init__(
             self,

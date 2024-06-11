@@ -3,7 +3,7 @@ import torch.nn as nn
 from typing import Literal
 from transformers import get_scheduler
 from functools import partial
-from torchmetrics import AUROC, Metric, MaxMetric, MetricCollection
+from torchmetrics import AUROC, Accuracy, F1Score, Metric, MaxMetric, MetricCollection
 
 from birdset.modules.metrics.multilabel import TopKAccuracy, cmAP, cmAP5, mAP, pcmAP
 from birdset.modules.models.efficientnet import EfficientNetClassifier
@@ -75,8 +75,47 @@ class LRSchedulerConfig:
 
     # extras: LRSchedulerExtrasConfig = LRSchedulerExtrasConfig()
 
+class MulticlassMetricsConfig:
+    """
+    A class for configuring multiclass metrics used during model training and evaluation.
 
-class MetricsConfig:
+    Attributes:
+        main_metric (Metric): The main metric used for model training.
+        val_metric_best (Metric): The metric used for model validation.
+        add_metrics (MetricCollection): A collection of additional metrics used during model training.
+        eval_complete (MetricCollection): A collection of metrics used during model evaluation.
+    """
+
+    def __init__(
+        self,
+        num_labels: int = 21,
+    ):
+        """
+        Initializes the MetricsConfig class.
+
+        Args:
+            num_labels (int): The number of labels in the dataset. Defaults to 21 as in the HSN dataset.
+        """
+        self.main_metric: Metric = Accuracy(
+            task="multiclass",
+            num_classes=num_labels,
+        )
+        self.val_metric_best: Metric = MaxMetric()
+     
+        self.add_metrics: MetricCollection = MetricCollection({
+            'F1': F1Score(
+                task="multiclass",
+                num_classes=num_labels,
+            ),
+        })
+        self.eval_complete: MetricCollection = MetricCollection({
+            'acc': Accuracy(
+            task="multiclass",
+            num_classes=num_labels,
+        )
+        })
+
+class MultilabelMetricsConfig:
     """
     A class for configuring the metrics used during model training and evaluation.
 
@@ -88,8 +127,8 @@ class MetricsConfig:
     """
 
     def __init__(
-            self,
-            num_labels: int = 21,
+        self,
+        num_labels: int = 21,
     ):
         """
         Initializes the MetricsConfig class.
@@ -109,12 +148,12 @@ class MetricsConfig:
                 average='macro',
                 thresholds=None
             ),
-            'T1Accuracy': TopKAccuracy(topk=1),
-            'T3Accuracy': TopKAccuracy(topk=3),
+            'T1Accuracy': TopKAccuracy(topk= 1),
+            'T3Accuracy': TopKAccuracy(topk= 3),
             'mAP': mAP(
-                num_labels=num_labels,
+                num_labels= num_labels,
                 thresholds=None
-            )
+            )  
         })
         self.eval_complete: MetricCollection = MetricCollection({
             'cmAP5': cmAP5(
@@ -129,6 +168,7 @@ class MetricsConfig:
                 thresholds=None
             )
         })
+
 
 
 @dataclass

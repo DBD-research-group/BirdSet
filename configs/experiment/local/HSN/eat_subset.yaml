@@ -48,6 +48,7 @@ datamodule:
     class_weights_sampler: null
     classlimit: 600
     eventlimit: 5
+    num_workers: 16
   transforms:
     preprocessing:
         normalize_waveform: instance_normalization
