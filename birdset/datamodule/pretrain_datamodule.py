@@ -1,15 +1,14 @@
-from collections import Counter
-from birdset.datamodule.components.event_decoding import EventDecoding
-from birdset.datamodule.components.transforms import BirdSetTransformsWrapper
-from birdset.datamodule.components.event_mapping import XCEventMapping
-from birdset.utils import pylogger
-from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
-from datasets import DatasetDict, Dataset
-from datasets import load_dataset, Audio, load_from_disk
-import logging
-import torch
 import os
+import logging
 from copy import deepcopy
+from datasets import load_dataset, Audio, load_from_disk
+
+from birdset.utils import pylogger
+from birdset.datamodule.components.event_mapping import XCEventMapping
+from birdset.datamodule.components.transforms import BirdSetTransformsWrapper
+from . import BaseDataModuleHF
+from birdset.configs import DatasetConfig, LoadersConfig
+
 log = pylogger.get_pylogger(__name__)
 
 
@@ -25,8 +24,8 @@ class PretrainDataModule(BaseDataModuleHF):
             dataset=dataset,
             loaders=loaders,
             transforms=transforms,
-            mapper=mapper
         )
+        self.event_mapper = mapper
 
     def prepare_data(self):
         if self.dataset_config.direct_fingerprint:
@@ -49,7 +48,7 @@ class PretrainDataModule(BaseDataModuleHF):
 
             transforms = deepcopy(self.transforms)
             transforms.set_mode(split)
-            if split == "train": # we need this for sampler, cannot be done later because set_transform
+            if split == "train":  # we need this for sampler, cannot be done later because set_transform
                 self.train_label_list = dataset["labels"]
 
             dataset.set_transform(transforms, output_all_columns=False)
@@ -76,7 +75,6 @@ class PretrainDataModule(BaseDataModuleHF):
         if self.dataset_config.subset:
             dataset = self._fast_dev_subset(dataset, self.dataset_config.subset)
 
-
         dataset = dataset.cast_column(
             column="audio",
             feature=Audio(
@@ -99,6 +97,7 @@ class PretrainDataModule(BaseDataModuleHF):
                 batch_size=300,
                 load_from_cache_file=True,
                 num_proc=self.dataset_config.n_workers,
+                desc="Event Mapping"
             )
 
             if self.dataset_config.class_weights_loss or self.dataset_config.class_weights_sampler:
@@ -131,6 +130,7 @@ class PretrainDataModule(BaseDataModuleHF):
                 batch_size=300,
                 load_from_cache_file=True,
                 num_proc=1,
+                desc="Event Mapping"
             )
 
             dataset = dataset.rename_column("ebird_code_multilabel", "labels")
@@ -151,25 +151,17 @@ class PretrainDataModule(BaseDataModuleHF):
                 batch_size=300,
                 load_from_cache_file=True,
                 num_proc=1,
+                desc="One-hot-encoding"
             )
 
             if self.dataset_config.class_weights_loss or self.dataset_config.class_weights_sampler:
                 self.num_train_labels = self._count_labels((dataset["train"]["ebird_code"]))
 
-
         dataset["train"] = dataset["train"].select_columns(
-            ["filepath", "labels", "detected_events", "start_time", "end_time", "no_call_events"]
+            ["filepath", "labels", "detected_events", "start_time", "end_time"]
         )
         dataset["valid"] = dataset["valid"].select_columns(
             ["filepath", "labels", "detected_events", "start_time", "end_time"]
         )
 
         return dataset
-
-    # def _create_splits(self, dataset: DatasetDict | Dataset):
-    #     return dataset 
-        
-
-
-
-    

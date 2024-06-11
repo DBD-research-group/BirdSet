@@ -1,6 +1,5 @@
 # BirdSet 
 
-
 [![python](https://img.shields.io/badge/-Python_3.10-blue?logo=python&logoColor=white)](https://github.com/pre-commit/pre-commit)
 <a href="https://pytorch.org/get-started/locally/"><img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-ee4c2c?logo=pytorch&logoColor=white"></a>
 <a href="https://pytorchlightning.ai/"><img alt="Lightning" src="https://img.shields.io/badge/-Lightning-792ee5?logo=pytorchlightning&logoColor=white"></a>
@@ -8,15 +7,9 @@
 <a href="https://github.com/DBD-research-group/BirdSet"><img alt="GitHub: github.com/DBD-research-group/BirdSet " src="https://img.shields.io/badge/-BirdSet-017F2F?style=flat&logo=github&labelColor=gray"></a>
 [![arXiv](https://img.shields.io/badge/arXiv-1234.56789-b31b1b.svg)](https://arxiv.org/abs/2403.10380)
 
+![logo](https://github.com/DBD-research-group/BirdSet/blob/main/resources/perch/birdsetsymbol.png)
 
 ## Get Started
-
-### Devcontainer
-
-You can use the [devcontainer](https://code.visualstudio.com/docs/devcontainers/containers) configured as as git submodule:
-```bash
-git submodule update --init --recursive
-```
 
 ### Install dependencies
 
@@ -26,12 +19,18 @@ conda create -n birdset python=3.10
 pip install -e .
 ```
 
+### Devcontainer
+
+You can use the [devcontainer](https://code.visualstudio.com/docs/devcontainers/containers) configured as as git submodule:
+```bash
+git submodule update --init --recursive
+```
+
 Or [poetry](https://python-poetry.org/).
 ```
 poetry install
 poetry shell
 ```
-
 
 
 # Minimal Working Example
@@ -56,7 +55,7 @@ Our datasets are shared via HuggingFace Datasets in our [HuggingFace BirdSet rep
 [Tutorial Notebook](https://github.com/DBD-research-group/BirdSet/blob/main/notebooks/tutorials/birdset-pipeline_tutorial.ipynb)
 ## Prepare Data
 
-```
+```python
 from birdset.datamodule.base_datamodule import DatasetConfig
 from birdset.datamodule.birdset_datamodule import BirdSetDataModule
 
@@ -89,7 +88,7 @@ train_loader = dm.train_dataloader()
 
 ## Prepare Model and Start Training
 
-```
+```python
 from lightning import Trainer
 min_epochs = 1
 max_epochs = 5
@@ -109,7 +108,7 @@ trainer.fit(model, dm)
 | <sub>Title</sub> | <sub>Notes</sub> |<sub>PER</sub> | <sub>NES</sub> | <sub>UHH</sub> | <sub>HSN</sub> | <sub>NBP</sub> | <sub>POW</sub> | <sub>SSW</sub> | <sub>SNE</sub>  | <sub>Overall</sub> | <sub>Code</sub> |
 | :----| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | <sub>**BirdSet: A Multi-Task Benchmark For Classification In Avian Bioacoustics**</sub> | | | | | | | |
-| <sub>**BIRB: A Generalization Benchmark for Information Retrieval in Bioacoustics**</sub> | |0.70 |0.90 |0.75 |0.86 | |0.83 |  0.62 | 0.69 | | |
+| <sub>**BIRB: A Generalization Benchmark for Information Retrieval in Bioacoustics**</sub> | | | | | | | |  | | | |
 ## Logging
 Logs will be written to [Weights&Biases](https://wandb.ai/) by default.
 
@@ -127,48 +126,6 @@ Replace `EXPERIMENT_PATH` with the path to the disired experiment YAML config or
 
 ``` bash
 python bridset/train.py experiment="local/HSN/efficientnet.yaml"
-```
-
-
-## Project structure
-
-This repository is inspired by the [Yet Another Lightning Hydra Template](https://github.com/gorodnitskiy/yet-another-lightning-hydra-template).
-
-```
-├── configs                     <- Hydra configuration files
-│   ├── callbacks               <- Callbacks configs
-│   ├── datamodule              <- Datamodule configs
-│   ├── debug                   <- Debugging configs
-│   ├── experiment              <- Experiment configs
-│   ├── extras                  <- Extra utilities configs
-│   ├── hydra                   <- Hydra settings configs
-│   ├── logger                  <- Logger configs
-│   ├── module                  <- Module configs
-│   ├── paths                   <- Project paths configs
-│   ├── trainer                 <- Trainer configs
-│   ├── transformations         <- Transformations / augmentation configs
-│   |
-│   ├── main.yaml               <- Main config
-│
-├── data_birdset                  <- Project data
-├── dataset                     <- Code to build the BirdSet dataset
-├── notebooks                   <- Jupyter notebooks.
-│
-├── birdset                         <- Source code
-│   ├── augmentations           <- Augmentations
-│   ├── callbacks               <- Additional callbacks
-│   ├── datamodules             <- Lightning datamodules
-│   ├── modules                 <- Lightning modules
-│   ├── utils                   <- Utility scripts
-│   │
-│   ├── main.py                 <- Run experiments
-│
-├── .gitignore                  <- List of files ignored by git
-├── pyproject.toml              <- Poetry project file
-├── requirements.txt            <- File for installing python dependencies
-├── requirements-dev.txt        <- File for installing python dev dependencies
-├── setup.py                    <- File for installing project as a package
-└── README.md
 ```
 
 # Data pipeline
