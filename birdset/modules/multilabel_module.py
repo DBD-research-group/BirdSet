@@ -8,7 +8,7 @@ from torch.optim import AdamW, Optimizer
 from functools import partial
 
 from .base_module import BaseModule
-from birdset.configs import NetworkConfig, LRSchedulerConfig, MetricsConfig, LoggingParamsConfig
+from birdset.configs import NetworkConfig, LRSchedulerConfig, MultilabelMetricsConfig, LoggingParamsConfig
 
 
 class MultilabelModule(BaseModule):
@@ -29,14 +29,12 @@ class MultilabelModule(BaseModule):
                 weight_decay=0.01,
             ),
             lr_scheduler: Optional[LRSchedulerConfig] = LRSchedulerConfig(),
-            metrics: MetricsConfig = MetricsConfig(),
+            metrics: MultilabelMetricsConfig = MultilabelMetricsConfig(),
             logging_params: LoggingParamsConfig = LoggingParamsConfig(),
             num_epochs: int = 50,
             len_trainset: int = 13878, # set to property from datamodule
             batch_size: int = 32,
             task: Literal['multiclass', 'multilabel'] = "multilabel",
-            class_weights_loss: Optional[bool] = None,
-            label_counts: int = 21,
             num_gpus: int = 1,
             prediction_table: bool = False,
             pretrain_info = None
@@ -55,8 +53,6 @@ class MultilabelModule(BaseModule):
             num_epochs=num_epochs,
             len_trainset=len_trainset,
             task=task,
-            class_weights_loss=class_weights_loss,
-            label_counts=label_counts,
             batch_size=batch_size,
             num_gpus=num_gpus,
             pretrain_info=pretrain_info

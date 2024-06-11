@@ -5,11 +5,11 @@ import datasets
 from dataclasses import asdict
 from functools import partial
 from typing import Callable, List, Literal, Type, Optional, Union
-from torch.nn import BCEWithLogitsLoss
+from torch.nn import CrossEntropyLoss
 from torch.nn.modules.loss import _Loss
 from torch.optim import AdamW, Optimizer
 
-from birdset.configs import NetworkConfig, LoggingParamsConfig, LRSchedulerConfig, MetricsConfig
+from birdset.configs import NetworkConfig, LoggingParamsConfig, LRSchedulerConfig, MulticlassMetricsConfig, MultilabelMetricsConfig, MultilabelMetricsConfig as MetricsConfig
 
 
 def get_num_gpu(num_gpus: Union[int|str|List[int]]) -> int:
@@ -30,10 +30,9 @@ def get_num_gpu(num_gpus: Union[int|str|List[int]]) -> int:
     else:    
         return num_gpus
 
-
 class BaseModule(L.LightningModule):
     """
-    BaseModule is a PyTorch Lightning module that serves as a base for all models.
+    BaseModule is a PyTorch Lightning module that serves as a base for all models. The default parameters are used for the task of 'multiclass' classification. See MultiLabelModule for 'multilabel' classification.
 
     Attributes:
         network (NetworkConfig): Configuration for the network.
@@ -47,31 +46,30 @@ class BaseModule(L.LightningModule):
         len_trainset (int): The length of the training set.
         batch_size (int): The batch size for training.
         task (str): The task type, can be either 'multiclass' or 'multilabel'.
-        class_weights_loss (bool, optional): Whether to use class weights for the loss function.
-        label_counts (int): The number of labels.
         num_gpus (int): The number of GPUs to use for training.
     """
     def __init__(
             self,
             network: NetworkConfig = NetworkConfig(),
-            output_activation: Callable[[torch.Tensor], torch.Tensor] = torch.sigmoid,
-            loss: _Loss = BCEWithLogitsLoss(),
+            output_activation: Callable[[torch.Tensor], torch.Tensor] = partial(
+                torch.softmax,
+                dim=1
+            ),
+            loss: _Loss = CrossEntropyLoss(),
             optimizer: partial[Type[Optimizer]] = partial(
                 AdamW,
                 lr=1e-5,
                 weight_decay=0.01,
             ),
             lr_scheduler: Optional[LRSchedulerConfig] = LRSchedulerConfig(),
-            metrics: MetricsConfig = MetricsConfig(),
+            metrics: MulticlassMetricsConfig | MultilabelMetricsConfig = MulticlassMetricsConfig(),
             logging_params: LoggingParamsConfig = LoggingParamsConfig(),
             num_epochs: int = 50,
             len_trainset: int = 13878, # set to property from datamodule
             batch_size: int = 32,
-            task: Literal['multiclass', 'multilabel'] = "multilabel",
-            class_weights_loss: Optional[bool] = None,
-            label_counts: int = 21,
+            task: Literal['multiclass', 'multilabel'] = "multiclass",
             num_gpus: int = 1,
-            pretrain_info = None
+            pretrain_info = None,
             ):
 
         super(BaseModule, self).__init__()
