@@ -13,16 +13,15 @@ defaults:
 # datamodule:
 #   _target_: birdset.datamodule.inference_datamodule.InferenceDataModule
 
-tags: ["NBP", "eat-m", "multilabel", "inference", "XCM"]
+tags: ["NBP", "eat", "multilabel", "inference", "XCM"]
 seed: 1
-ckpt_path: /workspace/logs/train/runs/XCL/eat/2024-05-10_084240/callback_checkpoints/checkpoint-05.ckpt
 
 test: True
 
 logger:
   wandb:
     tags: ${tags}
-    group: "NBP_inference_eat_xcm"
+    group: "MT_NBP_eat"
     mode: online
     # version: pretrain_xcl_eat_${seed}_${start_time} #to resume train run # needs to be tested
     #version: pretraineatxcm_2 #to resume train run # needs to be tested
@@ -36,7 +35,7 @@ module:
       pretrain_info:
         hf_path: DBD-research-group/BirdSet
         hf_name: NBP
-        hf_pretrain_name: XCL
+        hf_pretrain_name: XCM
 
 trainer:
   min_epochs: 1

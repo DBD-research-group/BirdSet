@@ -3,7 +3,7 @@
 defaults:
   - override /datamodule: /inference/SNE_inf.yaml
   - override /module: multilabel.yaml
-  - override /module/network: eat_m_soundnet.yaml
+  - override /module/network: eat_soundnet.yaml
   - override /trainer: single_gpu.yaml
   - override /datamodule/transforms: inference_default.yaml
   - override /paths: default.yaml

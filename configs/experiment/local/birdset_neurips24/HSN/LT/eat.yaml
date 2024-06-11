@@ -13,9 +13,8 @@ defaults:
 # datamodule:
 #   _target_: birdset.datamodule.inference_datamodule.InferenceDataModule
 
-tags: ["HSN", "eat_m", "multilabel", "inference", "XCL"]
+tags: ["HSN", "eat", "multilabel", "inference", "XCL"]
 seed: 1
-ckpt_path: /workspace/logs/train/runs/XCL/eat/2024-05-10_084240/callback_checkpoints/checkpoint-05.ckpt
 
 test: True
 
