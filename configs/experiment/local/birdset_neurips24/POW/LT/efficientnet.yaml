@@ -1,6 +1,6 @@
 # @package _global_
 defaults:
-  - override /datamodule: XCL.yaml
+  - override /datamodule: POW.yaml
   - override /module: multilabel.yaml
   - override /module/network: efficientnet.yaml
   - override /callbacks: default.yaml
@@ -9,43 +9,35 @@ defaults:
   - override /paths: default.yaml
   - override /hydra: default.yaml
 
-tags: ["birdsetLT", "pretrain"]
+tags: ["birdsetLT", "inference"]
 seed: 1
-train: True
-test: False
+train: False
+test: True
 
 logger:
   wandb:
     tags: ${tags}
-    group: "LT_XCL_efficientnet"
+    group: "LT_POW_efficientnet"
     mode: disabled
     version: LT_efficientnet_${seed}_${start_time}
 
-trainer:
-  min_epochs: 1
-  max_epochs: 30
-
 module:
-  optimizer:
-    _target_: torch.optim.AdamW
-    lr: 5e-4
-    weight_decay: 5e-4
-
   network:
     model:
+      local_checkpoint: null #TODO: Add the path to the XCL pretraining checkpoint here.
       pretrain_info:
         hf_path: ${datamodule.dataset.hf_path}
         hf_name: ${datamodule.dataset.hf_name}
         hf_pretrain_name: XCL
-        valid_test_only: True
+        valid_test_only: False
 
 datamodule:
   dataset:
     val_split: null
     class_weights_loss: null
     class_weights_sampler: null
-    classlimit: 500
-    eventlimit: 1
+    classlimit: null
+    eventlimit: null
 
   transforms:
     preprocessing:
@@ -67,8 +59,3 @@ datamodule:
     test:
       batch_size: 64
       num_workers: 32
-
-callbacks:
-  model_checkpoint:
-    save_top_k: 1
-    every_n_epochs: 1
