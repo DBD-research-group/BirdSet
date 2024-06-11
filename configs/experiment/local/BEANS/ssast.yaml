@@ -1,0 +1,69 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - override /datamodule: beans.yaml
+  - override /module: embedding.yaml
+  - override /module/embedding_model: ../network/ssast.yaml
+  - override /callbacks: default.yaml
+  - override /trainer: single_gpu.yaml
+  - override /paths: default.yaml
+  - override /hydra: default.yaml
+  - override /datamodule/transforms: bird_default_multiclass.yaml # Here the audio is transformed to a spectrogram
+  - override /datamodule/transforms/waveform_augmentations: none.yaml # No augmentations for now
+  - override /datamodule/transforms/spectrogram_augmentations: none.yaml
+
+tags: ["BEANS", "SSAST", "embeddings", "multiclass"]
+seed: 2
+train: True
+test: True
+
+logger:
+  wandb:
+    tags: ${tags}
+    group: "BEANS"
+    mode: online
+
+module:
+  optimizer:
+    lr: 1e-5
+    
+  output_activation: 
+    _target_: "torch.sigmoid"
+
+trainer:
+  devices: [0]
+  min_epochs: 1
+  max_epochs: 30
+
+datamodule:
+  dataset:
+    dataset_name: beans_bats
+    hf_path: DBD-research-group/beans_bats
+    hf_name: default
+    n_classes: 10
+    
+  loaders:
+    train:
+      batch_size: 32
+      shuffle: True
+      num_workers: 16
+      drop_last: True
+    valid:
+      batch_size: 32
+      num_workers: 16
+      shuffle: False
+    test:
+      batch_size: 32
+      num_workers: 16
+      shuffle: False
+
+  mapper: 
+    biggest_cluster: True
+    no_call: False
+  
+callbacks:
+  model_checkpoint:
+    save_last: True
+    every_n_epochs: 3
+    monitor: "val/CrossEntropyLoss"
+

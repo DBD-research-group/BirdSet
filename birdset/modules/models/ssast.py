@@ -68,7 +68,7 @@ class ASTModel(nn.Module):
 
             self.original_num_patches = self.v.patch_embed.num_patches
             self.oringal_hw = int(self.original_num_patches ** 0.5)
-            self.original_embedding_dim = self.v.pos_embed.shape[2]<
+            self.original_embedding_dim = self.v.pos_embed.shape[2]
 
             # SSL Pretraining Code
             self.softmax = nn.Softmax(dim=-1)
@@ -179,11 +179,8 @@ class ASTModel(nn.Module):
             else:
                 new_pos_embed = torch.nn.functional.interpolate(new_pos_embed, size=(f_dim, t_dim), mode='bilinear')
             # Error here
-            print(new_pos_embed)
             new_pos_embed = new_pos_embed.reshape(1, self.original_embedding_dim, num_patches).transpose(1, 2)
-            print('Tee')
             self.v.pos_embed = nn.Parameter(torch.cat([self.v.pos_embed[:, :self.cls_token_num, :].detach(), new_pos_embed], dim=1))
-            print('Test23')
 
     # get the shape of intermediate representation.
     def get_shape(self, fstride, tstride, input_fdim, input_tdim, fshape, tshape):
@@ -227,7 +224,7 @@ class ASTModel(nn.Module):
         self, input_tensor
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         B = input_tensor.shape[0]
-        x = self.v.patch_embed(x)
+        x = self.v.patch_embed(input_tensor)
         if self.cls_token_num == 2:
             cls_tokens = self.v.cls_token.expand(B, -1, -1)
             dist_token = self.v.dist_token.expand(B, -1, -1)
@@ -236,6 +233,16 @@ class ASTModel(nn.Module):
             cls_tokens = self.v.cls_token.expand(B, -1, -1)
             x = torch.cat((cls_tokens, x), dim=1)
         x = x + self.v.pos_embed
+        x = self.v.pos_drop(x)
+
+        for blk_id, blk in enumerate(self.v.blocks):
+            x = blk(x)
+        x = self.v.norm(x)
+
+        # average output of all tokens except cls token(s)
+        x = torch.mean(x[:, self.cls_token_num:, :], dim=1)
+        
+        return x, self.mlp_head(x)
         # x should go into the classifier with self.original_embedding_dim
     
     def finetuningavgtok(self, x):
