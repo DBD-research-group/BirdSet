@@ -74,7 +74,6 @@ def train(cfg):
         num_epochs=cfg.trainer.max_epochs,
         len_trainset=datamodule.len_trainset,
         batch_size=datamodule.loaders_config.train.batch_size,
-        label_counts=datamodule.num_train_labels,
         pretrain_info=cfg.module.network.model.pretrain_info
     )
 
