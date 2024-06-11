@@ -1,0 +1,57 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - override /datamodule: /inference/HSN_inf.yaml
+  - override /module: multilabel.yaml
+  - override /module/network: eat_m_soundnet.yaml
+  - override /trainer: single_gpu.yaml
+  - override /datamodule/transforms: inference_default.yaml
+  - override /paths: default.yaml
+  - override /hydra: default.yaml
+
+#override for inference
+# datamodule:
+#   _target_: birdset.datamodule.inference_datamodule.InferenceDataModule
+
+tags: ["HSN", "eat-m", "multilabel", "inference", "XCM"]
+seed: 1
+ckpt_path: /workspace/logs/train/runs/XCL/eat/2024-05-10_084240/callback_checkpoints/checkpoint-05.ckpt
+
+test: True
+
+logger:
+  wandb:
+    tags: ${tags}
+    group: "MT_HSN_eat"
+    mode: online
+    # version: pretrain_xcl_eat_${seed}_${start_time} #to resume train run # needs to be tested
+    #version: pretraineatxcm_2 #to resume train run # needs to be tested
+
+module:
+  network:
+    torch_compile: False
+    model:
+      #local_checkpoint: /home/lrauch/mnt/train/runs/XCM/ast/2024-04-03_133040/callback_checkpoints/last.ckpt
+      local_checkpoint : /workspace/logs/train/runs/XCL/eat/2024-05-10_084240/callback_checkpoints/checkpoint-05.ckpt
+      pretrain_info:
+        hf_path: DBD-research-group/BirdSet
+        hf_name: HSN
+        hf_pretrain_name: XCM
+
+trainer:
+  min_epochs: 1
+  max_epochs: 1
+  devices: [2]
+  limit_val_batches: 0
+
+datamodule:
+  transforms:
+    preprocessing:
+        normalize_waveform: instance_normalization
+
+  loaders:
+    test:
+      batch_size: 64
+      num_workers: 24
+      shuffle: False
+

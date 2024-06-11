@@ -1,10 +1,12 @@
-from birdset.datamodule.components.transforms import BirdSetTransformsWrapper
-from birdset.datamodule.components.event_mapping import XCEventMapping
-from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
 from datasets import load_dataset, Audio
+from birdset.datamodule.components.event_mapping import XCEventMapping
+from birdset.datamodule.components.transforms import BirdSetTransformsWrapper
 from birdset.utils import pylogger
+from . import BaseDataModuleHF
+from birdset.configs import DatasetConfig, LoadersConfig
 
 log = pylogger.get_pylogger(__name__)
+
 
 class InferenceDataModule(BaseDataModuleHF):
     def __init__(
@@ -12,13 +14,12 @@ class InferenceDataModule(BaseDataModuleHF):
             dataset: DatasetConfig = DatasetConfig(),
             loaders: LoadersConfig = LoadersConfig(),
             transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
-            mapper: XCEventMapping = XCEventMapping()
+            mapper: XCEventMapping = None
     ):
         super().__init__(
             dataset=dataset,
             loaders=loaders,
             transforms=transforms,
-            mapper=mapper
         )
 
     def _load_data(self, decode: bool = False):
@@ -69,6 +70,7 @@ class InferenceDataModule(BaseDataModuleHF):
                 batch_size=500,
                 load_from_cache_file=False,
                 num_proc=1,
+                desc="One-hot-encoding"
             )
 
         dataset["test"] = dataset["test"].select_columns(
