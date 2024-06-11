@@ -1,8 +1,8 @@
 # @package _global_
 defaults:
-  - override /datamodule: POW.yaml
+  - override /datamodule: SSW.yaml
   - override /module: multilabel.yaml
-  - override /module/network: convnext.yaml
+  - override /module/network: ast.yaml
   - override /callbacks: default.yaml 
   - override /trainer: single_gpu.yaml
   - override /datamodule/transforms: bird_default_multilabel.yaml
@@ -17,9 +17,9 @@ test: True
 logger:
   wandb:
     tags: ${tags}
-    group: "POW_subset_convnext"
+    group: "SSW_subset_ast"
     mode: disabled
-    version: DT_convnext_${start_time} 
+    version: DT_ast_${start_time} 
 
 module:
   optimizer:
@@ -40,6 +40,10 @@ datamodule:
     class_weights_sampler: null
     classlimit: 600
     eventlimit: 5
+  transforms:
+    preprocessing:
+      resizer:
+        target_width: 1_024
 
   loaders:
     train:
