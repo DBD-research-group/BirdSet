@@ -17,7 +17,7 @@ def main():
                  "dcase18_shard_0002.tar.gz"]  # Replace with the path to the file in the repository
     subfolder = "dcase18"
     revision = "data"
-    local_dir = f"{root}/data_birdset/dcase18"  # Replace with the local directory where the file will be downloaded
+    local_dir = f"{root}/data_birdset/"  # Replace with the local directory where the file will be downloaded
     repo_type = "dataset"
     # Download the file
     for filename in filenames:
@@ -34,7 +34,7 @@ def main():
     os.chdir(f"{root}/data_birdset/dcase18")
 
     # The directory where you want to extract the files
-    output_directory = "root/data_birdset/background_noise/"
+    output_directory = f"{root}/data_birdset/background_noise/"
 
     # Create the output directory if it doesn't exist
     os.makedirs(output_directory, exist_ok=True)

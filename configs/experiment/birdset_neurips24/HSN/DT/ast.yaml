@@ -8,8 +8,6 @@ defaults:
   - override /datamodule/transforms: bird_default_multilabel.yaml
   - override /paths: default.yaml
   - override /hydra: default.yaml
-  - override /datamodule/transforms/spectrogram_augmentations: none.yaml
-  - override /datamodule/transforms/waveform_augmentations: none.yaml
 
 tags: ["birdsetDT"]
 seed: 1
