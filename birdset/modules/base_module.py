@@ -156,6 +156,8 @@ class BaseModule(L.LightningModule):
     def model_step(self, batch, batch_idx):
         logits = self.forward(**batch)
         if self.class_mask and (not self.pretrain_info.valid_test_only or not self.trainer.training):
+            if batch["labels"].shape == logits.shape:
+                batch["labels"] = batch["labels"][:, self.class_mask]
             logits = logits[:, self.class_mask]
         loss = self.loss(logits, batch["labels"])
         preds = self.output_activation(logits)

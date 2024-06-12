@@ -43,19 +43,22 @@ class PretrainDataModule(BaseDataModuleHF):
     
     def _get_dataset(self, split):
         if self.dataset_config.direct_fingerprint:
-            path = self.dataset_config.direct_fingerprint
-            dataset = load_from_disk(os.path.join(path, split))
-
-            transforms = deepcopy(self.transforms)
-            transforms.set_mode(split)
-            if split == "train":  # we need this for sampler, cannot be done later because set_transform
-                self.train_label_list = dataset["labels"]
-
-            dataset.set_transform(transforms, output_all_columns=False)
-        
-            return dataset
+            path = os.path.join(self.dataset_config.direct_fingerprint, split)
         else:
-            return super()._get_dataset(split)
+            path = os.path.join(self.disk_save_path, split)
+
+        dataset = load_from_disk(path)
+
+        transforms = deepcopy(self.transforms)
+        transforms.set_mode(split)
+        if split == "train":  # we need this for sampler, cannot be done later because set_transform
+            self.train_label_list = dataset["labels"]
+
+        if split == "valid":
+            transforms.modes_to_skip.append("valid")
+        dataset.set_transform(transforms, output_all_columns=False)
+
+        return dataset
 
     def _load_data(self, decode: bool = False):
         """
