@@ -39,7 +39,7 @@ python resources/utils/download_background_noise.py
 We provide all experiment YAML files used to generate our results in the `birdset/configs/experiment/birdset_neurips24/ directory`. These files can be easily executed by running:
 
 ``` bash
-python birdset/train.py experiment="$EXPERIMENT_PATH"
+python birdset/train.py experiment="birdset_neurips24/$EXPERIMENT_PATH"
 ```
 
 For each dataset, we specify the parameters for each training scenario. The experiments for `DT` with the dedicated subset can be easily run as mentioned above. However, experiments for training scenarios `MT` and `LT` are harder to reproduce since they require more extensive training times. 
