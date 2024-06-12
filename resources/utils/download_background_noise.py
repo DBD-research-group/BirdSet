@@ -1,16 +1,23 @@
 from huggingface_hub import hf_hub_download
 import tarfile
 import os
+import pyrootutils
 
+root = pyrootutils.setup_root(
+    search_from=__file__,
+    indicator=[".git"],
+    pythonpath=True,
+    dotenv=True,
+)
 
 def main():
 
     repo_id = "DBD-research-group/BirdSet"  # Replace with the repository ID
     filenames = ["dcase18_shard_0001.tar.gz",
                  "dcase18_shard_0002.tar.gz"]  # Replace with the path to the file in the repository
-    subfolder = "data/dcase18"
+    subfolder = "dcase18"
     revision = "data"
-    local_dir = "/workspace/data_birdset/dcase18"  # Replace with the local directory where the file will be downloaded
+    local_dir = f"{root}/data_birdset/dcase18"  # Replace with the local directory where the file will be downloaded
     repo_type = "dataset"
     # Download the file
     for filename in filenames:
@@ -24,10 +31,10 @@ def main():
             local_dir_use_symlinks=False,
             force_download=True)
 
-    os.chdir("/workspace/data_birdset/dcase18/data/dcase18/")
+    os.chdir(f"{root}/data_birdset/dcase18")
 
     # The directory where you want to extract the files
-    output_directory = "/workspace/data_birdset/background_noise/"
+    output_directory = "root/data_birdset/background_noise/"
 
     # Create the output directory if it doesn't exist
     os.makedirs(output_directory, exist_ok=True)
