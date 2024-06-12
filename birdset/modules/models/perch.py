@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Optional, Tuple
+from typing import Optional, Tuple
 
 import datasets
 import pandas as pd
@@ -7,6 +7,8 @@ import tensorflow as tf
 import tensorflow_hub as hub
 import torch
 from torch import nn
+
+from birdset.configs import PretrainInfoConfig
 
 
 class PerchModel(nn.Module):
@@ -36,7 +38,7 @@ class PerchModel(nn.Module):
         train_classifier: bool = False,
         restrict_logits: bool = False,
         label_path: Optional[str] = None,
-        pretrain_info: Optional[Dict] = None,
+        pretrain_info: Optional[PretrainInfoConfig] = None,
     ) -> None:
         """
         Initializes the PerchModel with configuration for loading the TensorFlow Hub model,
@@ -61,8 +63,8 @@ class PerchModel(nn.Module):
         self.label_path = label_path
 
         if pretrain_info:
-            self.hf_path = pretrain_info["hf_path"]
-            self.hf_name = pretrain_info["hf_name"]
+            self.hf_path = pretrain_info.hf_path
+            self.hf_name = pretrain_info.hf_name
         else:
             self.hf_path = None
             self.hf_name = None
