@@ -445,7 +445,7 @@ class BirdSetTransformsWrapper(BaseTransforms):
         return audio_augmented
    
     def _prepare_call(self):
-        if self.mode in ("test", "predict"):#, "valid"): ##!! important
+        if self.mode in ("test", "predict", "valid"):
             self.wave_aug = None
             self.spec_aug = None
             self.nocall_sampler = None
