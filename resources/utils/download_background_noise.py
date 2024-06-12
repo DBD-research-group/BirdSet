@@ -2,6 +2,7 @@ from huggingface_hub import hf_hub_download
 import tarfile
 import os
 import pyrootutils
+from tqdm import tqdm 
 
 root = pyrootutils.setup_root(
     search_from=__file__,
@@ -40,12 +41,12 @@ def main():
     os.makedirs(output_directory, exist_ok=True)
 
     # Iterate through the files and extract each one
-    for filename in filenames:
+    for filename in tqdm(filenames, desc="Extracting files"):
         with tarfile.open(filename, "r:gz") as tar:
             tar.extractall(path=output_directory)
         os.remove(filename)
 
-    print("Extraction complete. No-Call samples ready.")
+    print("Extraction complete.")
 
 
 if __name__ == "__main__":

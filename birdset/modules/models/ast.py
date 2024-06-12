@@ -46,11 +46,17 @@ class ASTSequenceClassifier(nn.Module):
                 num_labels=self.num_classes,
                 cache_dir=self.cache_dir,
                 state_dict=state_dict,
-                ignore_mismatched_sizes=True
+                ignore_mismatched_sizes=True,
             )
         else:
-            config = ASTConfig.from_pretrained(self.checkpoint, num_labels=self.num_classes)
-            self.model = ASTForAudioClassification(config)
+            print(f"Loading only HF model from {self.checkpoint}")
+            self.model = ASTForAudioClassification.from_pretrained(
+                self.checkpoint,
+                num_labels=self.num_classes,
+                cache_dir=self.cache_dir,
+                ignore_mismatched_sizes=True,
+            )
+            
         
     def forward(self, input_values, attention_mask=None, labels=None, return_hidden_state=False):
         """

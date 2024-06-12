@@ -1,4 +1,3 @@
-# mit checkpoint laden 
 # @package _global_
 defaults:
   - override /datamodule: SNE.yaml
