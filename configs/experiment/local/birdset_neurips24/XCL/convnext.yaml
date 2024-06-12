@@ -44,8 +44,8 @@ datamodule:
     val_split: null
     class_weights_loss: null
     class_weights_sampler: null
-    classlimit: null
-    eventlimit: null
+    classlimit: 500
+    eventlimit: 1
 
   loaders:
     train:

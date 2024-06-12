@@ -47,6 +47,16 @@ datamodule:
     classlimit: null
     eventlimit: null
 
+  transforms:
+    preprocessing:
+      spectrogram_conversion:
+        n_fft: 2048
+        hop_length: 256
+        power: 2.0
+      melscale_conversion:
+        n_mels: 256
+        n_stft: 1025
+
   loaders:
     train:
       batch_size: 64
