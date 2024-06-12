@@ -1,0 +1,61 @@
+# @package _global_
+defaults:
+  - override /datamodule: SNE.yaml
+  - override /module: multilabel.yaml
+  - override /module/network: efficientnet.yaml
+  - override /callbacks: default.yaml
+  - override /trainer: single_gpu.yaml
+  - override /datamodule/transforms: bird_default_multilabel.yaml
+  - override /paths: default.yaml
+  - override /hydra: default.yaml
+
+tags: ["birdsetLT", "inference"]
+seed: 1
+train: False
+test: True
+
+logger:
+  wandb:
+    tags: ${tags}
+    group: "LT_SNE_efficientnet"
+    mode: disabled
+    version: LT_efficientnet_${seed}_${start_time}
+
+module:
+  network:
+    model:
+      local_checkpoint: null #TODO: Add the path to the XCL pretraining checkpoint here.
+      pretrain_info:
+        hf_path: ${datamodule.dataset.hf_path}
+        hf_name: ${datamodule.dataset.hf_name}
+        hf_pretrain_name: XCL
+        valid_test_only: False
+
+datamodule:
+  dataset:
+    val_split: null
+    class_weights_loss: null
+    class_weights_sampler: null
+    classlimit: null
+    eventlimit: null
+
+  transforms:
+    preprocessing:
+      spectrogram_conversion:
+        n_fft: 2048
+        hop_length: 256
+        power: 2.0
+      melscale_conversion:
+        n_mels: 256
+        n_stft: 1025
+
+  loaders:
+    train:
+      batch_size: 64
+      num_workers: 32
+    valid:
+      batch_size: 64
+      num_workers: 32
+    test:
+      batch_size: 64
+      num_workers: 32

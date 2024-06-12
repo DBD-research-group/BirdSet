@@ -1,0 +1,74 @@
+# @package _global_
+defaults:
+  - override /datamodule: XCM.yaml
+  - override /module: multilabel.yaml
+  - override /module/network: efficientnet.yaml
+  - override /callbacks: default.yaml
+  - override /trainer: single_gpu.yaml
+  - override /datamodule/transforms: bird_default_multilabel.yaml
+  - override /paths: default.yaml
+  - override /hydra: default.yaml
+
+tags: ["birdsetMT", "pretrain"]
+seed: 1
+train: True
+test: False
+
+logger:
+  wandb:
+    tags: ${tags}
+    group: "MT_XCM_efficientnet"
+    mode: disabled
+    version: MT_efficientnet_${seed}_${start_time}
+
+trainer:
+  min_epochs: 1
+  max_epochs: 30
+
+module:
+  optimizer:
+    _target_: torch.optim.AdamW
+    lr: 5e-4
+    weight_decay: 5e-4
+
+  network:
+    model:
+      pretrain_info:
+        hf_path: ${datamodule.dataset.hf_path}
+        hf_name: ${datamodule.dataset.hf_name}
+        hf_pretrain_name: XCM
+        valid_test_only: True
+
+datamodule:
+  dataset:
+    val_split: null
+    class_weights_loss: null
+    class_weights_sampler: null
+    classlimit: null
+    eventlimit: null
+
+  transforms:
+    preprocessing:
+      spectrogram_conversion:
+        n_fft: 2048
+        hop_length: 256
+        power: 2.0
+      melscale_conversion:
+        n_mels: 256
+        n_stft: 1025
+
+  loaders:
+    train:
+      batch_size: 64
+      num_workers: 32
+    valid:
+      batch_size: 64
+      num_workers: 32
+    test:
+      batch_size: 64
+      num_workers: 32
+
+callbacks:
+  model_checkpoint:
+    save_top_k: 1
+    every_n_epochs: 1

@@ -13,7 +13,7 @@ dataset:
   hf_path: DBD-research-group/BirdSet
   hf_name: SSW
   seed: ${seed}
-  n_workers: 1
+  n_workers: 5
   val_split: 0.2
   task: ${module.task}
   subset: null
