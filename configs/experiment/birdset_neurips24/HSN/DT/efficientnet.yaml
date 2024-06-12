@@ -1,4 +1,5 @@
 # @package _global_
+#package global is neccessary!
 defaults:
   - override /datamodule: HSN.yaml
   - override /module: multilabel.yaml
@@ -8,12 +9,12 @@ defaults:
   - override /datamodule/transforms: bird_default_multilabel.yaml
   - override /paths: default.yaml
   - override /hydra: default.yaml
-
+ 
 tags: ["birdsetDT"]
 seed: 1
 train: True
 test: True
-
+ 
 logger:
   wandb:
     tags: ${tags}

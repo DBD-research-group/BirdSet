@@ -1,0 +1,55 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - override /datamodule: /inference/SSW_inf.yaml
+  - override /module: multilabel.yaml
+  - override /module/network: eat_soundnet.yaml
+  - override /trainer: single_gpu.yaml
+  - override /datamodule/transforms: inference_default.yaml
+  - override /paths: default.yaml
+  - override /hydra: default.yaml
+
+#override for inference
+# datamodule:
+#   _target_: birdset.datamodule.inference_datamodule.InferenceDataModule
+
+tags: ["birdsetMT"]
+seed: 1
+
+test: True
+
+logger:
+  wandb:
+    tags: ${tags}
+    group: "MT_SSW_eat"
+    mode: online
+    # version: pretrain_xcl_eat_${seed}_${start_time} #to resume train run # needs to be tested
+    #version: pretraineatxcm_2 #to resume train run # needs to be tested
+
+module:
+  network:
+    torch_compile: False
+    model:
+      local_checkpoint: null #TODO: Add the path to the XCL pretraining checkpoint here.
+      pretrain_info:
+        hf_path: DBD-research-group/BirdSet
+        hf_name: SSW
+        hf_pretrain_name: XCM
+
+trainer:
+  min_epochs: 1
+  max_epochs: 1
+  devices: [2]
+  limit_val_batches: 0
+
+datamodule:
+  transforms:
+    preprocessing:
+        normalize_waveform: instance_normalization
+
+  loaders:
+    test:
+      batch_size: 64
+      num_workers: 24
+      shuffle: False
+
