@@ -13,7 +13,7 @@ defaults:
 # datamodule:
 #   _target_: birdset.datamodule.inference_datamodule.InferenceDataModule
 
-tags: ["SNE", "eat", "multilabel", "inference", "XCM"]
+tags: ["birdsetMT"]
 seed: 1
 
 test: True
@@ -30,8 +30,7 @@ module:
   network:
     torch_compile: False
     model:
-      #local_checkpoint: /home/lrauch/mnt/train/runs/XCM/ast/2024-04-03_133040/callback_checkpoints/last.ckpt
-      local_checkpoint : /workspace/logs/train/runs/XCL/eat/2024-05-10_084240/callback_checkpoints/checkpoint-05.ckpt
+      local_checkpoint: null #TODO: Add the path to the XCL pretraining checkpoint here.
       pretrain_info:
         hf_path: DBD-research-group/BirdSet
         hf_name: SNE
