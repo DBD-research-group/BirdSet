@@ -33,7 +33,7 @@ poetry shell
 First, you have to download the background noise files: 
 
 ``` bash
-python /resources/utils/download_background_noise.py
+python resources/utils/download_background_noise.py
 ```
 
 We provide all experiment YAML files used to generate our results in the `birdset/configs/experiment/birdset_neurips24/ directory`. These files can be easily executed by running:
