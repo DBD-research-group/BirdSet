@@ -10,7 +10,7 @@ defaults:
   - override /paths: default.yaml
   - override /hydra: default.yaml
  
-tags: ["HSN", "efficientnet", "multilabel", "birdsetDT"]
+tags: ["birdsetDT"]
 seed: 1
 train: True
 test: True
