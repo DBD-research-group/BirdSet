@@ -68,7 +68,7 @@ def train(cfg):
     with open_dict(cfg):
         cfg.module.metrics["num_labels"] = datamodule.num_classes
         cfg.module.network.model["num_classes"] = datamodule.num_classes # TODO not the correct classes when masking in valid/test only
-    print("cfg num_classes", cfg.module.metrics["num_labels"])
+
     model = hydra.utils.instantiate(
         cfg.module,
         num_epochs=cfg.trainer.max_epochs,
