@@ -5,7 +5,6 @@ model:
   train_classifier: False
   restrict_logits: True
   label_path: ${paths.root_dir}/resources/perch/label_updated.csv
-  task: ${module.task}
   pretrain_info:
     hf_path: ${datamodule.dataset.hf_path}
     hf_name: ${datamodule.dataset.hf_name}
