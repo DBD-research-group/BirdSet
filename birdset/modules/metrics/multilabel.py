@@ -1,8 +1,7 @@
 import torch
 import torchmetrics
 from torchmetrics.classification.average_precision import MultilabelAveragePrecision
-from torchmetrics import Metric
-from torchmetrics.utilities.data import dim_zero_cat
+from torchmetrics import Metric 
 
 class cmAP5(Metric):
     def __init__(

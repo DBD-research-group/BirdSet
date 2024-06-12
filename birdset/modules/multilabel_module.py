@@ -1,12 +1,15 @@
 from dataclasses import asdict
 import torch
-from .base_module import BaseModule, NetworkConfig, LRSchedulerConfig, MetricsConfig, LoggingParamsConfig
 import wandb
 from typing import Callable, Literal, Type, Optional
 from torch.nn import BCEWithLogitsLoss
 from torch.nn.modules.loss import _Loss
 from torch.optim import AdamW, Optimizer
 from functools import partial
+
+from .base_module import BaseModule
+from birdset.configs import NetworkConfig, LRSchedulerConfig, MultilabelMetricsConfig, LoggingParamsConfig
+
 
 class MultilabelModule(BaseModule):
     """
@@ -26,14 +29,12 @@ class MultilabelModule(BaseModule):
                 weight_decay=0.01,
             ),
             lr_scheduler: Optional[LRSchedulerConfig] = LRSchedulerConfig(),
-            metrics: MetricsConfig = MetricsConfig(),
+            metrics: MultilabelMetricsConfig = MultilabelMetricsConfig(),
             logging_params: LoggingParamsConfig = LoggingParamsConfig(),
             num_epochs: int = 50,
             len_trainset: int = 13878, # set to property from datamodule
             batch_size: int = 32,
             task: Literal['multiclass', 'multilabel'] = "multilabel",
-            class_weights_loss: Optional[bool] = None,
-            label_counts: int = 21,
             num_gpus: int = 1,
             prediction_table: bool = False,
             pretrain_info = None
@@ -42,7 +43,7 @@ class MultilabelModule(BaseModule):
         self.prediction_table = prediction_table
 
         super().__init__(
-            network = network,
+            network=network,
             output_activation=output_activation,
             loss=loss,
             optimizer=optimizer,
@@ -52,8 +53,6 @@ class MultilabelModule(BaseModule):
             num_epochs=num_epochs,
             len_trainset=len_trainset,
             task=task,
-            class_weights_loss=class_weights_loss,
-            label_counts=label_counts,
             batch_size=batch_size,
             num_gpus=num_gpus,
             pretrain_info=pretrain_info
@@ -85,8 +84,7 @@ class MultilabelModule(BaseModule):
         self.log_dict(self.test_add_metrics, **asdict(self.logging_params))
 
         return {"loss": test_loss, "preds": preds, "targets": targets}
-    
-    
+
     def on_test_epoch_end(self):
         test_targets = torch.cat(self.test_targets).int()
         test_preds = torch.cat(self.test_preds)
@@ -103,7 +101,6 @@ class MultilabelModule(BaseModule):
 
         if self.prediction_table:
             self._wandb_prediction_table(test_preds, test_targets)
-
 
     def _wandb_prediction_table(self, preds, targets):
         top5_values_preds, top5_indices_preds = preds.topk(dim=1, k=5, sorted=True)

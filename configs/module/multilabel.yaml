@@ -5,7 +5,6 @@ defaults:
   - network: ast.yaml
 
 task: multilabel
-class_weights_loss: ${datamodule.dataset.class_weights_loss}
 prediction_table: False
 num_gpus: ${trainer.devices}
 
@@ -16,7 +15,7 @@ optimizer:
   weight_decay: 0.01
 
 metrics:
-  _target_: birdset.modules.base_module.MetricsConfig
+  _target_: birdset.configs.module_configs.MultilabelMetricsConfig
   num_labels: ${datamodule.dataset.n_classes}
   
 
