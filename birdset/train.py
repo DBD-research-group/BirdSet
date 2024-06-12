@@ -51,7 +51,7 @@ def train(cfg):
     log.info(f"Instantiate logger")
     logger = utils.instantiate_loggers(cfg.get("logger"))
     # override standard TF logger to handle rare logger error
-    #logger.append(utils.TBLogger(Path(cfg.paths.log_dir)))
+    # logger.append(utils.TBLogger(Path(cfg.paths.log_dir)))
 
     # Setup callbacks
     log.info(f"Instantiate callbacks")
