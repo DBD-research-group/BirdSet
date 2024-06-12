@@ -54,11 +54,11 @@ python birdset/eval.py experiment="$EXPERIMENT_PATH"
 If you prefer to start the large-scale trainings and download the data, you can also employ the `XCM` and `XCL` trainings via the experiment YAML files. After training, the best model checkpoint is saved based on the validation loss and can then be used for inference:
 
 ``` bash
-python birdset/train.py experiment="$EXPERIMENT_PATH"
+python birdset/train.py experiment="birdset_neurips24/$EXPERIMENT_PATH"
 ```
 
 ``` bash
-python birdset/eval.py experiment="EXPERIMENT_PATH" module.model.network.local_checkpoint="$CHECKPOINT_PATH"
+python birdset/eval.py experiment="birdset_neurips24/$EXPERIMENT_PATH" module.model.network.local_checkpoint="$CHECKPOINT_PATH"
 ```
 
 
