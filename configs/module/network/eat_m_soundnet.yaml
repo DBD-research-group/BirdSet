@@ -1,14 +1,14 @@
 model_name: "eat"
 model:
   _target_: birdset.modules.models.eat_soundnet.SoundNet
-  nf: 16
+  nf: 32
   seq_len: 110250
-  embed_dim: 128
-  n_layers: 4
-  nhead: 8
+  embed_dim: 256
+  n_layers: 6
+  nhead: 16
   factors: [4, 4, 4, 4]
-  n_classes: null
-  dim_feedforward: 512
+  n_classes: ${datamodule.dataset.n_classes}
+  dim_feedforward: 2048
   pretrain_info: null
   
 torch_compile: False

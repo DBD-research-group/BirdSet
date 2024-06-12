@@ -1,5 +1,54 @@
 # @package _global_
 defaults:
+<<<<<<< HEAD:configs/experiment/local/birdset_neurips24/HSN/LT/efficientnet.yaml
+  - override /datamodule: /inference/HSN_inf.yaml
+  - override /module: multilabel.yaml
+  - override /module/network: efficientnet.yaml
+  - override /trainer: single_gpu.yaml
+  - override /datamodule/transforms: inference_default.yaml
+  - override /paths: default.yaml
+  - override /hydra: default.yaml
+ 
+#override for inference
+# datamodule:
+#   _target_: birdset.datamodule.inference_datamodule.InferenceDataModule
+ 
+tags: ["HSN", "efficientnet", "multilabel", "inference", "validation"]
+seed: 2
+ 
+test: True
+ 
+logger:
+  wandb:
+    tags: ${tags}
+    group: "HSN_inference_efficientnet_xcl_seed_2"
+    mode: online
+    #version: pretraineatxcm_2 #to resume train run # needs to be tested
+ 
+module:
+  network:
+    torch_compile: False
+    model:
+      local_checkpoint: null #TODO: Add the path to the XCL pretraining checkpoint here.
+      #local_checkpoint : /mnt/work/bird2vec/birdset_logs/train/runs/XCM/ast/22024-04-15_111606/callback_checkpoints/last.ckpt
+      local_checkpoint: /mnt/work/bird2vec/birdset_logs/train/runs/XCL/ast/22024-05-06_173427_seed2/callback_checkpoints/checkpoint-06.ckpt
+      pretrain_info:
+        hf_path: DBD-research-group/BirdSet
+        hf_name: HSN
+        hf_pretrain_name: XCL
+ 
+trainer:
+  min_epochs: 1
+  max_epochs: 1
+  devices: [2]
+ 
+datamodule:
+  transforms:
+    preprocessing:
+      spectrogram_conversion: 
+        n_fft: 2048
+        hop_length: 320
+=======
   - override /datamodule: HSN.yaml
   - override /module: multilabel.yaml
   - override /module/network: efficientnet.yaml
@@ -45,12 +94,21 @@ datamodule:
       spectrogram_conversion:
         n_fft: 2048
         hop_length: 256
+>>>>>>> origin/main:configs/experiment/birdset_neurips24/HSN/LT/efficientnet.yaml
         power: 2.0
       melscale_conversion:
         n_mels: 256
         n_stft: 1025
+<<<<<<< HEAD:configs/experiment/local/birdset_neurips24/HSN/LT/efficientnet.yaml
+  loaders:
+    test:
+      batch_size: 64
+      num_workers: 24
+      shuffle: False
+=======
 
   loaders:
     test:
       batch_size: 64
       num_workers: 32
+>>>>>>> origin/main:configs/experiment/birdset_neurips24/HSN/LT/efficientnet.yaml
