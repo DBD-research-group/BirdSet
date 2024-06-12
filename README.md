@@ -8,19 +8,16 @@
 
 ![logo](https://github.com/DBD-research-group/BirdSet/blob/main/resources/perch/birdsetsymbol.png)
 
-## Get Started
+Deep learning (DL) models have emerged as a powerful tool in avian bioacoustics to assess environmental health. To maximize the potential of cost-effective and minimal-invasive passive acoustic monitoring (PAM), DL models must analyze bird vocalizations across a wide range of species and environmental conditions. However, data fragmentation challenges a comprehensive evaluation of generalization performance. Therefore, we introduce the $\texttt{BirdSet}$ dataset, comprising approximately 520,000 global bird recordings for training and over 400 hours of PAM recordings for testing.
+## User Installation
 
-### Install dependencies
-
-Either with [conda](https://docs.conda.io/en/latest/) and [pip](https://pip.pypa.io/en/stable/).
+The simplest way to install $\texttt{BirdSet}$ is to clone this repository and install it as an editable package using [conda](https://docs.conda.io/en/latest/) and [pip](https://pip.pypa.io/en/stable/):
 ```
 conda create -n birdset python=3.10
 pip install -e .
 ```
 
-### Devcontainer
-
-You can use the [devcontainer](https://code.visualstudio.com/docs/devcontainers/containers) configured as as git submodule:
+You can also use the [devcontainer](https://code.visualstudio.com/docs/devcontainers/containers) configured as as git submodule:
 ```bash
 git submodule update --init --recursive
 ```
@@ -31,8 +28,41 @@ poetry install
 poetry shell
 ```
 
+## Reproduce Neurips2024 Baselines
 
-# Minimal Working Example
+First, you have to download the background noise files: 
+
+``` bash
+python /resources/utils/download_background_noise.py
+```
+
+We provide all experiment YAML files used to generate our results in the `birdset/configs/experiment/birdset_neurips24/ directory`. These files can be easily executed by running:
+
+``` bash
+python birdset/train.py experiment="$EXPERIMENT_PATH"
+```
+
+For each dataset, we specify the parameters for each training scenario. The experiments for `DT` with the dedicated subset can be easily run as mentioned above. However, experiments for training scenarios `MT` and `LT` are harder to reproduce since they require more extensive training times. 
+Additionally, the datasets are quite large (90GB and 480GB respectively). Therefore, we provide the best model checkpoints via Hugging Face in the experiment files to avoid the need for retraining.
+
+These checkpoints can be executed by running the evaluation script, which will automatically download the model and perform inference on the test datasets:
+
+``` bash
+python birdset/eval.py experiment="$EXPERIMENT_PATH"
+```
+
+If you prefer to start the large-scale trainings and download the data, you can also employ the `XCM` and `XCL` trainings via the experiment YAML files. After training, the best model checkpoint is saved based on the validation loss and can then be used for inference:
+
+``` bash
+python birdset/train.py experiment="$EXPERIMENT_PATH"
+```
+
+``` bash
+python birdset/eval.py experiment="EXPERIMENT_PATH" module.model.network.local_checkpoint="$CHECKPOINT_PATH"
+```
+
+
+## Example
 
 <!-- ## Log in to Huggingface
 
