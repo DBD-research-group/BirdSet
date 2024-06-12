@@ -73,7 +73,8 @@ logger:
 module:
   network:
     model:
-      local_checkpoint: null #TODO: Add the path to the XCL pretraining checkpoint here.
+      local_checkpoint: null #Add the path to your XCL pretraining checkpoint here, if it is saved locally.
+      checkpoint: DBD-research-group/EfficientNet-B1-BirdSet-XCL #Add the HuggingFace path to your XCL pretraining checkpoint here if it is uploaded on HuggingFace.
       pretrain_info:
         hf_path: ${datamodule.dataset.hf_path}
         hf_name: ${datamodule.dataset.hf_name}
@@ -107,12 +108,6 @@ datamodule:
 =======
 
   loaders:
-    train:
-      batch_size: 64
-      num_workers: 32
-    valid:
-      batch_size: 64
-      num_workers: 32
     test:
       batch_size: 64
       num_workers: 32

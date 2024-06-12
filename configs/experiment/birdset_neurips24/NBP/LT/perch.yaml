@@ -30,12 +30,6 @@ datamodule:
     eventlimit: null
 
   loaders:
-    train:
-      batch_size: 64
-      num_workers: 32
-    valid:
-      batch_size: 64
-      num_workers: 32
     test:
       batch_size: 64
       num_workers: 32

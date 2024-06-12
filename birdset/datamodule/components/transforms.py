@@ -220,8 +220,9 @@ class BirdSetTransformsWrapper(BaseTransforms):
                 nocall_sampler: NoCallMixer | None = None, 
                 preprocessing: PreprocessingConfig | None = PreprocessingConfig()
             ):
-        #max_length = 5
         super().__init__(task, sampling_rate, max_length, decoding, feature_extractor)
+
+        self.modes_to_skip = ["test", "predict"]
 
         self.model_type = model_type
         self.preprocessing = preprocessing
@@ -445,7 +446,7 @@ class BirdSetTransformsWrapper(BaseTransforms):
         return audio_augmented
    
     def _prepare_call(self):
-        if self.mode in ("test", "predict", "valid"):
+        if self.mode in self.modes_to_skip:
             self.wave_aug = None
             self.spec_aug = None
             self.nocall_sampler = None
