@@ -48,7 +48,7 @@ Additionally, the datasets are quite large (90GB and 480GB respectively). Theref
 These checkpoints can be executed by running the evaluation script, which will automatically download the model and perform inference on the test datasets:
 
 ``` bash
-python birdset/eval.py experiment="$EXPERIMENT_PATH"
+python birdset/eval.py experiment="birdset_neurips24/$EXPERIMENT_PATH"
 ```
 
 If you prefer to start the large-scale trainings and download the data, you can also employ the `XCM` and `XCL` trainings via the experiment YAML files. After training, the best model checkpoint is saved based on the validation loss and can then be used for inference:
