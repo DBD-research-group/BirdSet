@@ -30,32 +30,37 @@ poetry shell
 
 ## Reproduce Neurips2024 Baselines
 
-First, you have to download the background noise files: 
+First, you have to download the background noise files for augmentations
 
 ``` bash
 python resources/utils/download_background_noise.py
 ```
 
-We provide all experiment YAML files used to generate our results in the `birdset/configs/experiment/birdset_neurips24/ directory`. These files can be easily executed by running:
+We provide all experiment YAML files used to generate our results in the `birdset/configs/experiment/birdset_neurips24`. For each dataset, we specify the parameters for each training scenario. We differentiate between three training scenarios: `DT`, `MT`, and `LT`
+
+### Dedicated Training (DT)
+
+The experiments for `DT` with the dedicated subset can be easily run with a single line: 
 
 ``` bash
-python birdset/train.py experiment="birdset_neurips24/$EXPERIMENT_PATH"
+python birdset/train.py experiment="birdset_neurips24/DT/$Model"
 ```
 
-For each dataset, we specify the parameters for each training scenario. The experiments for `DT` with the dedicated subset can be easily run as mentioned above. However, experiments for training scenarios `MT` and `LT` are harder to reproduce since they require more extensive training times. 
-Additionally, the datasets are quite large (90GB and 480GB respectively). Therefore, we provide the best model checkpoints via Hugging Face in the experiment files to avoid the need for retraining.
-
+### Medium Training (MT) and Large Training (LT)
+Experiments for training scenarios `MT` and `LT` are harder to reproduce since they require more extensive training times. 
+Additionally, the datasets are quite large (90GB for XCM and 480GB for XCL). Therefore, we provide the best model checkpoints via Hugging Face in the experiment files to avoid the need for retraining.
 These checkpoints can be executed by running the evaluation script, which will automatically download the model and perform inference on the test datasets:
 
 ``` bash
 python birdset/eval.py experiment="birdset_neurips24/$EXPERIMENT_PATH"
 ```
 
-If you prefer to start the large-scale trainings and download the data, you can also employ the `XCM` and `XCL` trainings via the experiment YAML files. After training, the best model checkpoint is saved based on the validation loss and can then be used for inference:
+If you want to start the large-scale trainings and download the big training datasets, you can also employ the `XCM` and `XCL` trainings via the experiment YAML files. 
 
 ``` bash
 python birdset/train.py experiment="birdset_neurips24/$EXPERIMENT_PATH"
 ```
+After training, the best model checkpoint is saved based on the validation loss and can then be used for inference:
 
 ``` bash
 python birdset/eval.py experiment="birdset_neurips24/$EXPERIMENT_PATH" module.model.network.local_checkpoint="$CHECKPOINT_PATH"
