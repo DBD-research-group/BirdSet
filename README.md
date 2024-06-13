@@ -36,7 +36,7 @@ First, you have to download the background noise files for augmentations
 python resources/utils/download_background_noise.py
 ```
 
-We provide all experiment YAML files used to generate our results in the `birdset/configs/experiment/birdset_neurips24`. For each dataset, we specify the parameters for each training scenario. We differentiate between three training scenarios: `DT`, `MT`, and `LT`
+We provide all experiment YAML files used to generate our results in the path `birdset/configs/experiment/birdset_neurips24`. For each dataset, we specify the parameters for all training scenario: `DT`, `MT`, and `LT`
 
 ### Dedicated Training (DT)
 
