@@ -22,6 +22,7 @@ logger:
     version: LT_convnext_${seed}_${start_time}
 
 module:
+
   network:
     model:
       local_checkpoint: null #Add the path to your XCL pretraining checkpoint here, if it is saved locally.

@@ -23,7 +23,8 @@ logger:
 
 module:
   optimizer:
-    lr: 1e-5
+    lr: 5e-4
+    weight_decay: 5e-4
   loss:
     _target_: torch.nn.BCEWithLogitsLoss 
   network:
@@ -31,7 +32,7 @@ module:
 
 trainer:
   min_epochs: 1
-  max_epochs: 15
+  max_epochs: 30
 
 datamodule:
   dataset:
