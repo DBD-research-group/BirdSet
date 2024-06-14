@@ -48,12 +48,13 @@ python birdset/train.py experiment="birdset_neurips24/DT/$Model"
 
 ### Medium Training (MT) and Large Training (LT)
 Experiments for training scenarios `MT` and `LT` are harder to reproduce since they require more extensive training times. 
-Additionally, the datasets are quite large (90GB for XCM and 480GB for XCL). Therefore, we provide the best model checkpoints via Hugging Face in the experiment files to avoid the need for retraining.
-These checkpoints can be executed by running the evaluation script, which will automatically download the model and perform inference on the test datasets:
+Additionally, the datasets are quite large (90GB for XCM and 480GB for XCL). Therefore, we provide the best model checkpoints via Hugging Face in the experiment files to avoid the need for retraining. These checkpoints can be executed by running the evaluation script, which will automatically download the model and perform inference on the test datasets:
 
 ``` bash
 python birdset/eval.py experiment="birdset_neurips24/$EXPERIMENT_PATH"
 ```
+
+As the model EAT is not implemented in Hugging Face transformer (yet), the checkpoints are available to download from the tracked experiments on [Weights and Biases LT_XCL_eat](https://wandb.ai/deepbirddetect/birdset/runs/pretrain_eat_3_2024-05-17_075334/files?nw=nwuserraphaelschwinger).
 
 If you want to start the large-scale trainings and download the big training datasets, you can also employ the `XCM` and `XCL` trainings via the experiment YAML files. 
 
