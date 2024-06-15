@@ -30,9 +30,6 @@ module:
     #_target_: birdset.modules.embedding_module.BCEWithLogitsLoss
     #num_classes: ${datamodule.dataset.n_classes}  
     
-  output_activation: 
-    _target_: "torch.sigmoid" # Use sigmoid like Ghani et al
-
 trainer:
   devices: [1]
   min_epochs: 1

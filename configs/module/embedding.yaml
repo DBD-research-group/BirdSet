@@ -37,8 +37,9 @@ metrics:
   num_labels: ${datamodule.dataset.n_classes}
 
 output_activation: 
-  _target_: "torch.sigmoid" # Use sigmoid like Ghani et al
+  _target_: "torch.softmax" # Use sigmoid like Ghani et al
   _partial_: true
+  dim: 1
 
 logging_params:
   _target_: birdset.modules.base_module.LoggingParamsConfig 
