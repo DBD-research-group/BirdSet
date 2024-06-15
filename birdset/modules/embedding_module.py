@@ -10,6 +10,7 @@ from torch.nn.modules.loss import _Loss
 from torch.optim import AdamW, Optimizer
 from functools import partial
 from birdset.modules.models.embedding_abstract import EmbeddingModel
+from torch import nn
 
 @dataclass
 class EmbeddingModuleConfig(NetworkConfig):
@@ -18,23 +19,6 @@ class EmbeddingModuleConfig(NetworkConfig):
 
     """
     model: Union[EmbeddingModel, Module] = None # Model for extracting the embeddings
-
-class BCEWithLogitsLoss(torch.nn.BCEWithLogitsLoss):
-    """
-    Because BCE need one-hot encoding but most metrics don't we use a wrapper here!
-
-    Attributes:
-        num_classes (int): Number of classes in the dataset
-    """
-    def __init__(self, num_classes):
-        super(BCEWithLogitsLoss, self).__init__()
-        self.num_classes = num_classes
-
-    def forward(self, logits, target_labels):
-        # Convert integer labels to one-hot encoding
-        target_one_hot = F.one_hot(target_labels, num_classes=self.num_classes).float()
-        # Call the forward method of the parent class
-        return super().forward(logits, target_one_hot)
 
 class EmbeddingModule(BaseModule):
     """
@@ -81,6 +65,14 @@ class EmbeddingModule(BaseModule):
         )
         print(f"Using "+ embedding_model.model_name+" as the embedding model")
         self.embedding_model = embedding_model.model
+        self.model = nn.Sequential(
+            nn.Linear(embedding_model.embedding_size, 128),
+            nn.ReLU(),
+            nn.Dropout(0.5),
+            nn.Linear(128, 64),
+            nn.ReLU(),
+            nn.Linear(64, 31), # Change nr classes
+        )
 
     # Use the embedding model to get the embeddings and pass them to the classifier model
     def forward(self, *args, **kwargs):
@@ -91,4 +83,3 @@ class EmbeddingModule(BaseModule):
         # Pass embeddings through the classifier to get the final output
         embeddings = embeddings.view(embeddings.size(0), -1) # Transform for the classifier
         return self.model.forward(embeddings)
-

@@ -168,7 +168,7 @@ class BirdNetModel(nn.Module):
         device = input_values.device  # Get the device of the input tensor
 
         # Move the tensor to the CPU and convert it to a NumPy array.
-        input_values = input_values.cpu().numpy()
+        #input_values = input_values.cpu().numpy()
 
         # Get embeddings from the BirdNet model and move to the same device as input_values
         embeddings, logits = self.get_embeddings(input_tensor=input_values)
