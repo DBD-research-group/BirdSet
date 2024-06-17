@@ -4,6 +4,7 @@ model:
   num_classes: null
   num_channels: 1
   pretrained: True
+  pretrain_info: null
 
 model_name: resnet18
 model_type: vision

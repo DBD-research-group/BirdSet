@@ -32,7 +32,8 @@ class ResNetClassifier(nn.Module):
             baseline_architecture: ResNetVersion,
             num_classes: int,
             num_channels: int = 1,
-            pretrained: bool = False,):
+            pretrained: bool = False,
+            **kwargs):
         """
         Constructs all the necessary attributes for the ResNetClassifier object.
 

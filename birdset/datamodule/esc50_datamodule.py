@@ -18,6 +18,10 @@ class ESC50DataModule(BaseDataModuleHF):
             transforms=transforms,
         )
 
+    @property
+    def num_classes(self):
+        return 50
+    
     def _preprocess_data(self, dataset):
         dataset = dataset.cast_column(
             column="audio",

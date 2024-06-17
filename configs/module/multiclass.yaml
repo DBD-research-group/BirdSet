@@ -17,7 +17,7 @@ loss:
   _target_: torch.nn.CrossEntropyLoss
 
 metrics:
-  _target_: birdset.modules.metrics.multiclass.MulticlassMetricsConfig
+  _target_: birdset.configs.module_configs.MulticlassMetricsConfig
   num_labels: ${datamodule.dataset.n_classes}
   
 
