@@ -1,6 +1,7 @@
 import numpy as np
 import warnings
 
+
 class XCEventMapping:
     """
     Extracts all event_cluster into individual rows, should be used as mapping
@@ -26,19 +27,19 @@ class XCEventMapping:
     def __call__(self, batch):
         # create new batch to fill: dict with name and then fill with list
         new_batch = {key: [] for key in batch.keys()} 
-        new_batch["no_call_events"] = []
-        new_batch["noise_events"] = [] 
+        #new_batch["no_call_events"] = []
+        #new_batch["noise_events"] = []
 
         for b_idx in range(len(batch.get('filepath', []))):
 
             detected_events = np.array(batch["detected_events"][b_idx])
             detected_cluster = np.array(batch["event_cluster"][b_idx])
-            no_call_events = self._no_call_detection(
-                detected_events=detected_events, 
-                file_length=batch["length"][b_idx]
-            ) #!TODO LENGTH CAN BE 0???
+            # no_call_events = self._no_call_detection(
+            #     detected_events=detected_events,
+            #     file_length=batch["length"][b_idx]
+            # ) #!TODO LENGTH CAN BE 0???
 
-            noise_events = detected_events[detected_cluster==-1].tolist()
+            #noise_events = detected_events[detected_cluster==-1].tolist()
 
             # noise cluster not a bird, just if only 1 noise cluster is available
             if not (len(detected_cluster) == 1 and detected_cluster[0] == -1) or len(detected_cluster) > 1:
@@ -64,10 +65,10 @@ class XCEventMapping:
                             new_batch[key].append(detected_events[i])
                         elif key == "event_cluster":
                             new_batch[key].append([(detected_cluster[i])])
-                        elif key == "no_call_events":
-                            new_batch[key].append(no_call_events)
-                        elif key == "noise_events":
-                            new_batch[key].append(noise_events)
+                        # elif key == "no_call_events":
+                        #     new_batch[key].append(no_call_events)
+                        # elif key == "noise_events":
+                        #     new_batch[key].append(noise_events)
                         else:
                             new_batch[key].append(batch[key][b_idx])
                         
@@ -77,10 +78,10 @@ class XCEventMapping:
                         new_batch[key].append(batch["filepath"][b_idx])
                     elif key == "detected_events":
                         new_batch[key].append([0,5])
-                    elif key == "no_call_events":
-                        new_batch[key].append(no_call_events)
-                    elif key == "noise_events":
-                        new_batch[key].append(noise_events)    
+                    # elif key == "no_call_events":
+                    #     new_batch[key].append(no_call_events)
+                    # elif key == "noise_events":
+                    #     new_batch[key].append(noise_events)
                     elif key == "event_cluster":
                         new_batch[key].append(list(detected_cluster))    
                     else:

@@ -1,4 +1,3 @@
-# BirdSet 
 
 [![python](https://img.shields.io/badge/-Python_3.10-blue?logo=python&logoColor=white)](https://github.com/pre-commit/pre-commit)
 <a href="https://pytorch.org/get-started/locally/"><img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-ee4c2c?logo=pytorch&logoColor=white"></a>
@@ -9,19 +8,16 @@
 
 ![logo](https://github.com/DBD-research-group/BirdSet/blob/main/resources/perch/birdsetsymbol.png)
 
-## Get Started
+Deep learning models have emerged as a powerful tool in avian bioacoustics to assess environmental health. To maximize the potential of cost-effective and minimal-invasive passive acoustic monitoring (PAM), models must analyze bird vocalizations across a wide range of species and environmental conditions. However, data fragmentation challenges a evaluation of generalization performance. Therefore, we introduce the $\texttt{BirdSet}$ dataset, comprising approximately 520,000 global bird recordings for training and over 400 hours PAM recordings for testing.
+## User Installation
 
-### Install dependencies
-
-Either with [conda](https://docs.conda.io/en/latest/) and [pip](https://pip.pypa.io/en/stable/).
+The simplest way to install $\texttt{BirdSet}$ is to clone this repository and install it as an editable package using [conda](https://docs.conda.io/en/latest/) and [pip](https://pip.pypa.io/en/stable/):
 ```
 conda create -n birdset python=3.10
 pip install -e .
 ```
 
-### Devcontainer
-
-You can use the [devcontainer](https://code.visualstudio.com/docs/devcontainers/containers) configured as as git submodule:
+You can also use the [devcontainer](https://code.visualstudio.com/docs/devcontainers/containers) configured as as git submodule:
 ```bash
 git submodule update --init --recursive
 ```
@@ -32,8 +28,47 @@ poetry install
 poetry shell
 ```
 
+## Reproduce Neurips2024 Baselines
 
-# Minimal Working Example
+First, you have to download the background noise files for augmentations
+
+``` bash
+python resources/utils/download_background_noise.py
+```
+
+We provide all experiment YAML files used to generate our results in the path `birdset/configs/experiment/birdset_neurips24`. For each dataset, we specify the parameters for all training scenario: `DT`, `MT`, and `LT`
+
+### Dedicated Training (DT)
+
+The experiments for `DT` with the dedicated subset can be easily run with a single line: 
+
+``` bash
+python birdset/train.py experiment="birdset_neurips24/DT/$Model"
+```
+
+### Medium Training (MT) and Large Training (LT)
+Experiments for training scenarios `MT` and `LT` are harder to reproduce since they require more extensive training times. 
+Additionally, the datasets are quite large (90GB for XCM and 480GB for XCL). Therefore, we provide the best model checkpoints via Hugging Face in the experiment files to avoid the need for retraining. These checkpoints can be executed by running the evaluation script, which will automatically download the model and perform inference on the test datasets:
+
+``` bash
+python birdset/eval.py experiment="birdset_neurips24/$EXPERIMENT_PATH"
+```
+
+As the model EAT is not implemented in Hugging Face transformer (yet), the checkpoints are available to download from the tracked experiments on [Weights and Biases LT_XCL_eat](https://wandb.ai/deepbirddetect/birdset/runs/pretrain_eat_3_2024-05-17_075334/files?nw=nwuserraphaelschwinger).
+
+If you want to start the large-scale trainings and download the big training datasets, you can also employ the `XCM` and `XCL` trainings via the experiment YAML files. 
+
+``` bash
+python birdset/train.py experiment="birdset_neurips24/$EXPERIMENT_PATH"
+```
+After training, the best model checkpoint is saved based on the validation loss and can then be used for inference:
+
+``` bash
+python birdset/eval.py experiment="birdset_neurips24/$EXPERIMENT_PATH" module.model.network.local_checkpoint="$CHECKPOINT_PATH"
+```
+
+
+## Example
 
 <!-- ## Log in to Huggingface
 
@@ -103,12 +138,12 @@ model = MultilabelModule(
 
 trainer.fit(model, dm)
 ```
-
+<!---
 ## Results (AUROC)
 | <sub>Title</sub> | <sub>Notes</sub> |<sub>PER</sub> | <sub>NES</sub> | <sub>UHH</sub> | <sub>HSN</sub> | <sub>NBP</sub> | <sub>POW</sub> | <sub>SSW</sub> | <sub>SNE</sub>  | <sub>Overall</sub> | <sub>Code</sub> |
 | :----| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | <sub>**BirdSet: A Multi-Task Benchmark For Classification In Avian Bioacoustics**</sub> | | | | | | | |
-| <sub>**BIRB: A Generalization Benchmark for Information Retrieval in Bioacoustics**</sub> | | | | | | | |  | | | |
+| <sub>**BIRB: A Generalization Benchmark for Information Retrieval in Bioacoustics**</sub> | | | | | | | |  | | | |-->
 ## Logging
 Logs will be written to [Weights&Biases](https://wandb.ai/) by default.
 

@@ -29,7 +29,7 @@ module:
   network:
     torch_compile: False
     model:
-      #local_checkpoint: /home/lrauch/mnt/train/runs/XCM/ast/2024-04-03_133040/callback_checkpoints/last.ckpt
+      local_checkpoint: null #TODO: Add the path to the XCL pretraining checkpoint here.
       #local_checkpoint : /mnt/work/bird2vec/birdset_logs/train/runs/XCM/ast/22024-04-15_111606/callback_checkpoints/last.ckpt
       local_checkpoint: /mnt/work/bird2vec/birdset_logs/train/runs/XCL/ast/22024-05-06_173427_seed2/callback_checkpoints/checkpoint-06.ckpt
 

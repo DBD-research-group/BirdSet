@@ -1,0 +1,66 @@
+# @package _global_
+# package global is necessary!
+defaults:
+  - override /datamodule: NES.yaml
+  - override /module: multilabel.yaml
+  - override /module/network: wav2vec2.yaml
+  - override /callbacks: default.yaml
+  - override /trainer: single_gpu.yaml
+  - override /datamodule/transforms: bird_default_multilabel.yaml
+  - override /paths: default.yaml
+
+tags: ["birdsetMT", "inference"]
+seed: 2
+train: False
+
+logger:
+  wandb:
+    tags: ${tags}
+    group: "MT_NES_wav2vec2"
+    mode: offline
+    #version: test_ws_ #to resume train run # needs to be tested
+
+module:
+  optimizer:
+    lr: 1e-4
+  network:
+    model:
+      local_checkpoint: null #Add the path to your XCM pretraining checkpoint here, if it is saved locally.
+      checkpoint: DBD-research-group/Wav2Vec2-Base-BirdSet-XCM #Add the HuggingFace path to your XCM pretraining checkpoint here if it is uploaded on HuggingFace.
+      pretrain_info:
+        hf_pretrain_name: XCM
+
+trainer:
+  min_epochs: 1
+  max_epochs: 15
+
+callbacks:
+  model_checkpoint:
+    filename: ${module.network.model_name}_${datamodule.dataset.dataset_name}_{epoch:02d}
+    save_last: False
+    save_top_k: 0
+    mode: "min"
+
+datamodule:
+  dataset:
+    val_split: 0.1
+    classlimit: 600
+    eventlimit: 5
+  loaders:
+    train:
+      batch_size: 50
+      shuffle: True
+      num_workers: 16
+      drop_last: True
+      prefetch_factor: 5
+    valid:
+      batch_size: 50
+      num_workers: 16
+    test:
+      batch_size: 50
+      num_workers: 16
+  transforms:
+    preprocessing:
+      normalize_waveform: "instance_normalization"
+      use_spectrogram: False
+
