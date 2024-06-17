@@ -7,7 +7,7 @@ import tensorflow_hub as hub
 import torch
 from torch import nn
 
-from utils import get_label_to_class_mapping_from_metadata
+#from utils import get_label_to_class_mapping_from_metadata
 from .embedding_abstract import EmbeddingModel
 
 class PerchModel(nn.Module, EmbeddingModel):
