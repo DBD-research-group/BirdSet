@@ -200,15 +200,15 @@ class BaseModule(L.LightningModule):
             prog_bar=True
         )
 
-        # self.valid_metric(preds, targets.int())
-        # self.log(
-        #     f"val/{self.valid_metric.__class__.__name__}",
-        #     self.valid_metric,
-        #     **asdict(self.logging_params),
-        # )
+        self.valid_metric(preds, targets.int())
+        self.log(
+            f"val/{self.valid_metric.__class__.__name__}",
+            self.valid_metric,
+            **asdict(self.logging_params),
+        )
 
-        # self.valid_add_metrics(preds, targets.int())
-        # self.log_dict(self.valid_add_metrics, **asdict(self.logging_params))
+        self.valid_add_metrics(preds, targets.int())
+        self.log_dict(self.valid_add_metrics, **asdict(self.logging_params))
         return {"loss": val_loss, "preds": preds, "targets": targets}
 
     # def on_validation_epoch_end(self):

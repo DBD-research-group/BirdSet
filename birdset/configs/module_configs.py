@@ -4,8 +4,9 @@ from typing import Literal
 from transformers import get_scheduler
 from functools import partial
 from torchmetrics import AUROC, Accuracy, F1Score, Metric, MaxMetric, MetricCollection
+from torchmetrics.classification import MulticlassAUROC, MulticlassCalibrationError, MulticlassAveragePrecision
 
-from birdset.modules.metrics.multilabel import TopKAccuracy, cmAP, cmAP5, mAP, pcmAP
+from birdset.modules.metrics.multilabel import  TopKAccuracy, cmAP, cmAP5, mAP, pcmAP
 from birdset.modules.models.efficientnet import EfficientNetClassifier
 
 
@@ -107,6 +108,21 @@ class MulticlassMetricsConfig:
                 task="multiclass",
                 num_classes=num_labels,
             ),
+            'MulticlassAUROC': MulticlassAUROC(
+                num_classes=num_labels,
+                average='macro',
+                thresholds=None
+            ),
+            'ECE': MulticlassCalibrationError(
+                num_classes=num_labels,
+                n_bins=10,
+                norm='l1'
+            ),
+            'MulticlassAUPR': MulticlassAveragePrecision(
+                num_classes=num_labels,
+                average='macro',
+                thresholds=None
+            )
         })
         self.eval_complete: MetricCollection = MetricCollection({
             'acc': Accuracy(
