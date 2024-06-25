@@ -13,9 +13,8 @@ dataset:
   hf_path: DBD-research-group/BirdSet
   hf_name: XCM
   seed: ${seed}
-  n_classes: 411
-  n_workers: 1
-  val_split: 0.05
+  n_workers: 5
+  val_split: null
   task: ${module.task}
   subset: null
   sampling_rate: ${module.network.sampling_rate}
@@ -23,6 +22,7 @@ dataset:
   class_weights_sampler: null
   classlimit: 500
   eventlimit: 5
+  direct_fingerprint: null
 
 
 

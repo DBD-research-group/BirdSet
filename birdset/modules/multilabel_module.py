@@ -1,13 +1,15 @@
 from dataclasses import asdict
 import torch
-from .base_module import BaseModule, NetworkConfig, LRSchedulerConfig, LoggingParamsConfig
-from birdset.modules.metrics.multilabel import MultilabelMetricsConfig
 import wandb
 from typing import Callable, Literal, Type, Optional
 from torch.nn import BCEWithLogitsLoss
 from torch.nn.modules.loss import _Loss
 from torch.optim import AdamW, Optimizer
 from functools import partial
+
+from .base_module import BaseModule
+from birdset.configs import NetworkConfig, LRSchedulerConfig, MultilabelMetricsConfig, LoggingParamsConfig
+
 
 class MultilabelModule(BaseModule):
     """
@@ -41,7 +43,7 @@ class MultilabelModule(BaseModule):
         self.prediction_table = prediction_table
 
         super().__init__(
-            network = network,
+            network=network,
             output_activation=output_activation,
             loss=loss,
             optimizer=optimizer,
@@ -82,8 +84,7 @@ class MultilabelModule(BaseModule):
         self.log_dict(self.test_add_metrics, **asdict(self.logging_params))
 
         return {"loss": test_loss, "preds": preds, "targets": targets}
-    
-    
+
     def on_test_epoch_end(self):
         test_targets = torch.cat(self.test_targets).int()
         test_preds = torch.cat(self.test_preds)
@@ -100,7 +101,6 @@ class MultilabelModule(BaseModule):
 
         if self.prediction_table:
             self._wandb_prediction_table(test_preds, test_targets)
-
 
     def _wandb_prediction_table(self, preds, targets):
         top5_values_preds, top5_indices_preds = preds.topk(dim=1, k=5, sorted=True)

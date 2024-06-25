@@ -1,10 +1,11 @@
 import os 
 import hydra
 import lightning as L 
-from omegaconf import OmegaConf
+from omegaconf import OmegaConf, open_dict
 import json
 from birdset import utils
-import pyrootutils 
+import pyrootutils
+from pathlib import Path
 
 log = utils.get_pylogger(__name__)
 
@@ -48,7 +49,9 @@ def train(cfg):
 
     # Setup logger
     log.info(f"Instantiate logger")
-    logger = utils.instantiate_loggers(cfg.get("logger")) 
+    logger = utils.instantiate_loggers(cfg.get("logger"))
+    # override standard TF logger to handle rare logger error
+    # logger.append(utils.TBLogger(Path(cfg.paths.log_dir)))
 
     # Setup callbacks
     log.info(f"Instantiate callbacks")
@@ -57,14 +60,18 @@ def train(cfg):
     # Training
     log.info(f"Instantiate trainer <{cfg.trainer._target_}>")
     trainer = hydra.utils.instantiate(
-        cfg.trainer, callbacks= callbacks, logger=logger
+        cfg.trainer, callbacks=callbacks, logger=logger
     )
 
     # Setup model 
-    log.info(f"Instantiate model <{cfg.module.network.model._target_}>")     
+    log.info(f"Instantiate model <{cfg.module.network.model._target_}>")
+    with open_dict(cfg):
+        cfg.module.metrics["num_labels"] = datamodule.num_classes
+        cfg.module.network.model["num_classes"] = datamodule.num_classes # TODO not the correct classes when masking in valid/test only
+
     model = hydra.utils.instantiate(
         cfg.module,
-        num_epochs=cfg.trainer.max_epochs, #?
+        num_epochs=cfg.trainer.max_epochs,
         len_trainset=datamodule.len_trainset,
         batch_size=datamodule.loaders_config.train.batch_size,
         pretrain_info=cfg.module.network.model.pretrain_info

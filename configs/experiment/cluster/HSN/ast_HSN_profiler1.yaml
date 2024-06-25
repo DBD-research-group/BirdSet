@@ -18,7 +18,7 @@ test: True
 logger:
   wandb:
     tags: ${tags}
-    group: "HSN_train_ast"
+    group: "HSN_train_ast_profiler"
     mode: online
     #version: pretraineatxcm_2 #to resume train run # needs to be tested
 
@@ -34,7 +34,7 @@ module:
 trainer:
   min_epochs: 1
   max_epochs: 1
-  profiler: "simple"
+  profiler: "pytorch"
 
 datamodule:
   dataset:
@@ -45,7 +45,8 @@ datamodule:
     eventlimit: 3
   transforms:
     preprocessing:
-      normalize_waveform: instance_normalization
+      resizer:
+        target_width: 1_024
 
   loaders:
     train:
