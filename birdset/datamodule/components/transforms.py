@@ -450,21 +450,32 @@ class BirdSetTransformsWrapper(BaseTransforms):
             self.nocall_sampler = None
         return
     
-class EmbeddingTransforms(BaseTransforms):
-    def __init__(self, task: Literal['multiclass', 'multilabel'] = "multiclass", sampling_rate: int = 3200, max_length: int = 5, decoding: EventDecoding | None = None, feature_extractor: DefaultFeatureExtractor | None = None) -> None:
-        super().__init__(task, sampling_rate, max_length, decoding, feature_extractor)
+class EmbeddingTransforms(BirdSetTransformsWrapper):
+    def __init__(self,
+                task: Literal['multiclass', 'multilabel'] = "multilabel",
+                sampling_rate: int = 32000,
+                model_type: Literal['vision', 'waveform'] = "vision",
+                spectrogram_augmentations: DictConfig = DictConfig({}), # TODO: typing is wrong, can also be List of Augmentations
+                waveform_augmentations: DictConfig = DictConfig({}), # TODO: typing is wrong, can also be List of Augmentations
+                decoding: EventDecoding | None = None,
+                feature_extractor: DefaultFeatureExtractor = DefaultFeatureExtractor(),
+                max_length: int = 5,
+                nocall_sampler: NoCallMixer | None = None, 
+                preprocessing: PreprocessingConfig | None = PreprocessingConfig()) -> None:
+        super().__init__(task, sampling_rate, model_type, spectrogram_augmentations, waveform_augmentations, decoding, feature_extractor, max_length, nocall_sampler, preprocessing)
     
-    def _transform(self, batch):
-        embeddings = [embedding for embedding in batch["embeddings"]]
+    
+    def _get_waveform_batch(self, batch):
+        waveform_batch = [audio["array"] for audio in batch["audio"]]
+        # extract/pad/truncate
+        # max_length determains the difference with input waveforms as factor 5 (embedding)
+        max_length = int(int(self.sampling_rate) * int(self.max_length)) #!TODO: how to determine 5s
+        waveform_batch = self.feature_extractor(
+            waveform_batch,
+            padding='max_length',
+            max_length=max_length, 
+            truncation=True,
+            return_attention_mask=True
+        )
         
-        embeddings = torch.tensor(embeddings)
-        
-        if self.task == "multiclass":
-            labels = batch["labels"]
-        
-        else:
-            # self.task == "multilabel"
-            # datatype of labels must be float32 to support BCEWithLogitsLoss
-            labels = torch.tensor(batch["labels"], dtype=torch.float32)
-
-        return {"input_values": embeddings, "labels": labels}
+        return waveform_batch
