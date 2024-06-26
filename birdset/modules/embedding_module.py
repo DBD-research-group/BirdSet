@@ -65,14 +65,6 @@ class EmbeddingModule(BaseModule):
         )
         print(f"Using "+ embedding_model.model_name+" as the embedding model")
         self.embedding_model = embedding_model.model
-        self.model = nn.Sequential(
-            nn.Linear(embedding_model.embedding_size, 128),
-            nn.ReLU(),
-            nn.Dropout(0.5),
-            nn.Linear(128, 64),
-            nn.ReLU(),
-            nn.Linear(64, 31), # Change nr classes
-        )
 
     # Use the embedding model to get the embeddings and pass them to the classifier model
     def forward(self, *args, **kwargs):
