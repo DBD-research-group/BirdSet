@@ -1,7 +1,9 @@
 from birdset.datamodule.components.transforms import BirdSetTransformsWrapper
 from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
-from datasets import load_dataset, IterableDataset, IterableDatasetDict, DatasetDict, Audio, Dataset
+from datasets import load_dataset, IterableDataset, IterableDatasetDict, DatasetDict, Audio, Dataset, concatenate_datasets
+from collections import defaultdict
 import logging
+import random
 from birdset.utils import pylogger
 log = pylogger.get_pylogger(__name__)
 
@@ -13,7 +15,8 @@ class BEANSDataModule(BaseDataModuleHF):
             dataset: DatasetConfig = DatasetConfig(),
             loaders: LoadersConfig = LoadersConfig(),
             transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
-            mapper: None = None
+            mapper: None = None,
+            k_samples: int = 0
     ):
         super().__init__(
             dataset=dataset,
@@ -21,11 +24,53 @@ class BEANSDataModule(BaseDataModuleHF):
             transforms=transforms,
             mapper=mapper
         )
+        self.k_samples = k_samples
 
     def _preprocess_data(self, dataset):
         """
-        Preprocess the data. If multilabel is the task we will one hot encode.
+        Preprocess the data. If multilabel is the task we will one hot encode. Use k_samples > 0 if you want control over amount of samples per class. The rest is used for validation and testing.
         """
+
+        if self.k_samples > 0:
+            merged_data = concatenate_datasets([dataset['train'], dataset['valid'], dataset['test']])
+
+            # Shuffle the merged data
+            merged_data.shuffle()
+            
+            # Create a dictionary to store the selected samples per class
+            selected_samples = defaultdict(list)
+            rest_samples = []
+            # Iterate over the merged data and select the desired number of samples per class
+            for sample in merged_data:
+                label = sample['labels']
+                if len(selected_samples[label]) < self.k_samples:
+                    selected_samples[label].append(sample)
+                else:
+                    rest_samples.append(sample)    
+
+            # Flatten the selected samples into a single list
+            selected_samples = [sample for samples in selected_samples.values() for sample in samples]
+
+            # Split the selected samples into training, validation, and testing sets
+            test_ratio = 0.5
+
+            num_samples = len(rest_samples)
+            num_test_samples = int(test_ratio * num_samples)
+
+            train_data = selected_samples
+            test_data = rest_samples[:num_test_samples]
+            val_data = rest_samples[num_test_samples:]
+            
+            train_data = Dataset.from_dict({key: [sample[key] for sample in train_data] for key in train_data[0]})
+            test_data = Dataset.from_dict({key: [sample[key] for sample in test_data] for key in test_data[0]})
+            val_data = Dataset.from_dict({key: [sample[key] for sample in val_data] for key in val_data[0]})
+
+            # Combine into a DatasetDict
+            dataset = DatasetDict({
+                'train': train_data,
+                'valid': val_data,
+                'test': test_data
+            })
 
         if self.dataset_config.task == 'multilabel':
             log.info(">> One-hot-encode classes")
