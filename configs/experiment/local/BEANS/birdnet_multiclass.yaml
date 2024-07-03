@@ -8,7 +8,7 @@ defaults:
   - override /trainer: single_gpu.yaml
   - override /paths: default.yaml
   - override /hydra: default.yaml
-  - override /datamodule/transforms: bird_default_multiclass.yaml # Here the audio is transformed to a spectrogram
+  - override /datamodule/transforms: bird_default_multiclass.yaml # embedding_transform.yaml # Here the audio is transformed to a spectrogram
   - override /datamodule/transforms/waveform_augmentations: none.yaml # No augmentations for now
   - override /datamodule/transforms/spectrogram_augmentations: none.yaml
 
@@ -31,8 +31,8 @@ module:
     #_target_: birdset.modules.embedding_module.BCEWithLogitsLoss
     #num_classes: ${datamodule.dataset.n_classes}  
     
-  output_activation: 
-    _target_: "torch.sigmoid" # Use sigmoid like Ghani et al
+  #output_activation: 
+    #_target_: "torch.sigmoid" # Use sigmoid like Ghani et al
 
 trainer:
   devices: [0]
@@ -40,6 +40,9 @@ trainer:
   max_epochs: 20
 
 datamodule:
+  transforms:
+    max_length: 3
+
   dataset:
     dataset_name: beans_bats
     hf_path: DBD-research-group/beans_bats

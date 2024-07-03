@@ -7,8 +7,11 @@ from omegaconf import DictConfig
 from birdset.datamodule.components.feature_extraction import DefaultFeatureExtractor
 from birdset.datamodule.components.event_decoding import EventDecoding
 from birdset.datamodule.components.augmentations import Compose, NoCallMixer, PowerToDB
+from birdset.modules.models.embedding_abstract import EmbeddingModel
+from birdset.modules.embedding_module import EmbeddingModuleConfig
 
 import torch
+import torchaudio
 
 from birdset.datamodule.components.resize import Resizer
 import torch_audiomentations
@@ -455,6 +458,7 @@ class EmbeddingTransforms(BirdSetTransformsWrapper):
                 task: Literal['multiclass', 'multilabel'] = "multilabel",
                 sampling_rate: int = 32000,
                 model_type: Literal['vision', 'waveform'] = "vision",
+                embedding_model: EmbeddingModuleConfig = EmbeddingModuleConfig(), # Model for extracting the embeddings
                 spectrogram_augmentations: DictConfig = DictConfig({}), # TODO: typing is wrong, can also be List of Augmentations
                 waveform_augmentations: DictConfig = DictConfig({}), # TODO: typing is wrong, can also be List of Augmentations
                 decoding: EventDecoding | None = None,
@@ -463,9 +467,19 @@ class EmbeddingTransforms(BirdSetTransformsWrapper):
                 nocall_sampler: NoCallMixer | None = None, 
                 preprocessing: PreprocessingConfig | None = PreprocessingConfig()) -> None:
         super().__init__(task, sampling_rate, model_type, spectrogram_augmentations, waveform_augmentations, decoding, feature_extractor, max_length, nocall_sampler, preprocessing)
+        self.embedding_model = embedding_model.model
     
     
     def _get_waveform_batch(self, batch):
+        print(torch.cuda.is_available())
+        embeddings_waveform_batch = []
+        for audio in batch["audio"]:
+            embedding = self._get_embedding(audio, audio['sampling_rate'])
+            embeddings_waveform_batch.append(embedding)
+        
+        return embeddings_waveform_batch
+        
+        
         waveform_batch = [audio["array"] for audio in batch["audio"]]
         # extract/pad/truncate
         # max_length determains the difference with input waveforms as factor 5 (embedding)
@@ -479,3 +493,56 @@ class EmbeddingTransforms(BirdSetTransformsWrapper):
         )
         
         return waveform_batch
+    
+    def _get_embedding(self, audio, dataset_sampling_rate):
+        # Get waveform and sampling rate
+        waveform = torch.tensor(audio['array'], dtype=torch.float32)
+        #dataset_sampling_rate = audio['sampling_rate']
+        # Resample audio
+        audio = self._resample_audio(waveform, dataset_sampling_rate)
+        
+        # Zero-padding
+        audio = self._zero_pad(waveform)
+
+        # Check if audio is too long 
+        if waveform.shape[0] > self.max_length * self.sampling_rate:
+            return self._frame_and_average(waveform)    
+        else:
+            return self.embedding_model.get_embeddings(audio)[0] # To just use embeddings not logits
+
+    # Resample function
+    def _resample_audio(self, audio, orig_sr):
+        resampler = torchaudio.transforms.Resample(orig_freq=orig_sr, new_freq=self.sampling_rate)
+        return resampler(audio)
+
+    # Zero-padding function
+    def _zero_pad(self, audio):
+        desired_num_samples = self.max_length * self.sampling_rate 
+        current_num_samples = audio.shape[0]
+        padding = desired_num_samples - current_num_samples
+        if padding > 0:
+            #print('padding')
+            pad_left = padding // 2
+            pad_right = padding - pad_left
+            audio = torch.nn.functional.pad(audio, (pad_left, pad_right))
+        return audio
+
+    # Average multiple embeddings function
+    def _frame_and_average(self, audio):
+        # Frame the audio
+        frame_size = self.max_length * self.sampling_rate
+        hop_size = self.max_length * self.sampling_rate
+        frames = audio.unfold(0, frame_size, hop_size)
+        
+        # Generate embeddings for each frame
+        l = []
+        for frame in frames:
+            embedding = self.embedding_model.get_embeddings(frame) 
+            l.append(embedding[0]) # To just use embeddings not logits
+        
+        embeddings = torch.stack(tuple(l))
+        
+        # Average the embeddings
+        averaged_embedding = embeddings.mean(dim=0)
+        
+        return averaged_embedding
