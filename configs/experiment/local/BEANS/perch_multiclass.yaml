@@ -56,10 +56,6 @@ datamodule:
       batch_size: 32
       num_workers: 16
       shuffle: False
-
-  mapper: 
-    biggest_cluster: True
-    no_call: False
   
 callbacks:
   model_checkpoint:

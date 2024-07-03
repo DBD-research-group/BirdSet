@@ -13,13 +13,11 @@ class BEANSDataModule(BaseDataModuleHF):
             dataset: DatasetConfig = DatasetConfig(),
             loaders: LoadersConfig = LoadersConfig(),
             transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
-            mapper: None = None
     ):
         super().__init__(
             dataset=dataset,
             loaders=loaders,
-            transforms=transforms,
-            mapper=mapper
+            transforms=transforms
         )
 
     def _preprocess_data(self, dataset):

@@ -2,8 +2,7 @@ import torch
 import torch.nn.functional as F
 from dataclasses import dataclass
 from birdset.modules.base_module import BaseModule, NetworkConfig, LRSchedulerConfig, LoggingParamsConfig
-from birdset.modules.metrics.multiclass import MulticlassMetricsConfig
-from birdset.modules.metrics.multilabel import MultilabelMetricsConfig
+from birdset.configs.module_configs import MulticlassMetricsConfig, MultilabelMetricsConfig
 from typing import Callable, Literal, Type, Optional, Union
 from torch.nn import Module, CrossEntropyLoss
 from torch.nn.modules.loss import _Loss
@@ -65,14 +64,7 @@ class EmbeddingModule(BaseModule):
         )
         print(f"Using "+ embedding_model.model_name+" as the embedding model")
         self.embedding_model = embedding_model.model
-        self.model = nn.Sequential(
-            nn.Linear(embedding_model.embedding_size, 128),
-            nn.ReLU(),
-            nn.Dropout(0.5),
-            nn.Linear(128, 64),
-            nn.ReLU(),
-            nn.Linear(64, 31), # Change nr classes
-        )
+        self.model = self.network
 
     # Use the embedding model to get the embeddings and pass them to the classifier model
     def forward(self, *args, **kwargs):
