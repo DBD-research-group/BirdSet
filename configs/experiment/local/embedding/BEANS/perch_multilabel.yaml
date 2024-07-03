@@ -7,11 +7,11 @@ defaults:
   - override /trainer: single_gpu.yaml
   - override /paths: default.yaml
   - override /hydra: default.yaml
-  - override /datamodule/transforms: bird_default_multiclass.yaml # Here the audio is transformed to a spectrogram
+  - override /datamodule/transforms: bird_default_multilabel.yaml # Here the audio is transformed to a spectrogram
   - override /datamodule/transforms/waveform_augmentations: none.yaml # No augmentations for now
   - override /datamodule/transforms/spectrogram_augmentations: none.yaml
 
-tags: ["BEANS", "Ghani", "embeddings", "perch", "multiclass"]
+tags: ["BEANS", "Ghani", "embeddings", "perch", "multilabel"]
 seed: 2
 train: True
 test: True
@@ -23,17 +23,26 @@ logger:
     mode: online
 
 module:
+  embedding_model:  # This is needed to provide num_classes to the classifier model
+    model:
+      num_classes: ${datamodule.dataset.n_classes} 
+  task: multilabel
   optimizer:
     lr: 1e-5
-  
-  #loss:
-    #_target_: birdset.modules.embedding_module.BCEWithLogitsLoss
-    #num_classes: ${datamodule.dataset.n_classes}  
-    
+  loss:
+    _target_: torch.nn.BCEWithLogitsLoss  
+
+  metrics:
+    _target_: birdset.configs.module_configs.MultilabelMetricsConfig
+    num_labels: ${datamodule.dataset.n_classes}
+
+  output_activation: 
+    _target_: "torch.sigmoid" # Use sigmoid like Ghani et al
+
 trainer:
   devices: [1]
   min_epochs: 1
-  max_epochs: 30
+  max_epochs: 20
 
 datamodule:
   dataset:
@@ -56,10 +65,9 @@ datamodule:
       batch_size: 32
       num_workers: 16
       shuffle: False
-  
+
 callbacks:
   model_checkpoint:
     save_last: True
     every_n_epochs: 3
-    monitor: "val/CrossEntropyLoss"
-
+    monitor: "val/BCEWithLogitsLoss"

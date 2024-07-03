@@ -20,6 +20,7 @@ class BirdNetModel(nn.Module):
         restrict_logits: bool = False,
         label_path: Optional[str] = None,
         pretrain_info: Optional[Dict] = None,
+        gpu_to_use: int = 0
     ) -> None:
         """
         Initialize the BirdNetModel.
@@ -39,6 +40,7 @@ class BirdNetModel(nn.Module):
         self.train_classifier = train_classifier
         self.restrict_logits = restrict_logits
         self.label_path = label_path
+        self.gpu_to_use = gpu_to_use
 
         if pretrain_info:
             self.hf_path = pretrain_info["hf_path"]
@@ -67,7 +69,9 @@ class BirdNetModel(nn.Module):
         Load the model from TensorFlow Hub.
         """
         physical_devices = tf.config.list_physical_devices("GPU")
-        tf.config.experimental.set_memory_growth(physical_devices[0], True)
+        tf.config.experimental.set_visible_devices(physical_devices[self.gpu_to_use], 'GPU')
+        tf.config.experimental.set_memory_growth(physical_devices[self.gpu_to_use], True)
+
         tf.config.optimizer.set_jit(True)
         self.model = tf.saved_model.load(self.model_path)  # Load the BirdNet model
 
@@ -174,6 +178,10 @@ class BirdNetModel(nn.Module):
         max_length = 144000  # 3 seconds at 48kHz
         overlap_length = 48000  # 1 second overlap
 
+        device = input_tensor.device # Get the device of the input tensor 
+        input_tensor = input_tensor.cpu().numpy()  # Move the tensor to the CPU and convert it to a NumPy array.
+
+        
         # Check if input_tensor is longer than 3 seconds
         # TODO: Must be able to handle different audio lengths flexibly, currently only 5 second audios are supported!
         if input_tensor.shape[1] > max_length:
@@ -199,6 +207,8 @@ class BirdNetModel(nn.Module):
                 torch.from_numpy(output["embeddings"].numpy()) for output in outputs
             ]
             embeddings = torch.mean(torch.stack(embeddings_list), dim=0)
+            embeddings = embeddings.to(device) # Move back to previous device
+            logits = logits.to(device)
         else:
             # Process the single input_tensor as usual
             # Run the model and get the outputs using the optimized TensorFlow function
@@ -207,6 +217,8 @@ class BirdNetModel(nn.Module):
             # Extract embeddings and logits, convert them to PyTorch tensors
             embeddings = torch.from_numpy(outputs["embeddings"].numpy())
             logits = torch.from_numpy(outputs["logits"].numpy())
+            embeddings = embeddings.to(device) # Move back to previous device
+            logits = logits.to(device)
 
         if self.class_mask:
             # Initialize full_logits to a large negative value for penalizing non-present classes

@@ -1,6 +1,6 @@
 model: 
   _target_: birdset.modules.models.perch.PerchModel
-  num_classes: ${datamodule.dataset.n_classes}
+  num_classes: null
   tfhub_version: 4
   train_classifier: True
   restrict_logits: False

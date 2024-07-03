@@ -8,9 +8,8 @@ defaults:
 
 network:
   model:
-    _target_: "torch.nn.Linear"
+    _target_: birdset.modules.models.linear_classifier.LinearClassifier
     in_features: ${module.embedding_model.embedding_size}
-    out_features: ${datamodule.dataset.n_classes}
 
   model_name: ${module.embedding_model.model_name}_embedding # Most values are just taken from embedding model as it is the first part
   model_type: ${module.embedding_model.model_type}

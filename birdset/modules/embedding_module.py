@@ -64,7 +64,6 @@ class EmbeddingModule(BaseModule):
         )
         print(f"Using "+ embedding_model.model_name+" as the embedding model")
         self.embedding_model = embedding_model.model
-        self.model = self.network
 
     # Use the embedding model to get the embeddings and pass them to the classifier model
     def forward(self, *args, **kwargs):

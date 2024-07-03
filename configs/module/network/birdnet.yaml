@@ -1,9 +1,10 @@
 # Should have the correct values from BirdNET Paper
 model: 
   _target_: birdset.modules.models.birdnet.BirdNetModel
-  num_classes: ${datamodule.dataset.n_classes}
+  num_classes: null
   train_classifier: True
   model_path: ${paths.root_dir}/checkpoints/birdnet/BirdNET_GLOBAL_6K_V2.4_Model
+  #gpu_to_use: ${trainer.devices[0]}
 
 model_name: birdnet
 model_type: waveform
