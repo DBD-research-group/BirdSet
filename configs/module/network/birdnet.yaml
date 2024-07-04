@@ -3,7 +3,7 @@ model:
   _target_: birdset.modules.models.birdnet.BirdNetModel
   num_classes: ${datamodule.dataset.n_classes}
   train_classifier: True
-  model_path: ${paths.root_dir}/checkpoints/birdnet/BirdNET_GLOBAL_6K_V2.4_Model
+  model_path: ${paths.root_dir}/models/birdnet/BirdNET_GLOBAL_6K_V2.4_Model
 
 model_name: birdnet
 model_type: waveform

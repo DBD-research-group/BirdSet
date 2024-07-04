@@ -34,7 +34,7 @@ module:
 trainer:
   devices: 1
   min_epochs: 1
-  max_epochs: 20
+  max_epochs: 5
 
 datamodule:
   dataset:

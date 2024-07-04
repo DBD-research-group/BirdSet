@@ -25,7 +25,7 @@ logger:
 
 module:
   optimizer:
-    lr: 1e-2
+    lr: 5e-2
     weight_decay: 5e-4
   
   #loss:
@@ -38,17 +38,17 @@ module:
 trainer:
   devices: [0]
   min_epochs: 1
-  max_epochs: 20
+  max_epochs: 5
 
 datamodule:
   transforms:
     max_length: 3
 
   dataset:
-    dataset_name: beans_bats
-    hf_path: DBD-research-group/beans_bats
+    dataset_name: beans_watkins
+    hf_path: DBD-research-group/beans_watkins
     hf_name: default
-    n_classes: 10
+    n_classes: 31
     
   loaders:
     train:
