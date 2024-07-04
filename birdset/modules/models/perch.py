@@ -96,15 +96,15 @@ class PerchModel(nn.Module, EmbeddingModel):
         """
 
         model_url = f"{self.PERCH_TF_HUB_URL}/{self.tfhub_version}"
-        self.model = hub.load(model_url)
-        with tf.device('/CPU:0'):
-            self.model = hub.load(model_url)
-        #physical_devices = tf.config.list_physical_devices('GPU')
-        #tf.config.experimental.set_visible_devices(physical_devices[self.gpu_to_use], 'GPU')
-        #tf.config.experimental.set_memory_growth(physical_devices[self.gpu_to_use], True)
-
-        #tf.config.optimizer.set_jit(True)
         #self.model = hub.load(model_url)
+        #with tf.device('/CPU:0'):
+            #self.model = hub.load(model_url)
+        physical_devices = tf.config.list_physical_devices('GPU')
+        tf.config.experimental.set_visible_devices(physical_devices[self.gpu_to_use], 'GPU')
+        tf.config.experimental.set_memory_growth(physical_devices[self.gpu_to_use], True)
+
+        tf.config.optimizer.set_jit(True)
+        self.model = hub.load(model_url)
 
         if self.restrict_logits:
             # Load the class list from the CSV file
@@ -179,11 +179,9 @@ class PerchModel(nn.Module, EmbeddingModel):
         input_tensor = input_tensor.cpu().numpy()  # Move the tensor to the CPU and convert it to a NumPy array.
 
         input_tensor = input_tensor.reshape([-1, input_tensor.shape[-1]])
-        print("Test1")
         # Run the model and get the outputs using the optimized TensorFlow function
-        with tf.device('/CPU:0'):
-            outputs = self.run_tf_model(input_tensor=input_tensor)
-        print("Test2")
+        #with tf.device('/CPU:0'):
+        outputs = self.run_tf_model(input_tensor=input_tensor)
         # Extract embeddings and logits, convert them to PyTorch tensors
         embeddings = torch.from_numpy(outputs["output_1"].numpy())
         logits = torch.from_numpy(outputs["output_0"].numpy())

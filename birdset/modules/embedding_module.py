@@ -70,8 +70,8 @@ class EmbeddingModule(BaseModule):
     def forward(self, *args, **kwargs):
         # Get embeddings
         input_values = kwargs['input_values'] # Extract input tensor
-        #embeddings, _ = self.embedding_model.get_embeddings(input_values)
+        embeddings, _ = self.embedding_model.get_embeddings(input_values)
 
         # Pass embeddings through the classifier to get the final output
-        #embeddings = embeddings.view(embeddings.size(0), -1) # Transform for the classifier
-        return self.model.forward(input_values)
+        embeddings = embeddings.view(embeddings.size(0), -1) # Transform for the classifier
+        return self.model.forward(embeddings)

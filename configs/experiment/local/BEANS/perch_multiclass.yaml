@@ -7,7 +7,7 @@ defaults:
   - override /trainer: default.yaml
   - override /paths: default.yaml
   - override /hydra: default.yaml
-  - override /datamodule/transforms: embedding_transform.yaml #bird_default_multiclass.yaml # Here the audio is transformed to a spectrogram
+  - override /datamodule/transforms: bird_default_multiclass.yaml #bird_default_multiclass.yaml # Here the audio is transformed to a spectrogram
   - override /datamodule/transforms/waveform_augmentations: none.yaml # No augmentations for now
   - override /datamodule/transforms/spectrogram_augmentations: none.yaml
 
@@ -24,7 +24,8 @@ logger:
 
 module:
   optimizer:
-    lr: 1e-5
+    lr: 5e-4
+    weight_decay: 5e-4
   
   #loss:
     #_target_: birdset.modules.embedding_module.BCEWithLogitsLoss
