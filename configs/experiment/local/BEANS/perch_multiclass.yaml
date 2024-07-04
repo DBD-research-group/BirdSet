@@ -24,7 +24,7 @@ logger:
 
 module:
   optimizer:
-    lr: 5e-4
+    lr: 5e-2
     weight_decay: 5e-4
   
   #loss:
@@ -34,7 +34,7 @@ module:
 trainer:
   devices: 1
   min_epochs: 1
-  max_epochs: 30
+  max_epochs: 20
 
 datamodule:
   dataset:
