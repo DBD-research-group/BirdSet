@@ -236,7 +236,11 @@ class BaseModule(L.LightningModule):
             self.test_metric,
             **asdict(self.logging_params),
         )
-        self.test_add_metrics(preds, targets) # Removed int here
+        if self.task == "multiclass":
+            self.test_add_metrics(preds, targets)
+        else:    
+            self.test_add_metrics(preds, targets.int())
+            
         self.log_dict(self.test_add_metrics, **asdict(self.logging_params))
         return {"loss": test_loss, "preds": preds, "targets": targets}
 
