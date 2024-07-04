@@ -22,7 +22,8 @@ output/*
 data_birdset/*
 data_gadme/*
 data_birdset
-models
+/models/
+/!**/models/
 notebooks/dev/*
 dataset_/*
 
