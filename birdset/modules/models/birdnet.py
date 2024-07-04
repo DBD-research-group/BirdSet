@@ -180,7 +180,7 @@ class BirdNetModel(nn.Module):
 
         device = input_tensor.device # Get the device of the input tensor 
         input_tensor = input_tensor.cpu().numpy()  # Move the tensor to the CPU and convert it to a NumPy array.
-
+        input_tensor = input_tensor.reshape([-1, input_tensor.shape[-1]])
         
         # Check if input_tensor is longer than 3 seconds
         # TODO: Must be able to handle different audio lengths flexibly, currently only 5 second audios are supported!

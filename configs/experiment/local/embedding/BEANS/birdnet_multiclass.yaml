@@ -33,9 +33,6 @@ module:
   #loss:
     #_target_: birdset.modules.embedding_module.BCEWithLogitsLoss
     #num_classes: ${datamodule.dataset.n_classes}  
-    
-  output_activation: 
-    _target_: "torch.sigmoid" # Use sigmoid like Ghani et al
 
 trainer:
   devices: [0]
@@ -43,11 +40,13 @@ trainer:
   max_epochs: 20
 
 datamodule:
+  transforms:
+    max_length: 3
   dataset:
-    dataset_name: beans_bats
-    hf_path: DBD-research-group/beans_bats
+    dataset_name: beans_watkins
+    hf_path: DBD-research-group/beans_watkins
     hf_name: default
-    n_classes: 10
+    n_classes: 31
     
   loaders:
     train:
