@@ -28,16 +28,17 @@ module:
     model:
       num_classes: ${datamodule.dataset.n_classes} 
   optimizer:
-    lr: 1e-5
+    lr: 1e-2
+    weight_decay: 5e-4
   
   #loss:
     #_target_: birdset.modules.embedding_module.BCEWithLogitsLoss
     #num_classes: ${datamodule.dataset.n_classes}  
 
 trainer:
-  devices: [0]
+  devices: [1]
   min_epochs: 1
-  max_epochs: 20
+  max_epochs: 50
 
 datamodule:
   transforms:
