@@ -151,9 +151,9 @@ Data transformations are referred to data transformations that are applied to th
 
 
 ## Running Linear Probing Experiments
-Foundation Models are tested on the Benchmark of Animal Sounds (BEANS) which we host on [Huggingface](https://huggingface.co/collections/DBD-research-group/beans-datasets-6611bd670cd7eb7b0bfc614e) and we focus on the classification datasets (watkins bats, cbi, dogs & humbugdb). Using the [beans.sh](scripts/beans.sh) script you can specify one or multiple experiment Paths to execute linear probing on all the BEANS datasets. 
+Foundation Models are tested on the Benchmark of Animal Sounds (BEANS) which we host on [Huggingface](https://huggingface.co/collections/DBD-research-group/beans-datasets-6611bd670cd7eb7b0bfc614e) and we focus on the classification datasets (watkins bats, cbi, dogs & humbugdb). Using the [beans.sh](scripts/beans.sh) script you can specify one or multiple experiment Paths to execute linear probing on all the BEANS datasets:
 
-`$./scripts/beans.sh embedding/BEANS/perch.yaml`
+`$./scripts/beans.sh embedding/BEANS/perch.yaml [additional experiments]`
 
 Currently the available embedding experiments are:
 - [Perch](configs/experiment/local/embedding/BEANS/perch.yaml)
