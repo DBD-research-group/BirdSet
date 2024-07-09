@@ -5,8 +5,9 @@ wandb:
   offline: True
   id: null # pass correct id to resume experiment!
   anonymous: null # enable anonymous logging
-  project: "test"
+  project: "BioFoundation"
   log_model: False # upload lightning ckpts
+  entity: "deepbirddetect" 
   group: ""
   tags: []
   job_type: ""

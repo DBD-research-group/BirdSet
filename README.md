@@ -150,5 +150,31 @@ The following steps are performed in `setup`:
 Data transformations are referred to data transformations that are applied to the data during training. They include e.g. augmentations. The transformations are added to the huggingface dataset with [`set_transform`](https://huggingface.co/docs/datasets/main/en/package_reference/main_classes#datasets.Dataset.set_transform).
 
 
+## Running Linear Probing Experiments
+Foundation Models are tested on the Benchmark of Animal Sounds (BEANS) which we host on [Huggingface](https://huggingface.co/collections/DBD-research-group/beans-datasets-6611bd670cd7eb7b0bfc614e) and we focus on the classification datasets (watkins bats, cbi, dogs & humbugdb). Using the [beans.sh](scripts/beans.sh) script you can specify one or multiple experiment Paths to execute linear probing on all the BEANS datasets:
 
+`$./scripts/beans.sh embedding/BEANS/perch.yaml [additional experiments]`
 
+Currently the available embedding experiments are:
+- [Perch](configs/experiment/local/embedding/BEANS/perch.yaml)
+- [BirdNET](configs/experiment/local/embedding/BEANS/birdnet.yaml)
+
+To execute an experiment on a specific dataset you have to change the following lines in the experiment file:
+```yaml
+datamodule:
+  dataset:
+    dataset_name: beans_watkins # Change 
+    hf_path: DBD-research-group/beans_watkins # Change 
+    hf_name: default
+    n_classes: 31 # Change 
+```
+
+|dataset_name|n_classes|
+|------------|---------|
+|beans_watkins|31|
+|beans_bats|10|
+|beans_cbi|264|
+|beans_dogs|10|
+|beans_humbugdb|14|
+
+The classifier can also be changed and right now [this](birdset/modules/models/linear_classifier.py) is used.

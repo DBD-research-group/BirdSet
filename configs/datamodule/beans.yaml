@@ -1,0 +1,30 @@
+#BEANS watkins
+_target_: birdset.datamodule.beans_datamodule.BEANSDataModule
+
+defaults: 
+  - _self_
+  - transforms: bird_default.yaml
+  - loaders: default.yaml
+
+dataset:
+  data_dir: ${paths.dataset_path}
+  dataset_name: beans_watkins # Overwrite these through the experiment config
+  hf_path: DBD-research-group/beans_watkins
+  hf_name: default
+  seed: ${seed}
+  n_classes: 31 # Overwrite through experiment
+  n_workers: 1
+  val_split: null # Split is done in the dataset
+  task: ${module.task}
+  subset: null
+  sampling_rate: ${module.network.sampling_rate}
+  class_weights_loss: null
+  class_weights_sampler: null
+  classlimit: 500
+  eventlimit: 5
+
+
+
+
+
+
