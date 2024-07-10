@@ -1,4 +1,5 @@
-from typing import Dict, Optional, Tuple
+import logging
+from typing import Optional, Tuple
 
 import datasets
 import pandas as pd
@@ -7,8 +8,8 @@ import tensorflow_hub as hub
 import torch
 from torch import nn
 
-#from utils import get_label_to_class_mapping_from_metadata
-from .embedding_abstract import EmbeddingModel
+from birdset.configs import PretrainInfoConfig
+from birdset.modules.models.embedding_abstract import EmbeddingModel
 
 class PerchModel(nn.Module, EmbeddingModel):
     """
@@ -22,7 +23,6 @@ class PerchModel(nn.Module, EmbeddingModel):
         train_classifier (bool): Whether to train a classifier on top of the embeddings.
         restrict_logits (bool): Whether to restrict output logits to target classes only.
         dataset_info_path (Optional[str]): Path to the dataset information file for target class filtering.
-        task (Optional[str]): The type of classification task ('multiclass' or 'multilabel').
         model: The loaded TensorFlow Hub model (loaded dynamically).
         classifier (Optional[nn.Linear]): A linear classifier layer on top of the embeddings.
     """
@@ -38,8 +38,7 @@ class PerchModel(nn.Module, EmbeddingModel):
         train_classifier: bool = False,
         restrict_logits: bool = False,
         label_path: Optional[str] = None,
-        pretrain_info: Optional[Dict] = None,
-        task: Optional[str] = None,
+        pretrain_info: Optional[PretrainInfoConfig] = None,
         gpu_to_use: int = 0,
     ) -> None:
         """
@@ -52,25 +51,24 @@ class PerchModel(nn.Module, EmbeddingModel):
             label_path: Path to a CSV file containing the class information for the Perch model.
             train_classifier: If True, a classifier is added on top of the model embeddings.
             restrict_logits: If True, output logits are restricted to target classes based on dataset info.
-            task: The classification task type ('multiclass' or 'multilabel'), used with `dataset_info_path`.
             pretrain_info: A dictionary containing information about the pretraining of the model.
             gpu_to_use: The GPU index to use for the model.
         """
         super().__init__()
         self.model = None  # Placeholder for the loaded model
         self.class_mask = None
+        self.class_indices = None
 
         self.num_classes = num_classes
         self.tfhub_version = tfhub_version
         self.train_classifier = train_classifier
         self.restrict_logits = restrict_logits
         self.label_path = label_path
-        self.task = task
         self.gpu_to_use = gpu_to_use
 
         if pretrain_info:
-            self.hf_path = pretrain_info["hf_path"]
-            self.hf_name = pretrain_info["hf_name"]
+            self.hf_path = pretrain_info.hf_path
+            self.hf_name = pretrain_info.hf_name
         else:
             self.hf_path = None
             self.hf_name = None
@@ -108,12 +106,36 @@ class PerchModel(nn.Module, EmbeddingModel):
 
         if self.restrict_logits:
             # Load the class list from the CSV file
-            class_mapping_df = pd.read_csv(self.label_path)
-            # Extract the 'ebird2021' column as a numpy array
-            class_mapping = class_mapping_df["ebird2021"].values
-            # Convert the class mapping to a dictionary {index: "label"}
-            self.class_mapping = dict(enumerate(class_mapping))
-            self.target_indices = self.restrict_logits_to_target_classes()
+            pretrain_classlabels = pd.read_csv(self.label_path)
+            # Extract the 'ebird2021' column as a list
+            pretrain_classlabels = pretrain_classlabels["ebird2021"].tolist()
+
+            # Load dataset information
+            dataset_info = datasets.load_dataset_builder(
+                self.hf_path, self.hf_name
+            ).info
+            dataset_classlabels = dataset_info.features["ebird_code"].names
+
+            # Create the class mask
+            self.class_mask = [
+                pretrain_classlabels.index(label)
+                for label in dataset_classlabels
+                if label in pretrain_classlabels
+            ]
+            self.class_indices = [
+                i
+                for i, label in enumerate(dataset_classlabels)
+                if label in pretrain_classlabels
+            ]
+
+            # Log missing labels
+            missing_labels = [
+                label
+                for label in dataset_classlabels
+                if label not in pretrain_classlabels
+            ]
+            if missing_labels:
+                logging.warning(f"Missing labels in pretrained model: {missing_labels}")
 
     @tf.function  # Decorate with tf.function to compile into a callable TensorFlow graph
     def run_tf_model(self, input_tensor: tf.Tensor) -> dict:
@@ -189,5 +211,15 @@ class PerchModel(nn.Module, EmbeddingModel):
         logits = logits.to(device)
         
         if self.class_mask:
-            logits = logits[:, self.class_mask]
+            # Initialize full_logits to a large negative value for penalizing non-present classes
+            full_logits = torch.full(
+                (logits.shape[0], self.num_classes),
+                -10.0,
+                device=logits.device,
+                dtype=logits.dtype,
+            )
+            # Extract valid logits using indices from class_mask and directly place them
+            full_logits[:, self.class_indices] = logits[:, self.class_mask]
+            logits = full_logits
+
         return embeddings, logits

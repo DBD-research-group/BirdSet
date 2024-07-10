@@ -2,8 +2,7 @@ import torch
 import torch.nn.functional as F
 from dataclasses import dataclass
 from birdset.modules.base_module import BaseModule, NetworkConfig, LRSchedulerConfig, LoggingParamsConfig
-from birdset.modules.metrics.multiclass import MulticlassMetricsConfig
-from birdset.modules.metrics.multilabel import MultilabelMetricsConfig
+from birdset.configs.module_configs import MulticlassMetricsConfig, MultilabelMetricsConfig
 from typing import Callable, Literal, Type, Optional, Union
 from torch.nn import Module, CrossEntropyLoss
 from torch.nn.modules.loss import _Loss
@@ -22,7 +21,8 @@ class EmbeddingModuleConfig(NetworkConfig):
 
 class EmbeddingModule(BaseModule):
     """
-    MultilabelModule is a PyTorch Lightning module for multilabel classification tasks.
+    EmbeddingModule is a PyTorch Lightning module for multilabel classification tasks.
+    The Module expects a embedding_model that will be used to extract embeddings and than trains a network with these embeddings as input features.
 
     Attributes:
         model (Network): Model for extracting the embeddings

@@ -1,0 +1,56 @@
+# @package _global_
+defaults:
+  - override /datamodule: XCL.yaml
+  - override /module: multilabel.yaml
+  - override /module/network: efficientnet.yaml
+  - override /callbacks: default.yaml
+  - override /trainer: single_gpu.yaml
+  - override /datamodule/transforms: bird_default_multilabel.yaml
+  - override /paths: default.yaml
+  - override /hydra: default.yaml
+  - override /datamodule/transforms/waveform_augmentations: none.yaml
+  - override /datamodule/transforms/spectrogram_augmentations: none.yaml
+
+tags: ["XCL", "efficientnet", "multilabel"]
+seed: 1
+train: True
+test: False
+
+logger: null
+
+trainer:
+  min_epochs: 1
+  max_epochs: 2
+  limit_val_batches: 0
+  accelerator: "auto"
+
+module:
+  optimizer:
+    _target_: torch.optim.AdamW
+    lr: 5e-4
+    weight_decay: 5e-4
+  network:
+    torch_compile: False
+
+datamodule:
+  dataset:
+    val_split: null
+    class_weights_loss: null
+    class_weights_sampler: null
+    classlimit: 500
+    subset: 2000
+    eventlimit: 1
+    direct_fingerprint: null
+
+  loaders:
+    train:
+      batch_size: 32
+      num_workers: 20
+
+callbacks:
+  model_checkpoint:
+    save_top_k: -1
+    monitor: null
+    save_on_train_epoch_end: True
+    every_n_epochs: 1
+    filename: 'checkpoint-{epoch:02d}'

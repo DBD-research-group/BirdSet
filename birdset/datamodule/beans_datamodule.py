@@ -22,8 +22,7 @@ class BEANSDataModule(BaseDataModuleHF):
         super().__init__(
             dataset=dataset,
             loaders=loaders,
-            transforms=transforms,
-            mapper=mapper
+            transforms=transforms
         )
         self.k_samples = k_samples
         self.id_to_label = defaultdict(str)

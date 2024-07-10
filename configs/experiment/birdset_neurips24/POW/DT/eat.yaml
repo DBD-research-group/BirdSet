@@ -1,0 +1,81 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - override /datamodule: POW.yaml
+  - override /module: multilabel.yaml
+  - override /module/network: eat_soundnet.yaml
+  - override /callbacks: default.yaml
+  - override /trainer: single_gpu.yaml
+  - override /datamodule/transforms: bird_default_multilabel.yaml
+  - override /paths: default.yaml
+  - override /hydra: default.yaml
+tags: ["birdsetDT"]
+seed: 1
+train: True
+test: True
+ 
+logger:
+  wandb:
+    tags: ${tags}
+    group: "DT_POW_eat"
+    mode: online
+    version: eat_${seed}_${start_time} #to resume train run # needs to be tested
+ 
+module:
+  optimizer:
+    lr: 3e-4
+    weight_decay: 1e-5
+  loss:
+  #  _target_: birdset.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
+    _target_: torch.nn.BCEWithLogitsLoss
+  #_target_: birdset.modules.losses.focal_loss.MultiLabelFocalLoss
+  network:
+    torch_compile: False
+    # pretrain_info:
+    #   hf_path: DBD-research-group/BirdSet
+    #   hf_name: SNE
+    #   hf_pretrain_name: null
+ 
+trainer:
+  min_epochs: 1
+  max_epochs: 50
+  devices: [1]
+ 
+datamodule:
+  dataset:
+    val_split: 0.2
+    class_weights_loss: null
+    class_weights_sampler: null
+    classlimit: 600
+    eventlimit: 5
+  transforms:
+    preprocessing:
+        normalize_waveform: instance_normalization
+ 
+ 
+  loaders:
+    train:
+      batch_size: 128
+      shuffle: True
+      num_workers: 16
+      drop_last: True
+      prefetch_factor: 2
+ 
+    valid:
+      batch_size: 128
+      num_workers: 16
+      shuffle: False
+   
+    test:
+      batch_size: 16
+      num_workers: 16
+      shuffle: False
+ 
+  mapper:
+    biggest_cluster: True
+    no_call: False
+ 
+callbacks:
+  model_checkpoint:
+    save_last: True
+    every_n_epochs: 5

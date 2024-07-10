@@ -1,0 +1,2219 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "cr": "http://mlcommons.org/croissant/",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataBiases": "cr:dataBiases",
+    "dataCollection": "cr:dataCollection",
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "dct": "http://purl.org/dc/terms/",
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileProperty": "cr:fileProperty",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "jsonPath": "cr:jsonPath",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "personalSensitiveInformation": "cr:personalSensitiveInformation",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "sc": "https://schema.org/",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "repo",
+      "name": "repo",
+      "description": "The Hugging Face git repository.",
+      "contentUrl": "https://huggingface.co/datasets/DBD-research-group/BirdSet/tree/data",
+      "encodingFormat": "git+https",
+      "sha256": "https://github.com/mlcommons/croissant/issues/80"
+    },
+    {
+      "@type": "cr:FileSet",
+      "@id": "files-for-config-PER",
+      "name": "files-for-config-PER",
+      "description": "PER tar.gz files of audios with corresponding metadata in parquet files",
+      "containedIn": {
+        "@id": "repo"
+      },
+      "encodingFormat": "application/x-tar, application/x-parquet",
+      "includes": "PER/*.{tar.gz,parquet}"
+    },
+    {
+    "@type": "cr:FileSet",
+    "@id": "files-for-config-NES",
+    "name": "files-for-config-NES",
+    "description": "NES tar.gz files of audios with corresponding metadata in parquet files",
+    "containedIn": {
+        "@id": "repo"
+    },
+    "encodingFormat": "application/x-tar, application/x-parquet",
+    "includes": "NES/*.{tar.gz,parquet}"
+},
+    {
+    "@type": "cr:FileSet",
+    "@id": "files-for-config-UHH",
+    "name": "files-for-config-UHH",
+    "description": "UHH tar.gz files of audios with corresponding metadata in parquet files",
+    "containedIn": {
+        "@id": "repo"
+    },
+    "encodingFormat": "application/x-tar, application/x-parquet",
+    "includes": "UHH/*.{tar.gz,parquet}"
+},
+    {
+    "@type": "cr:FileSet",
+    "@id": "files-for-config-HSN",
+    "name": "files-for-config-HSN",
+    "description": "HSN tar.gz files of audios with corresponding metadata in parquet files",
+    "containedIn": {
+        "@id": "repo"
+    },
+    "encodingFormat": "application/x-tar, application/x-parquet",
+    "includes": "HSN/*.{tar.gz,parquet}"
+},
+    {
+    "@type": "cr:FileSet",
+    "@id": "files-for-config-NBP",
+    "name": "files-for-config-NBP",
+    "description": "NBP tar.gz files of audios with corresponding metadata in parquet files",
+    "containedIn": {
+        "@id": "repo"
+    },
+    "encodingFormat": "application/x-tar, application/x-parquet",
+    "includes": "NBP/*.{tar.gz,parquet}"
+},
+    {
+    "@type": "cr:FileSet",
+    "@id": "files-for-config-POW",
+    "name": "files-for-config-POW",
+    "description": "POW tar.gz files of audios with corresponding metadata in parquet files",
+    "containedIn": {
+        "@id": "repo"
+    },
+    "encodingFormat": "application/x-tar, application/x-parquet",
+    "includes": "POW/*.{tar.gz,parquet}"
+},
+    {
+    "@type": "cr:FileSet",
+    "@id": "files-for-config-SSW",
+    "name": "files-for-config-SSW",
+    "description": "SSW tar.gz files of audios with corresponding metadata in parquet files",
+    "containedIn": {
+        "@id": "repo"
+    },
+    "encodingFormat": "application/x-tar, application/x-parquet",
+    "includes": "SSW/*.{tar.gz,parquet}"
+},
+    {
+    "@type": "cr:FileSet",
+    "@id": "files-for-config-SNE",
+    "name": "files-for-config-SNE",
+    "description": "SNE tar.gz files of audios with corresponding metadata in parquet files",
+    "containedIn": {
+        "@id": "repo"
+    },
+    "encodingFormat": "application/x-tar, application/x-parquet",
+    "includes": "SNE/*.{tar.gz,parquet}"
+},
+    {
+    "@type": "cr:FileSet",
+    "@id": "files-for-config-XCM",
+    "name": "files-for-config-XCM",
+    "description": "XCM tar.gz files of audios with corresponding metadata in parquet files",
+    "containedIn": {
+        "@id": "repo"
+    },
+    "encodingFormat": "application/x-tar, application/x-parquet",
+    "includes": "XCM/*.{tar.gz,parquet}"
+},
+    {
+    "@type": "cr:FileSet",
+    "@id": "files-for-config-XCL",
+    "name": "files-for-config-XCL",
+    "description": "XCL tar.gz files of audios with corresponding metadata in parquet files",
+    "containedIn": {
+        "@id": "repo"
+    },
+    "encodingFormat": "application/x-tar, application/x-parquet",
+    "includes": "XCL/*.{tar.gz,parquet}"
+}
+  ],
+  "recordSet": [
+    {
+    "@type": "cr:RecordSet",
+    "@id": "PER",
+    "name": "PER",
+    "description": "DBD-research-group/BirdSet - 'PER' subset\n\nAdditional information:\n- 1 skipped column: filepath",
+    "field": [
+        {
+            "@type": "cr:Field",
+            "@id": "PER/start_time",
+            "name": "PER/start_time",
+            "description": "Column 'start_time' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-PER"
+                },
+                "extract": {
+                    "column": "start_time"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "PER/end_time",
+            "name": "PER/end_time",
+            "description": "Column 'end_time' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-PER"
+                },
+                "extract": {
+                    "column": "end_time"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "PER/low_freq",
+            "name": "PER/low_freq",
+            "description": "Column 'low_freq' from the Hugging Face parquet file.",
+            "dataType": "sc:Integer",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-PER"
+                },
+                "extract": {
+                    "column": "low_freq"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "PER/high_freq",
+            "name": "PER/high_freq",
+            "description": "Column 'high_freq' from the Hugging Face parquet file.",
+            "dataType": "sc:Integer",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-PER"
+                },
+                "extract": {
+                    "column": "high_freq"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "PER/ebird_code",
+            "name": "PER/ebird_code",
+            "description": "Column 'ebird_code' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-PER"
+                },
+                "extract": {
+                    "column": "ebird_code"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "PER/call_type",
+            "name": "PER/call_type",
+            "description": "Column 'call_type' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-PER"
+                },
+                "extract": {
+                    "column": "call_type"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "PER/sex",
+            "name": "PER/sex",
+            "description": "Column 'sex' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-PER"
+                },
+                "extract": {
+                    "column": "sex"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "PER/lat",
+            "name": "PER/lat",
+            "description": "Column 'lat' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-PER"
+                },
+                "extract": {
+                    "column": "lat"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "PER/long",
+            "name": "PER/long",
+            "description": "Column 'long' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-PER"
+                },
+                "extract": {
+                    "column": "long"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "PER/microphone",
+            "name": "PER/microphone",
+            "description": "Column 'microphone' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-PER"
+                },
+                "extract": {
+                    "column": "microphone"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "PER/license",
+            "name": "PER/license",
+            "description": "Column 'license' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-PER"
+                },
+                "extract": {
+                    "column": "license"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "PER/source",
+            "name": "PER/source",
+            "description": "Column 'source' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-PER"
+                },
+                "extract": {
+                    "column": "source"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "PER/local_time",
+            "name": "PER/local_time",
+            "description": "Column 'local_time' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-PER"
+                },
+                "extract": {
+                    "column": "local_time"
+                }
+            }
+        }
+    ]
+},
+    {
+    "@type": "cr:RecordSet",
+    "@id": "NES",
+    "name": "NES",
+    "description": "DBD-research-group/BirdSet - 'NES' subset\n\nAdditional information:\n- 1 skipped column: filepath",
+    "field": [
+        {
+            "@type": "cr:Field",
+            "@id": "NES/start_time",
+            "name": "NES/start_time",
+            "description": "Column 'start_time' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-NES"
+                },
+                "extract": {
+                    "column": "start_time"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "NES/end_time",
+            "name": "NES/end_time",
+            "description": "Column 'end_time' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-NES"
+                },
+                "extract": {
+                    "column": "end_time"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "NES/low_freq",
+            "name": "NES/low_freq",
+            "description": "Column 'low_freq' from the Hugging Face parquet file.",
+            "dataType": "sc:Integer",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-NES"
+                },
+                "extract": {
+                    "column": "low_freq"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "NES/high_freq",
+            "name": "NES/high_freq",
+            "description": "Column 'high_freq' from the Hugging Face parquet file.",
+            "dataType": "sc:Integer",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-NES"
+                },
+                "extract": {
+                    "column": "high_freq"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "NES/ebird_code",
+            "name": "NES/ebird_code",
+            "description": "Column 'ebird_code' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-NES"
+                },
+                "extract": {
+                    "column": "ebird_code"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "NES/call_type",
+            "name": "NES/call_type",
+            "description": "Column 'call_type' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-NES"
+                },
+                "extract": {
+                    "column": "call_type"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "NES/sex",
+            "name": "NES/sex",
+            "description": "Column 'sex' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-NES"
+                },
+                "extract": {
+                    "column": "sex"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "NES/lat",
+            "name": "NES/lat",
+            "description": "Column 'lat' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-NES"
+                },
+                "extract": {
+                    "column": "lat"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "NES/long",
+            "name": "NES/long",
+            "description": "Column 'long' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-NES"
+                },
+                "extract": {
+                    "column": "long"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "NES/microphone",
+            "name": "NES/microphone",
+            "description": "Column 'microphone' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-NES"
+                },
+                "extract": {
+                    "column": "microphone"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "NES/license",
+            "name": "NES/license",
+            "description": "Column 'license' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-NES"
+                },
+                "extract": {
+                    "column": "license"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "NES/source",
+            "name": "NES/source",
+            "description": "Column 'source' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-NES"
+                },
+                "extract": {
+                    "column": "source"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "NES/local_time",
+            "name": "NES/local_time",
+            "description": "Column 'local_time' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-NES"
+                },
+                "extract": {
+                    "column": "local_time"
+                }
+            }
+        }
+    ]
+},
+    {
+    "@type": "cr:RecordSet",
+    "@id": "UHH",
+    "name": "UHH",
+    "description": "DBD-research-group/BirdSet - 'UHH' subset\n\nAdditional information:\n- 1 skipped column: filepath",
+    "field": [
+        {
+            "@type": "cr:Field",
+            "@id": "UHH/start_time",
+            "name": "UHH/start_time",
+            "description": "Column 'start_time' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-UHH"
+                },
+                "extract": {
+                    "column": "start_time"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "UHH/end_time",
+            "name": "UHH/end_time",
+            "description": "Column 'end_time' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-UHH"
+                },
+                "extract": {
+                    "column": "end_time"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "UHH/low_freq",
+            "name": "UHH/low_freq",
+            "description": "Column 'low_freq' from the Hugging Face parquet file.",
+            "dataType": "sc:Integer",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-UHH"
+                },
+                "extract": {
+                    "column": "low_freq"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "UHH/high_freq",
+            "name": "UHH/high_freq",
+            "description": "Column 'high_freq' from the Hugging Face parquet file.",
+            "dataType": "sc:Integer",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-UHH"
+                },
+                "extract": {
+                    "column": "high_freq"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "UHH/ebird_code",
+            "name": "UHH/ebird_code",
+            "description": "Column 'ebird_code' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-UHH"
+                },
+                "extract": {
+                    "column": "ebird_code"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "UHH/call_type",
+            "name": "UHH/call_type",
+            "description": "Column 'call_type' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-UHH"
+                },
+                "extract": {
+                    "column": "call_type"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "UHH/sex",
+            "name": "UHH/sex",
+            "description": "Column 'sex' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-UHH"
+                },
+                "extract": {
+                    "column": "sex"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "UHH/lat",
+            "name": "UHH/lat",
+            "description": "Column 'lat' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-UHH"
+                },
+                "extract": {
+                    "column": "lat"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "UHH/long",
+            "name": "UHH/long",
+            "description": "Column 'long' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-UHH"
+                },
+                "extract": {
+                    "column": "long"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "UHH/microphone",
+            "name": "UHH/microphone",
+            "description": "Column 'microphone' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-UHH"
+                },
+                "extract": {
+                    "column": "microphone"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "UHH/license",
+            "name": "UHH/license",
+            "description": "Column 'license' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-UHH"
+                },
+                "extract": {
+                    "column": "license"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "UHH/source",
+            "name": "UHH/source",
+            "description": "Column 'source' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-UHH"
+                },
+                "extract": {
+                    "column": "source"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "UHH/local_time",
+            "name": "UHH/local_time",
+            "description": "Column 'local_time' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-UHH"
+                },
+                "extract": {
+                    "column": "local_time"
+                }
+            }
+        }
+    ]
+},
+    {
+    "@type": "cr:RecordSet",
+    "@id": "HSN",
+    "name": "HSN",
+    "description": "DBD-research-group/BirdSet - 'HSN' subset\n\nAdditional information:\n- 1 skipped column: filepath",
+    "field": [
+        {
+            "@type": "cr:Field",
+            "@id": "HSN/start_time",
+            "name": "HSN/start_time",
+            "description": "Column 'start_time' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-HSN"
+                },
+                "extract": {
+                    "column": "start_time"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "HSN/end_time",
+            "name": "HSN/end_time",
+            "description": "Column 'end_time' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-HSN"
+                },
+                "extract": {
+                    "column": "end_time"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "HSN/low_freq",
+            "name": "HSN/low_freq",
+            "description": "Column 'low_freq' from the Hugging Face parquet file.",
+            "dataType": "sc:Integer",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-HSN"
+                },
+                "extract": {
+                    "column": "low_freq"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "HSN/high_freq",
+            "name": "HSN/high_freq",
+            "description": "Column 'high_freq' from the Hugging Face parquet file.",
+            "dataType": "sc:Integer",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-HSN"
+                },
+                "extract": {
+                    "column": "high_freq"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "HSN/ebird_code",
+            "name": "HSN/ebird_code",
+            "description": "Column 'ebird_code' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-HSN"
+                },
+                "extract": {
+                    "column": "ebird_code"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "HSN/call_type",
+            "name": "HSN/call_type",
+            "description": "Column 'call_type' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-HSN"
+                },
+                "extract": {
+                    "column": "call_type"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "HSN/sex",
+            "name": "HSN/sex",
+            "description": "Column 'sex' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-HSN"
+                },
+                "extract": {
+                    "column": "sex"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "HSN/lat",
+            "name": "HSN/lat",
+            "description": "Column 'lat' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-HSN"
+                },
+                "extract": {
+                    "column": "lat"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "HSN/long",
+            "name": "HSN/long",
+            "description": "Column 'long' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-HSN"
+                },
+                "extract": {
+                    "column": "long"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "HSN/microphone",
+            "name": "HSN/microphone",
+            "description": "Column 'microphone' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-HSN"
+                },
+                "extract": {
+                    "column": "microphone"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "HSN/license",
+            "name": "HSN/license",
+            "description": "Column 'license' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-HSN"
+                },
+                "extract": {
+                    "column": "license"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "HSN/source",
+            "name": "HSN/source",
+            "description": "Column 'source' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-HSN"
+                },
+                "extract": {
+                    "column": "source"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "HSN/local_time",
+            "name": "HSN/local_time",
+            "description": "Column 'local_time' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-HSN"
+                },
+                "extract": {
+                    "column": "local_time"
+                }
+            }
+        }
+    ]
+},
+    {
+    "@type": "cr:RecordSet",
+    "@id": "NBP",
+    "name": "NBP",
+    "description": "DBD-research-group/BirdSet - 'NBP' subset\n\nAdditional information:\n- 1 skipped column: filepath",
+    "field": [
+        {
+            "@type": "cr:Field",
+            "@id": "NBP/start_time",
+            "name": "NBP/start_time",
+            "description": "Column 'start_time' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-NBP"
+                },
+                "extract": {
+                    "column": "start_time"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "NBP/end_time",
+            "name": "NBP/end_time",
+            "description": "Column 'end_time' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-NBP"
+                },
+                "extract": {
+                    "column": "end_time"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "NBP/low_freq",
+            "name": "NBP/low_freq",
+            "description": "Column 'low_freq' from the Hugging Face parquet file.",
+            "dataType": "sc:Integer",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-NBP"
+                },
+                "extract": {
+                    "column": "low_freq"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "NBP/high_freq",
+            "name": "NBP/high_freq",
+            "description": "Column 'high_freq' from the Hugging Face parquet file.",
+            "dataType": "sc:Integer",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-NBP"
+                },
+                "extract": {
+                    "column": "high_freq"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "NBP/ebird_code",
+            "name": "NBP/ebird_code",
+            "description": "Column 'ebird_code' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-NBP"
+                },
+                "extract": {
+                    "column": "ebird_code"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "NBP/call_type",
+            "name": "NBP/call_type",
+            "description": "Column 'call_type' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-NBP"
+                },
+                "extract": {
+                    "column": "call_type"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "NBP/sex",
+            "name": "NBP/sex",
+            "description": "Column 'sex' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-NBP"
+                },
+                "extract": {
+                    "column": "sex"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "NBP/lat",
+            "name": "NBP/lat",
+            "description": "Column 'lat' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-NBP"
+                },
+                "extract": {
+                    "column": "lat"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "NBP/long",
+            "name": "NBP/long",
+            "description": "Column 'long' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-NBP"
+                },
+                "extract": {
+                    "column": "long"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "NBP/microphone",
+            "name": "NBP/microphone",
+            "description": "Column 'microphone' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-NBP"
+                },
+                "extract": {
+                    "column": "microphone"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "NBP/license",
+            "name": "NBP/license",
+            "description": "Column 'license' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-NBP"
+                },
+                "extract": {
+                    "column": "license"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "NBP/source",
+            "name": "NBP/source",
+            "description": "Column 'source' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-NBP"
+                },
+                "extract": {
+                    "column": "source"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "NBP/local_time",
+            "name": "NBP/local_time",
+            "description": "Column 'local_time' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-NBP"
+                },
+                "extract": {
+                    "column": "local_time"
+                }
+            }
+        }
+    ]
+},
+    {
+    "@type": "cr:RecordSet",
+    "@id": "POW",
+    "name": "POW",
+    "description": "DBD-research-group/BirdSet - 'POW' subset\n\nAdditional information:\n- 1 skipped column: filepath",
+    "field": [
+        {
+            "@type": "cr:Field",
+            "@id": "POW/start_time",
+            "name": "POW/start_time",
+            "description": "Column 'start_time' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-POW"
+                },
+                "extract": {
+                    "column": "start_time"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "POW/end_time",
+            "name": "POW/end_time",
+            "description": "Column 'end_time' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-POW"
+                },
+                "extract": {
+                    "column": "end_time"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "POW/low_freq",
+            "name": "POW/low_freq",
+            "description": "Column 'low_freq' from the Hugging Face parquet file.",
+            "dataType": "sc:Integer",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-POW"
+                },
+                "extract": {
+                    "column": "low_freq"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "POW/high_freq",
+            "name": "POW/high_freq",
+            "description": "Column 'high_freq' from the Hugging Face parquet file.",
+            "dataType": "sc:Integer",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-POW"
+                },
+                "extract": {
+                    "column": "high_freq"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "POW/ebird_code",
+            "name": "POW/ebird_code",
+            "description": "Column 'ebird_code' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-POW"
+                },
+                "extract": {
+                    "column": "ebird_code"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "POW/call_type",
+            "name": "POW/call_type",
+            "description": "Column 'call_type' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-POW"
+                },
+                "extract": {
+                    "column": "call_type"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "POW/sex",
+            "name": "POW/sex",
+            "description": "Column 'sex' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-POW"
+                },
+                "extract": {
+                    "column": "sex"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "POW/lat",
+            "name": "POW/lat",
+            "description": "Column 'lat' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-POW"
+                },
+                "extract": {
+                    "column": "lat"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "POW/long",
+            "name": "POW/long",
+            "description": "Column 'long' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-POW"
+                },
+                "extract": {
+                    "column": "long"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "POW/microphone",
+            "name": "POW/microphone",
+            "description": "Column 'microphone' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-POW"
+                },
+                "extract": {
+                    "column": "microphone"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "POW/license",
+            "name": "POW/license",
+            "description": "Column 'license' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-POW"
+                },
+                "extract": {
+                    "column": "license"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "POW/source",
+            "name": "POW/source",
+            "description": "Column 'source' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-POW"
+                },
+                "extract": {
+                    "column": "source"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "POW/local_time",
+            "name": "POW/local_time",
+            "description": "Column 'local_time' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-POW"
+                },
+                "extract": {
+                    "column": "local_time"
+                }
+            }
+        }
+    ]
+},
+    {
+    "@type": "cr:RecordSet",
+    "@id": "SSW",
+    "name": "SSW",
+    "description": "DBD-research-group/BirdSet - 'SSW' subset\n\nAdditional information:\n- 1 skipped column: filepath",
+    "field": [
+        {
+            "@type": "cr:Field",
+            "@id": "SSW/start_time",
+            "name": "SSW/start_time",
+            "description": "Column 'start_time' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-SSW"
+                },
+                "extract": {
+                    "column": "start_time"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "SSW/end_time",
+            "name": "SSW/end_time",
+            "description": "Column 'end_time' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-SSW"
+                },
+                "extract": {
+                    "column": "end_time"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "SSW/low_freq",
+            "name": "SSW/low_freq",
+            "description": "Column 'low_freq' from the Hugging Face parquet file.",
+            "dataType": "sc:Integer",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-SSW"
+                },
+                "extract": {
+                    "column": "low_freq"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "SSW/high_freq",
+            "name": "SSW/high_freq",
+            "description": "Column 'high_freq' from the Hugging Face parquet file.",
+            "dataType": "sc:Integer",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-SSW"
+                },
+                "extract": {
+                    "column": "high_freq"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "SSW/ebird_code",
+            "name": "SSW/ebird_code",
+            "description": "Column 'ebird_code' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-SSW"
+                },
+                "extract": {
+                    "column": "ebird_code"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "SSW/call_type",
+            "name": "SSW/call_type",
+            "description": "Column 'call_type' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-SSW"
+                },
+                "extract": {
+                    "column": "call_type"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "SSW/sex",
+            "name": "SSW/sex",
+            "description": "Column 'sex' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-SSW"
+                },
+                "extract": {
+                    "column": "sex"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "SSW/lat",
+            "name": "SSW/lat",
+            "description": "Column 'lat' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-SSW"
+                },
+                "extract": {
+                    "column": "lat"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "SSW/long",
+            "name": "SSW/long",
+            "description": "Column 'long' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-SSW"
+                },
+                "extract": {
+                    "column": "long"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "SSW/microphone",
+            "name": "SSW/microphone",
+            "description": "Column 'microphone' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-SSW"
+                },
+                "extract": {
+                    "column": "microphone"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "SSW/license",
+            "name": "SSW/license",
+            "description": "Column 'license' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-SSW"
+                },
+                "extract": {
+                    "column": "license"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "SSW/source",
+            "name": "SSW/source",
+            "description": "Column 'source' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-SSW"
+                },
+                "extract": {
+                    "column": "source"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "SSW/local_time",
+            "name": "SSW/local_time",
+            "description": "Column 'local_time' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-SSW"
+                },
+                "extract": {
+                    "column": "local_time"
+                }
+            }
+        }
+    ]
+},
+    {
+    "@type": "cr:RecordSet",
+    "@id": "SNE",
+    "name": "SNE",
+    "description": "DBD-research-group/BirdSet - 'SNE' subset\n\nAdditional information:\n- 1 skipped column: filepath",
+    "field": [
+        {
+            "@type": "cr:Field",
+            "@id": "SNE/start_time",
+            "name": "SNE/start_time",
+            "description": "Column 'start_time' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-SNE"
+                },
+                "extract": {
+                    "column": "start_time"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "SNE/end_time",
+            "name": "SNE/end_time",
+            "description": "Column 'end_time' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-SNE"
+                },
+                "extract": {
+                    "column": "end_time"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "SNE/low_freq",
+            "name": "SNE/low_freq",
+            "description": "Column 'low_freq' from the Hugging Face parquet file.",
+            "dataType": "sc:Integer",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-SNE"
+                },
+                "extract": {
+                    "column": "low_freq"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "SNE/high_freq",
+            "name": "SNE/high_freq",
+            "description": "Column 'high_freq' from the Hugging Face parquet file.",
+            "dataType": "sc:Integer",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-SNE"
+                },
+                "extract": {
+                    "column": "high_freq"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "SNE/ebird_code",
+            "name": "SNE/ebird_code",
+            "description": "Column 'ebird_code' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-SNE"
+                },
+                "extract": {
+                    "column": "ebird_code"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "SNE/call_type",
+            "name": "SNE/call_type",
+            "description": "Column 'call_type' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-SNE"
+                },
+                "extract": {
+                    "column": "call_type"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "SNE/sex",
+            "name": "SNE/sex",
+            "description": "Column 'sex' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-SNE"
+                },
+                "extract": {
+                    "column": "sex"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "SNE/lat",
+            "name": "SNE/lat",
+            "description": "Column 'lat' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-SNE"
+                },
+                "extract": {
+                    "column": "lat"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "SNE/long",
+            "name": "SNE/long",
+            "description": "Column 'long' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-SNE"
+                },
+                "extract": {
+                    "column": "long"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "SNE/microphone",
+            "name": "SNE/microphone",
+            "description": "Column 'microphone' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-SNE"
+                },
+                "extract": {
+                    "column": "microphone"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "SNE/license",
+            "name": "SNE/license",
+            "description": "Column 'license' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-SNE"
+                },
+                "extract": {
+                    "column": "license"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "SNE/source",
+            "name": "SNE/source",
+            "description": "Column 'source' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-SNE"
+                },
+                "extract": {
+                    "column": "source"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "SNE/local_time",
+            "name": "SNE/local_time",
+            "description": "Column 'local_time' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-SNE"
+                },
+                "extract": {
+                    "column": "local_time"
+                }
+            }
+        }
+    ]
+},
+    {
+    "@type": "cr:RecordSet",
+    "@id": "XCM",
+    "name": "XCM",
+    "description": "DBD-research-group/BirdSet - 'XCM' subset\n\nAdditional information:\n- 1 skipped column: filepath",
+    "field": [
+        {
+            "@type": "cr:Field",
+            "@id": "XCM/start_time",
+            "name": "XCM/start_time",
+            "description": "Column 'start_time' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-XCM"
+                },
+                "extract": {
+                    "column": "start_time"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "XCM/end_time",
+            "name": "XCM/end_time",
+            "description": "Column 'end_time' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-XCM"
+                },
+                "extract": {
+                    "column": "end_time"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "XCM/low_freq",
+            "name": "XCM/low_freq",
+            "description": "Column 'low_freq' from the Hugging Face parquet file.",
+            "dataType": "sc:Integer",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-XCM"
+                },
+                "extract": {
+                    "column": "low_freq"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "XCM/high_freq",
+            "name": "XCM/high_freq",
+            "description": "Column 'high_freq' from the Hugging Face parquet file.",
+            "dataType": "sc:Integer",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-XCM"
+                },
+                "extract": {
+                    "column": "high_freq"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "XCM/ebird_code",
+            "name": "XCM/ebird_code",
+            "description": "Column 'ebird_code' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-XCM"
+                },
+                "extract": {
+                    "column": "ebird_code"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "XCM/call_type",
+            "name": "XCM/call_type",
+            "description": "Column 'call_type' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-XCM"
+                },
+                "extract": {
+                    "column": "call_type"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "XCM/sex",
+            "name": "XCM/sex",
+            "description": "Column 'sex' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-XCM"
+                },
+                "extract": {
+                    "column": "sex"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "XCM/lat",
+            "name": "XCM/lat",
+            "description": "Column 'lat' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-XCM"
+                },
+                "extract": {
+                    "column": "lat"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "XCM/long",
+            "name": "XCM/long",
+            "description": "Column 'long' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-XCM"
+                },
+                "extract": {
+                    "column": "long"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "XCM/microphone",
+            "name": "XCM/microphone",
+            "description": "Column 'microphone' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-XCM"
+                },
+                "extract": {
+                    "column": "microphone"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "XCM/license",
+            "name": "XCM/license",
+            "description": "Column 'license' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-XCM"
+                },
+                "extract": {
+                    "column": "license"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "XCM/source",
+            "name": "XCM/source",
+            "description": "Column 'source' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-XCM"
+                },
+                "extract": {
+                    "column": "source"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "XCM/local_time",
+            "name": "XCM/local_time",
+            "description": "Column 'local_time' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-XCM"
+                },
+                "extract": {
+                    "column": "local_time"
+                }
+            }
+        }
+    ]
+},
+    {
+    "@type": "cr:RecordSet",
+    "@id": "XCL",
+    "name": "XCL",
+    "description": "DBD-research-group/BirdSet - 'XCL' subset\n\nAdditional information:\n- 1 skipped column: filepath",
+    "field": [
+        {
+            "@type": "cr:Field",
+            "@id": "XCL/start_time",
+            "name": "XCL/start_time",
+            "description": "Column 'start_time' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-XCL"
+                },
+                "extract": {
+                    "column": "start_time"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "XCL/end_time",
+            "name": "XCL/end_time",
+            "description": "Column 'end_time' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-XCL"
+                },
+                "extract": {
+                    "column": "end_time"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "XCL/low_freq",
+            "name": "XCL/low_freq",
+            "description": "Column 'low_freq' from the Hugging Face parquet file.",
+            "dataType": "sc:Integer",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-XCL"
+                },
+                "extract": {
+                    "column": "low_freq"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "XCL/high_freq",
+            "name": "XCL/high_freq",
+            "description": "Column 'high_freq' from the Hugging Face parquet file.",
+            "dataType": "sc:Integer",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-XCL"
+                },
+                "extract": {
+                    "column": "high_freq"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "XCL/ebird_code",
+            "name": "XCL/ebird_code",
+            "description": "Column 'ebird_code' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-XCL"
+                },
+                "extract": {
+                    "column": "ebird_code"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "XCL/call_type",
+            "name": "XCL/call_type",
+            "description": "Column 'call_type' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-XCL"
+                },
+                "extract": {
+                    "column": "call_type"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "XCL/sex",
+            "name": "XCL/sex",
+            "description": "Column 'sex' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-XCL"
+                },
+                "extract": {
+                    "column": "sex"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "XCL/lat",
+            "name": "XCL/lat",
+            "description": "Column 'lat' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-XCL"
+                },
+                "extract": {
+                    "column": "lat"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "XCL/long",
+            "name": "XCL/long",
+            "description": "Column 'long' from the Hugging Face parquet file.",
+            "dataType": "sc:Float",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-XCL"
+                },
+                "extract": {
+                    "column": "long"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "XCL/microphone",
+            "name": "XCL/microphone",
+            "description": "Column 'microphone' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-XCL"
+                },
+                "extract": {
+                    "column": "microphone"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "XCL/license",
+            "name": "XCL/license",
+            "description": "Column 'license' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-XCL"
+                },
+                "extract": {
+                    "column": "license"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "XCL/source",
+            "name": "XCL/source",
+            "description": "Column 'source' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-XCL"
+                },
+                "extract": {
+                    "column": "source"
+                }
+            }
+        },
+        {
+            "@type": "cr:Field",
+            "@id": "XCL/local_time",
+            "name": "XCL/local_time",
+            "description": "Column 'local_time' from the Hugging Face parquet file.",
+            "dataType": "sc:Text",
+            "source": {
+                "fileSet": {
+                    "@id": "files-for-config-XCL"
+                },
+                "extract": {
+                    "column": "local_time"
+                }
+            }
+        }
+    ]
+}
+
+  ],
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "BirdSet",
+  "description": "DBD-research-group/BirdSet dataset hosted on Hugging Face and contributed by the HF Datasets community",
+  "alternateName": [
+    "DBD-research-group/BirdSet"
+  ],
+  "creator": {
+    "@type": "Organization",
+    "name": "DBD-research-group",
+    "url": "https://huggingface.co/DBD-research-group"
+  },
+  "keywords": [
+    "audio classification",
+    "bird classification",
+    "passive acoustic monitoring",
+    "bird dataset",
+    "bird call dataset"
+  ],
+  "url": "https://huggingface.co/datasets/DBD-research-group/BirdSet"
+}

@@ -1,8 +1,6 @@
-_target_: datamodule.components.augmentations.NoCallMixer
+_target_: birdset.datamodule.components.augmentations.NoCallMixer
 directory: ${paths.background_path}
 p: 0.075
 sampling_rate: ${module.network.sampling_rate}
 length: 5
-n_classes: ${datamodule.dataset.n_classes}
-
 
