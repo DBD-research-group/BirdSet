@@ -43,6 +43,7 @@ trainer:
 datamodule:
   transforms:
     max_length: 3
+  k_samples: 0  
 
   dataset:
     dataset_name: beans_watkins

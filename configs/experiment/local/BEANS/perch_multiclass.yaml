@@ -42,7 +42,9 @@ datamodule:
     hf_path: DBD-research-group/beans_watkins
     hf_name: default
     n_classes: 31
-    
+
+  k_samples: 15  
+
   loaders:
     train:
       batch_size: 32
