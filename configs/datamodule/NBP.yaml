@@ -13,11 +13,7 @@ dataset:
   hf_path: DBD-research-group/BirdSet
   hf_name: NBP
   seed: ${seed}
-  # feature_extractor:
-  #   _target_: transformers.AutoFeatureExtractor.from_pretrained
-  #   pretrained_model_name_or_path: ${module.network.model.checkpoint}
-  n_classes: 51
-  n_workers: 1
+  n_workers: 5
   val_split: 0.2
   task: ${module.task}
   subset: null

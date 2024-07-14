@@ -1,19 +1,14 @@
-from typing import Dict, Optional
-
+from typing import Optional
 import datasets
 import torch
 from torch import nn
 from transformers import AutoConfig, MobileNetV2ForImageClassification
 
+from birdset.configs import PretrainInfoConfig
 
 class MobileNetClassifier(nn.Module):
     """
     MobileNet model for audio classification.
-
-    Attributes:
-        num_classes (int): The number of classes for the output layer.
-        num_channels (int): The number of input channels.
-        checkpoint (Optional[str]): Path to a checkpoint for loading pre-trained weights.
     """
 
     def __init__(
@@ -23,16 +18,18 @@ class MobileNetClassifier(nn.Module):
         checkpoint: Optional[str] = None,
         local_checkpoint: Optional[str] = None,
         cache_dir: Optional[str] = None,
-        pretrain_info: Optional[Dict] = None,
+        pretrain_info: PretrainInfoConfig = None,
     ):
         """
-        Initialize the MobileNet model.
-
+        Initialize the EfficientNet model.
+        Note: Either num_classes or pretrain_info must be given
         Args:
-        architecture (MobileNetVersion): The version of the MobileNet architecture.
-        num_classes (int): The number of classes for classification.
-        num_channels (int): The number of input channels. Default is 1.
-        checkpoint (Optional[str]): Path to a checkpoint for loading pre-trained weights. Default is None.
+            num_channels: Number of input channels.
+            checkpoint: huggingface checkpoint path of any model of correct type
+            num_classes: number of classification heads to be used in the model
+            local_checkpoint: local path to checkpoint file
+            cache_dir: specified cache dir to save model files at
+            pretrain_info: hf_path and hf_name of info will be used to infer if num_classes is None
         """
         super().__init__()
 
@@ -62,7 +59,7 @@ class MobileNetClassifier(nn.Module):
 
         self._initialize_model()
 
-    def _initialize_model(self) -> nn.Module:
+    def _initialize_model(self):
         """Initializes the MobileNet model based on specified attributes.
 
         Returns:

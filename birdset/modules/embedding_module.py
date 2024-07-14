@@ -2,14 +2,14 @@ import torch
 import torch.nn.functional as F
 from dataclasses import dataclass
 from birdset.modules.base_module import BaseModule, NetworkConfig, LRSchedulerConfig, LoggingParamsConfig
-from birdset.modules.metrics.multiclass import MulticlassMetricsConfig
-from birdset.modules.metrics.multilabel import MultilabelMetricsConfig
+from birdset.configs.module_configs import MulticlassMetricsConfig, MultilabelMetricsConfig
 from typing import Callable, Literal, Type, Optional, Union
 from torch.nn import Module, CrossEntropyLoss
 from torch.nn.modules.loss import _Loss
 from torch.optim import AdamW, Optimizer
 from functools import partial
 from birdset.modules.models.embedding_abstract import EmbeddingModel
+from torch import nn
 
 @dataclass
 class EmbeddingModuleConfig(NetworkConfig):
@@ -19,26 +19,10 @@ class EmbeddingModuleConfig(NetworkConfig):
     """
     model: Union[EmbeddingModel, Module] = None # Model for extracting the embeddings
 
-class BCEWithLogitsLoss(torch.nn.BCEWithLogitsLoss):
-    """
-    Because BCE need one-hot encoding but most metrics don't we use a wrapper here!
-
-    Attributes:
-        num_classes (int): Number of classes in the dataset
-    """
-    def __init__(self, num_classes):
-        super(BCEWithLogitsLoss, self).__init__()
-        self.num_classes = num_classes
-
-    def forward(self, logits, target_labels):
-        # Convert integer labels to one-hot encoding
-        target_one_hot = F.one_hot(target_labels, num_classes=self.num_classes).float()
-        # Call the forward method of the parent class
-        return super().forward(logits, target_one_hot)
-
 class EmbeddingModule(BaseModule):
     """
-    MultilabelModule is a PyTorch Lightning module for multilabel classification tasks.
+    EmbeddingModule is a PyTorch Lightning module for multilabel classification tasks.
+    The Module expects a embedding_model that will be used to extract embeddings and than trains a network with these embeddings as input features.
 
     Attributes:
         model (Network): Model for extracting the embeddings
@@ -91,4 +75,3 @@ class EmbeddingModule(BaseModule):
         # Pass embeddings through the classifier to get the final output
         embeddings = embeddings.view(embeddings.size(0), -1) # Transform for the classifier
         return self.model.forward(embeddings)
-
