@@ -1,17 +1,18 @@
 # @package _global_
 #package global is neccessary!
 defaults:
+  - override /logger: wandb_embedding.yaml
   - override /datamodule: beans.yaml
   - override /module: embedding.yaml
   - override /callbacks: default.yaml
-  - override /trainer: default.yaml
+  - override /trainer: single_gpu.yaml
   - override /paths: default.yaml
   - override /hydra: default.yaml
   - override /datamodule/transforms: bird_default_multiclass.yaml #bird_default_multiclass.yaml # Here the audio is transformed to a spectrogram
   - override /datamodule/transforms/waveform_augmentations: none.yaml # No augmentations for now
   - override /datamodule/transforms/spectrogram_augmentations: none.yaml
 
-tags: ["BEANS", "Ghani", "embeddings", "perch", "multiclass"]
+tags: ["BEANS", "embeddings", "perch", "multiclass"]
 seed: 2
 train: True
 test: True
@@ -19,7 +20,6 @@ test: True
 logger:
   wandb:
     tags: ${tags}
-    group: "Ghani" # We use Ghani group to filter for all runs related to reconstructing the Ghani results
     mode: online
 
 module:
@@ -36,7 +36,7 @@ module:
     #num_classes: ${datamodule.dataset.n_classes}  
     
 trainer:
-  devices: 1
+  devices: [1]
   min_epochs: 1
   max_epochs: 4
 
@@ -47,7 +47,7 @@ datamodule:
     hf_name: default
     n_classes: 31
 
-  k_samples: 15
+  k_samples: 0
 
   loaders:
     train:
