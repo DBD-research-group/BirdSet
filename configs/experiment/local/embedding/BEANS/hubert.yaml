@@ -24,16 +24,14 @@ logger:
     mode: online
 
 module:
-  optimizer:
-    lr: 1e-5
+  embedding_model:  # This is needed to provide num_classes to the classifier model
+    model:
+      num_classes: ${datamodule.dataset.n_classes} 
   
   #loss:
     #_target_: birdset.modules.embedding_module.BCEWithLogitsLoss
     #num_classes: ${datamodule.dataset.n_classes}  
     
-  output_activation: 
-    _target_: "torch.sigmoid" # Use sigmoid like Ghani et al
-
 trainer:
   devices: [0]
   min_epochs: 1
@@ -41,10 +39,10 @@ trainer:
 
 datamodule:
   dataset:
-    dataset_name: beans_bats
-    hf_path: DBD-research-group/beans_bats
+    dataset_name: beans_watkins
+    hf_path: DBD-research-group/beans_watkins
     hf_name: default
-    n_classes: 10
+    n_classes: 31
     
   loaders:
     train:
@@ -60,10 +58,6 @@ datamodule:
       batch_size: 32
       num_workers: 16
       shuffle: False
-
-  mapper: 
-    biggest_cluster: True
-    no_call: False
   
 callbacks:
   model_checkpoint:
