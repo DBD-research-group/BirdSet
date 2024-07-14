@@ -1,8 +1,7 @@
-import soundfile as sf
-import librosa
 import random
 import soundfile as sf
 import librosa
+
 
 class EventDecoding:
     """
@@ -21,7 +20,12 @@ class EventDecoding:
     extracted_interval : float
         Denotes the fixed duration (in seconds) of the audio segment that is randomly extracted from the extended audio event.
     """
-    def __init__(self, min_len=1, max_len=5, sampling_rate=None, extension_time=8, extracted_interval=5):
+    def __init__(self,
+                 min_len: float = 1,
+                 max_len: float = 5,
+                 sampling_rate: int = 32000,
+                 extension_time: float = 8,
+                 extracted_interval: float = 5):
         self.min_len = min_len # in seconds
         self.max_len = max_len
         self.sampling_rate = sampling_rate
@@ -47,47 +51,60 @@ class EventDecoding:
             audio = librosa.resample(audio, orig_sr=sr, target_sr=self.sampling_rate)
             sr = self.sampling_rate
         return audio, sr
-    
+
     def _time_shifting(self, start, end, total_duration):
-        event_duration = round(end - start, 2)
+        event_duration = end - start
 
         if event_duration < self.extension_time:
             side_extension_time = (self.extension_time - event_duration) / 2
-            new_start_time = round(max(0, start - side_extension_time))
-            new_end_time = round(min(total_duration, end + side_extension_time))
+            new_start_time = max(0, start - side_extension_time)
+            new_end_time = min(total_duration, end + side_extension_time)
 
             if new_end_time - new_start_time < self.extension_time:
                 if new_start_time == 0:
                     new_end_time = min(self.extension_time, total_duration)
-                elif new_end_time == total_duration: 
+                elif new_end_time == total_duration:
                     new_start_time = max(0, total_duration - self.extension_time)
-        
-        else: # longer than extraction time
+
+        else:  # longer than extraction time
             new_start_time = start
             new_end_time = end
-        
-        # select a random interval of 5 seconds
-        max_start_interval = new_end_time - self.extracted_interval
+
+        # Ensure max_start_interval is non-negative
+        max_start_interval = max(0, new_end_time - self.extracted_interval)
         random_start = random.uniform(new_start_time, max_start_interval)
         random_end = random_start + self.extracted_interval
-
         return random_start, random_end
-    
 
     def __call__(self, batch):
+        """
+        Decodes an audio from a given batch by prioritizing load from the detected events.
+        If no detected_events are given from start_time and end_time else loads the whole audio.
+        possible to load audio by only start_time or end_time missing is 0 or len(audio) respectively.
+        If detected_events are used, extends the time and chooses a random subpart of length extracted_interval.
+        Expects batch to have following entries:
+            - filepath, list of audio files loadable by soundfile, else nothing is loaded
+        optional entries:
+            - detected_events, list of (start, end)-time-tuple
+            - start_time, start timestamp
+            - end_time, end timestamp
+        """
         audios, srs = [], []
-        for b_idx in range(len(batch.get("filepath", []))):
+        batch_len = len(batch.get("filepath", []))
+        for b_idx in range(batch_len):
             file_info = sf.info(batch["filepath"][b_idx])
             sr = file_info.samplerate
             duration = file_info.duration
 
-            if batch["detected_events"][b_idx]: #only for train data, not test
+            if batch.get("detected_events", []) and batch["detected_events"][b_idx]:
                 start, end = batch["detected_events"][b_idx]
                 if self.extension_time:
                     #time shifting
                     start, end = self._time_shifting(start, end, duration)
-            else:
+            elif (batch.get("start_time", []) or batch.get("end_time", [])) and (batch["start_time"][b_idx] or batch["end_time"][b_idx]):
                 start, end = batch["start_time"][b_idx], batch["end_time"][b_idx]
+            else:
+                start, end = None, None
             audio, sr = self._load_audio(batch["filepath"][b_idx], start, end, sr)
             audios.append(audio)
             srs.append(sr)

@@ -3,11 +3,11 @@ defaults:
   - override /datamodule: HSN.yaml
   - override /module: multilabel.yaml
   - override /module/network: convnext.yaml
-  - override /callbacks: default.yaml
+  - override /callbacks: cluster.yaml
   - override /trainer: single_gpu.yaml
   - override /datamodule/transforms: bird_default_multilabel.yaml
-  - override /paths: default.yaml
-  - override /hydra: default.yaml
+  - override /paths: cluster.yaml
+  - override /hydra: cluster.yaml
 
 tags: ["HSN", "convnext", "multilabel"]
 seed: 2
@@ -17,8 +17,9 @@ test: True
 logger:
   wandb:
     tags: ${tags}
-    group: "HSN_train_convnext"
+    group: "HSN_subset_convnext"
     mode: online
+    version: subset_convnext_${seed}_${start_time}
 
 trainer:
   min_epochs: 1
@@ -29,27 +30,33 @@ module:
     _target_: torch.optim.AdamW
     lr: 5e-4
     weight_decay: 5e-4
+  network:
+    torch_compile: False
 
 datamodule:
   dataset:
     val_split: 0.2
     class_weights_loss: null
     class_weights_sampler: null
-    classlimit: null
-    eventlimit: null
+    classlimit: 600
+    eventlimit: 5
 
   loaders:
     train:
       batch_size: 64
-      num_workers: 32
+      num_workers: 24
     valid:
-      batch_size: 64
-      num_workers: 32
+      batch_size: 256
+      num_workers: 24
     test:
-      batch_size: 64
-      num_workers: 32
+      batch_size: 256
+      num_workers: 24
+
+  mapper:
+    biggest_cluster: True
+    no_call: True
 
 callbacks:
   model_checkpoint:
-    save_top_k: -1
+    save_last: True
     every_n_epochs: 5

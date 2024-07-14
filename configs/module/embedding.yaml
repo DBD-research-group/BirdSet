@@ -8,9 +8,8 @@ defaults:
 
 network:
   model:
-    _target_: "torch.nn.Linear"
+    _target_: birdset.modules.models.linear_classifier.LinearClassifier
     in_features: ${module.embedding_model.embedding_size}
-    out_features: ${datamodule.dataset.n_classes}
 
   model_name: ${module.embedding_model.model_name}_embedding # Most values are just taken from embedding model as it is the first part
   model_type: ${module.embedding_model.model_type}
@@ -25,9 +24,9 @@ num_gpus: ${trainer.devices}
 
 optimizer:
   _target_: torch.optim.AdamW
-  lr: 1e-5
+  lr: 1e-2
   _partial_: true
-  weight_decay: 0.01
+  weight_decay: 5e-4
 
 loss:
   _target_: torch.nn.CrossEntropyLoss
@@ -37,8 +36,9 @@ metrics:
   num_labels: ${datamodule.dataset.n_classes}
 
 output_activation: 
-  _target_: "torch.sigmoid" # Use sigmoid like Ghani et al
+  _target_: "torch.softmax" # Use sigmoid like Ghani et al
   _partial_: true
+  dim: 1
 
 logging_params:
   _target_: birdset.modules.base_module.LoggingParamsConfig 

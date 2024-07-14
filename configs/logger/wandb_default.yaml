@@ -1,0 +1,13 @@
+wandb:
+  _target_: pytorch_lightning.loggers.wandb.WandbLogger
+  name: ${module.network.model_name}_${datamodule.dataset.dataset_name}#${seed}_${start_time}
+  save_dir: ${paths.log_dir}
+  offline: True
+  id: null # pass correct id to resume experiment!
+  anonymous: null # enable anonymous logging
+  project: "BioFoundation"
+  log_model: False # upload lightning ckpts
+  entity: "deepbirddetect" 
+  group: ""
+  tags: []
+  job_type: ""
