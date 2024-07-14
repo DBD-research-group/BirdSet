@@ -23,13 +23,6 @@ logger:
     group: "BEANS"
     mode: online
 
-module:
-  optimizer:
-    lr: 1e-5
-    
-  output_activation: 
-    _target_: "torch.sigmoid"
-
 trainer:
   devices: [0]
   min_epochs: 1
@@ -37,10 +30,10 @@ trainer:
 
 datamodule:
   dataset:
-    dataset_name: beans_bats
-    hf_path: DBD-research-group/beans_bats
+    dataset_name: beans_watkins
+    hf_path: DBD-research-group/beans_watkins
     hf_name: default
-    n_classes: 10
+    n_classes: 31
     
   loaders:
     train:
@@ -57,10 +50,6 @@ datamodule:
       num_workers: 16
       shuffle: False
 
-  mapper: 
-    biggest_cluster: True
-    no_call: False
-  
 callbacks:
   model_checkpoint:
     save_last: True
