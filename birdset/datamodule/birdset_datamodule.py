@@ -1,5 +1,5 @@
 from datasets import DatasetDict
-
+import datasets
 from birdset import utils
 from birdset.datamodule.components.transforms import BirdSetTransformsWrapper
 from birdset.datamodule.components.event_mapping import XCEventMapping
@@ -66,6 +66,10 @@ class BirdSetDataModule(BaseDataModuleHF):
             transforms=transforms,
         )
         self.event_mapper = mapper
+
+    @property
+    def num_classes(self):
+        return len(datasets.load_dataset_builder(self.dataset_config.hf_path, self.dataset_config.hf_name).info.features["ebird_code"].names)
 
     def _load_data(self, decode: bool = False):
         """

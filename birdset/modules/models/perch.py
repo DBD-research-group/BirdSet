@@ -9,9 +9,9 @@ import torch
 from torch import nn
 
 from birdset.configs import PretrainInfoConfig
+from birdset.modules.models.embedding_abstract import EmbeddingModel
 
-
-class PerchModel(nn.Module):
+class PerchModel(nn.Module, EmbeddingModel):
     """
     A PyTorch model for bird vocalization classification, integrating a TensorFlow Hub model.
 
@@ -39,6 +39,7 @@ class PerchModel(nn.Module):
         restrict_logits: bool = False,
         label_path: Optional[str] = None,
         pretrain_info: Optional[PretrainInfoConfig] = None,
+        gpu_to_use: int = 0,
     ) -> None:
         """
         Initializes the PerchModel with configuration for loading the TensorFlow Hub model,
@@ -50,6 +51,8 @@ class PerchModel(nn.Module):
             label_path: Path to a CSV file containing the class information for the Perch model.
             train_classifier: If True, a classifier is added on top of the model embeddings.
             restrict_logits: If True, output logits are restricted to target classes based on dataset info.
+            pretrain_info: A dictionary containing information about the pretraining of the model.
+            gpu_to_use: The GPU index to use for the model.
         """
         super().__init__()
         self.model = None  # Placeholder for the loaded model
@@ -61,6 +64,7 @@ class PerchModel(nn.Module):
         self.train_classifier = train_classifier
         self.restrict_logits = restrict_logits
         self.label_path = label_path
+        self.gpu_to_use = gpu_to_use
 
         if pretrain_info:
             self.hf_path = pretrain_info.hf_path
@@ -88,13 +92,15 @@ class PerchModel(nn.Module):
         """
         Load the model from TensorFlow Hub.
         """
+
         model_url = f"{self.PERCH_TF_HUB_URL}/{self.tfhub_version}"
         # self.model = hub.load(model_url)
         # with tf.device('/CPU:0'):
         #     model = hub.load(model_url)
+        physical_devices = tf.config.list_physical_devices('GPU')
+        tf.config.experimental.set_visible_devices(physical_devices[self.gpu_to_use], 'GPU')
+        tf.config.experimental.set_memory_growth(physical_devices[self.gpu_to_use], True)
 
-        physical_devices = tf.config.list_physical_devices("GPU")
-        tf.config.experimental.set_memory_growth(physical_devices[0], True)
         tf.config.optimizer.set_jit(True)
         self.model = hub.load(model_url)
 
@@ -165,7 +171,7 @@ class PerchModel(nn.Module):
         device = input_values.device  # Get the device of the input tensor
 
         # Move the tensor to the CPU and convert it to a NumPy array.
-        input_values = input_values.cpu().numpy()
+        #input_values = input_values.cpu().numpy()
 
         # Get embeddings from the Perch model and move to the same device as input_values
         embeddings, logits = self.get_embeddings(input_tensor=input_values)
@@ -191,6 +197,8 @@ class PerchModel(nn.Module):
         Returns:
             Tuple[torch.Tensor, torch.Tensor]: A tuple of two tensors (embeddings, logits).
         """
+        device = input_tensor.device # Get the device of the input tensor 
+        input_tensor = input_tensor.cpu().numpy()  # Move the tensor to the CPU and convert it to a NumPy array.
 
         input_tensor = input_tensor.reshape([-1, input_tensor.shape[-1]])
 
@@ -200,7 +208,9 @@ class PerchModel(nn.Module):
         # Extract embeddings and logits, convert them to PyTorch tensors
         embeddings = torch.from_numpy(outputs["output_1"].numpy())
         logits = torch.from_numpy(outputs["output_0"].numpy())
-
+        embeddings = embeddings.to(device)
+        logits = logits.to(device)
+        
         if self.class_mask:
             # Initialize full_logits to a large negative value for penalizing non-present classes
             full_logits = torch.full(

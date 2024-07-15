@@ -5,7 +5,6 @@ import os
 from collections import Counter
 import lightning as L
 import pandas as pd
-import datasets
 from datasets import load_dataset, load_from_disk, Audio, DatasetDict, Dataset, IterableDataset, IterableDatasetDict
 from torch.utils.data import DataLoader
 from copy import deepcopy
@@ -62,9 +61,12 @@ class BaseDataModuleHF(L.LightningDataModule):
         self.task = self.dataset_config.task
         self.train_batch_size = self.loaders_config.train.batch_size
 
+
+    
+
     @property
     def num_classes(self):
-        return len(datasets.load_dataset_builder(self.dataset_config.hf_path, self.dataset_config.hf_name).info.features["ebird_code"].names)
+        return self.dataset_config.n_classes
 
     def prepare_data(self):
         """

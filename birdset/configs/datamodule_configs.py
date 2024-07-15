@@ -45,6 +45,7 @@ class DatasetConfig:
     hf_path: str = "ashraq/esc50"
     hf_name: str = ""
     seed: int = 42
+    n_classes: Optional[int] = 50
     n_workers: int = 1
     val_split: float = 0.2
     task: Literal["multiclass", "multilabel"] = "multilabel"
