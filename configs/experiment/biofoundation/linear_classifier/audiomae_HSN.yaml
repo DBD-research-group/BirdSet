@@ -29,7 +29,7 @@ module:
     #_target_: birdset.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
 
 trainer: 
-  max_epochs: 50
+  max_epochs: 10
   accelerator: gpu
   devices: 1
 
@@ -41,6 +41,9 @@ datamodule:
     class_weights_sampler: null
     classlimit: 500
     eventlimit: 5
+  
+  transforms:
+    max_length: 10
 
   loaders:
     train: 

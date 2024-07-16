@@ -3,8 +3,53 @@ import timm
 import torch
 from torch import nn
 import torch.nn.functional as F
+import torchaudio.transforms as T
 
-from torchaudio.compliance import kaldi
+
+class AudioMAEProcessor:
+    def __init__(self, mean, std, device='cuda:0'):
+        self.MEAN = mean
+        self.STD = std
+        self.device = device  # Store the device information
+        self.mel_spectrogram = T.MelSpectrogram(
+            sample_rate=16000,  # Assuming a sample rate of 16000 Hz
+            n_fft=400,
+            win_length=400,
+            hop_length=160,
+            center=False,
+            pad=0,
+            window_fn=torch.hann_window,  # Move window to the specified device
+            n_mels=128,
+            power=2.0,
+            normalized=False,
+        )  
+
+    def process_batch(self, input_values):
+        # get device of input tensor
+        device = input_values.device
+        self.mel_spectrogram.to(device)
+
+        # Compute mel spectrogram for the batch
+        melspec = self.mel_spectrogram(input_values)  # shape (batch_size, 128, n_frames)
+
+        # Pad or truncate to 1024 frames
+        max_frames = 1024
+        current_frames = melspec.shape[-1]
+        if current_frames < max_frames:
+            padding = max_frames - current_frames
+            melspec = torch.nn.functional.pad(melspec, (0, padding))
+        else:
+            melspec = melspec[:, :, :max_frames]
+        
+        # transform from (batch_size, 1, 128, 1024) to (batchsize, 1, 1024, 128) (swap two last columns)
+        melspec = melspec.transpose(2, 3)
+
+
+        # Normalize
+        melspec = (melspec - self.MEAN) / (self.STD * 2)
+
+        return melspec
+
 
 
 
@@ -16,7 +61,7 @@ class AudioMAEModel(nn.Module):
 
     The model expect a 1D audio signale sampled with 16kHz and a length of 10s.
     """
-    EMBEDDING_SIZE = 767
+    EMBEDDING_SIZE = 768
     MEAN = -4.2677393
     STD = 4.5689974
 
@@ -30,6 +75,7 @@ class AudioMAEModel(nn.Module):
         self.load_model()
         self.num_classes = num_classes
         self.train_classifier = train_classifier
+        self.preprocessor = AudioMAEProcessor(mean=self.MEAN, std=self.STD, device='cuda:0')
          # Define a linear classifier to use on top of the embeddings
         # self.classifier = nn.Linear(
         #     in_features=self.EMBEDDING_SIZE, out_features=num_classes
@@ -52,24 +98,6 @@ class AudioMAEModel(nn.Module):
 
         self.model.eval()
 
-    def preprocess(self, input_values: torch.Tensor) -> torch.Tensor:
-        # If there's an extra channel dimension, remove it
-        if input_values.dim() > 2:
-            input_values = input_values.squeeze(1)
-        
-        # Convert input to mel spectrogram
-        melspec = kaldi.fbank(input_values, htk_compat=True, window_type="hanning", num_mel_bins=128)  # shape (n_frames, 128)
-
-        # AudioMAE only accepts 1024-frame input
-        if melspec.shape[0] < 1024:
-            melspec = F.pad(melspec, (0, 0, 0, 1024 - melspec.shape[0]))
-        else:
-            melspec = melspec[:1024]
-        melspec = (melspec - self.MEAN) / (self.STD * 2)
-
-        melspec = melspec.view(1, 1, 1024, 128)  # add batch dim and channel dim
-        return melspec
-
     
     def forward(
         self, input_values: torch.Tensor, labels: Optional[torch.Tensor] = None
@@ -84,7 +112,7 @@ class AudioMAEModel(nn.Module):
         Returns:
             torch.Tensor: The output of the classifier.
         """
-        melspec = self.preprocess(input_values)
+        melspec = self.preprocessor.process_batch(input_values)
         embeddings = self.model(melspec)
 
         if self.train_classifier:
@@ -107,7 +135,7 @@ class AudioMAEModel(nn.Module):
         Returns:
             torch.Tensor: The embeddings from the model.
         """
-        melspecs = self.preprocess(input_tensor)
+        melspecs = self.preprocessor.process_batch(input_tensor)
         embeddings = self.model(melspecs)
         return embeddings
 
