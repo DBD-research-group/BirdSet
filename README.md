@@ -67,6 +67,7 @@ After training, the best model checkpoint is saved based on the validation loss 
 python birdset/eval.py experiment="birdset_neurips24/$EXPERIMENT_PATH" module.model.network.local_checkpoint="$CHECKPOINT_PATH"
 ```
 
+**Disclaimer on results:** The results obtained using the `eval.py` script may differ from those reported in the paper. This discrepancy is because only the "best" model checkpoint was uploaded to HuggingFace, whereas the paper’s results were averaged over three different random seeds for a more robust evaluation.
 
 ## Example
 
