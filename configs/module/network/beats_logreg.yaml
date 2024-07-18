@@ -1,0 +1,11 @@
+model: 
+  _target_: birdset.modules.models.beats.BEATsModel
+  num_classes: null
+  train_classifier: True
+
+model_name: beats
+model_type: waveform
+torch_compile: False
+sampling_rate: 16_000
+normalize_spectrogram: False
+normalize_waveform: False
