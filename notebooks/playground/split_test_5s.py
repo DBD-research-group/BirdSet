@@ -10,7 +10,18 @@ def cut_underscores(path: str, num: int) -> str:
     return path
 
 
+def default_file_stripping(path :str) -> str:
+    """
+    The default file stripping that gets used when none is defined. 
+    """
+    path = cut_underscores(path, 2)
+    return path
+
+
 def get_dataset(name: str) -> DatasetDict:
+    """
+    Download or loads cached Birdset Dataset with the given name.
+    """
     dataset = load_dataset(
     name=name,
     path="DBD-research-group/BirdSet",
@@ -19,7 +30,12 @@ def get_dataset(name: str) -> DatasetDict:
     return dataset
 
 
-def split_into_sites(dataset: Dataset, strip_site_comparison: callable):
+def split_into_sites(dataset: Dataset, strip_site_comparison: callable) -> dict[str, Dataset]:
+    """
+    Splits the given dataset into datasets belonging to sites found in the original dataset.
+    The sites are found and distinguished based on the given strip_site_comparison function which should
+    strip the site descriptor out of the filepath.
+    """
     sites = {}
     last_site = strip_site_comparison(dataset["filepath"][0])
     last_split_idx = 0
@@ -38,7 +54,14 @@ def split_into_sites(dataset: Dataset, strip_site_comparison: callable):
     return sites
 
 
-def split_dataset(dataset : Dataset, split_from_idx : int, desired_test_split: float, strip_file_comparison: callable) -> DatasetDict:
+def split_dataset(dataset : Dataset, split_from_idx : int, desired_test_split: float, strip_file_comparison: callable=default_file_stripping) -> DatasetDict:
+    """
+    Splits the given dataset into train and test splits. 
+    The test split starts at the index given by "split_from_idx" and ends when the desired test split is achieved.
+    Because of the fact that files should not be split apart the test is not always exactly as big as desired but
+    it the nearest possibile percentage that doesn't split files.
+    Files are distinguished by the given strip_file_comparison function which should strip the wanted file descriptor out of the filepath.
+    """
     num_rows = len(dataset)
 
     # find start of test split
@@ -113,7 +136,7 @@ def split_dataset(dataset : Dataset, split_from_idx : int, desired_test_split: f
     return dataset_dict
 
 
-def split_into_k_datasets(dataset: Dataset, k: int, strip_file_comparison: callable) -> list[DatasetDict]:
+def split_into_k_datasets(dataset: Dataset, k: int, strip_file_comparison: callable=default_file_stripping) -> list[DatasetDict]:
     """
     Splits the given dataset into k datasets of about equal test percentage (1/k)
     """
@@ -129,7 +152,7 @@ def split_into_k_datasets(dataset: Dataset, k: int, strip_file_comparison: calla
     return dataset_dicts
 
 
-def split_into_k_datasets_with_sites(dataset: Dataset, k: int, strip_file_comparison: callable, strip_site_comparison: callable) -> list[DatasetDict]:
+def split_into_k_datasets_with_sites(dataset: Dataset, k: int, strip_site_comparison: callable, strip_file_comparison: callable=default_file_stripping) -> list[DatasetDict]:
     """
     Splits the given dataset into k datasets of about equal test percentage (1/k) while also trying to maintain site diversity in sets.
     """
