@@ -1,0 +1,152 @@
+from datasets import load_dataset, concatenate_datasets
+from datasets import DatasetDict, Dataset
+
+def cut_underscores(path: str, num: int) -> str:
+    """
+    cuts till 'num' underscores from end of 'path'
+    """
+    for i in range(num):
+        path = path[:path.rfind("_")]
+    return path
+
+
+def get_dataset(name: str) -> DatasetDict:
+    dataset = load_dataset(
+    name=name,
+    path="DBD-research-group/BirdSet",
+    cache_dir="../../data_birdset/" + name
+    )
+    return dataset
+
+
+def split_into_sites(dataset: Dataset, strip_site_comparison: callable):
+    sites = {}
+    last_site = strip_site_comparison(dataset["filepath"][0])
+    last_split_idx = 0
+
+    all_files = dataset["filepath"]
+    for idx in range(len(all_files)):
+        site = strip_site_comparison(all_files[idx])
+
+        if site != last_site:
+            sites[last_site] = dataset.select(range(last_split_idx, idx))
+            last_split_idx = idx
+            last_site = site
+
+    sites[last_site] = dataset.select(range(last_split_idx, idx))
+
+    return sites
+
+
+def split_dataset(dataset : Dataset, split_from_idx : int, desired_test_split: float, strip_file_comparison: callable) -> DatasetDict:
+    num_rows = len(dataset)
+
+    # find start of test split
+    bottom_start_idx = split_from_idx
+    top_start_idx = num_rows-1
+    split_file = strip_file_comparison(dataset[split_from_idx]["filepath"])
+
+    for idx in range(split_from_idx-1, -1, -1):
+        file_at_idx = strip_file_comparison(dataset[idx]["filepath"])
+
+        if file_at_idx != split_file:
+            bottom_start_idx = idx + 1
+            break
+
+    for idx in range(split_from_idx+1, num_rows):
+        filepath_at_idx = dataset[idx]["filepath"]
+        file_at_idx = strip_file_comparison(filepath_at_idx)
+
+        if file_at_idx != split_file:
+            top_start_idx = idx
+            break
+
+    if split_from_idx - bottom_start_idx > top_start_idx - split_from_idx:
+        nearest_start_idx = top_start_idx
+    else:
+        nearest_start_idx = bottom_start_idx
+
+    # find end of test split
+    desired_end_idx = min(nearest_start_idx + int(num_rows * desired_test_split), num_rows - 1)
+    split_file = strip_file_comparison(dataset[desired_end_idx]["filepath"])
+
+    bottom_end_idx = desired_end_idx
+    top_end_idx = num_rows
+
+    for idx in range(desired_end_idx-1, -1, -1):
+        file_at_idx = strip_file_comparison(dataset[idx]["filepath"])
+
+        if idx <= nearest_start_idx:
+            bottom_end_idx = nearest_start_idx
+            break
+
+        if file_at_idx != split_file:
+            bottom_end_idx = idx + 1
+            break
+
+    for idx in range(desired_end_idx, num_rows):
+        file_at_idx = strip_file_comparison(dataset[idx]["filepath"])
+
+        if file_at_idx != split_file:
+            top_end_idx = idx
+            break
+
+
+    bottom_test_split = ((bottom_end_idx - nearest_start_idx) / num_rows)
+    top_test_split = ((top_end_idx - nearest_start_idx) / num_rows)
+
+    if desired_test_split - bottom_test_split > top_test_split - desired_test_split:
+        nearest_end_idx = top_end_idx
+    else:
+        nearest_end_idx = bottom_end_idx
+
+    # build datasets and dataset dict
+    first_train_split = dataset.select(range(nearest_start_idx))
+    test_split = dataset.select(range(nearest_start_idx, nearest_end_idx))
+    if nearest_end_idx != num_rows:
+        second_train_split = dataset.select(range(nearest_end_idx, num_rows))
+    else:
+        second_train_split = dataset.select(range(0))
+
+    train_split = concatenate_datasets([first_train_split, second_train_split])
+    dataset_dict = DatasetDict({'train':train_split, 'test':test_split})
+    return dataset_dict
+
+
+def split_into_k_datasets(dataset: Dataset, k: int, strip_file_comparison: callable) -> list[DatasetDict]:
+    """
+    Splits the given dataset into k datasets of about equal test percentage (1/k)
+    """
+    test_percentage_per_set = 1/k
+    dataset_length = len(dataset)
+    dataset_dicts = []
+
+    for i in range(k):
+        split_from_idx = int(dataset_length * (test_percentage_per_set * i))
+        dataset_dict = split_dataset(dataset, split_from_idx, test_percentage_per_set, strip_file_comparison)
+        dataset_dicts.append(dataset_dict)
+
+    return dataset_dicts
+
+
+def split_into_k_datasets_with_sites(dataset: Dataset, k: int, strip_file_comparison: callable, strip_site_comparison: callable) -> list[DatasetDict]:
+    """
+    Splits the given dataset into k datasets of about equal test percentage (1/k) while also trying to maintain site diversity in sets.
+    """
+
+    dataset_sites: dict = split_into_sites(dataset, strip_site_comparison)
+    
+    site_sets = {}
+    for site, site_set in dataset_sites.items():
+        site_set_dicts = split_into_k_datasets(site_set, k, strip_file_comparison)
+        site_sets[site] = site_set_dicts
+
+    dataset_dicts = []
+    for i in range(k):
+        train_split = concatenate_datasets([site_sets[site][i]["train"] for site in site_sets])
+        test_split = concatenate_datasets([site_sets[site][i]["test"] for site in site_sets])
+        dataset_dict = DatasetDict({'train':train_split, 'test':test_split}) 
+        dataset_dicts.append(dataset_dict)
+
+
+    return dataset_dicts
