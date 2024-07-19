@@ -1,10 +1,9 @@
 from typing import Optional, Tuple
-import timm
 import torch
 from torch import nn
 import torch.nn.functional as F
 import torchaudio.transforms as T
-from ...unilm.beats.BEATs import BEATs, BEATsConfig
+from beats.BEATs import BEATs, BEATsConfig
 
 
 class BEATsProcessor:
@@ -56,11 +55,8 @@ class BEATsProcessor:
 
 class BEATsModel(nn.Module):
     """
-    Pretrained model for audio classification using the AUDIOMAE model.
-    Masked Autoencoders that Listen: https://arxiv.org/abs/2207.06405
-    Pretrained weights from Huggingface: gaunernst/vit_base_patch16_1024_128.audiomae_as2m
-
-    The model expect a 1D audio signale sampled with 16kHz and a length of 10s.
+    Pretrained model for audio classification using the BEATs model.
+    The model expects a 1D audio signal sampled with 16kHz and a length of 10s.
     """
     EMBEDDING_SIZE = 256
     MEAN = 0
@@ -96,7 +92,7 @@ class BEATsModel(nn.Module):
         Load the model from Huggingface.
         """
         # load the pre-trained checkpoints
-        checkpoint = torch.load('/BEATs.pt')
+        checkpoint = torch.load('/workspace/BEATs.pt')
 
         cfg = BEATsConfig(checkpoint['cfg'])
         self.model = BEATs(cfg)

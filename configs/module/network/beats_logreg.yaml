@@ -3,7 +3,7 @@ model:
   num_classes: null
   train_classifier: True
 
-model_name: beats
+model_name: BEATs
 model_type: waveform
 torch_compile: False
 sampling_rate: 16_000
