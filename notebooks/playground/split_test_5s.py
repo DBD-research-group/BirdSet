@@ -1,5 +1,49 @@
+from dataclasses import dataclass
 from datasets import load_dataset, concatenate_datasets
 from datasets import DatasetDict, Dataset
+
+@dataclass
+class SplittingDataset:
+    dataset: Dataset = None
+    strip_file_comparison: callable = None
+    strip_site_comparison: callable = None
+
+
+def get_splitting_dataset(name: str) -> SplittingDataset:
+    """
+    Downloads or loads cached Birdset Dataset with the given name.
+    """
+    dataset = load_dataset(
+    name=name,
+    path="DBD-research-group/BirdSet",
+    cache_dir="../../data_birdset/" + name
+    )
+
+    strip_functions = map_stripping_functions(name)
+
+    return SplittingDataset(dataset, strip_file_comparison=strip_functions[0], strip_site_comparison=strip_functions[1])
+
+
+def map_stripping_functions(dataset_name: str) -> tuple[callable,callable]:
+    """
+    Maps the dataset name to filepath stripping functions that fit the dataset.
+    Always returns a file stripping functions but only return a site stripping function for
+    datasets that include site information in the filepath.
+    """
+    if (dataset_name == "NES_scape" 
+        or dataset_name == "HSN_scape"
+        or dataset_name == "POW_scape"
+        or dataset_name == "SSW_scape"
+        or dataset_name == "NBP_scape"
+        or dataset_name == "SNE_scape"):
+        return default_file_stripping, None
+    elif (dataset_name == "PER_scape" 
+          or dataset_name == "UHH_scape"):
+        return default_file_stripping, default_site_stripping
+    else:
+        print(f"No stripping functions found for {dataset_name}. You'll have to set them manually")
+        return None, None
+
 
 def cut_underscores(path: str, num: int) -> str:
     """
@@ -12,30 +56,35 @@ def cut_underscores(path: str, num: int) -> str:
 
 def default_file_stripping(path :str) -> str:
     """
-    The default file stripping that gets used when none is defined. 
+    The default filepath stripping to get the file identifier. 
     """
     path = cut_underscores(path, 2)
+    path = path[path.rfind("\\")+1:]
     return path
 
 
-def get_dataset(name: str) -> DatasetDict:
+def default_site_stripping(path: str) -> str:
     """
-    Download or loads cached Birdset Dataset with the given name.
+    The default filepath stripping to get the site identifier. 
     """
-    dataset = load_dataset(
-    name=name,
-    path="DBD-research-group/BirdSet",
-    cache_dir="../../data_birdset/" + name
-    )
-    return dataset
+    site = cut_underscores(path, 4)
+    site = site[-3:]
+    return site
 
 
-def split_into_sites(dataset: Dataset, strip_site_comparison: callable) -> dict[str, Dataset]:
+def split_into_sites(splitting_dataset: SplittingDataset) -> dict[str, Dataset]:
     """
     Splits the given dataset into datasets belonging to sites found in the original dataset.
     The sites are found and distinguished based on the given strip_site_comparison function which should
     strip the site descriptor out of the filepath.
     """
+    if not splitting_dataset.strip_site_comparison:
+        print("Site splitting function is not defined in given dataset")
+        return
+
+
+    dataset = splitting_dataset.dataset["test_5s"]
+    strip_site_comparison = splitting_dataset.strip_site_comparison
     sites = {}
     last_site = strip_site_comparison(dataset["filepath"][0])
     last_split_idx = 0
@@ -54,7 +103,7 @@ def split_into_sites(dataset: Dataset, strip_site_comparison: callable) -> dict[
     return sites
 
 
-def split_dataset(dataset : Dataset, split_from_idx : int, desired_test_split: float, strip_file_comparison: callable=default_file_stripping) -> DatasetDict:
+def split_dataset(splitting_dataset: SplittingDataset, split_from_idx : int, desired_test_split: float) -> DatasetDict:
     """
     Splits the given dataset into train and test splits. 
     The test split starts at the index given by "split_from_idx" and ends when the desired test split is achieved.
@@ -62,6 +111,14 @@ def split_dataset(dataset : Dataset, split_from_idx : int, desired_test_split: f
     it the nearest possibile percentage that doesn't split files.
     Files are distinguished by the given strip_file_comparison function which should strip the wanted file descriptor out of the filepath.
     """
+
+    if not splitting_dataset.strip_file_comparison:
+        print("File splitting function is not defined in given dataset")
+        return
+
+    dataset = splitting_dataset.dataset["test_5s"]
+    strip_file_comparison = splitting_dataset.strip_file_comparison
+
     num_rows = len(dataset)
 
     # find start of test split
@@ -136,32 +193,46 @@ def split_dataset(dataset : Dataset, split_from_idx : int, desired_test_split: f
     return dataset_dict
 
 
-def split_into_k_datasets(dataset: Dataset, k: int, strip_file_comparison: callable=default_file_stripping) -> list[DatasetDict]:
+def split_into_k_datasets(splitting_dataset: SplittingDataset, k: int) -> list[DatasetDict]:
     """
     Splits the given dataset into k datasets of about equal test percentage (1/k)
     """
+    if not splitting_dataset.strip_file_comparison:
+        print("File splitting function is not defined in given dataset")
+        return
+
     test_percentage_per_set = 1/k
-    dataset_length = len(dataset)
+    dataset_length = len(splitting_dataset.dataset["test_5s"])
     dataset_dicts = []
 
     for i in range(k):
         split_from_idx = int(dataset_length * (test_percentage_per_set * i))
-        dataset_dict = split_dataset(dataset, split_from_idx, test_percentage_per_set, strip_file_comparison)
+        dataset_dict = split_dataset(splitting_dataset, split_from_idx, test_percentage_per_set)
         dataset_dicts.append(dataset_dict)
 
     return dataset_dicts
 
 
-def split_into_k_datasets_with_sites(dataset: Dataset, k: int, strip_site_comparison: callable, strip_file_comparison: callable=default_file_stripping) -> list[DatasetDict]:
+def split_into_k_datasets_with_sites(splitting_dataset: SplittingDataset, k: int) -> list[DatasetDict]:
     """
     Splits the given dataset into k datasets of about equal test percentage (1/k) while also trying to maintain site diversity in sets.
     """
-
-    dataset_sites: dict = split_into_sites(dataset, strip_site_comparison)
+    if not splitting_dataset.strip_file_comparison:
+        print("File splitting function is not defined in given dataset")
+        return
+    if not splitting_dataset.strip_site_comparison:
+        print("Site splitting function is not defined in given dataset")
+        return
+    
+    dataset_sites: dict = split_into_sites(splitting_dataset)
     
     site_sets = {}
     for site, site_set in dataset_sites.items():
-        site_set_dicts = split_into_k_datasets(site_set, k, strip_file_comparison)
+        site_splitting_set = SplittingDataset(
+            dataset=site_set,
+            strip_file_comparison=splitting_dataset.strip_file_comparison
+            )
+        site_set_dicts = split_into_k_datasets(site_splitting_set, k)
         site_sets[site] = site_set_dicts
 
     dataset_dicts = []

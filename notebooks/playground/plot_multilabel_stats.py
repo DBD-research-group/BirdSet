@@ -96,9 +96,6 @@ def show_multilabel_percentages(dataset_dict: DatasetDict, figwidth: int=10):
         train_label_occurences[label] = train_label_occurences.get(label, 0)
         test_label_occurences[label] = test_label_occurences.get(label, 0)
 
-    print(f"Unique labels in dataset: {len(unique_labels_in_dataset)}")
-    print(f"Unique labels in train set vs. test set:  {len(unique_train_labels)} vs. {len(unique_test_labels)}")
-
     for label in unique_labels_in_dataset:
         occurence_count_sum = train_label_occurences[label] + test_label_occurences[label]
         train_label_occurences[label] = train_label_occurences[label] / occurence_count_sum
