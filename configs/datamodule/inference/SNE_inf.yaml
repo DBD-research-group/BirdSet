@@ -1,0 +1,25 @@
+#SNE sierras nevada
+_target_: birdset.datamodule.inference_datamodule.InferenceDataModule
+
+defaults: 
+  - _self_
+  - transforms: bird_default.yaml
+  - loaders: default.yaml
+  - mapper: xc_bambird_mapper.yaml
+
+dataset:
+  data_dir: ${paths.dataset_path}
+  dataset_name: SNE
+  hf_path: DBD-research-group/BirdSet
+  hf_name: SNE
+  seed: ${seed}
+  n_classes: 56
+  n_workers: 1
+  val_split: 0.2
+  task: ${module.task}
+  subset: null
+  sampling_rate: ${module.network.sampling_rate}
+  class_weights_loss: null
+  class_weights_sampler: null
+  classlimit: 500
+  eventlimit: 5

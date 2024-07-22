@@ -1,0 +1,40 @@
+# @package _global_
+defaults:
+  - override /datamodule: HSN.yaml
+  - override /module: multilabel.yaml
+  - override /module/network: convnext.yaml
+  - override /callbacks: default.yaml
+  - override /trainer: single_gpu.yaml
+  - override /datamodule/transforms: bird_default_multilabel.yaml
+  - override /paths: default.yaml
+  - override /hydra: default.yaml
+
+tags: ["HSN", "convnext", "inference", "multilabel"]
+seed: 2
+train: False
+test: True
+
+logger:
+  wandb:
+    tags: ${tags}
+    group: "HSN_inference_convnext"
+    mode: online
+
+datamodule:
+  dataset:
+    val_split: 0.2
+    class_weights_loss: null
+    class_weights_sampler: null
+    classlimit: null
+    eventlimit: null
+
+  loaders:
+    train:
+      batch_size: 64
+      num_workers: 32
+    valid:
+      batch_size: 64
+      num_workers: 32
+    test:
+      batch_size: 64
+      num_workers: 32

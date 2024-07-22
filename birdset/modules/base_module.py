@@ -1,21 +1,16 @@
-from dataclasses import dataclass, asdict
-from functools import partial
-from typing import Callable, List, Literal, Type, Optional, Union
-
-from birdset.modules.metrics.multiclass import MulticlassMetricsConfig
-from birdset.modules.metrics.multilabel import MultilabelMetricsConfig
-from birdset.modules.models.efficientnet import EfficientNetClassifier
 import torch
 import math
-
-import datasets
-
 import lightning as L
-import torch.nn as nn
+import datasets
+from dataclasses import asdict
+from functools import partial
+from typing import Callable, List, Literal, Type, Optional, Union
 from torch.nn import CrossEntropyLoss
 from torch.nn.modules.loss import _Loss
-from torch.optim import AdamW, Optimizer 
-from transformers import get_scheduler
+from torch.optim import AdamW, Optimizer
+
+from birdset.configs import NetworkConfig, LoggingParamsConfig, LRSchedulerConfig, MulticlassMetricsConfig, MultilabelMetricsConfig, MultilabelMetricsConfig as MetricsConfig
+
 
 def get_num_gpu(num_gpus: Union[int|str|List[int]]) -> int:
     """
@@ -34,71 +29,6 @@ def get_num_gpu(num_gpus: Union[int|str|List[int]]) -> int:
             return int(num_gpus)
     else:    
         return num_gpus
-
-@dataclass
-class NetworkConfig:
-    """
-    A dataclass for configuring a neural network model for training.
-
-    Attributes:
-        model (nn.Module): The model to be used for training. Defaults to an instance of `EfficientNetClassifier`.
-        model_name (str): The name of the model. Defaults to "efficientnet".
-        model_type (Literal['vision', 'waveform']): The type of the model, can be either 'vision' or 'waveform'. Defaults to "vision".
-        torch_compile (bool): Whether to compile the model using TorchScript. Defaults to False.
-        sample_rate (int): The sample rate for audio data. Defaults to 32000.
-        normalize_waveform (bool): Whether to normalize the waveform data. Defaults to False.
-        normalize_spectrogram (bool): Whether to normalize the spectrogram data. Defaults to True.
-    """
-    model: nn.Module = EfficientNetClassifier(
-        architecture="efficientnet_b1",
-        num_classes=21,
-        num_channels=1,
-        checkpoint=None
-    )
-    model_name: str = "efficientnet"
-    model_type: Literal['vision', 'waveform'] = "vision"
-    torch_compile: bool = False
-    sample_rate: int = 32000
-    normalize_waveform: bool = False
-    normalize_spectrogram: bool = True
-
-@dataclass
-class LRSchedulerConfig:
-    """
-    A dataclass for configuring the learning rate scheduler.
-
-    Attributes:
-        scheduler (partial): The scheduler function. Defaults to a cosine scheduler with `num_cycles` set to 0.5 and `last_epoch` set to -1.
-        extras (LRSchedulerExtrasConfig): The extras configuration for the scheduler. Defaults to an instance of `LRSchedulerExtrasConfig`.
-    """
-    scheduler = partial(
-        get_scheduler,
-        name = "cosine",
-        scheduler_specific_kwargs = {
-            'num_cycles': 0.5,
-            'last_epoch': -1,
-        }
-    )
-
-    interval: str = "step"
-    warmup_ratio: float = 0.05
-
-@dataclass
-class LoggingParamsConfig:
-    """
-    A dataclass for configuring the logging parameters during model training.
-
-    Attributes:
-        on_step (bool): Whether to log metrics after each training step. Defaults to False.
-        on_epoch (bool): Whether to log metrics after each epoch. Defaults to True.
-        sync_dist (bool): Whether to synchronize the logging in a distributed setting. Defaults to False.
-        prog_bar (bool): Whether to display a progress bar during training. Defaults to True.
-    """
-    on_step: bool = False
-    on_epoch: bool = True
-    sync_dist: bool = False
-    prog_bar: bool = True         
-
 
 class BaseModule(L.LightningModule):
     """
@@ -138,7 +68,8 @@ class BaseModule(L.LightningModule):
             len_trainset: int = 13878, # set to property from datamodule
             batch_size: int = 32,
             task: Literal['multiclass', 'multilabel'] = "multiclass",
-            num_gpus: int = 1
+            num_gpus: int = 1,
+            pretrain_info = None,
             ):
 
         super(BaseModule, self).__init__()
@@ -161,6 +92,7 @@ class BaseModule(L.LightningModule):
         self.num_gpus = get_num_gpu(num_gpus)
 
         self.model = self.network.model
+        self.pretrain_info = pretrain_info
 
         # configure main metric
         self.train_metric = self.metrics.main_metric.clone()
@@ -184,13 +116,14 @@ class BaseModule(L.LightningModule):
         self.class_mask = None
 
         # TODO: reimplement this
-        if hasattr(network.model, 'pretran_info') and network.model.pretrain_info is not None:
-            self.pretrain_dataset = network.model.pretrain_info["hf_pretrain_name"]
-            self.hf_path = network.model.pretrain_info["hf_path"]
-            self.hf_name = network.model.pretrain_info["hf_name"]
-            pretrain_info = datasets.load_dataset_builder(self.hf_path, self.pretrain_dataset).info.features["ebird_code"]
-            dataset_info = datasets.load_dataset_builder(self.hf_path, self.hf_name).info.features["ebird_code"]
-            self.class_mask = [pretrain_info.names.index(i) for i in dataset_info.names]
+        if self.pretrain_info and self.pretrain_info.get("hf_pretrain_name"):
+            print("Masking Logits")
+            self.pretrain_dataset = self.pretrain_info["hf_pretrain_name"]
+            self.hf_path = self.pretrain_info["hf_path"]
+            self.hf_name = self.pretrain_info["hf_name"]
+            pretrain_classlabels = datasets.load_dataset_builder(self.hf_path, self.pretrain_dataset).info.features["ebird_code"]
+            dataset_classlabels = datasets.load_dataset_builder(self.hf_path, self.hf_name).info.features["ebird_code"]
+            self.class_mask = [pretrain_classlabels.names.index(i) for i in dataset_classlabels.names]
 
     def forward(self, *args, **kwargs):
         return self.model.forward(*args, **kwargs)
@@ -222,7 +155,9 @@ class BaseModule(L.LightningModule):
 
     def model_step(self, batch, batch_idx):
         logits = self.forward(**batch)
-        if self.class_mask:
+        if self.class_mask and (not self.pretrain_info.valid_test_only or not self.trainer.training):
+            if batch["labels"].shape == logits.shape:
+                batch["labels"] = batch["labels"][:, self.class_mask]
             logits = logits[:, self.class_mask]
         loss = self.loss(logits, batch["labels"])
         preds = self.output_activation(logits)
@@ -265,25 +200,25 @@ class BaseModule(L.LightningModule):
             prog_bar=True
         )
 
-        self.valid_metric(preds, targets.int())
-        self.log(
-            f"val/{self.valid_metric.__class__.__name__}",
-            self.valid_metric,
-            **asdict(self.logging_params),
-        )
+        # self.valid_metric(preds, targets.int())
+        # self.log(
+        #     f"val/{self.valid_metric.__class__.__name__}",
+        #     self.valid_metric,
+        #     **asdict(self.logging_params),
+        # )
 
         # self.valid_add_metrics(preds, targets.int())
         # self.log_dict(self.valid_add_metrics, **asdict(self.logging_params))
         return {"loss": val_loss, "preds": preds, "targets": targets}
 
-    def on_validation_epoch_end(self):
-        valid_metric = self.valid_metric.compute()  # get current valid metric
-        self.valid_metric_best(valid_metric)  # update best so far valid metric
-
-        self.log(
-            f"val/{self.valid_metric.__class__.__name__}_best",
-            self.valid_metric_best.compute(),
-        )
+    # def on_validation_epoch_end(self):
+    #     valid_metric = self.valid_metric.compute()  # get current valid metric
+    #     self.valid_metric_best(valid_metric)  # update best so far valid metric
+    #
+    #     self.log(
+    #         f"val/{self.valid_metric.__class__.__name__}_best",
+    #         self.valid_metric_best.compute(),
+    #     )
 
     def test_step(self, batch, batch_idx):
         test_loss, preds, targets = self.model_step(batch, batch_idx)

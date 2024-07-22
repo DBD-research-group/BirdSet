@@ -1,7 +1,7 @@
 defaults: 
   - multilabel_mix.yaml
   - background_noise.yaml
-  - gain.yaml
-  #- pitch_shift.yaml #extremely slow
   - colored_noise.yaml
+  - gain.yaml
+#  - low_pass_filter.yaml
 

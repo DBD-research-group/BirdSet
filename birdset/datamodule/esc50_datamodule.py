@@ -1,7 +1,9 @@
 from datasets import Audio
+
 from birdset.datamodule.components.transforms import BirdSetTransformsWrapper
-from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
-from datasets import load_dataset, Audio
+from . import BaseDataModuleHF
+from birdset.configs import DatasetConfig, LoadersConfig
+
 
 class ESC50DataModule(BaseDataModuleHF):
     def __init__(
@@ -9,16 +11,17 @@ class ESC50DataModule(BaseDataModuleHF):
             dataset: DatasetConfig = DatasetConfig(),
             loaders: LoadersConfig = LoadersConfig(),
             transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
-            mapper: None = None
     ):
         super().__init__(
             dataset=dataset,
             loaders=loaders,
             transforms=transforms,
-            mapper=mapper
         )
 
-
+    @property
+    def num_classes(self):
+        return 50
+    
     def _preprocess_data(self, dataset):
         dataset = dataset.cast_column(
             column="audio",
@@ -28,14 +31,6 @@ class ESC50DataModule(BaseDataModuleHF):
                 decode=True,
             ),
         )
-        if self.event_mapper is not None:
-            dataset = dataset['train'].map(
-                self.event_mapper,
-                batched=True,
-                batch_size=300,
-                load_from_cache_file=True,
-                num_proc=self.dataset_config.n_workers,
-            )
         dataset = dataset.rename_column("target", "labels")
         dataset = dataset.select_columns(["audio", "labels"])
         return dataset
