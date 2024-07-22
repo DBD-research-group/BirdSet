@@ -21,7 +21,7 @@ def get_splitting_dataset(name: str) -> SplittingDataset:
 
     strip_functions = map_stripping_functions(name)
 
-    return SplittingDataset(dataset, strip_file_comparison=strip_functions[0], strip_site_comparison=strip_functions[1])
+    return SplittingDataset(dataset["test_5s"], strip_file_comparison=strip_functions[0], strip_site_comparison=strip_functions[1])
 
 
 def map_stripping_functions(dataset_name: str) -> tuple[callable,callable]:
@@ -83,7 +83,7 @@ def split_into_sites(splitting_dataset: SplittingDataset) -> dict[str, Dataset]:
         return
 
 
-    dataset = splitting_dataset.dataset["test_5s"]
+    dataset = splitting_dataset.dataset
     strip_site_comparison = splitting_dataset.strip_site_comparison
     sites = {}
     last_site = strip_site_comparison(dataset["filepath"][0])
@@ -94,12 +94,20 @@ def split_into_sites(splitting_dataset: SplittingDataset) -> dict[str, Dataset]:
         site = strip_site_comparison(all_files[idx])
 
         if site != last_site:
-            sites[last_site] = dataset.select(range(last_split_idx, idx))
+            old_set = sites.get(last_site, None)
+            new_set = dataset.select(range(last_split_idx, idx))
+            if old_set:
+                new_set = concatenate_datasets([old_set, new_set])
+            sites[last_site] = new_set
             last_split_idx = idx
             last_site = site
 
-    sites[last_site] = dataset.select(range(last_split_idx, idx))
-
+    old_set = sites.get(last_site, None)
+    new_set = dataset.select(range(last_split_idx, idx))
+    if old_set:
+        new_set = concatenate_datasets([old_set, new_set])
+    sites[last_site] = new_set
+    
     return sites
 
 
@@ -116,7 +124,7 @@ def split_dataset(splitting_dataset: SplittingDataset, split_from_idx : int, des
         print("File splitting function is not defined in given dataset")
         return
 
-    dataset = splitting_dataset.dataset["test_5s"]
+    dataset = splitting_dataset.dataset
     strip_file_comparison = splitting_dataset.strip_file_comparison
 
     num_rows = len(dataset)
@@ -202,7 +210,7 @@ def split_into_k_datasets(splitting_dataset: SplittingDataset, k: int) -> list[D
         return
 
     test_percentage_per_set = 1/k
-    dataset_length = len(splitting_dataset.dataset["test_5s"])
+    dataset_length = len(splitting_dataset.dataset)
     dataset_dicts = []
 
     for i in range(k):
