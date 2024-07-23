@@ -3,7 +3,6 @@ sampling_rate: ${module.network.sampling_rate}
 model_type: ${module.network.model_type}
 task: ${datamodule.dataset.task}
 max_length: ${module.embedding_model.length}
-embedding_model: ${module.embedding_model}
 
 defaults:
   - _self_

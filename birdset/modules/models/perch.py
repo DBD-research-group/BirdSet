@@ -197,18 +197,68 @@ class PerchModel(nn.Module, EmbeddingModel):
         Returns:
             Tuple[torch.Tensor, torch.Tensor]: A tuple of two tensors (embeddings, logits).
         """
+        
         device = input_tensor.device # Get the device of the input tensor 
         input_tensor = input_tensor.cpu().numpy()  # Move the tensor to the CPU and convert it to a NumPy array.
 
         input_tensor = input_tensor.reshape([-1, input_tensor.shape[-1]])
-        # Run the model and get the outputs using the optimized TensorFlow function
-        #with tf.device('/CPU:0'):
-        outputs = self.run_tf_model(input_tensor=input_tensor)
-        # Extract embeddings and logits, convert them to PyTorch tensors
-        embeddings = torch.from_numpy(outputs["output_1"].numpy())
-        logits = torch.from_numpy(outputs["output_0"].numpy())
-        embeddings = embeddings.to(device)
-        logits = logits.to(device)
+        
+        max_length = 160000  # 5 seconds at 16kHz
+        overlap_length = 32000  # 1 second overlap 
+        
+        if input_tensor.shape[1] < max_length:
+            print("Too short")
+            # Pad the input tensor to the max_length
+            input_tensor = tf.pad(
+                input_tensor,
+                [[0, 0], [0, max_length - input_tensor.shape[1]]], # Add zeros to the end
+                constant_values=0,
+            )
+        
+        if input_tensor.shape[1] > max_length:
+            print("Too long")
+            # Calculate start indices for each segment
+            #! The input is split into segments with an overlap_length
+            start_indices = list(range(0, input_tensor.shape[1] - max_length + 1, max_length - overlap_length))
+
+            outputs = []
+
+            # Process each segment
+            for start in start_indices:
+                end = start + max_length
+                segment = input_tensor[:, start:end]
+                output = self.run_tf_model(input_tensor=segment)
+                outputs.append(output)
+                
+            if start_indices[-1] + max_length < input_tensor.shape[1]:
+                final_segment = input_tensor[:, -max_length:] #! It just takes all the rest even if bigger overlap
+                output = self.run_tf_model(input_tensor=final_segment)
+                outputs.append(output)    
+
+            # Combine logits from both segments by taking the maximum
+            logits_list = [
+                torch.from_numpy(output["output_0"].numpy()) for output in outputs
+            ]
+            logits = torch.max(logits_list[0], logits_list[1])
+
+            # Combine embeddings from both segments by averaging
+            embeddings_list = [
+                torch.from_numpy(output["output_1"].numpy()) for output in outputs
+            ]
+            embeddings = torch.mean(torch.stack(embeddings_list), dim=0)
+            embeddings = embeddings.to(device) # Move back to previous device
+            logits = logits.to(device)
+        else:
+            print("Normal")
+            # Process the single input_tensor as usual
+            # Run the model and get the outputs using the optimized TensorFlow function
+            outputs = self.run_tf_model(input_tensor=input_tensor)
+
+            # Extract embeddings and logits, convert them to PyTorch tensors
+            embeddings = torch.from_numpy(outputs["output_1"].numpy())
+            logits = torch.from_numpy(outputs["output_0"].numpy())
+            embeddings = embeddings.to(device) # Move back to previous device
+            logits = logits.to(device)
         
         if self.class_mask:
             # Initialize full_logits to a large negative value for penalizing non-present classes

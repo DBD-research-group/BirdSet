@@ -8,7 +8,7 @@ defaults:
   - override /trainer: single_gpu.yaml
   - override /paths: default.yaml
   - override /hydra: default.yaml
-  - override /datamodule/transforms: bird_default_multiclass.yaml #bird_default_multiclass.yaml # Here the audio is transformed to a spectrogram
+  - override /datamodule/transforms: embedding_transform.yaml #bird_default_multiclass.yaml # Here the audio is transformed to a spectrogram
   - override /datamodule/transforms/waveform_augmentations: none.yaml # No augmentations for now
   - override /datamodule/transforms/spectrogram_augmentations: none.yaml
 
@@ -36,7 +36,7 @@ module:
     #num_classes: ${datamodule.dataset.n_classes}  
     
 trainer:
-  devices: [1]
+  devices: [0]
   min_epochs: 1
   max_epochs: 4
 
