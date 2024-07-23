@@ -2,7 +2,9 @@ import os
 import hydra
 import json
 import pyrootutils
-import lightning as L 
+from omegaconf import open_dict
+import lightning as L
+from pathlib import Path
 
 from birdset import utils 
 
@@ -16,13 +18,14 @@ root = pyrootutils.setup_root(
 _HYDRA_PARAMS = {
     "version_base":None,
     "config_path": str(root / "configs"),
-    "config_name": "train.yaml"
+    "config_name": "eval.yaml"
 }
 
 log = utils.get_pylogger(__name__)
 
 @hydra.main(**_HYDRA_PARAMS)
 def eval(cfg):
+    # log.info('Using config: \n%s', OmegaConf.to_yaml(cfg))
     log.info("Starting Evaluation")
     log.info(f"Dataset path: <{os.path.abspath(cfg.paths.dataset_path)}>")
     os.makedirs(cfg.paths.dataset_path, exist_ok=True)
@@ -42,18 +45,22 @@ def eval(cfg):
     datamodule = hydra.utils.instantiate(cfg.datamodule)
     datamodule.prepare_data()
 
-    log.info(f"Instantiate model <{cfg.module.network.model._target_}>")     
+    log.info(f"Instantiate model <{cfg.module.network.model._target_}>")
+    with open_dict(cfg):
+        cfg.module.metrics["num_labels"] = datamodule.num_classes
+        cfg.module.network.model["num_classes"] = datamodule.num_classes
     model = hydra.utils.instantiate(
         cfg.module,
-        num_epochs=cfg.trainer.max_epochs, #?
+        num_epochs=cfg.trainer.max_epochs,
         len_trainset=datamodule.len_trainset,
         batch_size=datamodule.loaders_config.train.batch_size,
-        label_counts=datamodule.num_train_labels,
         pretrain_info=cfg.module.network.model.pretrain_info
     )
 
     log.info(f"Instantiate logger")
-    logger = utils.instantiate_loggers(cfg.get("logger")) 
+    logger = utils.instantiate_loggers(cfg.get("logger"))
+    # override standard TF logger to handle rare logger error
+    logger.append(utils.TBLogger(Path(cfg.paths.log_dir)))
 
     trainer = hydra.utils.instantiate(
         cfg.trainer, logger=logger

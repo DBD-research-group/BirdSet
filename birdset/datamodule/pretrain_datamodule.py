@@ -1,14 +1,14 @@
-from collections import Counter
-from birdset.datamodule.components.event_decoding import EventDecoding
-from birdset.datamodule.components.transforms import BirdSetTransformsWrapper
-from birdset.datamodule.components.event_mapping import XCEventMapping
-from birdset.utils import pylogger
-from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
-from datasets import DatasetDict, Dataset
-from datasets import load_dataset, Audio, load_from_disk
-import logging
-import torch
 import os
+import logging
+from copy import deepcopy
+from datasets import load_dataset, Audio, load_from_disk
+
+from birdset.utils import pylogger
+from birdset.datamodule.components.event_mapping import XCEventMapping
+from birdset.datamodule.components.transforms import BirdSetTransformsWrapper
+from . import BaseDataModuleHF
+from birdset.configs import DatasetConfig, LoadersConfig
+
 log = pylogger.get_pylogger(__name__)
 
 
@@ -24,8 +24,8 @@ class PretrainDataModule(BaseDataModuleHF):
             dataset=dataset,
             loaders=loaders,
             transforms=transforms,
-            mapper=mapper
         )
+        self.event_mapper = mapper
 
     def prepare_data(self):
         if self.dataset_config.direct_fingerprint:
@@ -43,18 +43,22 @@ class PretrainDataModule(BaseDataModuleHF):
     
     def _get_dataset(self, split):
         if self.dataset_config.direct_fingerprint:
-            path = self.dataset_config.direct_fingerprint
-            dataset = load_from_disk(os.path.join(path, split))
-
-            self.transforms.set_mode(split)
-            if split == "train": # we need this for sampler, cannot be done later because set_transform
-                self.train_label_list = dataset["labels"]
-
-            dataset.set_transform(self.transforms, output_all_columns=False) 
-        
-            return dataset
+            path = os.path.join(self.dataset_config.direct_fingerprint, split)
         else:
-            return super()._get_dataset(split)
+            path = os.path.join(self.disk_save_path, split)
+
+        dataset = load_from_disk(path)
+
+        transforms = deepcopy(self.transforms)
+        transforms.set_mode(split)
+        if split == "train":  # we need this for sampler, cannot be done later because set_transform
+            self.train_label_list = dataset["labels"]
+
+        if split == "valid":
+            transforms.modes_to_skip.append("valid")
+        dataset.set_transform(transforms, output_all_columns=False)
+
+        return dataset
 
     def _load_data(self, decode: bool = False):
         """
@@ -73,7 +77,6 @@ class PretrainDataModule(BaseDataModuleHF):
 
         if self.dataset_config.subset:
             dataset = self._fast_dev_subset(dataset, self.dataset_config.subset)
-
 
         dataset = dataset.cast_column(
             column="audio",
@@ -97,6 +100,7 @@ class PretrainDataModule(BaseDataModuleHF):
                 batch_size=300,
                 load_from_cache_file=True,
                 num_proc=self.dataset_config.n_workers,
+                desc="Event Mapping"
             )
 
             if self.dataset_config.class_weights_loss or self.dataset_config.class_weights_sampler:
@@ -126,9 +130,10 @@ class PretrainDataModule(BaseDataModuleHF):
                 self.event_mapper,
                 remove_columns=["audio"],
                 batched=True,
-                batch_size=500,
-                load_from_cache_file=False,
+                batch_size=300,
+                load_from_cache_file=True,
                 num_proc=1,
+                desc="Event Mapping"
             )
 
             dataset = dataset.rename_column("ebird_code_multilabel", "labels")
@@ -146,37 +151,20 @@ class PretrainDataModule(BaseDataModuleHF):
             dataset = dataset.map(
                 self._classes_one_hot,
                 batched=True,
-                batch_size=500,
-                load_from_cache_file=False,
+                batch_size=300,
+                load_from_cache_file=True,
                 num_proc=1,
+                desc="One-hot-encoding"
             )
 
             if self.dataset_config.class_weights_loss or self.dataset_config.class_weights_sampler:
                 self.num_train_labels = self._count_labels((dataset["train"]["ebird_code"]))
 
-
         dataset["train"] = dataset["train"].select_columns(
-            ["filepath", "labels", "detected_events", "start_time", "end_time", "no_call_events"]
+            ["filepath", "labels", "detected_events", "start_time", "end_time"]
+        )
+        dataset["valid"] = dataset["valid"].select_columns(
+            ["filepath", "labels", "detected_events", "start_time", "end_time"]
         )
 
         return dataset
-
-    def _create_splits(self, dataset: DatasetDict | Dataset):
-       
-        if self.dataset_config.get("val_split"):
-            # no test set 
-            split = dataset["train"].train_test_split(
-                self.dataset_config.val_split, shuffle=True, seed=self.dataset_config.seed
-            )
-
-            return DatasetDict({
-                "train": split["train"],
-                "valid": split["test"]
-            })
-        else:
-            return dataset 
-        
-
-
-
-    

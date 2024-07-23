@@ -10,16 +10,17 @@ defaults:
   - override /hydra: cluster.yaml
 
 tags: ["XCL", "efficientnet", "multilabel"]
-seed: 2
+seed: 1
 train: True
 test: False
+ckpt_path: /mnt/work/bird2vec/birdset_logs/train/runs/XCL/efficientnet/12024-05-10_180319/callback_checkpoints/checkpoint-11.ckpt
 
 logger:
   wandb:
     tags: ${tags}
     group: pretrain_effnet_XCL
     mode: online
-    version: "pretrain_eat${seed}_${start_time}"
+    version: "pretrain_effnet1_2024-05-10_180319"
 
 trainer:
   min_epochs: 1
@@ -41,24 +42,22 @@ datamodule:
     class_weights_sampler: null
     classlimit: 500
     eventlimit: 1
+    direct_fingerprint: /scratch/birdset/XCL/XCL_processed_1_362dee0b0d9936df
 
   loaders:
     train:
       batch_size: 48
-      num_workers: 18
-    valid:
-      batch_size: 48
-      num_workers: 18
-    test:
-      batch_size: 48
-      num_workers: 18
+      num_workers: 20
 
 callbacks:
   model_checkpoint:
     #save_last: True
     #every_n_epochs: 5
-    every_n_train_steps: 10_000
+    #every_n_train_steps: 20_000
     save_top_k: -1
     #save_top_k: 5
     monitor: null
-    filename: 'checkpoint-{epoch:02d}-{step:06d}'
+    save_on_train_epoch_end: True
+    every_n_epochs: 1
+    #filename: 'checkpoint-{epoch:02d}-{step:06d}'
+    filename: 'checkpoint-{epoch:02d}'
