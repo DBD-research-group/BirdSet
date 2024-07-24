@@ -71,13 +71,13 @@ class BEATsConfig:
 class BEATs(nn.Module):
     def __init__(
             self,
-            cfg: BEATsConfig,
+            cfg: BEATsConfig, device='cuda:0'
     ) -> None:
         super().__init__()
         logger.info(f"BEATs Config: {cfg.__dict__}")
 
         self.cfg = cfg
-
+        self.device = device    
         self.embed = cfg.embed_dim
         self.post_extract_proj = (
             nn.Linear(self.embed, cfg.encoder_embed_dim)
@@ -106,6 +106,7 @@ class BEATs(nn.Module):
             features: torch.Tensor,
             padding_mask: torch.Tensor,
     ) -> torch.Tensor:
+
         extra = padding_mask.size(1) % features.size(1)
         if extra > 0:
             padding_mask = padding_mask[:, :-extra]
@@ -121,12 +122,16 @@ class BEATs(nn.Module):
             fbank_mean: float = 15.41663,
             fbank_std: float = 6.55582,
     ) -> torch.Tensor:
+
         fbanks = []
+        device = source.device
         for waveform in source:
-            waveform = waveform.unsqueeze(0) * 2 ** 15
+            waveform = waveform * 2 ** 15
+            waveform.to(device)
             fbank = ta_kaldi.fbank(waveform, num_mel_bins=128, sample_frequency=16000, frame_length=25, frame_shift=10)
             fbanks.append(fbank)
         fbank = torch.stack(fbanks, dim=0)
+        fbank = fbank.to(device)
         fbank = (fbank - fbank_mean) / (2 * fbank_std)
         return fbank
 
@@ -138,7 +143,8 @@ class BEATs(nn.Module):
             fbank_std: float = 6.55582,
     ):
         fbank = self.preprocess(source, fbank_mean=fbank_mean, fbank_std=fbank_std)
-
+        device = source.device
+        fbank.to(device)
         if padding_mask is not None:
             padding_mask = self.forward_padding_mask(fbank, padding_mask)
 

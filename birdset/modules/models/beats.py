@@ -1,55 +1,16 @@
 from typing import Optional, Tuple
+
+import sys
+import os
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath("/workspace/beats"))
+sys.path.append(os.path.dirname(SCRIPT_DIR))
+
+from workspace.beats.BEATs import BEATs, BEATsConfig
 import torch
 from torch import nn
 import torch.nn.functional as F
 import torchaudio.transforms as T
-from beats.BEATs import BEATs, BEATsConfig
-
-
-class BEATsProcessor:
-    def __init__(self, mean, std, device='cuda:0'):
-        self.MEAN = mean
-        self.STD = std
-        self.device = device  # Store the device information
-        self.mel_spectrogram = T.MelSpectrogram(
-            sample_rate=16000,  # Assuming a sample rate of 16000 Hz
-            n_fft=400,
-            win_length=400,
-            hop_length=160,
-            center=False,
-            pad=0,
-            window_fn=torch.hann_window,  # Move window to the specified device
-            n_mels=128,
-            power=2.0,
-            normalized=False,
-        )  
-
-    def process_batch(self, input_values):
-        # get device of input tensor
-        device = input_values.device
-        self.mel_spectrogram.to(device)
-
-        # Compute mel spectrogram for the batch
-        melspec = self.mel_spectrogram(input_values)  # shape (batch_size, 128, n_frames)
-
-        # Pad or truncate to 1024 frames
-        max_frames = 1024
-        current_frames = melspec.shape[-1]
-        if current_frames < max_frames:
-            padding = max_frames - current_frames
-            melspec = torch.nn.functional.pad(melspec, (0, padding))
-        else:
-            melspec = melspec[:, :, :max_frames]
-        
-        # transform from (batch_size, 1, 128, 1024) to (batchsize, 1, 1024, 128) (swap two last columns)
-        melspec = melspec.transpose(2, 3)
-
-
-        # Normalize
-        melspec = (melspec - self.MEAN) / (self.STD * 2)
-
-        return melspec
-
 
 
 
@@ -58,9 +19,7 @@ class BEATsModel(nn.Module):
     Pretrained model for audio classification using the BEATs model.
     The model expects a 1D audio signal sampled with 16kHz and a length of 10s.
     """
-    EMBEDDING_SIZE = 256
-    MEAN = 0
-    STD = 0.5
+    EMBEDDING_SIZE = 768
 
     def __init__(
             self,
@@ -72,7 +31,6 @@ class BEATsModel(nn.Module):
         self.load_model()
         self.num_classes = num_classes
         self.train_classifier = train_classifier
-        self.preprocessor = BEATsProcessor(mean=self.MEAN, std=self.STD, device='cuda:0')
          # Define a linear classifier to use on top of the embeddings
         # self.classifier = nn.Linear(
         #     in_features=self.EMBEDDING_SIZE, out_features=num_classes
@@ -100,34 +58,33 @@ class BEATsModel(nn.Module):
         self.model.eval()
 
 
-
     
     def forward(
-        self, input_values: torch.Tensor, labels: Optional[torch.Tensor] = None
-    ) -> torch.Tensor:
-        """
-        Forward pass through the model.
+            self, input_values: torch.Tensor, labels: Optional[torch.Tensor] = None
+        ) -> torch.Tensor:
+            """
+            Forward pass through the model.
 
-        Args:
-            input_values (torch.Tensor): The input tensor for the classifier.
-            labels (Optional[torch.Tensor]): The true labels for the input values. Default is None.
+            Args:
+                input_values (torch.Tensor): The input tensor for the classifier.
+                labels (Optional[torch.Tensor]): The true labels for the input values. Default is None.
 
-        Returns:
-            torch.Tensor: The output of the classifier.
-        """
-        melspec = self.preprocessor.process_batch(input_values)
-        embeddings = self.model(melspec)
+            Returns:
+                torch.Tensor: The output of the classifier.
+            """
+            #print("input_values",input_values.size())
+            embeddings = self.get_embeddings(input_values)
+            #print("embeddings",embeddings.size())
+            if self.train_classifier:
+                # Pass embeddings through the classifier to get the final output
+                output = self.classifier(embeddings)
+            else:
+                output = embeddings
 
-        if self.train_classifier:
-            # Pass embeddings through the classifier to get the final output
-            output = self.classifier(embeddings)
-        else:
-            output = embeddings
-
-        return output
+            return output
 
     def get_embeddings(
-        self, input_tensor: torch.Tensor
+        self, input_values: torch.Tensor
     ) -> torch.Tensor:
         """
         Get the embeddings and logits from the AUDIOMAE model.
@@ -138,7 +95,5 @@ class BEATsModel(nn.Module):
         Returns:
             torch.Tensor: The embeddings from the model.
         """
-        melspecs = self.preprocessor.process_batch(input_tensor)
-        embeddings = self.model(melspecs)
-        return embeddings
-
+        embeddings = self.model.extract_features(input_values)[0]
+        return embeddings[:,-1,:]

@@ -29,7 +29,7 @@ module:
     #_target_: birdset.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
 
 trainer: 
-  max_epochs: 10
+  max_epochs: 3
   accelerator: gpu
   devices: 1
 
