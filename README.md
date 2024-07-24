@@ -30,6 +30,11 @@ poetry shell
 
 ## Reproduce Neurips2024 Baselines
 
+> 🚧 This repository is still under active development. You can access the NeurIPS 24 code at the tag  `neurips2024`
+> ```bash
+> git checkout neurips2024
+```
+
 First, you have to download the background noise files for augmentations
 
 ``` bash
@@ -43,7 +48,7 @@ We provide all experiment YAML files used to generate our results in the path `b
 The experiments for `DT` with the dedicated subset can be easily run with a single line: 
 
 ``` bash
-python birdset/train.py experiment="birdset_neurips24/DT/$Model"
+python birdset/train.py experiment="birdset_neurips24/$Dataset/DT/$Model"
 ```
 
 ### Medium Training (MT) and Large Training (LT)
