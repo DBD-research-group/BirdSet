@@ -1,15 +1,16 @@
 model_name: "eat"
 model:
   _target_: birdset.modules.models.eat_soundnet.SoundNet
-  nf: 32
+  nf: 16
   seq_len: 110250
   embed_dim: 128
   n_layers: 4
   nhead: 8
   factors: [4, 4, 4, 4]
-  n_classes: ${datamodule.dataset.n_classes}
+  n_classes: null
   dim_feedforward: 512
-  checkpoint: null
+  pretrain_info: null
+  
 torch_compile: False
 model_type: waveform
 sampling_rate: 22050

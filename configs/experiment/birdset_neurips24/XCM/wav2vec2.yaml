@@ -1,0 +1,70 @@
+# @package _global_
+# package global is necessary!
+defaults:
+  - override /datamodule: XCM.yaml
+  - override /module: multilabel.yaml
+  - override /module/network: wav2vec2.yaml
+  - override /callbacks: default.yaml
+  - override /trainer: single_gpu.yaml
+  - override /datamodule/transforms: bird_default_multilabel.yaml
+  - override /paths: default.yaml
+
+tags: ["birdsetMT", "pretrain"]
+seed: 2
+test: False
+
+logger:
+  wandb:
+    tags: ${tags}
+    group: "MT_XCM_wav2vec2"
+    mode: offline
+
+module:
+  optimizer:
+    lr: 3e-5
+  network:
+    model:
+      _target_: birdset.modules.models.wav2vec2.Wav2vec2SequenceClassifier # a path to the pyton calls eg. foo.bar.name
+      pretrain_info:
+        hf_name: POW
+        hf_pretrain_name: XCM
+        valid_test_only: True
+    model_name: Wav2vec2 # the end of model_path eg. name
+
+trainer:
+  min_epochs: 1
+  max_epochs: 100
+
+callbacks:
+  model_checkpoint:
+    monitor: val/BCEWithLogitsLoss
+    dirpath: /mnt/work/bird2vec/logs_mw/checkpoints/${datamodule.dataset.hf_name}/${module.network.model_name}
+    filename: ${module.network.model_name}_${datamodule.dataset.dataset_name}_{epoch:02d}
+    save_last: True
+    save_top_k: 3
+    mode: "min"
+
+datamodule:
+  dataset:
+    val_split: 0.1
+    subset: 200
+    classlimit: null
+    eventlimit: null
+  loaders:
+    train:
+      batch_size: 64
+      shuffle: True
+      num_workers: 24
+      drop_last: False
+      prefetch_factor: 7
+    valid:
+      batch_size: 64
+      num_workers: 24
+    test:
+      batch_size: 64
+      num_workers: 24
+  transforms:
+    preprocessing:
+      normalize_waveform: "instance_normalization"
+      use_spectrogram: False
+

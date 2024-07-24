@@ -1,112 +1,21 @@
-from dataclasses import asdict, dataclass, field
-import logging
+from dataclasses import asdict
 import torch
 import random
 import os
-from typing import List, Literal, Optional
 from collections import Counter
-from torch.utils.data import Subset
-from tqdm import tqdm
 import lightning as L
-import numpy as np
 import pandas as pd
-import hydra 
-
+import datasets
 from datasets import load_dataset, load_from_disk, Audio, DatasetDict, Dataset, IterableDataset, IterableDatasetDict
 from torch.utils.data import DataLoader
-from birdset.datamodule.components.event_mapping import XCEventMapping
+from copy import deepcopy
+
 from birdset.datamodule.components.transforms import BirdSetTransformsWrapper
+from birdset.utils import pylogger
+from birdset.configs import DatasetConfig, LoadersConfig
 
-@dataclass
-class DatasetConfig:
-    """
-    A class used to configure the dataset for the model.
+log = pylogger.get_pylogger(__name__)
 
-    Attributes
-    ----------
-    data_dir : str
-        Specifies the directory where the dataset files are stored.  **Important**: The dataset uses a lot of disk space, so make sure you have enough storage available.
-    dataset_name : str
-        The name assigned to the dataset.
-    hf_path : str
-        The path to the dataset stored on HuggingFace.
-    hf_name : str
-        The name of the dataset on HuggingFace.
-    seed : int
-        A seed value for ensuring reproducibility across runs.
-    n_classes : int
-        The total number of distinct classes in the dataset.
-    n_workers : int
-        The number of worker processes used for data loading.
-    val_split : float
-        The proportion of the dataset reserved for validation.
-    task : str
-        Defines the type of task (e.g., 'multilabel' or 'multiclass').
-    subset : int, optional
-        A subset of the dataset to use. If None, the entire dataset is used.
-    sampling_rate : int
-        The sampling rate for audio data processing.
-    class_weights_loss : bool, optional
-        (Deprecated) Previously used for applying class weights in loss calculation.
-    class_weights_sampler : bool, optional
-        Indicates whether to use class weights in the sampler for handling imbalanced datasets.
-    classlimit : int, optional
-        The maximum number of samples per class. If None, all samples are used.
-    eventlimit : int, optional
-        Defines the maximum number of audio events processed per audio file, capping the quantity to ensure balance across files. If None, all events are processed.
-    """
-    data_dir: str = "/workspace/data_birdset"
-    dataset_name: str = "esc50"
-    hf_path: str = "ashraq/esc50"
-    hf_name: str = ""
-    seed: int = 42
-    n_classes: int = 50
-    n_workers: int = 1
-    val_split: float = 0.2
-    task: Literal["multiclass", "multilabel"] = "multiclass"
-    subset: Optional[int] = None
-    sampling_rate: int = 32_000
-    class_weights_loss: Optional[bool] = None
-    class_weights_sampler: Optional[bool] = None
-    classlimit: Optional[int] = None
-    eventlimit: Optional[int] = None
-
-
-@dataclass
-class LoaderConfig:
-    """
-    A class used to configure the data loader for the model.
-
-    Attributes
-    ----------
-    batch_size : int
-        Specifies the number of samples contained in each batch. This is a crucial parameter as it impacts memory utilization and model performance.
-    shuffle : bool
-        Determines whether the data is shuffled at the beginning of each epoch. Shuffling is typically used for training data to ensure model robustness and prevent overfitting.
-    num_workers : int
-        Sets the number of subprocesses to be used for data loading. More workers can speed up the data loading process but also increase memory consumption.
-    pin_memory : bool
-        When set to `True`, enables the DataLoader to copy Tensors into CUDA pinned memory before returning them. This can lead to faster data transfer to CUDA-enabled GPUs.
-    drop_last : bool
-        Determines whether to drop the last incomplete batch. Setting this to `True` is useful when the total size of the dataset is not divisible by the batch size.
-    persistent_workers : bool
-        Indicates whether the data loader should keep the workers alive for the next epoch. This can improve performance at the cost of memory.
-    prefetch_factor : int
-        Defines the number of samples loaded in advance by each worker. This parameter is commented out here and can be adjusted based on specific requirements.
-    """
-    batch_size: int = 32
-    shuffle: bool = True
-    num_workers: int = 1
-    pin_memory: bool = True
-    drop_last: bool = False
-    persistent_workers: bool = True
-    prefetch_factor: int = 2 
-
-@dataclass
-class LoadersConfig:
-    train: LoaderConfig = LoaderConfig()
-    valid: LoaderConfig = LoaderConfig(shuffle=False)
-    test: LoaderConfig = LoaderConfig(shuffle=False)
 
 class BaseDataModuleHF(L.LightningDataModule):
     """
@@ -128,17 +37,15 @@ class BaseDataModuleHF(L.LightningDataModule):
     """
 
     def __init__(
-        self, 
-        mapper: XCEventMapping | None = None,
-        dataset: DatasetConfig = DatasetConfig(),
-        loaders: LoadersConfig = LoadersConfig(),
-        transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
-        ):
+            self,
+            dataset: DatasetConfig = DatasetConfig(),
+            loaders: LoadersConfig = LoadersConfig(),
+            transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
+    ):
         super().__init__()
         self.dataset_config = dataset
         self.loaders_config = loaders
-        self.transforms = transforms #hier erst nach 15 iterations??
-        self.event_mapper = mapper
+        self.transforms = transforms
 
         self.data_path = None
         self.train_dataset = None
@@ -154,11 +61,10 @@ class BaseDataModuleHF(L.LightningDataModule):
         # Make some config parameters accessible
         self.task = self.dataset_config.task
         self.train_batch_size = self.loaders_config.train.batch_size
-        
 
     @property
     def num_classes(self):
-        return self.dataset_config.n_classes
+        return len(datasets.load_dataset_builder(self.dataset_config.hf_path, self.dataset_config.hf_name).info.features["ebird_code"].names)
 
     def prepare_data(self):
         """
@@ -189,33 +95,33 @@ class BaseDataModuleHF(L.LightningDataModule):
 
         """
 
-        logging.info("Check if preparing has already been done.")
+        log.info("Check if preparing has already been done.")
         if self._prepare_done:
-            logging.info("Skip preparing.")
+            log.info("Skip preparing.")
             return
 
-        logging.info("Prepare Data")
+        log.info("Prepare Data")
 
         dataset = self._load_data()
         dataset = self._preprocess_data(dataset)
         dataset = self._create_splits(dataset)
 
         # set the length of the training set to be accessed by the model
-        self.len_trainset = len(dataset["train"])        
+        self.len_trainset = len(dataset["train"])
         self._save_dataset_to_disk(dataset)
 
         # set to done so that lightning does not call it again
         self._prepare_done = True
-       
+
     def _preprocess_data(self, dataset):
         """
         Preprocesses the dataset.
         This includes stuff that only needs to be done once.
         """
-          
+
         return dataset
 
-    def _save_dataset_to_disk(self, dataset):
+    def _save_dataset_to_disk(self, dataset: Dataset | DatasetDict):
         """
         Saves the dataset to disk.
 
@@ -223,13 +129,14 @@ class BaseDataModuleHF(L.LightningDataModule):
         the dataset to disk. If the dataset already exists on disk, it does not save the dataset again.
 
         Args:
-            dataset (datasets.Dataset): The dataset to be saved. The dataset should be a Hugging Face `datasets.Dataset` object.
+            dataset (datasets.DatasetDict): The dataset to be saved. The dataset should be a Hugging Face `datasets.DatasetDict` object.
 
         Returns:
             None
         """
         dataset.set_format("np")
-        fingerprint = dataset["train"]._fingerprint
+
+        fingerprint = dataset[next(iter(dataset))]._fingerprint if isinstance(dataset, DatasetDict) else dataset._fingerprint  # changed to next_iter to be more robust
 
         self.disk_save_path = os.path.join(
             self.dataset_config.data_dir,
@@ -237,9 +144,9 @@ class BaseDataModuleHF(L.LightningDataModule):
         )
 
         if os.path.exists(self.disk_save_path):
-            logging.info(f"Train fingerprint found in {self.disk_save_path}, saving to disk is skipped")
+            log.info(f"Train fingerprint found in {self.disk_save_path}, saving to disk is skipped")
         else:
-            logging.info(f"Saving to disk: {self.disk_save_path}")
+            log.info(f"Saving to disk: {self.disk_save_path}")
             dataset.save_to_disk(self.disk_save_path)
 
     def _ensure_train_test_splits(self, dataset: Dataset | DatasetDict) -> DatasetDict:
@@ -256,8 +163,8 @@ class BaseDataModuleHF(L.LightningDataModule):
             else:
                 dataset = dataset[list(dataset.keys())[0]]
                 return self._ensure_train_test_splits(dataset)
-    
-    def _create_splits(self, dataset: DatasetDict | Dataset):
+
+    def _create_splits(self, dataset: DatasetDict | Dataset) -> DatasetDict:
         """
         Creates train, validation, and test splits for the dataset.
 
@@ -280,6 +187,8 @@ class BaseDataModuleHF(L.LightningDataModule):
             return DatasetDict({"train": split_1["train"], "valid": split_2["train"], "test": split_2["test"]})
         elif isinstance(dataset, DatasetDict):
             # check if dataset has train, valid, test splits
+            if "train" in dataset.keys() and "valid" in dataset.keys():
+                 return dataset
             if "train" in dataset.keys() and "valid" in dataset.keys() and "test" in dataset.keys():
                 return dataset
             if "train" in dataset.keys() and "test" in dataset.keys():
@@ -287,19 +196,16 @@ class BaseDataModuleHF(L.LightningDataModule):
                     self.dataset_config.val_split, shuffle=True, seed=self.dataset_config.seed
                 )
                 return DatasetDict({"train": split["train"], "valid": split["test"], "test": dataset["test"]})
-            # if dataset has only one key, split it into train, valid, test
-            elif "train" in dataset.keys() and "test" not in dataset.keys():
-                return self._create_splits(dataset["train"])
-            else: 
+            else:
                 return self._create_splits(dataset[list(dataset.keys())[0]])
 
-    def _load_data(self,decode: bool = True ):
+    def _load_data(self, decode: bool = True) -> DatasetDict:
         """
         Load audio dataset from Hugging Face Datasets.
 
         Returns HF dataset with audio column casted to Audio feature, containing audio data as numpy array and sampling rate.
         """
-        logging.info("> Loading data set.")
+        log.info("> Loading data set.")
 
         dataset = load_dataset(
             name=self.dataset_config.hf_name,
@@ -307,13 +213,12 @@ class BaseDataModuleHF(L.LightningDataModule):
             cache_dir=self.dataset_config.data_dir,
             num_proc=3,
         )
-        if isinstance(dataset, IterableDataset |IterableDatasetDict):
-            logging.error("Iterable datasets not supported yet.")
+        if isinstance(dataset, IterableDataset | IterableDatasetDict):
+            log.error("Iterable datasets not supported yet.")
             return
         assert isinstance(dataset, DatasetDict | Dataset)
         dataset = self._ensure_train_test_splits(dataset)
 
-        
         if self.dataset_config.subset:
             dataset = self._fast_dev_subset(dataset, self.dataset_config.subset)
 
@@ -326,8 +231,8 @@ class BaseDataModuleHF(L.LightningDataModule):
             ),
         )
         return dataset
-    
-    def _fast_dev_subset(self, dataset: DatasetDict, size: int=500):
+
+    def _fast_dev_subset(self, dataset: DatasetDict, size: int = 500):
         """
         Selects a subset of the dataset for fast development.
 
@@ -345,58 +250,59 @@ class BaseDataModuleHF(L.LightningDataModule):
             random_indices = random.sample(range(len(dataset[split])), size)
             dataset[split] = dataset[split].select(random_indices)
         return dataset
-    
  
     def _get_dataset(self, split):
         """
         Get Dataset from disk and add run-time transforms to a specified split.
         """
-        
+
         dataset = load_from_disk(os.path.join(self.disk_save_path, split))
 
-        self.transforms.set_mode(split)
+        transforms = deepcopy(self.transforms)
+        transforms.set_mode(split)
 
-        if split == "train": # we need this for sampler, cannot be done later because set_transform
+        if split == "train":  # we need this for sampler, cannot be done later because set_transform
             self.train_label_list = dataset["labels"]
 
         # add run-time transforms to dataset
-        dataset.set_transform(self.transforms, output_all_columns=False) 
-        
+        dataset.set_transform(transforms, output_all_columns=False)
+
         return dataset
     
     def _create_weighted_sampler(self):
         label_counts = torch.tensor(self.num_train_labels)
-        #calculate sample weights
-        sample_weights = (label_counts / label_counts.sum())**(-0.5)    
-        #when no_call = 0 --> 0 probability 
+        # calculate sample weights
+        sample_weights = (label_counts / label_counts.sum()) ** (-0.5)
+        # when no_call = 0 --> 0 probability
         sample_weights = torch.where(
-            condition=torch.isinf(sample_weights), 
-            input=torch.tensor(0), 
+            condition=torch.isinf(sample_weights),
+            input=torch.tensor(0),
             other=sample_weights
         )
 
-        if self.dataset_config.task == "multiclass":
+        if self.task == "multiclass":
             weight_list = [sample_weights[classes] for classes in self.train_label_list]
-        elif self.dataset_config.task == "multilabel": # sum up weights if multilabel
+        elif self.task == "multilabel":  # sum up weights if multilabel
             weight_list = torch.matmul(torch.tensor(self.train_label_list, dtype=torch.float32), sample_weights)
+        else:
+            raise f"dataset config task can not be {self.task}"
 
         weighted_sampler = torch.utils.data.WeightedRandomSampler(
             weight_list, len(weight_list)
         )
 
         return weighted_sampler
-                
     
     def setup(self, stage=None):
         if not self.train_dataset and not self.val_dataset:
             if stage == "fit":
-                logging.info("fit")
-                self.train_dataset = self._get_dataset("train")
+                log.info("fit")
                 self.val_dataset = self._get_dataset("valid")
-
+                self.train_dataset = self._get_dataset("train")
+ 
         if not self.test_dataset:
             if stage == "test":
-                logging.info("test")
+                log.info("test")
                 self.test_dataset = self._get_dataset("test")
 
     def _count_labels(self, labels):
@@ -430,20 +336,20 @@ class BaseDataModuleHF(L.LightningDataModule):
         # Subset the dataset
         return dataset.select(limited_indices)
 
-    def _unique_identifier(self, x, label_name):
-        file = x["filepath"]
-        label = x[label_name]
-        return {"id": f"{file}-{label}"}
-
     def _smart_sampling(self, dataset, label_name, class_limit, event_limit):
+        def _unique_identifier(x, labelname):
+            file = x["filepath"]
+            label = x[labelname]
+            return {"id": f"{file}-{label}"}
+
         class_limit = class_limit if class_limit else -float("inf")
-        dataset = dataset.map(lambda x: self._unique_identifier(x, label_name))
+        dataset = dataset.map(lambda x: _unique_identifier(x, label_name), desc="smart-sampling-1")
         df = pd.DataFrame(dataset)
         path_label_count = df.groupby(["id", label_name], as_index=False).size()
         path_label_count = path_label_count.set_index("id")
         class_sizes = df.groupby(label_name).size()
 
-        for label in tqdm(class_sizes.index, desc="Processing labels"):
+        for label in class_sizes.index:
             current = path_label_count[path_label_count[label_name] == label]
             total = current["size"].sum()
             most = current["size"].max()
@@ -491,9 +397,7 @@ class BaseDataModuleHF(L.LightningDataModule):
             dict: The batch with the "labels" field converted to one-hot encoding. The keys are the field names and the values are the field data.
         """
         label_list = [y for y in batch["labels"]]
-        class_one_hot_matrix = torch.zeros(
-            (len(label_list), self.dataset_config.n_classes), dtype=torch.float
-        )
+        class_one_hot_matrix = torch.zeros((len(label_list), self.num_classes), dtype=torch.float)
 
         for class_idx, idx in enumerate(label_list):
             class_one_hot_matrix[class_idx, idx] = 1
@@ -512,7 +416,7 @@ class BaseDataModuleHF(L.LightningDataModule):
             return DataLoader(self.train_dataset, **asdict(self.loaders_config.train))  # type: ignore
 
     def val_dataloader(self):
-        return DataLoader(self.val_dataset, **asdict(self.loaders_config.valid)) # type: ignore
+        return DataLoader(self.val_dataset, **asdict(self.loaders_config.valid))  # type: ignore
 
     def test_dataloader(self):
-        return DataLoader(self.test_dataset, **asdict(self.loaders_config.test)) # type: ignore
+        return DataLoader(self.test_dataset, **asdict(self.loaders_config.test))  # type: ignore

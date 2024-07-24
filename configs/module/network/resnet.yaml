@@ -1,9 +1,10 @@
 model:
   _target_: birdset.modules.models.resnet.ResNetClassifier
   baseline_architecture: 'resnet18'
-  num_classes: ${datamodule.dataset.n_classes}
+  num_classes: null
   num_channels: 1
   pretrained: True
+  pretrain_info: null
 
 model_name: resnet18
 model_type: vision
