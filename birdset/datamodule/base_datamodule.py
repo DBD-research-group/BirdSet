@@ -1,21 +1,19 @@
 from dataclasses import asdict, dataclass, field
-import logging
 import torch
 import random
 import os
 from typing import List, Literal, Optional
 from collections import Counter
-from torch.utils.data import Subset
 from tqdm import tqdm
 import lightning as L
-import numpy as np
 import pandas as pd
-import hydra 
 
 from datasets import load_dataset, load_from_disk, Audio, DatasetDict, Dataset, IterableDataset, IterableDatasetDict
 from torch.utils.data import DataLoader
 from birdset.datamodule.components.event_mapping import XCEventMapping
 from birdset.datamodule.components.transforms import BirdSetTransformsWrapper
+from birdset.utils import pylogger
+log = pylogger.get_pylogger(__name__)
 
 @dataclass
 class DatasetConfig:
@@ -70,7 +68,7 @@ class DatasetConfig:
     class_weights_sampler: Optional[bool] = None
     classlimit: Optional[int] = None
     eventlimit: Optional[int] = None
-
+    direct_fingerprint: Optional[str] = None
 
 @dataclass
 class LoaderConfig:
@@ -189,12 +187,12 @@ class BaseDataModuleHF(L.LightningDataModule):
 
         """
 
-        logging.info("Check if preparing has already been done.")
+        log.info("Check if preparing has already been done.")
         if self._prepare_done:
-            logging.info("Skip preparing.")
+            log.info("Skip preparing.")
             return
 
-        logging.info("Prepare Data")
+        log.info("Prepare Data")
 
         dataset = self._load_data()
         dataset = self._preprocess_data(dataset)
@@ -229,7 +227,7 @@ class BaseDataModuleHF(L.LightningDataModule):
             None
         """
         dataset.set_format("np")
-        fingerprint = dataset["train"]._fingerprint
+        fingerprint = dataset[next(iter(dataset))]._fingerprint # changed to next_iter to be more robust
 
         self.disk_save_path = os.path.join(
             self.dataset_config.data_dir,
@@ -237,9 +235,9 @@ class BaseDataModuleHF(L.LightningDataModule):
         )
 
         if os.path.exists(self.disk_save_path):
-            logging.info(f"Train fingerprint found in {self.disk_save_path}, saving to disk is skipped")
+            log.info(f"Train fingerprint found in {self.disk_save_path}, saving to disk is skipped")
         else:
-            logging.info(f"Saving to disk: {self.disk_save_path}")
+            log.info(f"Saving to disk: {self.disk_save_path}")
             dataset.save_to_disk(self.disk_save_path)
 
     def _ensure_train_test_splits(self, dataset: Dataset | DatasetDict) -> DatasetDict:
@@ -299,7 +297,7 @@ class BaseDataModuleHF(L.LightningDataModule):
 
         Returns HF dataset with audio column casted to Audio feature, containing audio data as numpy array and sampling rate.
         """
-        logging.info("> Loading data set.")
+        log.info("> Loading data set.")
 
         dataset = load_dataset(
             name=self.dataset_config.hf_name,
@@ -308,7 +306,7 @@ class BaseDataModuleHF(L.LightningDataModule):
             num_proc=3,
         )
         if isinstance(dataset, IterableDataset |IterableDatasetDict):
-            logging.error("Iterable datasets not supported yet.")
+            log.error("Iterable datasets not supported yet.")
             return
         assert isinstance(dataset, DatasetDict | Dataset)
         dataset = self._ensure_train_test_splits(dataset)
@@ -390,13 +388,16 @@ class BaseDataModuleHF(L.LightningDataModule):
     def setup(self, stage=None):
         if not self.train_dataset and not self.val_dataset:
             if stage == "fit":
-                logging.info("fit")
+                log.info("fit")
+ 
+                if self.dataset_config.get("val_split"):
+                    self.val_dataset = self._get_dataset("valid")
+ 
                 self.train_dataset = self._get_dataset("train")
-                self.val_dataset = self._get_dataset("valid")
-
+ 
         if not self.test_dataset:
             if stage == "test":
-                logging.info("test")
+                log.info("test")
                 self.test_dataset = self._get_dataset("test")
 
     def _count_labels(self, labels):
@@ -437,7 +438,7 @@ class BaseDataModuleHF(L.LightningDataModule):
 
     def _smart_sampling(self, dataset, label_name, class_limit, event_limit):
         class_limit = class_limit if class_limit else -float("inf")
-        dataset = dataset.map(lambda x: self._unique_identifier(x, label_name))
+        dataset = dataset.map(lambda x: self._unique_identifier(x, label_name)) #TODO: what are we doing here
         df = pd.DataFrame(dataset)
         path_label_count = df.groupby(["id", label_name], as_index=False).size()
         path_label_count = path_label_count.set_index("id")

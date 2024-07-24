@@ -2,11 +2,14 @@ from collections import Counter
 from birdset.datamodule.components.event_decoding import EventDecoding
 from birdset.datamodule.components.transforms import BirdSetTransformsWrapper
 from birdset.datamodule.components.event_mapping import XCEventMapping
+from birdset.utils import pylogger
 from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
 from datasets import DatasetDict, Dataset
-from datasets import load_dataset, Audio
+from datasets import load_dataset, Audio, load_from_disk
 import logging
 import torch
+import os
+log = pylogger.get_pylogger(__name__)
 
 
 class PretrainDataModule(BaseDataModuleHF):
@@ -23,6 +26,35 @@ class PretrainDataModule(BaseDataModuleHF):
             transforms=transforms,
             mapper=mapper
         )
+
+    def prepare_data(self):
+        if self.dataset_config.direct_fingerprint:
+
+            if self._prepare_done:
+                log.info("Skip preparing.")
+                return
+            path = self.dataset_config.direct_fingerprint
+            log.info(f"Loading an already sharded dataset from local path: {path}")
+            dataset = load_from_disk(os.path.join(path, "train"))
+            self.len_trainset = len(dataset)
+            self._prepare_done = True
+        else:
+            return super().prepare_data()
+    
+    def _get_dataset(self, split):
+        if self.dataset_config.direct_fingerprint:
+            path = self.dataset_config.direct_fingerprint
+            dataset = load_from_disk(os.path.join(path, split))
+
+            self.transforms.set_mode(split)
+            if split == "train": # we need this for sampler, cannot be done later because set_transform
+                self.train_label_list = dataset["labels"]
+
+            dataset.set_transform(self.transforms, output_all_columns=False) 
+        
+            return dataset
+        else:
+            return super()._get_dataset(split)
 
     def _load_data(self, decode: bool = False):
         """
@@ -52,7 +84,7 @@ class PretrainDataModule(BaseDataModuleHF):
             ),
         )
 
-        return dataset
+        return dataset       
     
     def _preprocess_data(self, dataset):
         if self.dataset_config.task == "multiclass":
@@ -94,7 +126,7 @@ class PretrainDataModule(BaseDataModuleHF):
                 self.event_mapper,
                 remove_columns=["audio"],
                 batched=True,
-                batch_size=350,
+                batch_size=500,
                 load_from_cache_file=False,
                 num_proc=1,
             )
@@ -130,14 +162,21 @@ class PretrainDataModule(BaseDataModuleHF):
         return dataset
 
     def _create_splits(self, dataset: DatasetDict | Dataset):
-        # no test set 
-        split = dataset["train"].train_test_split(
-            self.dataset_config.val_split, shuffle=True, seed=self.dataset_config.seed
-        )
+       
+        if self.dataset_config.get("val_split"):
+            # no test set 
+            split = dataset["train"].train_test_split(
+                self.dataset_config.val_split, shuffle=True, seed=self.dataset_config.seed
+            )
 
-        return DatasetDict({
-            "train": split["train"],
-            "valid": split["test"]
-        })
+            return DatasetDict({
+                "train": split["train"],
+                "valid": split["test"]
+            })
+        else:
+            return dataset 
+        
+
+
 
     

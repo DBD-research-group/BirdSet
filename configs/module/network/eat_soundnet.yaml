@@ -10,6 +10,8 @@ model:
   n_classes: ${datamodule.dataset.n_classes}
   dim_feedforward: 512
   checkpoint: null
+  pretrain_info: null
+  
 torch_compile: False
 model_type: waveform
 sampling_rate: 22050

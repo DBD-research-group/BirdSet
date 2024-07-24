@@ -1,0 +1,83 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - override /datamodule: PER.yaml
+  - override /module: multilabel.yaml
+  - override /module/network: ast.yaml
+  - override /callbacks: cluster.yaml 
+  - override /trainer: single_gpu.yaml
+  - override /datamodule/transforms: bird_default_multilabel.yaml
+  - override /paths: cluster.yaml
+  - override /hydra: cluster.yaml
+
+tags: ["subset_PER", "ast", "multilabel", "5event"]
+seed: 2
+train: True
+test: True
+
+ckpt_path: /mnt/work/bird2vec/birdset_logs/train/runs/PER/ast/52024-04-15_150556/callback_checkpoints/last.ckpt
+
+logger:
+  wandb:
+    tags: ${tags}
+    group: "PER_subset_ast"
+    mode: online
+    version: subset_ast_2024-04-15_150556 #to resume train run # needs to be tested
+
+module:
+  optimizer:
+    lr: 1e-5
+  loss:
+  #  _target_: birdset.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
+    _target_: torch.nn.BCEWithLogitsLoss 
+  #_target_: birdset.modules.losses.focal_loss.MultiLabelFocalLoss
+  network:
+    torch_compile: False
+    # pretrain_info:
+    #   hf_path: DBD-research-group/BirdSet
+    #   hf_name: PER
+    #   hf_pretrain_name: null
+
+trainer:
+  min_epochs: 1
+  max_epochs: 15
+
+datamodule:
+  dataset:
+    val_split: 0.2
+    class_weights_loss: null
+    class_weights_sampler: null
+    classlimit: 600
+    eventlimit: 5
+  transforms:
+    preprocessing:
+      resizer:
+        target_width: 1_024
+
+
+  loaders:
+    train:
+      batch_size: 14
+      shuffle: True
+      num_workers: 16
+      drop_last: True
+      prefetch_factor: 2
+
+    valid:
+      batch_size: 20
+      num_workers: 16
+      shuffle: False
+    
+    test:
+      batch_size: 20
+      num_workers: 16
+      shuffle: False
+
+  mapper: 
+    biggest_cluster: True
+    no_call: False
+  
+callbacks:
+  model_checkpoint:
+    save_last: True
+    every_n_epochs: 5

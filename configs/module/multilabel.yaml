@@ -16,8 +16,7 @@ optimizer:
   weight_decay: 0.01
 
 metrics:
-  #_target_: birdset.module.metrics.multilabel.MultilabelMetricsConfig
-  _target_: birdset.modules.metrics.multilabel.MultilabelMetricsConfig
+  _target_: birdset.module.metrics.multilabel.MultilabelMetricsConfig
   num_labels: ${datamodule.dataset.n_classes}
   
 
