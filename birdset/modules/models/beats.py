@@ -1,25 +1,15 @@
-from typing import Optional, Tuple
+from typing import Optional
 
-import sys
-import os
 
-SCRIPT_DIR = os.path.dirname(os.path.abspath("/workspace/beats"))
-sys.path.append(os.path.dirname(SCRIPT_DIR))
-
-from workspace.beats.BEATs import BEATs, BEATsConfig
+from birdset.modules.models.BEATs import BEATs, BEATsConfig
 import torch
 from torch import nn
-import torch.nn.functional as F
-import torchaudio.transforms as T
-
-
 
 class BEATsModel(nn.Module):
     """
     Pretrained model for audio classification using the BEATs model.
-    The model expects a 1D audio signal sampled with 16kHz and a length of 10s.
     """
-    EMBEDDING_SIZE = 768
+    EMBEDDING_SIZE = 496*768
 
     def __init__(
             self,
@@ -43,14 +33,17 @@ class BEATsModel(nn.Module):
             nn.ReLU(),
             nn.Linear(64, self.num_classes),
         )
+           # freeze the model
+        for param in self.model.parameters():
+            param.requires_grad = False
 
 
     def load_model(self) -> None:
         """
-        Load the model from Huggingface.
+        Load the model from shared storage.
         """
         # load the pre-trained checkpoints
-        checkpoint = torch.load('/workspace/BEATs.pt')
+        checkpoint = torch.load('/workspace/models/beats/BEATs_iter3_plus_AS2M.pt')
 
         cfg = BEATsConfig(checkpoint['cfg'])
         self.model = BEATs(cfg)
@@ -72,12 +65,11 @@ class BEATsModel(nn.Module):
             Returns:
                 torch.Tensor: The output of the classifier.
             """
-            #print("input_values",input_values.size())
             embeddings = self.get_embeddings(input_values)
-            #print("embeddings",embeddings.size())
             if self.train_classifier:
+                flattend_embeddings = embeddings.reshape(embeddings.size(0), -1)
                 # Pass embeddings through the classifier to get the final output
-                output = self.classifier(embeddings)
+                output = self.classifier(flattend_embeddings)
             else:
                 output = embeddings
 
@@ -87,7 +79,7 @@ class BEATsModel(nn.Module):
         self, input_values: torch.Tensor
     ) -> torch.Tensor:
         """
-        Get the embeddings and logits from the AUDIOMAE model.
+        Get the embeddings and logits from the BEATs model.
 
         Args:
             input_tensor (torch.Tensor): The input tensor for the model.
@@ -95,5 +87,6 @@ class BEATsModel(nn.Module):
         Returns:
             torch.Tensor: The embeddings from the model.
         """
-        embeddings = self.model.extract_features(input_values)[0]
-        return embeddings[:,-1,:]
+        embeddings = self.model.extract_features(input_values)[0] # outputs a tensor of size 496x768
+
+        return embeddings

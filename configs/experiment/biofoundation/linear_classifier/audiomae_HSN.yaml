@@ -22,14 +22,14 @@ logger:
 
 module:
   optimizer:
-    lr: 5e-4
+    lr: 1e-2
     weight_decay: 5e-4
   loss:
     _target_: torch.nn.BCEWithLogitsLoss
     #_target_: birdset.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
 
 trainer: 
-  max_epochs: 10
+  max_epochs: 50
   accelerator: gpu
   devices: 1
 

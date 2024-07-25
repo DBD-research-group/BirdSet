@@ -13,7 +13,7 @@ import torch.nn as nn
 from torch.nn import LayerNorm
 import torchaudio.compliance.kaldi as ta_kaldi
 
-from .backbone import (
+from birdset.modules.models.BEATs.backbone import (
     TransformerEncoder,
 )
 
@@ -23,7 +23,7 @@ from typing import Optional
 logger = logging.getLogger(__name__)
 
 
-class BEATsConfig:
+class BEATsConfig():
     def __init__(self, cfg=None):
         self.input_patch_size: int = -1  # path size of patch embedding
         self.embed_dim: int = 512  # patch embedding dimension
