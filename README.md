@@ -72,27 +72,27 @@ After training, the best model checkpoint is saved based on the validation loss 
 python birdset/eval.py experiment="birdset_neurips24/$EXPERIMENT_PATH" module.model.network.local_checkpoint="$CHECKPOINT_PATH"
 ```
 
-**Disclaimer on results:** The results obtained using the `eval.py` script may differ from those reported in the paper. This discrepancy is because only the "best" model checkpoint was uploaded to HuggingFace, whereas the paper’s results were averaged over three different random seeds for a more robust evaluation.
+**Disclaimer on results:** The results obtained using the `eval.py` script may differ from those reported in the paper. This discrepancy is because only the "best" model checkpoint was uploaded to Hugging Face, whereas the paper’s results were averaged over three different random seeds for a more robust evaluation.
 
 ## Example
 
-<!-- ## Log in to Huggingface
+<!-- ## Log in to Hugging Face
 
-Our datasets are shared via HuggingFace Datasets in our [HuggingFace BirdSet repository](https://huggingface.co/datasets/DBD-research-group/birdset_v1). Huggingface is a central hub for sharing and utilizing datasets and models, particularly beneficial for machine learning and data science projects. For accessing private datasets hosted on HuggingFace, you need to be authenticated. Here's how you can log in to HuggingFace:
+Our datasets are shared via Hugging Face Datasets in our [Hugging Face BirdSet repository](https://huggingface.co/datasets/DBD-research-group/BirdSet). Hugging Face is a central hub for sharing and utilizing datasets and models, particularly beneficial for machine learning and data science projects. For accessing private datasets hosted on Hugging Face, you need to be authenticated. Here's how you can log in to Hugging Face:
 
-1. **Install HuggingFace CLI**: If you haven't already, you need to install the HuggingFace CLI (Command Line Interface). This tool enables you to interact with HuggingFace services directly from your terminal. You can install it using pip:
+1. **Install Hugging Face CLI**: If you haven't already, you need to install the Hugging Face CLI (Command Line Interface). This tool enables you to interact with Hugging Face services directly from your terminal. You can install it using pip:
 
    ```bash
    pip install huggingface_hub
    ```
 
-2. **Login via CLI**: Once the HuggingFace CLI is installed, you can log in to your HuggingFace account directly from your terminal. This step is essential for accessing private datasets or contributing to the HuggingFace community. Use the following command:
+2. **Login via CLI**: Once the Hugging Face CLI is installed, you can log in to your Hugging Face account directly from your terminal. This step is essential for accessing private datasets or contributing to the Hugging Face community. Use the following command:
 
    ```bash
    huggingface-cli login
    ```
 
-   After executing this command, you'll be prompted to enter your HuggingFace credentials ([User Access Token](https://huggingface.co/docs/hub/security-tokens)). Once authenticated, your credentials will be saved locally, allowing seamless access to HuggingFace resources. -->
+   After executing this command, you'll be prompted to enter your Hugging Face credentials ([User Access Token](https://huggingface.co/docs/hub/security-tokens)). Once authenticated, your credentials will be saved locally, allowing seamless access to Hugging Face resources. -->
 [Tutorial Notebook](https://github.com/DBD-research-group/BirdSet/blob/main/notebooks/tutorials/birdset-pipeline_tutorial.ipynb)
 ## Prepare Data
 
@@ -166,13 +166,13 @@ python birdset/train.py experiment="EXPERIMENT_PATH"
 Replace `EXPERIMENT_PATH` with the path to the disired experiment YAML config originating from the `experiment` directory. For example, here's a command for training an EfficientNet on HSN: 
 
 ``` bash
-python bridset/train.py experiment="local/HSN/efficientnet.yaml"
+python birdset/train.py experiment="local/HSN/efficientnet.yaml"
 ```
 
 # Data pipeline
 
-Our datasets are shared via HuggingFace Datasets in our [BirdSet repository](https://huggingface.co/datasets/DBD-research-group/birdset_v1).
-First log in to HuggingFace with:
+Our datasets are shared via Hugging Face Datasets in our [BirdSet repository](https://huggingface.co/datasets/DBD-research-group/BirdSet).
+First log in to Hugging Face with:
 ```bash
 huggingface-cli login
 ```
@@ -186,7 +186,7 @@ The datamodules are defined in `birdset/datamodule` and configurations are store
 
 The following steps are performed in `prepare_data`:
 
-1. Data is downloaded from HuggingFace Datasets `_load_data`
+1. Data is downloaded from Hugging Face Datasets `_load_data`
 2. Data gets preprocessed with `_preprocess_data`
 3. Data is split into train validation and test sets with `_create_splits`
 4. Length of the dataset gets saved to access later
@@ -197,7 +197,7 @@ The following steps are performed in `setup`:
 
 ## Transformations
 
-Data transformations are referred to data transformations that are applied to the data during training. They include e.g. augmentations. The transformations are added to the huggingface dataset with [`set_transform`](https://huggingface.co/docs/datasets/main/en/package_reference/main_classes#datasets.Dataset.set_transform).
+Data transformations are referred to data transformations that are applied to the data during training. They include e.g. augmentations. The transformations are added to the Hugging Face dataset with [`set_transform`](https://huggingface.co/docs/datasets/main/en/package_reference/main_classes#datasets.Dataset.set_transform).
 
 
 
