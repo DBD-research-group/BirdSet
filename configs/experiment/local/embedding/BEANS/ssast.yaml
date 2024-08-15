@@ -20,13 +20,13 @@ test: True
 logger:
   wandb:
     tags: ${tags}
-    group: "BEANS"
+    group: "embedding_ssast"
     mode: online
 
 trainer:
   devices: [0]
   min_epochs: 1
-  max_epochs: 30
+  max_epochs: 50
 
 datamodule:
   dataset:
