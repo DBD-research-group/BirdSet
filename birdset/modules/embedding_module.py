@@ -45,8 +45,8 @@ class EmbeddingModule(BaseModule):
             batch_size: int = 32,
             task: Literal['multiclass', 'multilabel'] = "multiclass",
             num_gpus: int = 1,
-            pretrain_info = None,
-            embedding_model: EmbeddingModuleConfig = EmbeddingModuleConfig() # Model for extracting the embeddings
+            pretrain_info = None
+            #embedding_model: EmbeddingModuleConfig = EmbeddingModuleConfig() # Model for extracting the embeddings
             ):
         super().__init__(
             network = network,
@@ -63,15 +63,15 @@ class EmbeddingModule(BaseModule):
             num_gpus=num_gpus,
             pretrain_info = pretrain_info,
         )
-        print(f"Using "+ embedding_model.model_name+" as the embedding model")
-        self.embedding_model = embedding_model.model
+        #print(f"Using "+ embedding_model.model_name+" as the embedding model")
+        #self.embedding_model = embedding_model.model
 
     # Use the embedding model to get the embeddings and pass them to the classifier model
     def forward(self, *args, **kwargs):
         # Get embeddings
         input_values = kwargs['input_values'] # Extract input tensor
-        embeddings, _ = self.embedding_model.get_embeddings(input_values)
+        #embeddings, _ = self.embedding_model.get_embeddings(input_values)
 
         # Pass embeddings through the classifier to get the final output
-        embeddings = embeddings.view(embeddings.size(0), -1) # Transform for the classifier
-        return self.model.forward(embeddings)
+        #embeddings = embeddings.view(embeddings.size(0), -1) # Transform for the classifier
+        return self.model.forward(input_values)

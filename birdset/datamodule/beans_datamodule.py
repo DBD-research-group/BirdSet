@@ -1,105 +1,36 @@
 from birdset.datamodule.components.transforms import BirdSetTransformsWrapper
+from birdset.modules.models.embedding_abstract import EmbeddingModel
+from birdset.modules.embedding_module import EmbeddingModuleConfig
+from birdset.datamodule.embeddings_datamodule import EmbeddingDataModule
 from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
 from datasets import load_dataset, IterableDataset, IterableDatasetDict, DatasetDict, Audio, Dataset, concatenate_datasets
 from collections import defaultdict
-from tabulate import tabulate
-from tqdm import tqdm
-import logging
 from birdset.utils import pylogger
+import logging
 log = pylogger.get_pylogger(__name__)
 
 detection_sets = ['beans_dcase', 'beans_enabirds', 'beans_hiceas', 'beans_rfcx', 'beans_gibbons']
 
-class BEANSDataModule(BaseDataModuleHF):
+class BEANSDataModule(EmbeddingDataModule):
     def __init__(
             self,
             dataset: DatasetConfig = DatasetConfig(),
             loaders: LoadersConfig = LoadersConfig(),
             transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
             mapper: None = None,
-            k_samples: int = 0
+            k_samples: int = 0,
+            embedding_model: EmbeddingModuleConfig = EmbeddingModuleConfig()
+            
     ):
         super().__init__(
             dataset=dataset,
             loaders=loaders,
-            transforms=transforms
+            transforms=transforms,
+            mapper = mapper,
+            k_samples = k_samples,
+            embedding_model = embedding_model
+            
         )
-        self.k_samples = k_samples
-        self.id_to_label = defaultdict(str)
-
-    def _preprocess_data(self, dataset):
-        """
-        Preprocess the data. If multilabel is the task we will one hot encode. Use k_samples > 0 if you want control over amount of samples per class. The rest is used for validation and testing.
-        """
-
-        if self.k_samples > 0:
-            print(f">> Selecting {self.k_samples} Samples per Class this may take a bit...")
-            merged_data = concatenate_datasets([dataset['train'], dataset['valid'], dataset['test']])
-
-            # Shuffle the merged data
-            merged_data.shuffle() # Check if this is affected by the public seed
-            
-            # Create a dictionary to store the selected samples per class
-            selected_samples = defaultdict(list)
-            train_count = defaultdict(int)
-            testval_count = defaultdict(int)
-            rest_samples = []
-            # Iterate over the merged data and select the desired number of samples per class
-            for sample in tqdm(merged_data, total=len(merged_data), desc="Selecting samples"):
-                label = sample['labels']
-                if len(selected_samples[label]) < self.k_samples:
-                    selected_samples[label].append(sample)
-                    train_count[label] += 1
-                else:
-                    rest_samples.append(sample)
-                    testval_count[label] += 1    
-
-            
-            # Create and print table to show class distribution
-            headers = ["Class", "#Train-Samples", "#Test,Valid-Samples"]
-            rows = []
-            
-            for class_id in selected_samples.keys():
-                rows.append([self.id_to_label[class_id], train_count[class_id], testval_count[class_id]])
-            
-            print(tabulate(rows, headers, tablefmt="rounded_grid"))
-            
-            # Flatten the selected samples into a single list
-            selected_samples = [sample for samples in selected_samples.values() for sample in samples]
-
-            # Split the selected samples into training, validation, and testing sets
-            test_ratio = 0.5
-
-            num_samples = len(rest_samples)
-            num_test_samples = int(test_ratio * num_samples)
-
-            train_data = selected_samples
-            test_data = rest_samples[:num_test_samples]
-            val_data = rest_samples[num_test_samples:]
-            
-            train_data = Dataset.from_dict({key: [sample[key] for sample in train_data] for key in train_data[0]})
-            test_data = Dataset.from_dict({key: [sample[key] for sample in test_data] for key in test_data[0]})
-            val_data = Dataset.from_dict({key: [sample[key] for sample in val_data] for key in val_data[0]})
-
-            # Combine into a DatasetDict
-            dataset = DatasetDict({
-                'train': train_data,
-                'valid': val_data,
-                'test': test_data
-            })
-
-        if self.dataset_config.task == 'multilabel':
-            log.info(">> One-hot-encode classes")
-            dataset = dataset.map(
-                self._classes_one_hot,
-                batched=True,
-                batch_size=500,
-                load_from_cache_file=True,
-                num_proc=self.dataset_config.n_workers,
-            )
-
-        return dataset
-
 
 
     def _load_data(self,decode: bool = True):    
@@ -109,6 +40,7 @@ class BEANSDataModule(BaseDataModuleHF):
         Returns HF dataset with audio column casted to Audio feature, containing audio data as numpy array and sampling rate.
         """
         logging.info("> Loading data set.")
+        print(self.disk_save_path)
         dataset = load_dataset(
             name=self.dataset_config.hf_name,
             path=self.dataset_config.hf_path,
@@ -169,3 +101,28 @@ class BEANSDataModule(BaseDataModuleHF):
         )
         
         return dataset
+    
+    
+    def _preprocess_data(self, dataset):
+        """
+        Preprocess the data. This calls the _ksamples function to select k samples per class and calls the embedding extraction function. If multilabel is the task we will one hot encode. 
+        """
+
+        # Check if actually a dict
+        dataset = self._ksamples(dataset)
+        dataset = self._compute_embeddings(dataset)
+
+        if self.dataset_config.task == 'multilabel':
+            log.info(">> One-hot-encode classes")
+            dataset = dataset.map(
+                self._classes_one_hot,
+                batched=True,
+                batch_size=500,
+                load_from_cache_file=True,
+                num_proc=self.dataset_config.n_workers,
+            )
+
+        return dataset
+
+
+    

@@ -77,15 +77,14 @@ class PerchModel(nn.Module, EmbeddingModel):
         # self.classifier = nn.Linear(
         #     in_features=self.EMBEDDING_SIZE, out_features=num_classes
         # )
-        self.classifier = nn.Sequential(
+        '''self.classifier = nn.Sequential(
             nn.Linear(self.EMBEDDING_SIZE, 128),
             nn.ReLU(),
             nn.Dropout(0.5),
             nn.Linear(128, 64),
             nn.ReLU(),
             nn.Linear(64, self.num_classes),
-        )
-
+        )'''
         self.load_model()
 
     def load_model(self) -> None:
@@ -203,7 +202,7 @@ class PerchModel(nn.Module, EmbeddingModel):
 
         input_tensor = input_tensor.reshape([-1, input_tensor.shape[-1]])
         
-        max_length = 160000  # 5 seconds at 16kHz
+        max_length = 160000  # 5 seconds at 32kHz
         overlap_length = 32000  # 1 second overlap 
         
         if input_tensor.shape[1] < max_length:
@@ -249,7 +248,6 @@ class PerchModel(nn.Module, EmbeddingModel):
             embeddings = embeddings.to(device) # Move back to previous device
             logits = logits.to(device)
         else:
-            print("Normal")
             # Process the single input_tensor as usual
             # Run the model and get the outputs using the optimized TensorFlow function
             outputs = self.run_tf_model(input_tensor=input_tensor)
@@ -271,5 +269,4 @@ class PerchModel(nn.Module, EmbeddingModel):
             # Extract valid logits using indices from class_mask and directly place them
             full_logits[:, self.class_indices] = logits[:, self.class_mask]
             logits = full_logits
-
         return embeddings, logits

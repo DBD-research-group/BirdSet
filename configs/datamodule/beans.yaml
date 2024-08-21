@@ -5,6 +5,8 @@ defaults:
   - _self_
   - transforms: bird_default.yaml
   - loaders: default.yaml
+  - embedding_model: ../../module/network/perch_logreg.yaml
+
 
 dataset:
   data_dir: ${paths.dataset_path}

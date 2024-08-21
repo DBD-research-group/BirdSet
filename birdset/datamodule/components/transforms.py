@@ -476,10 +476,11 @@ class EmbeddingTransforms(BirdSetTransformsWrapper):
         # Idea: Padd to longest audio file in batch, then do average embedding to model size 
         
         # Find the longest audio in the batch
-        max_length = max(len(audio["array"]) for audio in batch["audio"])
-        
+        max_length = min(max(len(audio["array"]) for audio in batch["audio"]), int(self.sampling_rate) * 80)
+        #max_length = int(int(self.sampling_rate) * 40)
         #! Implement resampling here 
 
+        #! Some samples for example in watkins are really long with >1000 seconds so we make sure not too choose a too high max_length as it takes ages otherwise
         # max_length determains the difference with input waveforms as factor 5 (embedding)
         #max_length = int(int(self.sampling_rate) * int(self.max_length))
         waveform_batch = self.feature_extractor(
@@ -489,8 +490,6 @@ class EmbeddingTransforms(BirdSetTransformsWrapper):
             truncation=True,
             return_attention_mask=True
         )
-        
-        #print(waveform_batch['input_values'].shape)
         
         return waveform_batch
 
