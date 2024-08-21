@@ -484,5 +484,4 @@ class EmbeddingTransforms(BirdSetTransformsWrapper):
             truncation=True,
             return_attention_mask=True
         )
-        print(waveform_batch["input_values"].shape)
         return waveform_batch
