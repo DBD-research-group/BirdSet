@@ -5,12 +5,9 @@ import numpy as np
 from omegaconf import DictConfig
 from birdset.datamodule.components.feature_extraction import DefaultFeatureExtractor
 from birdset.datamodule.components.event_decoding import EventDecoding
-from birdset.datamodule.components.augmentations import Compose, NoCallMixer, PowerToDB
-from birdset.modules.models.embedding_abstract import EmbeddingModel
-from birdset.modules.embedding_module import EmbeddingModuleConfig
+from birdset.datamodule.components.augmentations import NoCallMixer, PowerToDB
 
 import torch
-import torchaudio
 
 from birdset.datamodule.components.resize import Resizer
 import torch_audiomentations

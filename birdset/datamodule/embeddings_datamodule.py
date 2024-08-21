@@ -1,16 +1,28 @@
 from birdset.datamodule.components.transforms import BirdSetTransformsWrapper
-from birdset.modules.embedding_module import EmbeddingModuleConfig
-from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
-from datasets import load_dataset, IterableDataset, IterableDatasetDict, DatasetDict, Audio, Dataset, concatenate_datasets
+from birdset.datamodule.base_datamodule import BaseDataModuleHF
+from birdset.configs import NetworkConfig, DatasetConfig, LoadersConfig
+from datasets import DatasetDict, Dataset, concatenate_datasets
 from collections import defaultdict
 from tabulate import tabulate
 from birdset.utils import pylogger
 from tqdm import tqdm
+from dataclasses import dataclass
+from typing import Union
+from birdset.modules.models.embedding_abstract import EmbeddingModel
 import torch
 import torchaudio
 import os
 
 log = pylogger.get_pylogger(__name__)
+
+@dataclass
+class EmbeddingModuleConfig(NetworkConfig):
+    """
+    A dataclass that makes sure the model inherits from EmbeddingClassifier.
+
+    """
+    model: Union[EmbeddingModel, torch.nn.Module] = None # Model for extracting the embeddings
+
 class EmbeddingDataModule(BaseDataModuleHF):
     def __init__(
             self,

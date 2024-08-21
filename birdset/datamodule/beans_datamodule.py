@@ -1,10 +1,7 @@
 from birdset.datamodule.components.transforms import BirdSetTransformsWrapper
-from birdset.modules.models.embedding_abstract import EmbeddingModel
-from birdset.modules.embedding_module import EmbeddingModuleConfig
-from birdset.datamodule.embeddings_datamodule import EmbeddingDataModule
-from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
-from datasets import load_dataset, IterableDataset, IterableDatasetDict, DatasetDict, Audio, Dataset, concatenate_datasets
-from collections import defaultdict
+from birdset.datamodule.embeddings_datamodule import EmbeddingDataModule, EmbeddingModuleConfig
+from birdset.configs import DatasetConfig, LoadersConfig
+from datasets import load_dataset, IterableDataset, IterableDatasetDict, DatasetDict, Audio, Dataset
 from birdset.utils import pylogger
 import logging
 log = pylogger.get_pylogger(__name__)
