@@ -136,7 +136,7 @@ class EmbeddingDataModule(BaseDataModuleHF):
                     embedding = self._get_embedding(sample['audio'])
 
                     # Add the embedding to the list
-                    sample['audio']['array'] = embedding 
+                    sample['audio']['array'] = embedding.squeeze(0)
                     embeddings.append(sample)
 
                 # Convert the list of embeddings to a tensor

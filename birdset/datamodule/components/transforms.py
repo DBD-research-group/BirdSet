@@ -474,7 +474,7 @@ class EmbeddingTransforms(BirdSetTransformsWrapper):
         
         #! max_length here is the embedding size of the model
 
-        if (len(batch["audio"][0]["array"][0]) != self.max_length):
+        if (len(batch["audio"][0]["array"]) != self.max_length):
             log.error("Input embeddings don't match classifier input size")  
         
         waveform_batch = self.feature_extractor(
