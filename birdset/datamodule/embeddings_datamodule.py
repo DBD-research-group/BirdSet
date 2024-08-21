@@ -108,32 +108,49 @@ class EmbeddingDataModule(BaseDataModuleHF):
         """
         Compute Embeddings for the entire dataset and store them in a new DatasetDict.
         """
-        #! For some reason the .map() from Datasets caused errors
-        # Create a new DatasetDict to store the embeddings
-        embeddings_dataset = DatasetDict()
-        # Iterate over each split in the dataset
-        for split in dataset.keys():
-            print(f">> Extracting Embeddings for {split} Split")
-            # Get the current split data
-            split_data = dataset[split]
+        # Define save path
+        self.disk_save_path = os.path.join(
+            self.dataset_config.data_dir,
+            f"{self.dataset_config.dataset_name}_processed_{self.dataset_config.seed}_{self.embedding_model_name}_{self.k_samples}",
+        )
+        
+        # Check if embeddings have to be extracted
+        if not os.path.exists(self.disk_save_path):
+            
+            # Create a new DatasetDict to store the embeddings
+            embeddings_dataset = DatasetDict()
+            
+            #! For some reason the .map() from Datasets caused errors
+            # Iterate over each split in the dataset
+            for split in dataset.keys():
+                print(f">> Extracting Embeddings for {split} Split")
+                # Get the current split data
+                split_data = dataset[split]
 
-            # Create a list to store the embeddings for the current split
-            embeddings = []
+                # Create a list to store the embeddings for the current split
+                embeddings = []
 
-            # Iterate over each sample in the split
-            for sample in tqdm(split_data, total=len(split_data), desc="Extracting Embeddings"):
-                # Get the embedding for the audio sample
-                embedding = self._get_embedding(sample['audio'])
+                # Iterate over each sample in the split
+                for sample in tqdm(split_data, total=len(split_data), desc="Extracting Embeddings"):
+                    # Get the embedding for the audio sample
+                    embedding = self._get_embedding(sample['audio'])
 
-                # Add the embedding to the list
-                sample['audio']['array'] = embedding 
-                embeddings.append(sample)
+                    # Add the embedding to the list
+                    sample['audio']['array'] = embedding 
+                    embeddings.append(sample)
 
-            # Convert the list of embeddings to a tensor
-            #embeddings = torch.stack(embeddings)
+                # Convert the list of embeddings to a tensor
+                #embeddings = torch.stack(embeddings)
 
-            # Create a new Dataset with the embeddings
-            embeddings_dataset[split] =  Dataset.from_dict({key: [sample[key] for sample in embeddings] for key in embeddings[0]})
+                # Create a new Dataset with the embeddings
+                embeddings_dataset[split] =  Dataset.from_dict({key: [sample[key] for sample in embeddings] for key in embeddings[0]})
+        else:
+            # Create empty datasetdict
+            embeddings_dataset = DatasetDict({
+                'train': Dataset.from_dict({}),
+                'test': Dataset.from_dict({}),
+                'valid': Dataset.from_dict({})
+            })
 
         return embeddings_dataset
         

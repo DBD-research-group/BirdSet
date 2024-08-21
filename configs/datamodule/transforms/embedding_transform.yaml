@@ -2,7 +2,7 @@ _target_: birdset.datamodule.components.transforms.EmbeddingTransforms
 sampling_rate: ${module.network.sampling_rate}
 model_type: ${module.network.model_type}
 task: ${datamodule.dataset.task}
-max_length: ${module.embedding_model.length}
+max_length: ${module.network.model.in_features}
 
 defaults:
   - _self_

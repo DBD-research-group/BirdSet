@@ -263,7 +263,6 @@ class BirdSetTransformsWrapper(BaseTransforms):
         input_values = waveform_batch["input_values"]
         input_values = input_values.unsqueeze(1)
         labels = torch.tensor(batch["labels"])
-
         if self.wave_aug: 
             input_values, labels = self._waveform_augmentation(input_values, labels)
         
@@ -473,39 +472,17 @@ class EmbeddingTransforms(BirdSetTransformsWrapper):
     def _get_waveform_batch(self, batch):
         waveform_batch = [audio["array"] for audio in batch["audio"]]
         
-        # Idea: Padd to longest audio file in batch, then do average embedding to model size 
-        
-        # Find the longest audio in the batch
-        max_length = min(max(len(audio["array"]) for audio in batch["audio"]), int(self.sampling_rate) * 80)
-        #max_length = int(int(self.sampling_rate) * 40)
-        #! Implement resampling here 
+        #! max_length here is the embedding size of the model
 
-        #! Some samples for example in watkins are really long with >1000 seconds so we make sure not too choose a too high max_length as it takes ages otherwise
-        # max_length determains the difference with input waveforms as factor 5 (embedding)
-        #max_length = int(int(self.sampling_rate) * int(self.max_length))
+        if (len(batch["audio"][0]["array"][0]) != self.max_length):
+            log.error("Input embeddings don't match classifier input size")  
+        
         waveform_batch = self.feature_extractor(
             waveform_batch,
             padding='max_length',
-            max_length=max_length, 
+            max_length=self.max_length, 
             truncation=True,
             return_attention_mask=True
         )
-        
+        print(waveform_batch["input_values"].shape)
         return waveform_batch
-
-    # Resample function
-    def _resample_audio(self, audio, orig_sr):
-        resampler = torchaudio.transforms.Resample(orig_freq=orig_sr, new_freq=self.sampling_rate)
-        return resampler(audio)
-
-    def _resample_batch(self, batch, target_sample_rate):
-            resampled_batch = []
-            for audio in batch["audio"]:
-                waveform = torch.tensor(audio["array"], dtype=torch.float32)
-                orig_sample_rate = audio["sampling_rate"]
-                resampler = torchaudio.transforms.Resample(orig_freq=orig_sample_rate, new_freq=target_sample_rate)
-                resampled_waveform = resampler(waveform)
-                audio["array"] = resampled_waveform.numpy()
-                audio["sampling_rate"] = target_sample_rate
-                resampled_batch.append(audio)
-            return resampled_batch
