@@ -174,51 +174,19 @@ class BirdNetModel(nn.Module):
         Returns:
             Tuple[torch.Tensor, torch.Tensor]: A tuple of two tensors (embeddings, logits).
         """
-
-        max_length = 144000  # 3 seconds at 48kHz
-        overlap_length = 48000  # 1 second overlap
-
         device = input_tensor.device # Get the device of the input tensor 
         input_tensor = input_tensor.cpu().numpy()  # Move the tensor to the CPU and convert it to a NumPy array.
         input_tensor = input_tensor.reshape([-1, input_tensor.shape[-1]])
         
-        # Check if input_tensor is longer than 3 seconds
-        # TODO: Must be able to handle different audio lengths flexibly, currently only 5 second audios are supported!
-        if input_tensor.shape[1] > max_length:
-            # Calculate start indices for each segment
-            start_indices = [0, max_length - overlap_length]
-            outputs = []
+        # Process the single input_tensor as usual
+        # Run the model and get the outputs using the optimized TensorFlow function
+        outputs = self.run_tf_model(input_tensor=input_tensor)
 
-            # Process each segment
-            for start in start_indices:
-                end = start + max_length
-                segment = input_tensor[:, start:end]
-                output = self.run_tf_model(input_tensor=segment)
-                outputs.append(output)
-
-            # Combine logits from both segments by taking the maximum
-            logits_list = [
-                torch.from_numpy(output["logits"].numpy()) for output in outputs
-            ]
-            logits = torch.max(logits_list[0], logits_list[1])
-
-            # Combine embeddings from both segments by averaging
-            embeddings_list = [
-                torch.from_numpy(output["embeddings"].numpy()) for output in outputs
-            ]
-            embeddings = torch.mean(torch.stack(embeddings_list), dim=0)
-            embeddings = embeddings.to(device) # Move back to previous device
-            logits = logits.to(device)
-        else:
-            # Process the single input_tensor as usual
-            # Run the model and get the outputs using the optimized TensorFlow function
-            outputs = self.run_tf_model(input_tensor=input_tensor)
-
-            # Extract embeddings and logits, convert them to PyTorch tensors
-            embeddings = torch.from_numpy(outputs["embeddings"].numpy())
-            logits = torch.from_numpy(outputs["logits"].numpy())
-            embeddings = embeddings.to(device) # Move back to previous device
-            logits = logits.to(device)
+        # Extract embeddings and logits, convert them to PyTorch tensors
+        embeddings = torch.from_numpy(outputs["embeddings"].numpy())
+        logits = torch.from_numpy(outputs["logits"].numpy())
+        embeddings = embeddings.to(device) # Move back to previous device
+        logits = logits.to(device)
 
         if self.class_mask:
             # Initialize full_logits to a large negative value for penalizing non-present classes

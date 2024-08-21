@@ -31,6 +31,7 @@ class EmbeddingDataModule(BaseDataModuleHF):
             transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
             mapper: None = None,
             k_samples: int = 0,
+            test_ratio: float = 1,
             embedding_model: EmbeddingModuleConfig = EmbeddingModuleConfig()
             
     ):
@@ -40,6 +41,7 @@ class EmbeddingDataModule(BaseDataModuleHF):
             transforms=transforms
         )
         self.k_samples = k_samples
+        self.test_ratio = test_ratio
         self.id_to_label = defaultdict(str)
         self.embedding_model_name = embedding_model.model_name
         self.embedding_model = embedding_model.model
@@ -57,7 +59,7 @@ class EmbeddingDataModule(BaseDataModuleHF):
             merged_data = concatenate_datasets([dataset['train'], dataset['valid'], dataset['test']])
 
             # Shuffle the merged data
-            merged_data.shuffle() # Check if this is affected by the public seed
+            merged_data.shuffle() #? Check if this is affected by the public seed
             
             # Create a dictionary to store the selected samples per class
             selected_samples = defaultdict(list)
@@ -88,16 +90,15 @@ class EmbeddingDataModule(BaseDataModuleHF):
             selected_samples = [sample for samples in selected_samples.values() for sample in samples]
 
             # Split the selected samples into training, validation, and testing sets
-            test_ratio = 1
 
-            if test_ratio == 1:
+            if self.test_ratio == 1:
                 train_data = selected_samples
                 test_data = rest_samples
                 val_data = Dataset.from_dict({})
             
             else:    
                 num_samples = len(rest_samples)
-                num_test_samples = int(test_ratio * num_samples)
+                num_test_samples = int(self.test_ratio * num_samples)
 
                 train_data = selected_samples
                 test_data = rest_samples[:num_test_samples]
@@ -155,7 +156,8 @@ class EmbeddingDataModule(BaseDataModuleHF):
                 #embeddings = torch.stack(embeddings)
 
                 # Create a new Dataset with the embeddings
-                embeddings_dataset[split] =  Dataset.from_dict({key: [sample[key] for sample in embeddings] for key in embeddings[0]})
+                if len(embeddings) > 0:
+                    embeddings_dataset[split] =  Dataset.from_dict({key: [sample[key] for sample in embeddings] for key in embeddings[0]})
         else:
             # Create empty datasetdict
             embeddings_dataset = DatasetDict({
