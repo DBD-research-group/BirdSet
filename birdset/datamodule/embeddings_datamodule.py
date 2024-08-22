@@ -32,8 +32,8 @@ class EmbeddingDataModule(BaseDataModuleHF):
             mapper: None = None,
             k_samples: int = 0,
             test_ratio: float = 1,
-            embedding_model: EmbeddingModuleConfig = EmbeddingModuleConfig()
-            
+            embedding_model: EmbeddingModuleConfig = EmbeddingModuleConfig(),
+            average: bool = True
     ):
         super().__init__(
             dataset=dataset,
@@ -42,6 +42,7 @@ class EmbeddingDataModule(BaseDataModuleHF):
         )
         self.k_samples = k_samples
         self.test_ratio = test_ratio
+        self.average = average
         self.id_to_label = defaultdict(str)
         self.embedding_model_name = embedding_model.model_name
         self.embedding_model = embedding_model.model
@@ -147,7 +148,7 @@ class EmbeddingDataModule(BaseDataModuleHF):
                 for sample in tqdm(split_data, total=len(split_data), desc="Extracting Embeddings"):
                     # Get the embedding for the audio sample
                     embedding = self._get_embedding(sample['audio'])
-
+                    
                     # Add the embedding to the list
                     sample['audio']['array'] = embedding.squeeze(0)
                     embeddings.append(sample)
@@ -176,15 +177,24 @@ class EmbeddingDataModule(BaseDataModuleHF):
         # Resample audio
         audio = self._resample_audio(waveform, dataset_sampling_rate)
         
+        # Check if waveform is longer than 100s and cut of rest (Otherwise it takes too long)
+        '''if waveform.shape[0] > 30 * self.sampling_rate:
+            print("Cutting off rest of waveform:", waveform.shape[0]/self.sampling_rate)
+            # Chop off the rest of the waveform
+            waveform = waveform[:30 * self.sampling_rate]'''
+        
         # Zero-padding
         audio = self._zero_pad(waveform)
 
         # Check if audio is too long 
         if waveform.shape[0] > self.max_length * self.sampling_rate:
-            #print(waveform.shape[0]/self.sampling_rate)
-            return self._frame_and_average(waveform)    
+            if self.average:
+                return self._frame_and_average(waveform) 
+            else:
+                audio = audio[:self.max_length * self.sampling_rate]
+                return self.embedding_model.get_embeddings(audio.view(1, 1, -1))[0] 
         else:
-            return self.embedding_model.get_embeddings(audio)[0] # To just use embeddings not logits
+            return self.embedding_model.get_embeddings(audio.view(1, 1, -1))[0] # To just use embeddings not logits
 
     # Resample function
     def _resample_audio(self, audio, orig_sr):
@@ -213,7 +223,7 @@ class EmbeddingDataModule(BaseDataModuleHF):
         # Generate embeddings for each frame
         l = []
         for frame in frames:
-            embedding = self.embedding_model.get_embeddings(frame) 
+            embedding = self.embedding_model.get_embeddings(frame.view(1, 1, -1)) 
             l.append(embedding[0]) # To just use embeddings not logits
         
         embeddings = torch.stack(tuple(l))

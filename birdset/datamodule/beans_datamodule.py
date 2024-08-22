@@ -16,7 +16,9 @@ class BEANSDataModule(EmbeddingDataModule):
             transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
             mapper: None = None,
             k_samples: int = 0,
-            embedding_model: EmbeddingModuleConfig = EmbeddingModuleConfig()
+            test_ratio: float = 1,
+            embedding_model: EmbeddingModuleConfig = EmbeddingModuleConfig(),
+            average: bool = True
             
     ):
         super().__init__(
@@ -25,8 +27,9 @@ class BEANSDataModule(EmbeddingDataModule):
             transforms=transforms,
             mapper = mapper,
             k_samples = k_samples,
-            embedding_model = embedding_model
-            
+            test_ratio = test_ratio,
+            embedding_model = embedding_model,
+            average = average
         )
 
 
