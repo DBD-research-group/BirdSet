@@ -2,9 +2,9 @@
 #package global is neccessary!
 defaults:
   - local/embedding/BEANS/embedding_config.yaml 
-  - override /datamodule/embedding_model: ../../module/network/hubert.yaml  
+  - override /datamodule/embedding_model: ../../module/network/wav2vec2.yaml  
 
-tags: ["BEANS", "embeddings", "hubert", "multiclass"]
+tags: ["BEANS", "embeddings", "wav2vec2", "multiclass"]
 seed: 2
 
 trainer:

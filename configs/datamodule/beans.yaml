@@ -7,7 +7,6 @@ defaults:
   - loaders: default.yaml
   - embedding_model: ../../module/network/perch_logreg.yaml
 
-
 dataset:
   data_dir: ${paths.dataset_path}
   dataset_name: beans_watkins # Overwrite these through the experiment config
@@ -27,6 +26,6 @@ dataset:
 
 
 k_samples: 0
-
+gpu_to_use: ${trainer.devices[0]} 
 
 

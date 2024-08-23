@@ -18,7 +18,8 @@ class BEANSDataModule(EmbeddingDataModule):
             k_samples: int = 0,
             test_ratio: float = 1,
             embedding_model: EmbeddingModuleConfig = EmbeddingModuleConfig(),
-            average: bool = True
+            average: bool = True,
+            gpu_to_use: int = 0
             
     ):
         super().__init__(
@@ -29,7 +30,8 @@ class BEANSDataModule(EmbeddingDataModule):
             k_samples = k_samples,
             test_ratio = test_ratio,
             embedding_model = embedding_model,
-            average = average
+            average = average,
+            gpu_to_use = gpu_to_use
         )
 
 

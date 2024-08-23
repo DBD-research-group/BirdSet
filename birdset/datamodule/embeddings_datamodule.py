@@ -33,19 +33,22 @@ class EmbeddingDataModule(BaseDataModuleHF):
             k_samples: int = 0,
             test_ratio: float = 1,
             embedding_model: EmbeddingModuleConfig = EmbeddingModuleConfig(),
-            average: bool = True
+            average: bool = True,
+            gpu_to_use: int = 0
     ):
         super().__init__(
             dataset=dataset,
             loaders=loaders,
             transforms=transforms
         )
+        self.device = torch.device(f'cuda:{gpu_to_use}')
         self.k_samples = k_samples
         self.test_ratio = test_ratio
         self.average = average
         self.id_to_label = defaultdict(str)
         self.embedding_model_name = embedding_model.model_name
-        self.embedding_model = embedding_model.model
+        self.embedding_model = embedding_model.model.to(self.device) # Move Model to GPU
+        self.embedding_model.eval()  # Set the model to evaluation mode
         self.sampling_rate = embedding_model.sampling_rate
         self.max_length = embedding_model.length
         print(f"Using embedding model:{embedding_model.model_name} (Sampling Rate:{self.sampling_rate}, Window Size:{self.max_length})")
@@ -125,7 +128,7 @@ class EmbeddingDataModule(BaseDataModuleHF):
         # Define save path
         self.disk_save_path = os.path.join(
             self.dataset_config.data_dir,
-            f"{self.dataset_config.dataset_name}_processed_{self.dataset_config.seed}_{self.embedding_model_name}_{self.k_samples}",
+            f"{self.dataset_config.dataset_name}_processed_{self.dataset_config.seed}_{self.embedding_model_name}_{self.k_samples}_{self.average}_{self.sampling_rate}_{self.max_length}",
         )
         
         # Check if embeddings have to be extracted
@@ -145,20 +148,21 @@ class EmbeddingDataModule(BaseDataModuleHF):
                 embeddings = []
 
                 # Iterate over each sample in the split
-                for sample in tqdm(split_data, total=len(split_data), desc="Extracting Embeddings"):
-                    # Get the embedding for the audio sample
-                    embedding = self._get_embedding(sample['audio'])
-                    
-                    # Add the embedding to the list
-                    sample['audio']['array'] = embedding.squeeze(0)
-                    embeddings.append(sample)
+                with torch.no_grad(): # No need to compute gradients
+                    for sample in tqdm(split_data, total=len(split_data), desc="Extracting Embeddings"):
+                        # Get the embedding for the audio sample
+                        embedding = self._get_embedding(sample['audio'])
+                        
+                        # Add the embedding to the list
+                        sample['audio']['array'] = embedding.squeeze(0).cpu().numpy() # Move to CPU and convert to numpy
+                        embeddings.append(sample)
 
-                # Convert the list of embeddings to a tensor
-                #embeddings = torch.stack(embeddings)
+                    # Convert the list of embeddings to a tensor
+                    #embeddings = torch.stack(embeddings)
 
-                # Create a new Dataset with the embeddings
-                if len(embeddings) > 0:
-                    embeddings_dataset[split] =  Dataset.from_dict({key: [sample[key] for sample in embeddings] for key in embeddings[0]})
+                    # Create a new Dataset with the embeddings
+                    if len(embeddings) > 0:
+                        embeddings_dataset[split] =  Dataset.from_dict({key: [sample[key] for sample in embeddings] for key in embeddings[0]})
         else:
             # Create empty datasetdict
             embeddings_dataset = DatasetDict({
@@ -172,16 +176,10 @@ class EmbeddingDataModule(BaseDataModuleHF):
 
     def _get_embedding(self, audio):
         # Get waveform and sampling rate
-        waveform = torch.tensor(audio['array'], dtype=torch.float32)
+        waveform = torch.tensor(audio['array'], dtype=torch.float32).to(self.device) # Get waveform audio and move to GPU
         dataset_sampling_rate = audio['sampling_rate']
         # Resample audio
         audio = self._resample_audio(waveform, dataset_sampling_rate)
-        
-        # Check if waveform is longer than 100s and cut of rest (Otherwise it takes too long)
-        '''if waveform.shape[0] > 30 * self.sampling_rate:
-            print("Cutting off rest of waveform:", waveform.shape[0]/self.sampling_rate)
-            # Chop off the rest of the waveform
-            waveform = waveform[:30 * self.sampling_rate]'''
         
         # Zero-padding
         audio = self._zero_pad(waveform)
@@ -253,7 +251,7 @@ class EmbeddingDataModule(BaseDataModuleHF):
         dataset.set_format("np")
         self.disk_save_path = os.path.join(
             self.dataset_config.data_dir,
-            f"{self.dataset_config.dataset_name}_processed_{self.dataset_config.seed}_{self.embedding_model_name}_{self.k_samples}",
+            f"{self.dataset_config.dataset_name}_processed_{self.dataset_config.seed}_{self.embedding_model_name}_{self.k_samples}_{self.average}_{self.sampling_rate}_{self.max_length}",
         )
 
         if os.path.exists(self.disk_save_path):
