@@ -16,7 +16,9 @@ class BEANSDataModule(EmbeddingDataModule):
             transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
             mapper: None = None,
             k_samples: int = 0,
-            test_ratio: float = 1,
+            val_set: bool = True, # Should val set be created
+            test_ratio: float = 0.5, # Ratio of test set if val set is also created
+            low_train: bool = False, # If low train set is used
             embedding_model: EmbeddingModuleConfig = EmbeddingModuleConfig(),
             average: bool = True,
             gpu_to_use: int = 0
@@ -28,7 +30,9 @@ class BEANSDataModule(EmbeddingDataModule):
             transforms=transforms,
             mapper = mapper,
             k_samples = k_samples,
+            val_set = val_set,
             test_ratio = test_ratio,
+            low_train = low_train,
             embedding_model = embedding_model,
             average = average,
             gpu_to_use = gpu_to_use

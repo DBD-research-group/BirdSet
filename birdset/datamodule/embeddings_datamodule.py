@@ -31,7 +31,9 @@ class EmbeddingDataModule(BaseDataModuleHF):
             transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
             mapper: None = None,
             k_samples: int = 0,
-            test_ratio: float = 1,
+            val_set: bool = False, # Should val set be created
+            test_ratio: float = 0.5, # Ratio of test set if val set is also created
+            low_train: bool = False, # If low train set is used
             embedding_model: EmbeddingModuleConfig = EmbeddingModuleConfig(),
             average: bool = True,
             gpu_to_use: int = 0
@@ -43,7 +45,9 @@ class EmbeddingDataModule(BaseDataModuleHF):
         )
         self.device = torch.device(f'cuda:{gpu_to_use}')
         self.k_samples = k_samples
+        self.val_set = val_set
         self.test_ratio = test_ratio
+        self.low_train = low_train
         self.average = average
         self.id_to_label = defaultdict(str)
         self.embedding_model_name = embedding_model.model_name
@@ -57,6 +61,7 @@ class EmbeddingDataModule(BaseDataModuleHF):
     def _ksamples(self, dataset):
         """
         Use k_samples > 0 if you want control over amount of samples per class. The rest is used for validation and testing.
+        If test_ratio == 1 then no validation set even if k_samples == 0!
         """
         if self.k_samples > 0:
             print(f">> Selecting {self.k_samples} Samples per Class this may take a bit...")
@@ -95,7 +100,7 @@ class EmbeddingDataModule(BaseDataModuleHF):
 
             # Split the selected samples into training, validation, and testing sets
 
-            if self.test_ratio == 1:
+            if not self.val_set:
                 train_data = selected_samples
                 test_data = rest_samples
                 val_data = Dataset.from_dict({})
@@ -118,6 +123,18 @@ class EmbeddingDataModule(BaseDataModuleHF):
                 'valid': val_data,
                 'test': test_data
             })
+        else:
+            if not self.val_set:
+                dataset['test'] = concatenate_datasets([dataset['valid'], dataset['test']])
+                del dataset['valid']
+                
+            if self.low_train:
+                del dataset['train']
+                dataset['train'] = dataset['train_low']
+
+            del dataset['train_low']    
+                
+            
             
         return dataset
 
@@ -128,7 +145,7 @@ class EmbeddingDataModule(BaseDataModuleHF):
         # Define save path
         self.disk_save_path = os.path.join(
             self.dataset_config.data_dir,
-            f"{self.dataset_config.dataset_name}_processed_{self.dataset_config.seed}_{self.embedding_model_name}_{self.k_samples}_{self.average}_{self.sampling_rate}_{self.max_length}",
+            f"{self.dataset_config.dataset_name}_processed_{self.dataset_config.seed}_{self.embedding_model_name}_{self.k_samples}_{self.average}_{self.val_set}_{self.low_train}_{self.sampling_rate}_{self.max_length}",
         )
         
         # Check if embeddings have to be extracted
@@ -251,7 +268,7 @@ class EmbeddingDataModule(BaseDataModuleHF):
         dataset.set_format("np")
         self.disk_save_path = os.path.join(
             self.dataset_config.data_dir,
-            f"{self.dataset_config.dataset_name}_processed_{self.dataset_config.seed}_{self.embedding_model_name}_{self.k_samples}_{self.average}_{self.sampling_rate}_{self.max_length}",
+            f"{self.dataset_config.dataset_name}_processed_{self.dataset_config.seed}_{self.embedding_model_name}_{self.k_samples}_{self.average}_{self.val_set}_{self.low_train}_{self.sampling_rate}_{self.max_length}",
         )
 
         if os.path.exists(self.disk_save_path):
