@@ -16,7 +16,7 @@ class BEANSDataModule(EmbeddingDataModule):
             transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
             mapper: None = None,
             k_samples: int = 0,
-            val_set: bool = True, # Should val set be created
+            val_batches: int = None, # Should val set be created
             test_ratio: float = 0.5, # Ratio of test set if val set is also created
             low_train: bool = False, # If low train set is used
             embedding_model: EmbeddingModuleConfig = EmbeddingModuleConfig(),
@@ -30,7 +30,7 @@ class BEANSDataModule(EmbeddingDataModule):
             transforms=transforms,
             mapper = mapper,
             k_samples = k_samples,
-            val_set = val_set,
+            val_batches = val_batches,
             test_ratio = test_ratio,
             low_train = low_train,
             embedding_model = embedding_model,

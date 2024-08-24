@@ -66,9 +66,9 @@ defaults:
 datamodule:
     # If >0 only X samples per class are used for training; The rest is used for validation and testing
     k_samples: 0 
-    # If a validation set should be used/generated
-    val_set: True
-    # (If True and k_samples > 0 then all remaining samples land in test set; If k_samples = 0 val and test split in BEANS are combined in the test set)
+    # If a validation set should be used: Use null to use val set and 0 for no validation at all
+    val_batch: null
+    # (If 0 and k_samples > 0 then all remaining samples land in test set; If k_samples = 0 val and test split in BEANS are combined in the test set)
 
     # Test/Validation_ratio if k_samples > 0
     test_ratio: 0.5 
