@@ -1,0 +1,15 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - local/finetune/BEANS/finetune_config.yaml 
+  - override /module/embedding_model: ../../module/network/hubert.yaml  
+
+tags: ["BEANS", "finetune", "hubert", "multiclass"]
+seed: 2
+
+trainer:
+  devices: [1]
+  min_epochs: 1
+  max_epochs: 20 # Use null to use all batches; 0 for no validation at all
+  
+

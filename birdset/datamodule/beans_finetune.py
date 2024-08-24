@@ -1,5 +1,5 @@
 from birdset.datamodule.components.transforms import BirdSetTransformsWrapper
-from birdset.datamodule.embeddings_datamodule import EmbeddingDataModule, EmbeddingModuleConfig
+from birdset.datamodule.base_datamodule import BaseDataModuleHF
 from birdset.configs import DatasetConfig, LoadersConfig
 from datasets import load_dataset, IterableDataset, IterableDatasetDict, DatasetDict, Audio, Dataset
 from birdset.utils import pylogger
@@ -8,35 +8,21 @@ log = pylogger.get_pylogger(__name__)
 
 detection_sets = ['beans_dcase', 'beans_enabirds', 'beans_hiceas', 'beans_rfcx', 'beans_gibbons']
 
-class BEANSDataModule(EmbeddingDataModule):
+class BEANSDataModule(BaseDataModuleHF):
     def __init__(
             self,
             dataset: DatasetConfig = DatasetConfig(),
             loaders: LoadersConfig = LoadersConfig(),
             transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
-            mapper: None = None,
-            k_samples: int = 0,
-            val_batches: int = None, # Should val set be created
-            test_ratio: float = 0.5, # Ratio of test set if val set is also created
-            low_train: bool = False, # If low train set is used
-            embedding_model: EmbeddingModuleConfig = EmbeddingModuleConfig(),
-            average: bool = True,
-            gpu_to_use: int = 0
+            mapper: None = None
             
     ):
         super().__init__(
             dataset=dataset,
             loaders=loaders,
-            transforms=transforms,
-            mapper = mapper,
-            k_samples = k_samples,
-            val_batches = val_batches,
-            test_ratio = test_ratio,
-            low_train = low_train,
-            embedding_model = embedding_model,
-            average = average,
-            gpu_to_use = gpu_to_use
+            transforms=transforms
         )
+    
 
 
     def _load_data(self,decode: bool = True):    
@@ -110,12 +96,8 @@ class BEANSDataModule(EmbeddingDataModule):
     
     def _preprocess_data(self, dataset):
         """
-        Preprocess the data. This calls the _ksamples function to select k samples per class and calls the embedding extraction function. If multilabel is the task we will one hot encode. 
+        Preprocess the data.
         """
-
-        # Check if actually a dict
-        dataset = self._ksamples(dataset)
-        dataset = self._compute_embeddings(dataset)
 
         if self.dataset_config.task == 'multilabel':
             log.info(">> One-hot-encode classes")
@@ -130,4 +112,5 @@ class BEANSDataModule(EmbeddingDataModule):
         return dataset
 
 
-    
+            
+        
