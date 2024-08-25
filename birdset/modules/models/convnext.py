@@ -5,6 +5,7 @@ import torch
 from torch import nn
 from transformers import AutoConfig, ConvNextForImageClassification
 from birdset.configs import PretrainInfoConfig
+from typing import Tuple
 
 
 class ConvNextClassifier(nn.Module):
@@ -40,11 +41,14 @@ class ConvNextClassifier(nn.Module):
                 if not pretrain_info.hf_pretrain_name
                 else pretrain_info.hf_pretrain_name
             )
-            self.num_classes = len(
-                datasets.load_dataset_builder(self.hf_path, self.hf_name)
-                .info.features["ebird_code"]
-                .names
-            )
+            if self.hf_path == 'DBD-research-group/BirdSet':
+                self.num_classes = len(
+                    datasets.load_dataset_builder(self.hf_path, self.hf_name)
+                    .info.features["ebird_code"]
+                    .names
+                )
+            else:
+                self.num_classes = num_classes
         else:
             self.hf_path = None
             self.hf_name = None
@@ -110,10 +114,28 @@ class ConvNextClassifier(nn.Module):
         Returns:
             torch.Tensor: The output of the ConvNext model.
         """
+        print(input_values.shape)
         output = self.model(input_values)
         logits = output.logits
 
         return logits
+    
+    def get_embeddings(
+        self, input_tensor
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        output = self.model(
+            input_tensor,
+            output_hidden_states=True,
+            return_dict=True
+            )
+        # Extract last hidden state
+        last_hidden_state = output.hidden_states[-1]
+        # Flatten the tensor and keep batch size
+        cls_state = last_hidden_state.view(last_hidden_state.size(0), -1)
+        print("HOOOHOOO")
+        logits = output.logits
+        return cls_state, logits
+        
 
     @torch.inference_mode()
     def get_logits(self, dataloader, device):
