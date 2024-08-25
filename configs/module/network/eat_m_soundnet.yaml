@@ -7,7 +7,7 @@ model:
   n_layers: 6
   nhead: 16
   factors: [4, 4, 4, 4]
-  n_classes: ${datamodule.dataset.n_classes}
+  num_classes: ${datamodule.dataset.n_classes}
   dim_feedforward: 2048
   pretrain_info: null
   
