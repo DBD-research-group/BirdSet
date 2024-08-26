@@ -1,10 +1,11 @@
 #BEANS watkins
-_target_: birdset.datamodule.beans_datamodule.BEANSDataModule
+_target_: birdset.datamodule.beans_embedding_datamodule.BEANSEmbeddingDataModule
 
 defaults: 
   - _self_
   - transforms: bird_default.yaml
   - loaders: default.yaml
+  - embedding_model: ../../module/network/perch_logreg.yaml
 
 dataset:
   data_dir: ${paths.dataset_path}
@@ -22,3 +23,9 @@ dataset:
   class_weights_sampler: null
   classlimit: 500
   eventlimit: 5
+
+
+k_samples: 0
+gpu_to_use: ${trainer.devices[0]} 
+
+

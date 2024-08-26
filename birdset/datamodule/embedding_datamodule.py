@@ -1,16 +1,13 @@
-from birdset.datamodule.components.transforms import BirdSetTransformsWrapper
+from birdset.datamodule.components.transforms import EmbeddingTransforms
 from birdset.datamodule.base_datamodule import BaseDataModuleHF
 from birdset.configs import NetworkConfig, DatasetConfig, LoadersConfig
 from datasets import DatasetDict, Dataset, concatenate_datasets
-from dataclasses import asdict
 from collections import defaultdict
 from tabulate import tabulate
 from birdset.utils import pylogger
 from tqdm import tqdm
 from dataclasses import dataclass
-from torch.utils.data import DataLoader
 from typing import Union
-from birdset.modules.models.embedding_abstract import EmbeddingModel
 import torch
 import torchaudio
 import os
@@ -24,15 +21,14 @@ class EmbeddingModuleConfig(NetworkConfig):
     A dataclass that makes sure the model inherits from EmbeddingClassifier.
 
     """
-    model: Union[EmbeddingModel, torch.nn.Module] = None # Model for extracting the embeddings
+    model: Union[torch.nn.Module] = None # Model for extracting the embeddings
 
 class EmbeddingDataModule(BaseDataModuleHF):
     def __init__(
             self,
             dataset: DatasetConfig = DatasetConfig(),
             loaders: LoadersConfig = LoadersConfig(),
-            transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
-            mapper: None = None,
+            transforms: EmbeddingTransforms = EmbeddingTransforms(),
             k_samples: int = 0,
             val_batches: int = None, # Should val set be created
             test_ratio: float = 0.5, # Ratio of test set if val set is also created
@@ -41,6 +37,21 @@ class EmbeddingDataModule(BaseDataModuleHF):
             average: bool = True,
             gpu_to_use: int = 0
     ):
+        """
+        DataModule for extracting embeddings as a preprocessing step from audio data.
+
+        Args:
+            dataset (DatasetConfig, optional): The config of the dataset to use. Defaults to DatasetConfig().
+            loaders (LoadersConfig, optional): Loader config. Defaults to LoadersConfig().
+            transforms (BirdSetTransformsWrapper, optional): uses EmbeddingsTransform so no Embeddings are cut off. Defaults to EmbeddingTransforms().
+            k_samples (int, optional): The amount of samples per class that should be used. Defaults to 0 where the predefined sets are used.
+            val_batches (int, optional): If a validation set should be used or not. Defaults to None which means that the normal validation split or amount is used.
+            test_ratio (float, optional): Ratio of test set if val set is also created. Defaults to 0.5.
+            low_train (bool, optional): If low train set is used (Exists in BEANS for example). Defaults to False.
+            embedding_model (EmbeddingModuleConfig, optional): Model for extracting the embeddings. Defaults to EmbeddingModuleConfig().
+            average (bool, optional): If embeddings should be averaged if the audio clip is too long. Defaults to True.
+            gpu_to_use (int, optional): Which GPU should be used for extracting the embeddings. Defaults to 0.
+        """
         super().__init__(
             dataset=dataset,
             loaders=loaders,
@@ -62,7 +73,56 @@ class EmbeddingDataModule(BaseDataModuleHF):
             self.dataset_config.data_dir,
             f"{self.dataset_config.dataset_name}_processed_{self.dataset_config.seed}_{self.embedding_model_name}_{self.k_samples}_{self.average}_{self.val_batches}_{self.low_train}_{self.sampling_rate}_{self.max_length}",
         )
-        print(f"Using embedding model:{embedding_model.model_name} (Sampling Rate:{self.sampling_rate}, Window Size:{self.max_length})")
+        log.info(f"Using embedding model:{embedding_model.model_name} (Sampling Rate:{self.sampling_rate}, Window Size:{self.max_length})")
+
+    def prepare_data(self):
+        """
+        Same as prepare_data in BaseDataModuleHF but checks if path exists and skips rest otherwise
+        """
+        if not self._prepare_done and os.path.exists(self.disk_save_path):
+            #! We need to set self.len_trainset otherwise base_module doesn't work so we load train split to get the length
+            self.len_trainset = len(self._get_dataset("train"))
+            self._prepare_done = True
+
+        log.info("Check if preparing has already been done.")
+        if self._prepare_done:
+            log.info("Skip preparing.")
+            return
+
+        log.info("Prepare Data")
+
+        dataset = self._load_data()
+        dataset = self._preprocess_data(dataset)
+        dataset = self._create_splits(dataset)
+
+        # set the length of the training set to be accessed by the model
+        self.len_trainset = len(dataset["train"])
+        self._save_dataset_to_disk(dataset)
+
+        # set to done so that lightning does not call it again
+        self._prepare_done = True
+
+    def _preprocess_data(self, dataset):
+        """
+        Preprocess the data. This calls the _ksamples function to select k samples per class and calls the embedding extraction function. If multilabel is the task we will one hot encode. 
+        """
+
+        # Check if actually a dict
+        dataset = self._ksamples(dataset)
+        dataset = self._compute_embeddings(dataset)
+
+        if self.dataset_config.task == 'multilabel':
+            log.info(">> One-hot-encode classes")
+            dataset = dataset.map(
+                self._classes_one_hot,
+                batched=True,
+                batch_size=500,
+                load_from_cache_file=True,
+                num_proc=self.dataset_config.n_workers,
+            )
+
+        return dataset
+
 
     def _ksamples(self, dataset):
         """
@@ -70,11 +130,11 @@ class EmbeddingDataModule(BaseDataModuleHF):
         If test_ratio == 1 then no validation set even if k_samples == 0!
         """
         if self.k_samples > 0:
-            print(f">> Selecting {self.k_samples} Samples per Class this may take a bit...")
+            log.info(f">> Selecting {self.k_samples} Samples per Class this may take a bit...")
             merged_data = concatenate_datasets([dataset['train'], dataset['valid'], dataset['test']])
 
             # Shuffle the merged data
-            merged_data.shuffle() #? Check if this is affected by the public seed
+            merged_data.shuffle() #TODO: Check if this is affected by the public seed
             
             # Create a dictionary to store the selected samples per class
             selected_samples = defaultdict(list)
@@ -144,43 +204,31 @@ class EmbeddingDataModule(BaseDataModuleHF):
             
         return dataset
 
+
+
+
     def _compute_embeddings(self, dataset):
         """
-        Compute Embeddings for the entire dataset and store them in a new DatasetDict.
+        Compute Embeddings for the entire dataset and update the dataset in place.
         """
-        # Create a new DatasetDict to store the embeddings
-        embeddings_dataset = DatasetDict()
-        
-        #! For some reason the .map() from Datasets caused errors
-        # Iterate over each split in the dataset
+        # Define the function that will be applied to each sample
+        def compute_and_update_embedding(sample):
+            with torch.no_grad():
+                # Get the embedding for the audio sample
+                embedding = self._get_embedding(sample['audio'])
+                # Update the sample with the new embedding
+                sample['embedding'] = {}
+                sample['embedding']['array'] = embedding.squeeze(0).cpu().numpy()
+                sample.pop('audio') # Remove audio to save space
+            return sample
+
+        # Apply the transformation to each split in the dataset
         for split in dataset.keys():
-            print(f">> Extracting Embeddings for {split} Split")
-            # Get the current split data
-            split_data = dataset[split]
+            log.info(f">> Extracting Embeddings for {split} Split")
+            # Apply the embedding function to each sample in the split
+            dataset[split] = dataset[split].map(compute_and_update_embedding, desc="Extracting Embeddings")
 
-            # Create a list to store the embeddings for the current split
-            embeddings = []
-
-            # Iterate over each sample in the split
-            with torch.no_grad(): # No need to compute gradients
-                for sample in tqdm(split_data, total=len(split_data), desc="Extracting Embeddings"):
-                    # Get the embedding for the audio sample
-                    embedding = self._get_embedding(sample['audio'])
-                    
-                    # Add the embedding to the list
-                    sample['audio']['array'] = embedding.squeeze(0).cpu().numpy() # Move to CPU and convert to numpy
-                    embeddings.append(sample)
-
-                # Convert the list of embeddings to a tensor
-                #embeddings = torch.stack(embeddings)
-
-                # Create a new Dataset with the embeddings
-                if len(embeddings) > 0:
-                    embeddings_dataset[split] =  Dataset.from_dict({key: [sample[key] for sample in embeddings] for key in embeddings[0]})
-                else:
-                    embeddings_dataset[split] = Dataset.from_dict({'audio':[], 'labels':[]})    
-
-        return embeddings_dataset
+        return dataset
         
 
     def _get_embedding(self, audio):
@@ -201,7 +249,7 @@ class EmbeddingDataModule(BaseDataModuleHF):
                 audio = audio[:self.max_length * self.sampling_rate]
                 return self.embedding_model.get_embeddings(audio.view(1, 1, -1))[0] 
         else:
-            return self.embedding_model.get_embeddings(audio.view(1, 1, -1))[0] # To just use embeddings not logits
+            return self.embedding_model.get_embeddings(audio.view(1, 1, -1))[0]
 
     # Resample function
     def _resample_audio(self, audio, orig_sr):
@@ -230,7 +278,7 @@ class EmbeddingDataModule(BaseDataModuleHF):
         # Generate embeddings for each frame
         l = []
         for frame in frames:
-            embedding = self.embedding_model.get_embeddings(frame.view(1, 1, -1)) 
+            embedding = self.embedding_model.get_embeddings(frame.view(1, 1, -1))[0] 
             l.append(embedding[0]) # To just use embeddings not logits
         
         embeddings = torch.stack(tuple(l))
@@ -264,30 +312,3 @@ class EmbeddingDataModule(BaseDataModuleHF):
         else:
             log.info(f"Saving to disk: {self.disk_save_path}")
             dataset.save_to_disk(self.disk_save_path)
-            
-    def prepare_data(self):
-        """
-        Same as prepare_data in BaseDataModuleHF but checks if path exists and skips rest otherwise
-        """
-        if not self._prepare_done and os.path.exists(self.disk_save_path):
-            #! We need to set self.len_trainset otherwise base_module doesn't work so we load train split to get the length
-            self.len_trainset = len(self._get_dataset("train"))
-            self._prepare_done = True
-
-        log.info("Check if preparing has already been done.")
-        if self._prepare_done:
-            log.info("Skip preparing.")
-            return
-
-        log.info("Prepare Data")
-
-        dataset = self._load_data()
-        dataset = self._preprocess_data(dataset)
-        dataset = self._create_splits(dataset)
-
-        # set the length of the training set to be accessed by the model
-        self.len_trainset = len(dataset["train"])
-        self._save_dataset_to_disk(dataset)
-
-        # set to done so that lightning does not call it again
-        self._prepare_done = True
