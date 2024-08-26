@@ -46,7 +46,7 @@ class BEANSDataModule(EmbeddingDataModule):
         Returns HF dataset with audio column casted to Audio feature, containing audio data as numpy array and sampling rate.
         """
         logging.info("> Loading data set.")
-        print(self.disk_save_path)
+        print(self.embeddings_save_path)
         dataset = load_dataset(
             name=self.dataset_config.hf_name,
             path=self.dataset_config.hf_path,
@@ -115,8 +115,8 @@ class BEANSDataModule(EmbeddingDataModule):
         """
 
         # Check if actually a dict
-        dataset = self._ksamples(dataset)
         dataset = self._compute_embeddings(dataset)
+        dataset = self._ksamples(dataset)
 
         if self.dataset_config.task == 'multilabel':
             log.info(">> One-hot-encode classes")
@@ -127,7 +127,6 @@ class BEANSDataModule(EmbeddingDataModule):
                 load_from_cache_file=True,
                 num_proc=self.dataset_config.n_workers,
             )
-
         return dataset
 
 
