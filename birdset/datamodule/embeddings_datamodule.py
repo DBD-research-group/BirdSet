@@ -138,7 +138,7 @@ class EmbeddingDataModule(BaseDataModuleHF):
                 del dataset['train']
                 dataset['train'] = dataset['train_low']
 
-            del dataset['train_low']    
+                del dataset['train_low']    
                 
             
             
