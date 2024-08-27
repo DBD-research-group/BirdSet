@@ -5,7 +5,7 @@ from torch.nn import CrossEntropyLoss
 from torch.nn.modules.loss import _Loss
 from torch.optim import AdamW, Optimizer
 from birdset.configs import NetworkConfig, LoggingParamsConfig, LRSchedulerConfig, MulticlassMetricsConfig, MultilabelMetricsConfig, MultilabelMetricsConfig as MetricsConfig
-from birdset.datamodule.embeddings_datamodule import EmbeddingModuleConfig
+from birdset.datamodule.embedding_datamodule import EmbeddingModuleConfig
 
 import torch
 import math

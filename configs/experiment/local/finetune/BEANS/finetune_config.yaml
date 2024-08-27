@@ -2,7 +2,7 @@
 #package global is neccessary!
 defaults:
   - override /logger: wandb_default.yaml
-  - override /datamodule: beans_finetune.yaml
+  - override /datamodule: beans.yaml
   - override /module: finetune.yaml
   - override /callbacks: default.yaml
   - override /trainer: single_gpu.yaml
@@ -29,7 +29,7 @@ module:
         num_classes: ${datamodule.dataset.n_classes} 
   optimizer:
     lr: 1e-4
-    weight_decay: 5e-4
+    weight_decay: 5e-4 # A lot lower than for linear probing
     
 trainer:
   devices: [0]
