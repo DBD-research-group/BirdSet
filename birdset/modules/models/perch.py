@@ -9,9 +9,8 @@ import torch
 from torch import nn
 
 from birdset.configs import PretrainInfoConfig
-from birdset.modules.models.embedding_abstract import EmbeddingModel
 
-class PerchModel(nn.Module, EmbeddingModel):
+class PerchModel(nn.Module):
     """
     A PyTorch model for bird vocalization classification, integrating a TensorFlow Hub model.
 
