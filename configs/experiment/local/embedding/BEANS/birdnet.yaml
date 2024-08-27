@@ -1,72 +1,16 @@
 # @package _global_
 #package global is neccessary!
 defaults:
-  - override /datamodule: beans.yaml
-  - override /module: embedding.yaml
-  - override /module/embedding_model: ../network/birdnet.yaml
-  - override /callbacks: default.yaml
-  - override /trainer: single_gpu.yaml
-  - override /paths: default.yaml
-  - override /hydra: default.yaml
-  - override /datamodule/transforms: bird_default_multiclass.yaml # Here the audio is transformed to a spectrogram
-  - override /datamodule/transforms/waveform_augmentations: none.yaml # No augmentations for now
-  - override /datamodule/transforms/spectrogram_augmentations: none.yaml
+  - local/embedding/BEANS/embedding_config.yaml
+  - override /datamodule/embedding_model: ../../module/network/birdnet.yaml
 
-tags: ["BEANS", "Ghani", "embeddings", "birdnet", "multiclass"]
+tags: ["BEANS", "embeddings", "birdnet", "multiclass"]
 seed: 2
-train: True
-test: True
-
-logger:
-  wandb:
-    tags: ${tags}
-    group: "Ghani" # We use Ghani group to filter for all runs related to reconstructing the Ghani results
-    mode: online
-
-module:
-  embedding_model:  # This is needed to provide num_classes to the classifier model
-    model:
-      num_classes: ${datamodule.dataset.n_classes} 
-  optimizer:
-    lr: 1e-2
-    weight_decay: 5e-4
   
-  #loss:
-    #_target_: birdset.modules.embedding_module.BCEWithLogitsLoss
-    #num_classes: ${datamodule.dataset.n_classes}  
-
 trainer:
   devices: [1]
   min_epochs: 1
-  max_epochs: 50
+  max_epochs: 20
 
 datamodule:
-  transforms:
-    max_length: 3
-  dataset:
-    dataset_name: beans_watkins
-    hf_path: DBD-research-group/beans_watkins
-    hf_name: default
-    n_classes: 31
-    
-  loaders:
-    train:
-      batch_size: 32
-      shuffle: True
-      num_workers: 16
-      drop_last: True
-    valid:
-      batch_size: 32
-      num_workers: 16
-      shuffle: False
-    test:
-      batch_size: 32
-      num_workers: 16
-      shuffle: False
-  
-callbacks:
-  model_checkpoint:
-    save_last: True
-    every_n_epochs: 3
-    monitor: "val/CrossEntropyLoss"
-
+  k_samples: 0  

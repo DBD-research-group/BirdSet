@@ -24,6 +24,64 @@ poetry install
 poetry shell
 ```
 
+## Running Linear Probing Experiments
+Foundation Models are tested on the Benchmark of Animal Sounds (BEANS) which we host on [Huggingface](https://huggingface.co/collections/DBD-research-group/beans-datasets-6611bd670cd7eb7b0bfc614e) and we focus on the classification datasets (watkins bats, cbi, dogs & humbugdb). Using the [beans.sh](scripts/beans.sh) script you can specify one or multiple experiment Paths to execute linear probing on all the BEANS datasets:
+
+`$./scripts/beans.sh embedding/BEANS/perch.yaml [additional experiments]`
+
+Currently the available embedding experiments are:
+- [Perch](configs/experiment/local/embedding/BEANS/perch.yaml)
+- [BirdNET](configs/experiment/local/embedding/BEANS/birdnet.yaml)
+- [Hubert](configs/experiment/local/embedding/BEANS/hubert.yaml)
+- [Wav2Vec2](configs/experiment/local/embedding/BEANS/wav2vec2.yaml)
+
+They all inherit from the base configuration [embedding_config.yaml](configs/experiment/local/embedding/BEANS/embedding_config.yaml) where most changes for extracting Embeddings are set.
+To execute an experiment on a specific dataset you have to change the following lines in the experiment file:
+```yaml
+datamodule:
+  dataset:
+    dataset_name: beans_watkins # Change 
+    hf_path: DBD-research-group/beans_watkins # Change 
+    hf_name: default
+    n_classes: 31 # Change 
+```
+
+|dataset_name|n_classes|
+|------------|---------|
+|beans_watkins|31|
+|beans_bats|10|
+|beans_cbi|264|
+|beans_dogs|10|
+|beans_humbugdb|14|
+
+Regarding the embedding extraction multiple things can be configured by changing the params of the [embeddings_datamodule.py](birdset/datamodule/embeddings_datamodule.py) for example through the experiment config:
+
+```yaml
+defaults:
+  # Inherit from default embedding config  
+  - local/embedding/BEANS/embedding_config.yaml 
+  # Use Hubert for embedding extraction 
+  - override /datamodule/embedding_model: ../../module/network/hubert.yaml
+
+datamodule:
+    # If >0 only X samples per class are used for training; The rest is used for validation and testing
+    k_samples: 0 
+    # If a validation set should be used: Use null to use val set and 0 for no validation at all
+    val_batch: null
+    # (If 0 and k_samples > 0 then all remaining samples land in test set; If k_samples = 0 val and test split in BEANS are combined in the test set)
+
+    # Test/Validation_ratio if k_samples > 0
+    test_ratio: 0.5 
+    # BEANS provides a low_train split which can be used instead of the default train split
+    low_train: False 
+    # If embeddings should be averaged or if just the first seconds should be used
+    average: True 
+```
+
+
+The classifier can also be changed and right now [this](birdset/modules/models/linear_classifier.py) is used.
+
+
 ## Example
 
 <!-- ## Log in to Huggingface
@@ -148,33 +206,3 @@ The following steps are performed in `setup`:
 ## Transformations
 
 Data transformations are referred to data transformations that are applied to the data during training. They include e.g. augmentations. The transformations are added to the huggingface dataset with [`set_transform`](https://huggingface.co/docs/datasets/main/en/package_reference/main_classes#datasets.Dataset.set_transform).
-
-
-## Running Linear Probing Experiments
-Foundation Models are tested on the Benchmark of Animal Sounds (BEANS) which we host on [Huggingface](https://huggingface.co/collections/DBD-research-group/beans-datasets-6611bd670cd7eb7b0bfc614e) and we focus on the classification datasets (watkins bats, cbi, dogs & humbugdb). Using the [beans.sh](scripts/beans.sh) script you can specify one or multiple experiment Paths to execute linear probing on all the BEANS datasets:
-
-`$./scripts/beans.sh embedding/BEANS/perch.yaml [additional experiments]`
-
-Currently the available embedding experiments are:
-- [Perch](configs/experiment/local/embedding/BEANS/perch.yaml)
-- [BirdNET](configs/experiment/local/embedding/BEANS/birdnet.yaml)
-
-To execute an experiment on a specific dataset you have to change the following lines in the experiment file:
-```yaml
-datamodule:
-  dataset:
-    dataset_name: beans_watkins # Change 
-    hf_path: DBD-research-group/beans_watkins # Change 
-    hf_name: default
-    n_classes: 31 # Change 
-```
-
-|dataset_name|n_classes|
-|------------|---------|
-|beans_watkins|31|
-|beans_bats|10|
-|beans_cbi|264|
-|beans_dogs|10|
-|beans_humbugdb|14|
-
-The classifier can also be changed and right now [this](birdset/modules/models/linear_classifier.py) is used.

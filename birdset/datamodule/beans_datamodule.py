@@ -1,8 +1,9 @@
 from birdset.datamodule.components.transforms import BirdSetTransformsWrapper
-from .base_datamodule import BaseDataModuleHF, DatasetConfig, LoadersConfig
+from birdset.datamodule.base_datamodule import BaseDataModuleHF
+from birdset.configs import DatasetConfig, LoadersConfig
 from datasets import load_dataset, IterableDataset, IterableDatasetDict, DatasetDict, Audio, Dataset
-import logging
 from birdset.utils import pylogger
+import logging
 log = pylogger.get_pylogger(__name__)
 
 detection_sets = ['beans_dcase', 'beans_enabirds', 'beans_hiceas', 'beans_rfcx', 'beans_gibbons']
@@ -13,30 +14,13 @@ class BEANSDataModule(BaseDataModuleHF):
             dataset: DatasetConfig = DatasetConfig(),
             loaders: LoadersConfig = LoadersConfig(),
             transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
+            
     ):
         super().__init__(
             dataset=dataset,
             loaders=loaders,
             transforms=transforms
         )
-
-    def _preprocess_data(self, dataset):
-        """
-        Preprocess the data. If multilabel is the task we will one hot encode.
-        """
-
-        if self.dataset_config.task == 'multilabel':
-            log.info(">> One-hot-encode classes")
-            dataset = dataset.map(
-                self._classes_one_hot,
-                batched=True,
-                batch_size=500,
-                load_from_cache_file=True,
-                num_proc=self.dataset_config.n_workers,
-            )
-
-        return dataset
-
 
 
     def _load_data(self,decode: bool = True):    
@@ -77,6 +61,7 @@ class BEANSDataModule(BaseDataModuleHF):
                 labels.update(dataset[split]["labels"])
 
             label_to_id = {lbl: i for i, lbl in enumerate(labels)}
+            self.id_to_label = {value: key for key, value in label_to_id.items()} # Save id_to_label to get names later on 
 
             def label_to_id_fn(batch):
                 for i in range(len(batch['labels'])):
@@ -104,4 +89,22 @@ class BEANSDataModule(BaseDataModuleHF):
             ),
         )
         
+        return dataset
+    
+    
+    def _preprocess_data(self, dataset):
+        """
+        Preprocess the data. ! For now this is here if the beans_datamodule is used without the embedding datamodule.
+        """
+
+        if self.dataset_config.task == 'multilabel':
+            log.info(">> One-hot-encode classes")
+            dataset = dataset.map(
+                self._classes_one_hot,
+                batched=True,
+                batch_size=500,
+                load_from_cache_file=True,
+                num_proc=self.dataset_config.n_workers,
+            )
+
         return dataset

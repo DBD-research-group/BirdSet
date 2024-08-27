@@ -1,8 +1,14 @@
 _target_: birdset.datamodule.components.transforms.EmbeddingTransforms
 sampling_rate: ${module.network.sampling_rate}
+model_type: ${module.network.model_type}
 task: ${datamodule.dataset.task}
-max_length: ${module.network.model.embedding_model.window_size_s} # Attention: this might not work with any model!! -> You must specify it or set to 5s as its done in code
-  
+max_length: ${module.network.model.in_features}
 
-
-
+defaults:
+  - _self_
+  - preprocessing: default.yaml 
+  - waveform_augmentations: default.yaml
+  - spectrogram_augmentations: default.yaml
+  - decoding: bird_event_decoder.yaml
+  - feature_extractor: default_aug.yaml
+  - nocall_sampler: null
