@@ -9,8 +9,8 @@ seed: 2
 
 trainer:
   devices: [0]
-  min_epochs: 20
-  max_epochs: 40
+  min_epochs: 40
+  max_epochs: 50
 
 datamodule:
   k_samples: 0  

@@ -32,7 +32,7 @@ class FinetuneModule(BaseModule):
             num_gpus: int = 1,
             pretrain_info = None,
             embedding_model: EmbeddingModuleConfig = EmbeddingModuleConfig(), # Model for extracting the embeddings
-            hybid: bool = False # Set to true if first train the classifier and then finetune feature extractor
+            hybrid: bool = False # Set to true if first train the classifier and then finetune feature extractor
             ):
         super().__init__(
             network = network,

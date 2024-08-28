@@ -222,23 +222,24 @@ class ASTModel(nn.Module):
         mask_id = random.sample(range(0, sequence_len), mask_size)
         return torch.tensor(mask_id)
 
-    def preprocess(self, input_values: torch.Tensor) -> torch.Tensor:
+    def preprocess(self, input_values: torch.Tensor, input_tdim=500, sampling_rate=16000) -> torch.Tensor:
         """
         Preprocesses the input values by applying mel-filterbank transformation.
         Args:
             input_values (torch.Tensor): Input tensor of shape (batch_size, num_samples).
+            input_tdim (int): The number of frames to keep. Defaults to 500.
+            sampling_rate (int): The sampling rate of the input tensor. Defaults to 16000.
         Returns:
             torch.Tensor: Preprocessed tensor of shape (batch_size, 1, num_mel_bins, num_frames).
         """
         device = input_values.device
         melspecs = []
         for waveform in input_values:
-            melspec = kaldi.fbank(waveform, htk_compat=True, window_type="hanning", num_mel_bins=128, use_energy=False, sample_frequency=16000, frame_shift=1)  # shape (n_frames, 128)
-            if melspec.shape[0] < 1024:
-                print("TOO SMALL")
-                melspec = F.pad(melspec, (0, 0, 0, 1024 - melspec.shape[0]))
+            melspec = kaldi.fbank(waveform, htk_compat=True, window_type="hanning", num_mel_bins=128, use_energy=False, sample_frequency=sampling_rate, frame_shift=10)  # shape (n_frames, 128)
+            if melspec.shape[0] < input_tdim:
+                melspec = F.pad(melspec, (0, 0, 0, input_tdim - melspec.shape[0]))
             else:
-                melspec = melspec[:1024]
+                melspec = melspec[:input_tdim]
             melspecs.append(melspec)
         melspecs = torch.stack(melspecs).to(device)
         melspecs = melspecs.unsqueeze(1)  # shape (batch_size, 1, 128, 1024)
@@ -255,24 +256,27 @@ class ASTModel(nn.Module):
         """
         input_tensor=self.preprocess(input_tensor) # Convert to spectrogram
         # expect input x = (batch_size, time_frame_num, frequency_bins), e.g., (12, 1024, 128)
+        input_tensor = input_tensor.transpose(2, 3)
         B = input_tensor.shape[0]
         x = self.v.patch_embed(input_tensor)
+
         if self.cls_token_num == 2:
             cls_tokens = self.v.cls_token.expand(B, -1, -1)
             dist_token = self.v.dist_token.expand(B, -1, -1)
             x = torch.cat((cls_tokens, dist_token, x), dim=1)
         else:
             cls_tokens = self.v.cls_token.expand(B, -1, -1)
-            x = torch.cat((cls_tokens, x), dim=1)
+            x = torch.cat((cls_tokens, x), dim=1)   
+            
         x = x + self.v.pos_embed
         x = self.v.pos_drop(x)
-
+        
         for blk_id, blk in enumerate(self.v.blocks):
-            x = blk(x)
-        x = self.v.norm(x)
-
+            x = blk(x) 
+            
+        x = self.v.norm(x) 
         # average output of all tokens except cls token(s)
-        x = torch.mean(x[:, self.cls_token_num:, :], dim=1)
+        x = torch.mean(x[:, self.cls_token_num:, :], dim=1)   
         
         return x, self.mlp_head(x)
         # x should go into the classifier with self.original_embedding_dim
