@@ -27,7 +27,7 @@ poetry shell
 ## Running Linear Probing Experiments
 Foundation Models are tested on the Benchmark of Animal Sounds (BEANS) which we host on [Huggingface](https://huggingface.co/collections/DBD-research-group/beans-datasets-6611bd670cd7eb7b0bfc614e) and we focus on the classification datasets (watkins bats, cbi, dogs & humbugdb). Using the [beans.sh](scripts/beans.sh) script you can specify one or multiple experiment Paths to execute linear probing on all the BEANS datasets:
 
-`$./scripts/beans.sh embedding/BEANS/perch.yaml [additional experiments]`
+`$./projects/biofoundation/scripts/run_beans_embeddings_experiments.sh embedding/BEANS/perch.yaml [additional experiments]`
 
 Currently the available embedding experiments are:
 - [Perch](configs/experiment/local/embedding/BEANS/perch.yaml)
@@ -35,7 +35,7 @@ Currently the available embedding experiments are:
 - [Hubert](configs/experiment/local/embedding/BEANS/hubert.yaml)
 - [Wav2Vec2](configs/experiment/local/embedding/BEANS/wav2vec2.yaml)
 
-They all inherit from the base configuration [embedding_config.yaml](configs/experiment/local/embedding/BEANS/embedding_config.yaml) where most changes for extracting Embeddings are set.
+They all inherit from the base configuration [embedding_config.yaml](configs/experiment/biofoundation/embedding/BEANS/embedding_config.yaml) where most changes for extracting Embeddings are set.
 To execute an experiment on a specific dataset you have to change the following lines in the experiment file:
 ```yaml
 datamodule:
@@ -59,7 +59,7 @@ Regarding the embedding extraction multiple things can be configured by changing
 ```yaml
 defaults:
   # Inherit from default embedding config  
-  - local/embedding/BEANS/embedding_config.yaml 
+  - biofoundation/embedding/BEANS/embedding_config.yaml 
   # Use Hubert for embedding extraction 
   - override /datamodule/embedding_model: ../../module/network/hubert.yaml
 
