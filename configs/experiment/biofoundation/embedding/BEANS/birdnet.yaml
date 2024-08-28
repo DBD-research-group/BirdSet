@@ -1,7 +1,7 @@
 # @package _global_
 #package global is neccessary!
 defaults:
-  - local/embedding/BEANS/embedding_config.yaml
+  - biofoundation/embedding/BEANS/embedding_config.yaml
   - override /datamodule/embedding_model: ../../module/network/birdnet.yaml
 
 tags: ["BEANS", "embeddings", "birdnet", "multiclass"]
