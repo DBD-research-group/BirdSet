@@ -27,13 +27,13 @@ poetry shell
 ## Running Linear Probing Experiments
 Foundation Models are tested on the Benchmark of Animal Sounds (BEANS) which we host on [Huggingface](https://huggingface.co/collections/DBD-research-group/beans-datasets-6611bd670cd7eb7b0bfc614e) and we focus on the classification datasets (watkins bats, cbi, dogs & humbugdb). Using the [beans.sh](scripts/beans.sh) script you can specify one or multiple experiment Paths to execute linear probing on all the BEANS datasets:
 
-`$./projects/biofoundation/scripts/run_beans_embeddings_experiments.sh embedding/BEANS/perch.yaml [additional experiments]`
+`$./projects/biofoundation/scripts/run_beans_embeddings_experiments.sh embedding/BEANS/perch [additional experiments]`
 
 Currently the available embedding experiments are:
-- [Perch](configs/experiment/local/embedding/BEANS/perch.yaml)
-- [BirdNET](configs/experiment/local/embedding/BEANS/birdnet.yaml)
-- [Hubert](configs/experiment/local/embedding/BEANS/hubert.yaml)
-- [Wav2Vec2](configs/experiment/local/embedding/BEANS/wav2vec2.yaml)
+- [perch](configs/experiment/local/embedding/BEANS/perch.yaml)
+- [birdnet](configs/experiment/local/embedding/BEANS/birdnet.yaml)
+- [hubert](configs/experiment/local/embedding/BEANS/hubert.yaml)
+- [wav2vec2](configs/experiment/local/embedding/BEANS/wav2vec2.yaml)
 
 They all inherit from the base configuration [embedding_config.yaml](configs/experiment/biofoundation/embedding/BEANS/embedding_config.yaml) where most changes for extracting Embeddings are set.
 To execute an experiment on a specific dataset you have to change the following lines in the experiment file:
