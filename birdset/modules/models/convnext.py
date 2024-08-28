@@ -6,6 +6,8 @@ from torch import nn
 from transformers import AutoConfig, ConvNextForImageClassification
 from birdset.configs import PretrainInfoConfig
 from typing import Tuple
+from torchaudio.compliance import kaldi
+import torch.nn.functional as F
 
 
 class ConvNextClassifier(nn.Module):
@@ -120,9 +122,36 @@ class ConvNextClassifier(nn.Module):
 
         return logits
     
+    def preprocess(self, input_values: torch.Tensor, input_tdim=500, sampling_rate=32000) -> torch.Tensor:
+        """
+        Preprocesses the input values by applying mel-filterbank transformation.
+        Args:
+            input_values (torch.Tensor): Input tensor of shape (batch_size, num_samples).
+            input_tdim (int): The number of frames to keep. Defaults to 500.
+            sampling_rate (int): The sampling rate of the input tensor. Defaults to 16000.
+        Returns:
+            torch.Tensor: Preprocessed tensor of shape (batch_size, 1, num_mel_bins, num_frames).
+        """
+        device = input_values.device
+        melspecs = []
+        for waveform in input_values:
+            melspec = kaldi.fbank(waveform, htk_compat=True, window_type="hanning", num_mel_bins=128, use_energy=False, sample_frequency=sampling_rate, frame_shift=10)  # shape (n_frames, 128)
+            #print(melspec.shape)
+            if melspec.shape[0] < input_tdim:
+                melspec = F.pad(melspec, (0, 0, 0, input_tdim - melspec.shape[0]))
+            else:
+                melspec = melspec[:input_tdim]
+            melspecs.append(melspec)
+        melspecs = torch.stack(melspecs).to(device)
+        melspecs = melspecs.unsqueeze(1)  # shape (batch_size, 1, 128, 1024)
+        #melspecs = (melspecs - self.MEAN) / (self.STD * 2)
+        return melspecs
+    
     def get_embeddings(
         self, input_tensor
     ) -> Tuple[torch.Tensor, torch.Tensor]:
+        input_tensor = self.preprocess(input_tensor)
+        input_tensor = input_tensor.transpose(2, 3)
         output = self.model(
             input_tensor,
             output_hidden_states=True,
@@ -132,8 +161,8 @@ class ConvNextClassifier(nn.Module):
         last_hidden_state = output.hidden_states[-1]
         # Flatten the tensor and keep batch size
         cls_state = last_hidden_state.view(last_hidden_state.size(0), -1)
-        print("HOOOHOOO")
         logits = output.logits
+        print(cls_state.shape)
         return cls_state, logits
         
 
