@@ -84,10 +84,15 @@ class EmbeddingDataModule(BaseDataModuleHF):
         if self._prepare_done:
             log.info("Skip preparing.")
             return
+                # Check if the embeddings for the dataset have already been computed
+        if os.path.exists(self.embeddings_save_path):
+            log.info(f"Embeddings found in {self.embeddings_save_path}, loading from disk")
+            dataset = load_from_disk(self.embeddings_save_path)
+        else:
+            log.info("Prepare Data")
+            dataset = self._load_data()
+            dataset = self._compute_embeddings(dataset)
 
-        log.info("Prepare Data")
-
-        dataset = self._load_data()
         dataset = self._preprocess_data(dataset)
         dataset = self._create_splits(dataset)
 
@@ -105,7 +110,6 @@ class EmbeddingDataModule(BaseDataModuleHF):
 
         # Check if actually a dict
         dataset = self._ksamples(dataset)
-        dataset = self._compute_embeddings(dataset)
 
         if self.dataset_config.task == 'multilabel':
             log.info(">> One-hot-encode classes")
@@ -206,12 +210,6 @@ class EmbeddingDataModule(BaseDataModuleHF):
         """
         Compute Embeddings for the entire dataset and store them in a new DatasetDict to disk. If the embeddings have already been computed, the dataset will be loaded from disk.
         """
-        # Check if the embeddings for the dataset have already been computed
-        if os.path.exists(self.embeddings_save_path):
-            log.info(f"Embeddings found in {self.embeddings_save_path}, loading from disk")
-            return load_from_disk(self.embeddings_save_path)
-
-      
         # Define the function that will be applied to each sample
         def compute_and_update_embedding(sample):
             with torch.no_grad():
@@ -222,12 +220,16 @@ class EmbeddingDataModule(BaseDataModuleHF):
                 sample['embedding']['array'] = embedding.squeeze(0).cpu().numpy()
                 sample.pop('audio') # Remove audio to save space
             return sample
+        
+        def get_new_fingerprint(split):
+            old_fingerprint =  dataset[split]._fingerprint
+            return f"{old_fingerprint}_embedding_model_{self.embedding_model_name}_{self.average}_{self.sampling_rate}_{self.max_length}"
 
         # Apply the transformation to each split in the dataset
         for split in dataset.keys():
             log.info(f">> Extracting Embeddings for {split} Split")
             # Apply the embedding function to each sample in the split
-            dataset[split] = dataset[split].map(compute_and_update_embedding, desc="Extracting Embeddings")
+            dataset[split] = dataset[split].map(compute_and_update_embedding, desc="Extracting Embeddings", load_from_cache_file=True, new_fingerprint=get_new_fingerprint(split), num_proc=self.dataset_config.n_workers)
         
         log.info(f"Saving emebeddings to disk: {self.embeddings_save_path}")
         dataset.save_to_disk(self.embeddings_save_path)
