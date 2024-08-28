@@ -8,9 +8,9 @@ tags: ["BEANS", "embeddings", "hubert", "multiclass"]
 seed: 2
 
 trainer:
-  devices: [2]
+  devices: [0]
   min_epochs: 1
-  max_epochs: 20
+  max_epochs: 40
 
 datamodule:
   k_samples: 0  
