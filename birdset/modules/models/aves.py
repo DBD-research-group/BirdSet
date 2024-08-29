@@ -49,7 +49,7 @@ class AvesClassifier(nn.Module):
         self.config = self.load_config(config_path)
         self.model = wav2vec2_model(**self.config, aux_num_out=None)
         self.model.load_state_dict(torch.load(model_path))
-        #self.model.feature_extractor.requires_grad_(False) #! Taken out
+        self.model.feature_extractor.requires_grad_(True) #! Taken out
         #self.head = nn.Linear(in_features=embeddings_dim, out_features=num_classes)
 
     def load_config(self, config_path):
