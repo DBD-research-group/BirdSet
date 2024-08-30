@@ -9,7 +9,7 @@ defaults:
   - override /datamodule/transforms/spectrogram_augmentations: none.yaml
   - override /datamodule/transforms: bird_default_multilabel.yaml
 
-tags: ["HSN", "BEATs", "no_augments"]
+tags: ["HSN", "BEATs", "multilabel", "no_augments"]
 seed: 2
 train: True
 test: True
@@ -29,9 +29,9 @@ module:
     #_target_: birdset.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
 
 trainer: 
-  max_epochs: 3
-  accelerator: gpu
-  devices: 1
+  max_epochs: 2
+  precision: 32
+  #devices: 1
 
 datamodule:
   dataset:
@@ -41,6 +41,7 @@ datamodule:
     class_weights_sampler: null
     classlimit: 500
     eventlimit: 5
+    
   
   transforms:
     max_length: 10
