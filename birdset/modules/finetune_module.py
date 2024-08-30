@@ -6,11 +6,12 @@ from torch.nn.modules.loss import _Loss
 from torch.optim import AdamW, Optimizer
 from birdset.configs import NetworkConfig, LoggingParamsConfig, LRSchedulerConfig, MulticlassMetricsConfig, MultilabelMetricsConfig, MultilabelMetricsConfig as MetricsConfig
 from birdset.datamodule.embedding_datamodule import EmbeddingModuleConfig
+from birdset.utils import pylogger
 
 import torch
 import math
 
-
+log = pylogger.get_pylogger(__name__)
 class FinetuneModule(BaseModule):
     def __init__(
             self,
@@ -32,7 +33,6 @@ class FinetuneModule(BaseModule):
             num_gpus: int = 1,
             pretrain_info = None,
             embedding_model: EmbeddingModuleConfig = EmbeddingModuleConfig(), # Model for extracting the embeddings
-            hybrid: bool = False # Set to true if first train the classifier and then finetune feature extractor
             ):
         super().__init__(
             network = network,
@@ -53,9 +53,9 @@ class FinetuneModule(BaseModule):
         self.sampling_rate = embedding_model.sampling_rate
         self.max_length = embedding_model.length
         for name, param in self.embedding_model.named_parameters():
-            if param.requires_grad:
-                print(f"Parameter Name: {name}")
-        print(f"FINETUNING using embedding model:{embedding_model.model_name} (Sampling Rate:{self.sampling_rate}, Window Size:{self.max_length})")
+            if not param.requires_grad:
+                print(f"Parameter Name: {name}")    
+        log.info(f"FINETUNING using embedding model:{embedding_model.model_name} (Sampling Rate:{self.sampling_rate}, Window Size:{self.max_length})")
 
     def configure_optimizers(self):
         self.optimizer = self.optimizer(list(self.model.parameters())+list(self.embedding_model.parameters())) #! Changed this
