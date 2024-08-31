@@ -4,6 +4,7 @@ from typing import Optional
 from birdset.modules.models.BEATs import BEATs, BEATsConfig
 import torch
 from torch import nn
+from typing import Tuple
 
 class BEATsModel(nn.Module):
     """
@@ -34,8 +35,8 @@ class BEATsModel(nn.Module):
             nn.Linear(64, self.num_classes),
         )
            # freeze the model
-        for param in self.model.parameters():
-            param.requires_grad = False
+        #for param in self.model.parameters():
+            #param.requires_grad = False
 
 
     def load_model(self) -> None:
@@ -77,7 +78,7 @@ class BEATsModel(nn.Module):
 
     def get_embeddings(
         self, input_values: torch.Tensor
-    ) -> torch.Tensor:
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Get the embeddings and logits from the BEATs model.
 
@@ -88,5 +89,6 @@ class BEATsModel(nn.Module):
             torch.Tensor: The embeddings from the model.
         """
         embeddings = self.model.extract_features(input_values)[0] # outputs a tensor of size 496x768
-
-        return embeddings
+        cls_state = embeddings[:,0,:]
+        
+        return cls_state, None
