@@ -29,6 +29,10 @@ dataset_/*
 
 
 birdset/output/*
+LTU.pth/*
+BEATs.pt/*
+AudioMAE.pth/*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
