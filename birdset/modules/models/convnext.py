@@ -4,6 +4,7 @@ import datasets
 import torch
 from torch import nn
 from transformers import AutoConfig, ConvNextForImageClassification
+from transformers.models.convnext.modeling_convnext import ConvNextModel
 from birdset.configs import PretrainInfoConfig
 from typing import Tuple
 from torchaudio.compliance import kaldi
@@ -122,6 +123,106 @@ class ConvNextClassifier(nn.Module):
 
         return logits
     
+    @torch.inference_mode()
+    def get_logits(self, dataloader, device):
+        pass
+
+    @torch.inference_mode()
+    def get_probas(self, dataloader, device):
+        pass
+
+    @torch.inference_mode()
+    def get_representations(self, dataloader, device):
+        pass
+
+
+class ConvNextEmbedding(nn.Module):
+    """
+    ConvNext model for audio classification.
+    """
+    MEAN = -4.2677393
+    STD = 4.5689974
+
+    def __init__(
+        self,
+        num_channels: int = 1,
+        num_classes: Optional[int] = None,
+        checkpoint: Optional[str] = None,
+        local_checkpoint: Optional[str] = None,
+        cache_dir: Optional[str] = None,
+        pretrain_info: PretrainInfoConfig = None,
+    ):
+        """
+        Note: Either num_classes or pretrain_info must be given
+        Args:
+            num_channels: Number of input channels.
+            checkpoint: huggingface checkpoint path of any model of correct type
+            local_checkpoint: local path to checkpoint file
+            cache_dir: specified cache dir to save model files at
+            pretrain_info: hf_path and hf_name of info will be used to infer if num_classes is None
+        """
+        super().__init__()
+
+        if pretrain_info:
+            self.hf_path = pretrain_info.hf_path
+            self.hf_name = (
+                pretrain_info.hf_name
+                if not pretrain_info.hf_pretrain_name
+                else pretrain_info.hf_pretrain_name
+            )
+        else:
+            self.hf_path = None
+            self.hf_name = None
+
+        self.num_channels = num_channels
+        self.checkpoint = checkpoint
+        self.local_checkpoint = local_checkpoint
+        self.cache_dir = cache_dir
+
+        self.model = None
+
+        self._initialize_model()
+
+    def _initialize_model(self):
+        """Initializes the ConvNext model based on specified attributes.
+        """
+
+        adjusted_state_dict = None
+
+        if self.checkpoint:
+            if self.local_checkpoint:
+                state_dict = torch.load(self.local_checkpoint)["state_dict"]
+
+                # Update this part to handle the necessary key replacements
+                adjusted_state_dict = {}
+                for key, value in state_dict.items():
+                    # Handle 'model.model.' prefix
+                    new_key = key.replace("model.model.", "")
+
+                    # Handle 'model._orig_mod.model.' prefix
+                    new_key = new_key.replace("model._orig_mod.model.", "")
+
+                    # Assign the adjusted key
+                    adjusted_state_dict[new_key] = value
+
+            
+            self.model = ConvNextModel.from_pretrained(
+                self.checkpoint,
+                num_channels=self.num_channels,
+                cache_dir=self.cache_dir,
+                state_dict=adjusted_state_dict,
+                ignore_mismatched_sizes=True,
+            )
+            
+        else:
+            print("Using pretrained convnext")
+            config = AutoConfig.from_pretrained(
+                "facebook/convnext-base-224-22k",
+                num_channels=self.num_channels,
+            )
+            self.model = ConvNextModel(config)
+     
+            
     def preprocess(self, input_values: torch.Tensor, input_tdim=500, sampling_rate=32000) -> torch.Tensor:
         """
         Preprocesses the input values by applying mel-filterbank transformation.
@@ -144,8 +245,9 @@ class ConvNextClassifier(nn.Module):
             melspecs.append(melspec)
         melspecs = torch.stack(melspecs).to(device)
         melspecs = melspecs.unsqueeze(1)  # shape (batch_size, 1, 128, 1024)
-        #melspecs = (melspecs - self.MEAN) / (self.STD * 2)
-        return melspecs
+        melspecs = (melspecs - self.MEAN) / (self.STD * 2)
+        return melspecs    
+    
     
     def get_embeddings(
         self, input_tensor
@@ -157,23 +259,4 @@ class ConvNextClassifier(nn.Module):
             output_hidden_states=True,
             return_dict=True
             )
-        # Extract last hidden state
-        last_hidden_state = output.hidden_states[-1]
-        # Flatten the tensor and keep batch size
-        cls_state = last_hidden_state.view(last_hidden_state.size(0), -1)
-        logits = output.logits
-        print(cls_state.shape)
-        return cls_state, logits
-        
-
-    @torch.inference_mode()
-    def get_logits(self, dataloader, device):
-        pass
-
-    @torch.inference_mode()
-    def get_probas(self, dataloader, device):
-        pass
-
-    @torch.inference_mode()
-    def get_representations(self, dataloader, device):
-        pass
+        return output.pooler_output, None

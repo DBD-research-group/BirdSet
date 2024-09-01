@@ -2,7 +2,7 @@
 #package global is neccessary!
 defaults:
   - local/finetune/BEANS/finetune_config.yaml 
-  - override /module/embedding_model: ../../module/network/convnext.yaml  
+  - override /module/embedding_model: ../../module/network/convnext_emb.yaml  
 
 tags: ["BEANS", "finetune", "convnext", "multiclass"]
 seed: 2
@@ -10,6 +10,6 @@ seed: 2
 trainer:
   devices: [1]
   min_epochs: 1
-  max_epochs: 20 # Use null to use all batches; 0 for no validation at all
+  max_epochs: 20
   
 
