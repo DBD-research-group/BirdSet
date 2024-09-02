@@ -198,7 +198,8 @@ class EmbeddingDataModule(BaseDataModuleHF):
                 del dataset['train']
                 dataset['train'] = dataset['train_low']
 
-            del dataset['train_low']    
+            if 'train_low' in dataset:
+                del dataset['train_low'] 
                 
             
             

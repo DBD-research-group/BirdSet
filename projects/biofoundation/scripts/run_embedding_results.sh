@@ -2,8 +2,8 @@
 
 # Datasets to loop through
 #("beans_watkins" "beans_bats" "beans_cbi" "beans_dogs" "beans_humbugdb")
-dnames=("beans_watkins" "beans_bats" "beans_cbi" "beans_dogs" "beans_humbugdb")
-dclasses=(31 10 264 10 14)
+dnames=("beans_watkins" "beans_cbi" "beans_dogs" "beans_humbugdb" "beans_bats")
+dclasses=(31 264 10 14 10)
 
 # Check if at least one argument is provided
 if [ $# -eq 0 ]; then
