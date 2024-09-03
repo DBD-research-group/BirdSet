@@ -1,0 +1,16 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - biofoundation/embedding/BEANS/embedding_config.yaml
+  - override /datamodule/embedding_model: ../../module/network/birdnet.yaml
+
+tags: ["BEANS", "embeddings", "birdnet", "multiclass"]
+seed: 2
+  
+trainer:
+  devices: [1]
+  min_epochs: 1
+  max_epochs: 20
+
+datamodule:
+  k_samples: 0  

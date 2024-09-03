@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from typing import Tuple
 from transformers import AutoModelForAudioClassification, AutoConfig
 import datasets
 
@@ -29,12 +30,26 @@ class Wav2vec2SequenceClassifier(nn.Module):
 
         self.checkpoint = checkpoint
 
-        if pretrain_info:  # either num_classes if provided or pretrain info
+        if pretrain_info:
             self.hf_path = pretrain_info.hf_path
-            self.hf_name = pretrain_info.hf_name if not pretrain_info.hf_pretrain_name else pretrain_info.hf_pretrain_name
-            self.num_classes = len(datasets.load_dataset_builder(self.hf_path, self.hf_name).info.features["ebird_code"].names)
+            self.hf_name = (
+                pretrain_info.hf_name
+                if not pretrain_info.hf_pretrain_name
+                else pretrain_info.hf_pretrain_name
+            )
+            if self.hf_path == 'DBD-research-group/BirdSet':
+                self.num_classes = len(
+                    datasets.load_dataset_builder(self.hf_path, self.hf_name)
+                    .info.features["ebird_code"]
+                    .names
+                )
+            else:
+                self.num_classes = num_classes
         else:
+            self.hf_path = None
+            self.hf_name = None
             self.num_classes = num_classes
+                
         self.cache_dir = cache_dir
 
         state_dict = None
@@ -88,6 +103,27 @@ class Wav2vec2SequenceClassifier(nn.Module):
             output = logits
 
         return output
+
+    def get_embeddings(
+        self, input_tensor
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        input_tensor = input_tensor.squeeze(1)
+
+        outputs = self.model(
+            input_tensor,
+            output_attentions=False,
+            output_hidden_states=True,
+            return_dict=True,
+            #labels=None
+        )
+        logits = outputs['logits']
+
+        last_hidden_state = outputs["hidden_states"][-1] #(batch, sequence, dim)
+        cls_state = last_hidden_state[:,0,:]
+        
+        
+        
+        return cls_state, logits
 
     @torch.inference_mode()
     def get_logits(self, dataloader, device):

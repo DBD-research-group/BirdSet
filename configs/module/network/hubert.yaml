@@ -11,10 +11,13 @@ model:
     valid_test_only: False
   
 model_name: hubert
-model_type: raw
+model_type: waveform
 torch_compile: False
-sampling_rate: 16_000
-
+sampling_rate: 32_000 # Or 16k (performed 2% worse)
+normalize_spectrogram: False
+normalize_waveform: False
+embedding_size: 768
+length: 15 #15 Seems to be best
 # hubert uses the w2v2 featue extractor 
 
 
