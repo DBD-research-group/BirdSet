@@ -10,3 +10,4 @@ sampling_rate: 16_000
 normalize_spectrogram: False
 normalize_waveform: False
 embedding_size: 768
+length: 10
