@@ -8,7 +8,7 @@ defaults:
   - override /trainer: single_gpu.yaml
   - override /paths: default.yaml
   - override /hydra: default.yaml
-  - override /datamodule/transforms: bird_default.yaml # Here the audio is transformed to a spectrogram
+  - override /datamodule/transforms: bird_default.yaml
   - override /datamodule/transforms/waveform_augmentations: none.yaml # No augmentations for now
   - override /datamodule/transforms/spectrogram_augmentations: none.yaml
 
@@ -36,9 +36,11 @@ module:
 trainer:
   devices: [0]
   min_epochs: 1
-  max_epochs: 100
+  max_epochs: 80
 
 datamodule:
+  transforms:
+    max_length: ${module.embedding_model.length}
   dataset:
     dataset_name: beans_watkins
     hf_path: DBD-research-group/beans_watkins
