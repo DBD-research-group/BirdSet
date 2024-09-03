@@ -1,0 +1,6 @@
+defaults:
+  - wandb_default.yaml
+
+
+wandb:
+  group: ${module.network.model_name}_${datamodule.dataset.dataset_name}_#${datamodule.k_samples}  

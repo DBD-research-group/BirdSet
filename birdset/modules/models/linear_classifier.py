@@ -23,4 +23,4 @@ class LinearClassifier(nn.Module):
     def forward(
         self, input_values: torch.Tensor, labels: Optional[torch.Tensor] = None
     ) -> torch.Tensor:
-        return self.classifier(input_values) 
+        return self.classifier(input_values).squeeze(1) 

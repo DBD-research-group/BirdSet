@@ -9,9 +9,8 @@ import torch
 from torch import nn
 
 from birdset.configs import PretrainInfoConfig
-from birdset.modules.models.embedding_abstract import EmbeddingModel
 
-class PerchModel(nn.Module, EmbeddingModel):
+class PerchModel(nn.Module):
     """
     A PyTorch model for bird vocalization classification, integrating a TensorFlow Hub model.
 
@@ -85,7 +84,6 @@ class PerchModel(nn.Module, EmbeddingModel):
             nn.ReLU(),
             nn.Linear(64, self.num_classes),
         )
-
         self.load_model()
 
     def load_model(self) -> None:
@@ -94,9 +92,9 @@ class PerchModel(nn.Module, EmbeddingModel):
         """
 
         model_url = f"{self.PERCH_TF_HUB_URL}/{self.tfhub_version}"
-        # self.model = hub.load(model_url)
-        # with tf.device('/CPU:0'):
-        #     model = hub.load(model_url)
+        #self.model = hub.load(model_url)
+        #with tf.device('/CPU:0'):
+            #self.model = hub.load(model_url)
         physical_devices = tf.config.list_physical_devices('GPU')
         tf.config.experimental.set_visible_devices(physical_devices[self.gpu_to_use], 'GPU')
         tf.config.experimental.set_memory_growth(physical_devices[self.gpu_to_use], True)
