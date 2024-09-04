@@ -16,7 +16,10 @@ class FinetuneModule(BaseModule):
     def __init__(
             self,
             network: NetworkConfig = NetworkConfig(),
-            output_activation: Callable[[torch.Tensor], torch.Tensor] = torch.sigmoid,
+            output_activation: Callable[[torch.Tensor], torch.Tensor] = partial(
+                torch.softmax,
+                dim=1
+            ),
             loss: _Loss = CrossEntropyLoss(),
             optimizer: partial[Type[Optimizer]] = partial(
                 AdamW,
@@ -90,5 +93,6 @@ class FinetuneModule(BaseModule):
         embeddings, _ = self.embedding_model.get_embeddings(input_values)
 
         # Pass embeddings through the classifier to get the final output
-        embeddings = embeddings.view(embeddings.size(0), -1) # Transform for the classifier
-        return self.model.forward(embeddings)    
+        embeddings = embeddings.unsqueeze(1) # Transform for the classifier
+        logits = self.model.forward(embeddings)    
+        return logits

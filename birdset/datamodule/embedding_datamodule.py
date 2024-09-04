@@ -263,10 +263,7 @@ class EmbeddingDataModule(BaseDataModuleHF):
         current_num_samples = audio.shape[0]
         padding = desired_num_samples - current_num_samples
         if padding > 0:
-            #print('padding')
-            pad_left = padding // 2
-            pad_right = padding - pad_left
-            audio = torch.nn.functional.pad(audio, (pad_left, pad_right))
+            audio = torch.nn.functional.pad(audio, (0, padding))
         return audio
 
     # Average multiple embeddings function
