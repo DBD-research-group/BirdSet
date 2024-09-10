@@ -1,0 +1,17 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - biofoundation/embedding/ESC50/embedding_config.yaml
+  - override /datamodule/embedding_model: ../../module/network/hubert.yaml  
+
+tags: ["ESC50", "embeddings", "hubert", "multiclass"]
+seed: 2
+
+trainer:
+  devices: [2]
+  min_epochs: 1
+  max_epochs: 20
+
+datamodule:
+  k_samples: 0  
+  val_batches: null # Use null to use all batches; 0 for no validation at all
