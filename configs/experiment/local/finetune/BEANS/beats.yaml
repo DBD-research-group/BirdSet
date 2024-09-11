@@ -10,9 +10,13 @@ seed: 2
 trainer:
   devices: [1]
   min_epochs: 1
+  max_epochs: 5
   precision: 32
   #devices: 1
 
 
-  
+module:
+  embedding_model:  
+    model:
+        train_classifier: False
 
