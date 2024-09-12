@@ -34,12 +34,32 @@ poetry shell
 ```
 -->
 
-## Example
+## Examples
 
 We offer an in-depth [tutorial notebook](https://github.com/DBD-research-group/BirdSet/blob/main/notebooks/tutorials/birdset-pipeline_tutorial.ipynb) on how to use this repository. In the following, we provide simple code snippets:
 
+### Manual Data Preparation
 
-### Prepare Data
+You can manually download the datasets from Hugging Face. We offer a uniform metadata format but also provide flexibility on how to prepare the data (e.g. you can manually decide which events to filter from the training data). The dataset dictionary comes with: 
+
+- `train`: Focal instance with variable lengths. Possible `detected_events` are provided.  
+- `test_5s`: Each soundscape instance corresponds to a 5-second clip with a `ebird_code_multilabel` format.  
+- `test`: Each soundscape instance is the full recording without any preprocessing and the correspoding ebird_code with ground truth `start_time` and `end_time`.
+
+ 
+```python
+from datasets import load_dataset, dataset
+
+# download the dataset 
+dataset = load_dataset("DBD-research-group/BirdSet","HSN")
+
+# set HF decoder (decodes the complete file!)
+dataset = dataset.cast_column("audio", Audio(sampling_rate=32_000)
+
+```
+### BirdSet: Data Preparation
+
+This code snippet utilizes the datamodule for an example dataset $\texttt{HSN}$. 
 
 ```python
 from birdset.datamodule.base_datamodule import DatasetConfig
@@ -72,7 +92,7 @@ dm.setup(stage="fit")
 train_loader = dm.train_dataloader()
 ```
 
-### Prepare Model and Start Training
+### BirdSet: Prepare Model and Start Training
 
 ```python
 from lightning import Trainer
