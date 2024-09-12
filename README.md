@@ -5,10 +5,15 @@
 <a href="https://hydra.cc/"><img alt="Config: Hydra" src="https://img.shields.io/badge/Config-Hydra-89b8cd"></a>
 <a href="https://github.com/DBD-research-group/BirdSet"><img alt="GitHub: github.com/DBD-research-group/BirdSet " src="https://img.shields.io/badge/-BirdSet-017F2F?style=flat&logo=github&labelColor=gray"></a>
 [![arXiv](https://img.shields.io/badge/arXiv-1234.56789-b31b1b.svg)](https://arxiv.org/abs/2403.10380)
+<div align="center">
+  <img src="https://github.com/DBD-research-group/BirdSet/blob/main/resources/perch/birdsetsymbol.png" alt="logo" width="150">
+</div>
 
-![logo](https://github.com/DBD-research-group/BirdSet/blob/main/resources/perch/birdsetsymbol.png)
-
+# $\texttt{BirdSet}$ - A Dataset and Benchmark in Avian Bioacoustics 🤗
 Deep learning models have emerged as a powerful tool in avian bioacoustics to assess environmental health. To maximize the potential of cost-effective and minimal-invasive passive acoustic monitoring (PAM), models must analyze bird vocalizations across a wide range of species and environmental conditions. However, data fragmentation challenges a evaluation of generalization performance. Therefore, we introduce the $\texttt{BirdSet}$ dataset, comprising approximately 520,000 global bird recordings for training and over 400 hours PAM recordings for testing.
+
+Our datasets are shared via Hugging Face 🤗 Datasets in our [BirdSet repository](https://huggingface.co/datasets/DBD-research-group/BirdSet). Our accompanying code package includes modules for further data preparation, model training, and evaluation.
+
 ## User Installation
 
 The simplest way to install $\texttt{BirdSet}$ is to clone this repository and install it as an editable package using [conda](https://docs.conda.io/en/latest/) and [pip](https://pip.pypa.io/en/stable/):
@@ -16,7 +21,7 @@ The simplest way to install $\texttt{BirdSet}$ is to clone this repository and i
 conda create -n birdset python=3.10
 pip install -e .
 ```
-
+<!-- 
 You can also use the [devcontainer](https://code.visualstudio.com/docs/devcontainers/containers) configured as as git submodule:
 ```bash
 git submodule update --init --recursive
@@ -27,7 +32,63 @@ Or [poetry](https://python-poetry.org/).
 poetry install
 poetry shell
 ```
+-->
 
+## Example
+
+We offer an in-depth [tutorial notebook](https://github.com/DBD-research-group/BirdSet/blob/main/notebooks/tutorials/birdset-pipeline_tutorial.ipynb) on how to use this repository. In the following, we provide simple code snippets:
+
+
+### Prepare Data
+
+```python
+from birdset.datamodule.base_datamodule import DatasetConfig
+from birdset.datamodule.birdset_datamodule import BirdSetDataModule
+
+# initiate the data module
+dm = BirdSetDataModule(
+    dataset= DatasetConfig(
+        data_dir='data_birdset/HSN', # specify your data directory!
+        dataset_name='HSN',
+        hf_path='DBD-research-group/BirdSet',
+        hf_name='HSN',
+        n_classes=21,
+        n_workers=3,
+        val_split=0.2,
+        task="multilabel",
+        classlimit=500,
+        eventlimit=5,
+        sampling_rate=32000,
+    ),
+)
+
+# prepare the data (download dataset, ...)
+dm.prepare_data()
+
+# setup the dataloaders
+dm.setup(stage="fit")
+
+# get the dataloaders
+train_loader = dm.train_dataloader()
+```
+
+### Prepare Model and Start Training
+
+```python
+from lightning import Trainer
+min_epochs = 1
+max_epochs = 5
+trainer = Trainer(min_epochs=min_epochs, max_epochs=max_epochs, accelerator="gpu", devices=1)
+
+from birdset.modules.multilabel_module import MultilabelModule
+model = MultilabelModule(
+    len_trainset=dm.len_trainset,
+    task=dm.task,
+    batch_size=dm.train_batch_size,
+    num_epochs=max_epochs)
+
+trainer.fit(model, dm)
+```
 ## Reproduce Neurips2024 Baselines
 
 > 🚧 This repository is still under active development. You can access the NeurIPS 24 code at the tag  `neurips2024`
@@ -74,76 +135,6 @@ python birdset/eval.py experiment="birdset_neurips24/$EXPERIMENT_PATH" module.mo
 
 **Disclaimer on results:** The results obtained using the `eval.py` script may differ from those reported in the paper. This discrepancy is because only the "best" model checkpoint was uploaded to Hugging Face, whereas the paper’s results were averaged over three different random seeds for a more robust evaluation.
 
-## Example
-
-<!-- ## Log in to Hugging Face
-
-Our datasets are shared via Hugging Face Datasets in our [Hugging Face BirdSet repository](https://huggingface.co/datasets/DBD-research-group/BirdSet). Hugging Face is a central hub for sharing and utilizing datasets and models, particularly beneficial for machine learning and data science projects. For accessing private datasets hosted on Hugging Face, you need to be authenticated. Here's how you can log in to Hugging Face:
-
-1. **Install Hugging Face CLI**: If you haven't already, you need to install the Hugging Face CLI (Command Line Interface). This tool enables you to interact with Hugging Face services directly from your terminal. You can install it using pip:
-
-   ```bash
-   pip install huggingface_hub
-   ```
-
-2. **Login via CLI**: Once the Hugging Face CLI is installed, you can log in to your Hugging Face account directly from your terminal. This step is essential for accessing private datasets or contributing to the Hugging Face community. Use the following command:
-
-   ```bash
-   huggingface-cli login
-   ```
-
-   After executing this command, you'll be prompted to enter your Hugging Face credentials ([User Access Token](https://huggingface.co/docs/hub/security-tokens)). Once authenticated, your credentials will be saved locally, allowing seamless access to Hugging Face resources. -->
-[Tutorial Notebook](https://github.com/DBD-research-group/BirdSet/blob/main/notebooks/tutorials/birdset-pipeline_tutorial.ipynb)
-## Prepare Data
-
-```python
-from birdset.datamodule.base_datamodule import DatasetConfig
-from birdset.datamodule.birdset_datamodule import BirdSetDataModule
-
-# initiate the data module
-dm = BirdSetDataModule(
-    dataset= DatasetConfig(
-        data_dir='data_birdset/HSN', # specify your data directory!
-        dataset_name='HSN',
-        hf_path='DBD-research-group/BirdSet',
-        hf_name='HSN',
-        n_classes=21,
-        n_workers=3,
-        val_split=0.2,
-        task="multilabel",
-        classlimit=500,
-        eventlimit=5,
-        sampling_rate=32000,
-    ),
-)
-
-# prepare the data (download dataset, ...)
-dm.prepare_data()
-
-# setup the dataloaders
-dm.setup(stage="fit")
-
-# get the dataloaders
-train_loader = dm.train_dataloader()
-```
-
-## Prepare Model and Start Training
-
-```python
-from lightning import Trainer
-min_epochs = 1
-max_epochs = 5
-trainer = Trainer(min_epochs=min_epochs, max_epochs=max_epochs, accelerator="gpu", devices=1)
-
-from birdset.modules.multilabel_module import MultilabelModule
-model = MultilabelModule(
-    len_trainset=dm.len_trainset,
-    task=dm.task,
-    batch_size=dm.train_batch_size,
-    num_epochs=max_epochs)
-
-trainer.fit(model, dm)
-```
 <!---
 ## Results (AUROC)
 | <sub>Title</sub> | <sub>Notes</sub> |<sub>PER</sub> | <sub>NES</sub> | <sub>UHH</sub> | <sub>HSN</sub> | <sub>NBP</sub> | <sub>POW</sub> | <sub>SSW</sub> | <sub>SNE</sub>  | <sub>Overall</sub> | <sub>Code</sub> |
@@ -168,7 +159,7 @@ Replace `EXPERIMENT_PATH` with the path to the disired experiment YAML config or
 ``` bash
 python birdset/train.py experiment="local/HSN/efficientnet.yaml"
 ```
-
+<!-- 
 # Data pipeline
 
 Our datasets are shared via Hugging Face Datasets in our [BirdSet repository](https://huggingface.co/datasets/DBD-research-group/BirdSet).
@@ -199,6 +190,7 @@ The following steps are performed in `setup`:
 
 Data transformations are referred to data transformations that are applied to the data during training. They include e.g. augmentations. The transformations are added to the Hugging Face dataset with [`set_transform`](https://huggingface.co/docs/datasets/main/en/package_reference/main_classes#datasets.Dataset.set_transform).
 
+-->
 
 
 
