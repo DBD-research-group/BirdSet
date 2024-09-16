@@ -234,6 +234,8 @@ class BaseDataModuleHF(L.LightningDataModule):
             ):
                 return dataset
             if "train" in dataset.keys() and "test" in dataset.keys():
+                if self.dataset_config.val_split == 0:
+                    raise ValueError("A small validation split is required. Please set val_split > 0.")
                 train_valid_split = dataset["train"].train_test_split(
                     self.dataset_config.val_split,
                     shuffle=True,
