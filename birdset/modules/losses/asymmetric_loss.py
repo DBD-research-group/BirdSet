@@ -1,23 +1,30 @@
-import torch 
-import torch.nn as nn
-import torch.nn.functional as F
-#https://openaccess.thecvf.com/content/ICCV2021/papers/Ridnik_Asymmetric_Loss_for_Multi-Label_Classification_ICCV_2021_paper.pdf
+# https://openaccess.thecvf.com/content/ICCV2021/papers/Ridnik_Asymmetric_Loss_for_Multi-Label_Classification_ICCV_2021_paper.pdf
 import torch
-import torch.nn as nn
+from torch import nn
 
-#https://github.com/huggingface/pytorch-image-models/blob/bbe798317fb26f063c18279827c038058e376479/timm/loss/asymmetric_loss.py#L6
+
+# https://github.com/huggingface/pytorch-image-models/blob/bbe798317fb26f063c18279827c038058e376479/timm/loss/asymmetric_loss.py#L6
 class AsymmetricLossMultiLabel(nn.Module):
-    def __init__(self, gamma_neg=4, gamma_pos=1, clip=0.05, eps=1e-8, disable_torch_grad_focal_loss=False):
-        super(AsymmetricLossMultiLabel, self).__init__()
+    def __init__(
+        self,
+        gamma_neg=4,
+        gamma_pos=1,
+        clip=0.05,
+        eps=1e-8,
+        disable_torch_grad_focal_loss=False,
+        reduction="mean",
+    ):
+        super().__init__()
 
         self.gamma_neg = gamma_neg
         self.gamma_pos = gamma_pos
         self.clip = clip
         self.disable_torch_grad_focal_loss = disable_torch_grad_focal_loss
         self.eps = eps
+        self.reduction = reduction
 
     def forward(self, x, y):
-        """"
+        """
         Parameters
         ----------
         x: input logits
@@ -51,12 +58,17 @@ class AsymmetricLossMultiLabel(nn.Module):
                 torch._C.set_grad_enabled(True)
             loss *= one_sided_w
 
-        return -loss.sum()
+        if self.reduction == "mean":
+            return -loss.mean()
+        if self.reduction == "sum":
+            return -loss.sum()
+
+        return -loss
 
 
 class AsymmetricLossSingleLabel(nn.Module):
-    def __init__(self, gamma_pos=1, gamma_neg=4, eps: float = 0.1, reduction='mean'):
-        super(AsymmetricLossSingleLabel, self).__init__()
+    def __init__(self, gamma_pos=1, gamma_neg=4, eps: float = 0.1, reduction="mean"):
+        super().__init__()
 
         self.eps = eps
         self.logsoftmax = nn.LogSoftmax(dim=-1)
@@ -65,8 +77,8 @@ class AsymmetricLossSingleLabel(nn.Module):
         self.gamma_neg = gamma_neg
         self.reduction = reduction
 
-    def forward(self, inputs, target, reduction=None):
-        """"
+    def forward(self, inputs, target):
+        """
         Parameters
         ----------
         x: input logits
@@ -75,7 +87,9 @@ class AsymmetricLossSingleLabel(nn.Module):
 
         num_classes = inputs.size()[-1]
         log_preds = self.logsoftmax(inputs)
-        self.targets_classes = torch.zeros_like(inputs).scatter_(1, target.long().unsqueeze(1), 1)
+        self.targets_classes = torch.zeros_like(inputs).scatter_(
+            1, target.long().unsqueeze(1), 1
+        )
 
         # ASL weights
         targets = self.targets_classes
@@ -84,18 +98,22 @@ class AsymmetricLossSingleLabel(nn.Module):
         xs_neg = 1 - xs_pos
         xs_pos = xs_pos * targets
         xs_neg = xs_neg * anti_targets
-        asymmetric_w = torch.pow(1 - xs_pos - xs_neg,
-                                 self.gamma_pos * targets + self.gamma_neg * anti_targets)
+        asymmetric_w = torch.pow(
+            1 - xs_pos - xs_neg,
+            self.gamma_pos * targets + self.gamma_neg * anti_targets,
+        )
         log_preds = log_preds * asymmetric_w
 
         if self.eps > 0:  # label smoothing
-            self.targets_classes = self.targets_classes.mul(1 - self.eps).add(self.eps / num_classes)
+            self.targets_classes = self.targets_classes.mul(1 - self.eps).add(
+                self.eps / num_classes
+            )
 
         # loss calculation
-        loss = - self.targets_classes.mul(log_preds)
+        loss = -self.targets_classes.mul(log_preds)
 
         loss = loss.sum(dim=-1)
-        if self.reduction == 'mean':
+        if self.reduction == "mean":
             loss = loss.mean()
 
         return loss
