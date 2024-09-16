@@ -48,7 +48,7 @@ You can manually download the datasets from Hugging Face. We offer a uniform met
 
  
 ```python
-from datasets import load_dataset, dataset
+from datasets import load_dataset, dataset, Audio
 
 # download the dataset 
 dataset = load_dataset("DBD-research-group/BirdSet","HSN")
@@ -61,9 +61,19 @@ dataset = dataset.cast_column("audio", Audio(sampling_rate=32_000)
 
 This code snippet utilizes the datamodule for an example dataset $\texttt{HSN}$. 
 
+**prepare_data**
+- downloads the data (or loads from cache)
+- preprocesses the data (event_mapping/sampling, one-hot encodes classes, create splits)
+- saves dataset to disk
+
+**setup**
+- sets up and loads the dataset for training and evaluating
+- adds `set_transforms` that transforms on-the-fly (decoding, augmentation etc.)
+  
 ```python
 from birdset.datamodule.base_datamodule import DatasetConfig
 from birdset.datamodule.birdset_datamodule import BirdSetDataModule
+from datasets import load_from_disk
 
 # initiate the data module
 dm = BirdSetDataModule(
@@ -82,15 +92,24 @@ dm = BirdSetDataModule(
     ),
 )
 
-# prepare the data (download dataset, ...)
+# prepare the data
 dm.prepare_data()
 
-# setup the dataloaders
+# manually load the complete prepared dataset (without any transforms). you have to cast the column with audio for decoding
+ds = load_from_disk(dm.disk_save_path)
+
+# setup the datasets with BirdSet ("test" for testdata)
 dm.setup(stage="fit")
+
+# audio is now decoded when a sample is called
+train_ds = dm.train_dataset
+val_ds = dm.val_dataset
 
 # get the dataloaders
 train_loader = dm.train_dataloader()
 ```
+
+More details are available in the `datamodule_configs.py`and the tutorial notebook. 
 
 ### BirdSet: Prepare Model and Start Training
 
