@@ -98,7 +98,7 @@ dm.prepare_data()
 # manually load the complete prepared dataset (without any transforms). you have to cast the column with audio for decoding
 ds = load_from_disk(dm.disk_save_path)
 
-# setup the datasets with BirdSet ("test" for testdata)
+# OR setup the datasets with BirdSet ("test" for testdata)
 dm.setup(stage="fit")
 
 # audio is now decoded when a sample is called
