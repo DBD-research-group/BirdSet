@@ -22,7 +22,7 @@ num_gpus: ${trainer.devices}
 
 optimizer:
   _target_: torch.optim.AdamW
-  lr: 1e-2
+  lr: 1e-4
   _partial_: true
   weight_decay: 5e-4
 

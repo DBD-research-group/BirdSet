@@ -117,7 +117,6 @@ class ConvNextClassifier(nn.Module):
         Returns:
             torch.Tensor: The output of the ConvNext model.
         """
-        print(input_values.shape)
         output = self.model(input_values)
         logits = output.logits
 
