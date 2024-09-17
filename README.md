@@ -79,7 +79,6 @@ from datasets import load_from_disk
 dm = BirdSetDataModule(
     dataset= DatasetConfig(
         data_dir='data_birdset/HSN', # specify your data directory!
-        dataset_name='HSN',
         hf_path='DBD-research-group/BirdSet',
         hf_name='HSN',
         n_classes=21,

@@ -158,7 +158,7 @@ class BaseDataModuleHF(L.LightningDataModule):
 
         self.disk_save_path = os.path.join(
             self.dataset_config.data_dir,
-            f"{self.dataset_config.dataset_name}_processed_{self.dataset_config.seed}_{fingerprint}",
+            f"{self.dataset_config.hf_name}_processed_{self.dataset_config.seed}_{fingerprint}",
         )
 
         if os.path.exists(self.disk_save_path):
@@ -234,6 +234,8 @@ class BaseDataModuleHF(L.LightningDataModule):
             ):
                 return dataset
             if "train" in dataset.keys() and "test" in dataset.keys():
+                if self.dataset_config.val_split == 0:
+                    raise ValueError("A small validation split is required. Please set val_split > 0.")
                 train_valid_split = dataset["train"].train_test_split(
                     self.dataset_config.val_split,
                     shuffle=True,
@@ -257,12 +259,17 @@ class BaseDataModuleHF(L.LightningDataModule):
         """
         log.info("> Loading data set.")
 
-        dataset = load_dataset(
-            name=self.dataset_config.hf_name,
-            path=self.dataset_config.hf_path,
-            cache_dir=self.dataset_config.data_dir,
-            num_proc=3,
-        )
+        dataset_args = {
+            "path": self.dataset_config.hf_path,
+            "cache_dir": self.dataset_config.data_dir,
+            "num_proc": 3,
+        }
+
+        if self.dataset_config.hf_name != "esc50": # special esc50 case due to naming
+            dataset_args["name"] = self.dataset_config.hf_name
+
+        dataset = load_dataset(**dataset_args)
+
         if isinstance(dataset, IterableDataset | IterableDatasetDict):
             log.error("Iterable datasets not supported yet.")
             return

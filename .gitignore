@@ -12,6 +12,7 @@ wandb/
 output_birdset/
 *.hydra
 *.ogg
+*.devcontainer
 
 data/*
 

@@ -29,7 +29,6 @@ class HSNDataModule(BirdSetDataModule):
         super().__init__(
             dataset=DatasetConfig(
                 data_dir='/workspace/data_birdset/HSN',
-                dataset_name='HSN',
                 hf_path=HF_PATH,
                 hf_name='HSN',
                 n_workers=n_workers,
@@ -65,7 +64,6 @@ class NBPDataModule(BirdSetDataModule):
         super().__init__(
             dataset=DatasetConfig(
                 data_dir='/workspace/data_birdset/NBP',
-                dataset_name='NBP',
                 hf_path=HF_PATH,
                 hf_name='NBP',
                 n_workers=n_workers,
@@ -101,7 +99,6 @@ class NESDataModule(BirdSetDataModule):
         super().__init__(
             dataset=DatasetConfig(
                 data_dir='/workspace/data_birdset/NES',
-                dataset_name='NES',
                 hf_path=HF_PATH,
                 hf_name='NES',
                 n_workers=n_workers,
@@ -137,7 +134,6 @@ class PERDataModule(BirdSetDataModule):
         super().__init__(
             dataset=DatasetConfig(
                 data_dir='/workspace/data_birdset/PER',
-                dataset_name='PER',
                 hf_path=HF_PATH,
                 hf_name='PER',
                 n_workers=n_workers,
@@ -173,7 +169,6 @@ class POWDataModule(BirdSetDataModule):
         super().__init__(
             dataset=DatasetConfig(
                 data_dir='/workspace/data_birdset/POW',
-                dataset_name='POW',
                 hf_path=HF_PATH,
                 hf_name='POW',
                 n_workers=n_workers,
@@ -209,7 +204,6 @@ class SNEDataModule(BirdSetDataModule):
         super().__init__(
             dataset=DatasetConfig(
                 data_dir='/workspace/data_birdset/SNE',
-                dataset_name='SNE',
                 hf_path=HF_PATH,
                 hf_name='SNE',
                 n_workers=n_workers,
@@ -245,7 +239,6 @@ class SSWDataModule(BirdSetDataModule):
         super().__init__(
             dataset=DatasetConfig(
                 data_dir='/workspace/data_birdset/SSW',
-                dataset_name='SSW',
                 hf_path=HF_PATH,
                 hf_name='SSW',
                 n_workers=n_workers,
@@ -281,7 +274,6 @@ class XCMDataModule(BirdSetDataModule):
         super().__init__(
             dataset=DatasetConfig(
                 data_dir='/workspace/data_birdset/XCM',
-                dataset_name='XCM',
                 hf_path=HF_PATH,
                 hf_name='XCM',
                 n_workers=n_workers,
@@ -317,7 +309,6 @@ class XCLDataModule(BirdSetDataModule):
         super().__init__(
             dataset=DatasetConfig(
                 data_dir='/workspace/data_birdset/SSW',
-                dataset_name='XCL',
                 hf_path=HF_PATH,
                 hf_name='XCL',
                 n_workers=n_workers,
@@ -353,7 +344,6 @@ class UHHDataModule(BirdSetDataModule):
         super().__init__(
             dataset=DatasetConfig(
                 data_dir='/workspace/data_birdset/SSW',
-                dataset_name='UHH',
                 hf_path=HF_PATH,
                 hf_name='UHH',
                 n_workers=n_workers,
