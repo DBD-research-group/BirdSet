@@ -14,7 +14,7 @@ Deep learning models have emerged as a powerful tool in avian bioacoustics to as
 
 Our datasets are shared via Hugging Face 🤗 Datasets in our [BirdSet repository](https://huggingface.co/datasets/DBD-research-group/BirdSet). Our accompanying code package includes modules for further data preparation, model training, and evaluation.
 
-## User Installation
+## User Installation 🐣
 
 The simplest way to install $\texttt{BirdSet}$ is to clone this repository and install it as an editable package using [conda](https://docs.conda.io/en/latest/) and [pip](https://pip.pypa.io/en/stable/):
 ```
@@ -34,7 +34,7 @@ poetry shell
 ```
 -->
 
-## Examples
+## Examples 🐤
 
 We offer an in-depth [tutorial notebook](https://github.com/DBD-research-group/BirdSet/blob/main/notebooks/tutorials/birdset-pipeline_tutorial.ipynb) on how to use this repository. In the following, we provide simple code snippets:
 
@@ -57,7 +57,7 @@ dataset = load_dataset("DBD-research-group/BirdSet","HSN")
 dataset = dataset.cast_column("audio", Audio(sampling_rate=32_000)
 
 ```
-### BirdSet: Data Preparation
+### BirdSet: Data Preparation :bird:
 
 This code snippet utilizes the datamodule for an example dataset $\texttt{HSN}$. 
 
@@ -111,7 +111,7 @@ train_loader = dm.train_dataloader()
 
 More details are available in the `datamodule_configs.py`and the tutorial notebook. 
 
-### BirdSet: Prepare Model and Start Training
+### BirdSet: Prepare Model and Start Training  :bird:
 
 ```python
 from lightning import Trainer
@@ -128,9 +128,9 @@ model = MultilabelModule(
 
 trainer.fit(model, dm)
 ```
-## Reproduce Neurips2024 Baselines
+## Reproduce Neurips2024 Baselines 🚧
 
-> 🚧 This repository is still under active development. You can access the NeurIPS 24 code at the tag  `neurips2024`
+> This repository is still under active development. You can access the NeurIPS 24 code at the tag  `neurips2024`
 > ```bash
 > git checkout neurips2024
 ```
