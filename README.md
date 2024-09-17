@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://github.com/DBD-research-group/BirdSet/blob/main/resources/perch/birdsetsymbol.png" alt="logo" width="150">
+  <img src="https://github.com/DBD-research-group/BirdSet/blob/main/resources/perch/birdsetsymbol.png" alt="logo" width="100">
 </div>
 
 # $\texttt{BirdSet}$ - A Benchmark in Avian Bioacoustics 🤗
