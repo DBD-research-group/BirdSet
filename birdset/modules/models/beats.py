@@ -15,8 +15,7 @@ class BEATsModel(nn.Module):
     def __init__(
             self,
             num_classes: int,
-            train_classifier: bool = False,
-            state_dict: Optional[dict] = None
+            train_classifier: bool = False
         ) -> None:
         super().__init__()
         self.model = None  # Placeholder for the loaded model
@@ -36,14 +35,6 @@ class BEATsModel(nn.Module):
             nn.Linear(64, self.num_classes),
         )
         
-        if state_dict is not None:
-            print("LOADED2")
-            state_dict = torch.load(state_dict)["state_dict"]
-            #print(state_dict)
-            state_dict = {key: weight for key, weight in state_dict.items() if key.startswith('embedding_model.')}
-            state_dict = {key.replace('embedding_model.', ''): weight for key, weight in state_dict.items()}
-            print("Modified state_dict keys:", state_dict.keys())
-            self.load_state_dict(state_dict,strict=True)
         # freeze the model
         #! Dont freeze when finetuning
         if self.train_classifier:
