@@ -6,7 +6,7 @@ work_dir: ${hydra:runtime.cwd}
 output_dir: ${hydra:runtime.output_dir}
 
 # data directory
-dataset_path: /mnt/work/bird2vec/birdset_hf_download/${datamodule.dataset.dataset_name}
+dataset_path: /mnt/work/bird2vec/birdset_hf_download/${datamodule.dataset.hf_name}
 model_path: /mnt/work/bird2vec/birdset_hf_download/models
 background_path: /mnt/work/bird2vec/data/dcase18/wav
 

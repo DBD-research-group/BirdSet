@@ -8,9 +8,8 @@ defaults:
 
 dataset:
   data_dir: ${paths.dataset_path}
-  dataset_name: esc50
   hf_path: ashraq/esc50
-  hf_name: default
+  hf_name: esc50
   seed: ${seed}
   n_classes: 50
   n_workers: 1

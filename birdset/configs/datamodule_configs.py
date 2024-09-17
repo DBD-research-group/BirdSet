@@ -11,8 +11,6 @@ class DatasetConfig:
     ----------
     data_dir : str
         Specifies the directory where the dataset files are stored.  **Important**: The dataset uses a lot of disk space, so make sure you have enough storage available.
-    dataset_name : str
-        The name assigned to the dataset.
     hf_path : str
         The path to the dataset stored on HuggingFace.
     hf_name : str
@@ -41,9 +39,8 @@ class DatasetConfig:
         Only works with PretrainDatamodule. Path to a saved preprocessed dataset path
     """
     data_dir: str = "/workspace/data_birdset"
-    dataset_name: str = "esc50"
     hf_path: str = "ashraq/esc50"
-    hf_name: str = ""
+    hf_name: str = "esc50"
     seed: int = 42
     n_workers: int = 1
     val_split: float = 0.2
