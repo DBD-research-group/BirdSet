@@ -61,14 +61,14 @@ dataset = dataset.cast_column("audio", Audio(sampling_rate=32_000)
 
 This code snippet utilizes the datamodule for an example dataset $\texttt{HSN}$. 
 
-**prepare_data**
-- downloads the data (or loads from cache)
-- preprocesses the data (event_mapping/sampling, one-hot encodes classes, create splits)
-- saves dataset to disk
+>**prepare_data**
+>- downloads the data (or loads from cache)
+>- preprocesses the data (event_mapping/sampling, one-hot encodes classes, create splits)
+>- saves dataset to disk
 
-**setup**
-- sets up and loads the dataset for training and evaluating
-- adds `set_transforms` that transforms on-the-fly (decoding, augmentation etc.)
+>**setup**
+>- sets up and loads the dataset for training and evaluating
+>- adds `set_transforms` that transforms on-the-fly (decoding, augmentation etc.)
   
 ```python
 from birdset.datamodule.base_datamodule import DatasetConfig
