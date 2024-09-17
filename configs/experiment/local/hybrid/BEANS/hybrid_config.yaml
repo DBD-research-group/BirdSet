@@ -25,12 +25,8 @@ logger:
 
 module:
   _target_: birdset.modules.hybrid_module.HybridModule
-  ft_max_epochs: 6
-  ft_optimizer:
-    _target_: torch.optim.AdamW
-    lr: 0.06
-    _partial_: true
-    weight_decay: 0
+  #ft_max_epochs: 20
+  #ft_lr: 1e-4
 
   network:
     model_name: ${module.embedding_model.model_name}_hybrid
@@ -42,11 +38,13 @@ module:
     weight_decay: 5e-4
     
 trainer:
-  devices: [0]
+  devices: [2]
   min_epochs: 1
   max_epochs: 50
 
 datamodule:
+  transforms:
+    max_length: ${module.embedding_model.length}
   dataset:
     dataset_name: beans_watkins
     hf_path: DBD-research-group/beans_watkins

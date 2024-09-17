@@ -15,5 +15,8 @@ trainer:
 datamodule:
   k_samples: 0  
   val_batches: null # Use null to use all batches; 0 for no validation at all
-  
-
+  dataset:
+    dataset_name: beans_bats
+    hf_path: DBD-research-group/beans_bats
+    hf_name: default
+    n_classes: 10  
