@@ -25,8 +25,8 @@ logger:
 
 module:
   _target_: birdset.modules.hybrid_module.HybridModule
-  #ft_max_epochs: 20
-  #ft_lr: 1e-4
+  ft_max_epochs: 20
+  ft_lr: 1e-4
 
   network:
     model_name: ${module.embedding_model.model_name}_hybrid

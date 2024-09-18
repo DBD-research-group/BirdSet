@@ -37,8 +37,8 @@ class HybridModule(FinetuneModule):
             num_gpus: int = 1,
             pretrain_info = None,
             embedding_model: EmbeddingModuleConfig = EmbeddingModuleConfig(), # Model for extracting the embeddings
-            #ft_lr: int = 5,
-            #ft_max_epochs: int = 5,
+            ft_lr: int = 1e-2,
+            ft_max_epochs: int = 10,
             ):
         super().__init__(
             network = network,
@@ -57,8 +57,8 @@ class HybridModule(FinetuneModule):
             embedding_model=embedding_model
         )
         self.linear_probing = True
-        #self.ft_lr = ft_lr
-        #self.ft_max_epochs = ft_max_epochs
+        self.ft_lr = ft_lr
+        self.ft_max_epochs = ft_max_epochs
         
     """def configure_optimizers(self):
         if not self.linear_probing:
@@ -97,19 +97,17 @@ class HybridModule(FinetuneModule):
     def configure_optimizers(self):
         if not self.linear_probing:
             self.embedding_model.train()  
-            #self.optimizer.add_param_group({'params': self.embedding_model.parameters()})
+            self.optimizer.add_param_group({'params': self.embedding_model.parameters()})
 
             for param in self.embedding_model.parameters():
                 param.requires_grad = True 
                 
             for param_group in self.trainer.optimizers[0].param_groups:
-                param_group['lr'] = 1e-4
+                param_group['lr'] = self.ft_lr
             
             return self.optimizer
         
-        self.optimizer = self.optimizer(list(self.model.parameters())+list(self.embedding_model.parameters())) #! Changed this
-        for param in self.embedding_model.parameters():
-                param.requires_grad = False
+        self.optimizer = self.optimizer(list(self.model.parameters())) #! Changed this
         if self.lr_scheduler is not None:
             # TODO: Handle the case when we do not want warmup
             num_training_steps = math.ceil((self.num_epochs * self.len_trainset) / self.batch_size * self.num_gpus)
@@ -136,23 +134,11 @@ class HybridModule(FinetuneModule):
 
     def on_train_end(self):
         if self.linear_probing:
-            print("STARTING fine-tuning...")
             self.linear_probing = False
-            #print(self.trainer.checkpoint_callback.best_model_path)
-            #self.trainer.fit(self,  datamodule=self.trainer.datamodule)
-            
-            #self.embedding_model.train()  
-            #for param in self.embedding_model.parameters():
-                #param.requires_grad = True 
-                
-            #for param_group in self.trainer.optimizers[0].param_groups:
-                #param_group['lr'] = 1e-4 # Set your new learning rate here 
-            #print("Erhöht")
-            
-            self.trainer.fit_loop.max_epochs += 5
-            
-            
-            self.trainer.fit(self,  datamodule=self.trainer.datamodule, ckpt_path=self.trainer.checkpoint_callback.best_model_path)         
-            #self.trainer.fit_loop.min_epochs = self.trainer.current_epoch + 5  
-            #self.trainer.fit(self,  datamodule=self.trainer.datamodule, ckpt_path=self.trainer.checkpoint_callback.best_model_path)         
-                        
+            self.trainer.fit_loop.max_epochs += self.ft_max_epochs
+            # Load best model
+            best_model_path = self.trainer.checkpoint_callback.best_model_path
+            state_dict = torch.load(best_model_path)["state_dict"]
+            self.load_state_dict(state_dict, strict=True)
+            log.info("Starting finetuning and loaded best model")
+            self.trainer.fit(self,  datamodule=self.trainer.datamodule)         

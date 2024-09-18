@@ -12,11 +12,10 @@ trainer:
   min_epochs: 1
   max_epochs: 5
   precision: 32
+
+module:
+  ft_max_epochs: 5
+  ft_lr: 1e-4
   
-datamodule:
-  dataset:
-    dataset_name: beans_bats
-    hf_path: DBD-research-group/beans_bats
-    hf_name: default
-    n_classes: 10  
+
 
