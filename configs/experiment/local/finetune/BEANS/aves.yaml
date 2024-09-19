@@ -9,11 +9,5 @@ seed: 2
 
 trainer:
   devices: [0]
-  min_epochs: 50
-  max_epochs: 50
-
-optimizer:
-  betas: [0.9, 0.999]
-  eps: 1e-8
-  lr: 5*1e-5
-  weight_decay: 0
+  min_epochs: 1
+  max_epochs: 25

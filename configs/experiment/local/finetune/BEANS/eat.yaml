@@ -9,6 +9,6 @@ seed: 2
 
 trainer:
   devices: [1]
-  min_epochs: 30
+  min_epochs: 1
   
 

@@ -9,7 +9,7 @@ seed: 2
 
 trainer:
   devices: [1]
-  min_epochs: 20
-  max_epochs: 20 # Use null to use all batches; 0 for no validation at all
+  min_epochs: 1
+  max_epochs: 25
   
 

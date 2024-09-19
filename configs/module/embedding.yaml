@@ -31,11 +31,11 @@ loss:
   _target_: torch.nn.CrossEntropyLoss
 
 metrics: 
-  _target_: birdset.modules.metrics.multiclass.EmbeddingMetricsConfig # Temporary solution 
+  _target_: birdset.modules.metrics.multiclass.EmbeddingMetricsConfig
   num_labels: ${datamodule.dataset.n_classes}
 
 output_activation: 
-  _target_: "torch.softmax" # Use sigmoid like Ghani et al
+  _target_: "torch.softmax"
   _partial_: true
   dim: 1
 

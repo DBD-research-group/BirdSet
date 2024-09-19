@@ -54,10 +54,7 @@ class FinetuneModule(BaseModule):
         )
         self.embedding_model = embedding_model.model
         self.sampling_rate = embedding_model.sampling_rate
-        self.max_length = embedding_model.length
-        for name, param in self.embedding_model.named_parameters():
-            if not param.requires_grad:
-                print(f"Parameter Name: {name}")    
+        self.max_length = embedding_model.length  
         log.info(f"FINETUNING using embedding model:{embedding_model.model_name} (Sampling Rate:{self.sampling_rate}, Window Size:{self.max_length})")
 
     def configure_optimizers(self):
