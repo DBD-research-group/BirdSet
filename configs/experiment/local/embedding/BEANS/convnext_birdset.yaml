@@ -16,5 +16,10 @@ datamodule:
   k_samples: 0  
   val_batches: null # Use null to use all batches; 0 for no validation at all
   average: False
+
+  embedding_model:
+    model:
+      checkpoint: DBD-research-group/ConvNeXT-Base-BirdSet-XCL
+    model_name: convnext_birdset
   
 
