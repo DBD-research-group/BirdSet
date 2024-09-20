@@ -64,5 +64,6 @@ datamodule:
   
 callbacks:
   model_checkpoint:
-    monitor: "val/CrossEntropyLoss"
+    monitor: "val/MulticlassAccuracy"
+    mode: "max"
 
