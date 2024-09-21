@@ -180,11 +180,13 @@ class SoundNet(nn.Module):
             self.down.load_state_dict(self.load_state_dict_from_file(local_checkpoint, model_name='down'))
             self.down2.load_state_dict(self.load_state_dict_from_file(local_checkpoint, model_name='down2'))
             self.project.load_state_dict(self.load_state_dict_from_file(local_checkpoint, model_name='project'))
-            self.tf.load_state_dict(self.load_state_dict_from_file(local_checkpoint, model_name='tf'))
+            self.tf.load_state_dict(self.load_state_dict_from_file(local_checkpoint, model_name='tf'), strict=False)
 
     def load_state_dict_from_file(self, file_path, model_name= 'model'):
         state_dict = torch.load(file_path, map_location=self.device)["state_dict"]
         # select only models where the key starts with `model.` + model_name + `.`
+        # TODO: Only do this if classifier varies 
+        state_dict = {k: v for k, v in state_dict.items() if not k.startswith('model.tf.fc')}
         state_dict = {key: weight for key, weight in state_dict.items() if key.startswith('model.' + model_name + '.')}
         state_dict = {key.replace('model.' + model_name + '.', ''): weight for key, weight in state_dict.items()}
 
