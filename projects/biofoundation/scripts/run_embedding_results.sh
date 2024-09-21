@@ -17,6 +17,6 @@ for experiment in "$@"; do
     dname=${dnames[$i]}
     dclass=${dclasses[$i]}
     echo "Running with dataset_name=$dname and n_classes=$dclass"
-    python birdset/train.py --multirun experiment="local/embedding/BEANS/$experiment" seed=1,2,3 datamodule.average=False logger.wandb.group="results_run5" trainer.devices=[1] trainer.min_epochs=20 trainer.max_epochs=50 datamodule.dataset.dataset_name=$dname datamodule.dataset.hf_path="DBD-research-group/$dname" datamodule.dataset.n_classes=$dclass
+    python birdset/train.py --multirun experiment="local/embedding/BEANS/$experiment" seed=1,2,3 datamodule.average=False datamodule.k_samples=0 datamodule.average=False logger.wandb.group="results_run9" trainer.devices=[2] trainer.min_epochs=1 trainer.max_epochs=50 datamodule.dataset.dataset_name=$dname datamodule.dataset.hf_path="DBD-research-group/$dname" datamodule.dataset.n_classes=$dclass
   done
 done
