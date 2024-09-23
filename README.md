@@ -10,7 +10,7 @@
 <a href="https://hydra.cc/"><img alt="Config: Hydra" src="https://img.shields.io/badge/Config-Hydra-89b8cd"></a>
 [![arXiv paper](https://img.shields.io/badge/arXiv-1234.56789-b31b1b.svg)](https://arxiv.org/abs/2403.10380)
 
-Deep learning models have emerged as a powerful tool in avian bioacoustics to assess environmental health. To maximize the potential of cost-effective and minimal-invasive passive acoustic monitoring (PAM), models must analyze bird vocalizations across a wide range of species and environmental conditions. However, data fragmentation challenges a evaluation of generalization performance. Therefore, we introduce the $\texttt{BirdSet}$ dataset, comprising approximately 520,000 global bird recordings for training and over 400 hours PAM recordings for testing.
+Deep learning models have emerged as a powerful tool in avian bioacoustics to assess environmental health. To maximize the potential of cost-effective and minimal-invasive passive acoustic monitoring (PAM), models must analyze bird vocalizations across a wide range of species and environmental conditions. However, data fragmentation challenges a evaluation of generalization performance. Therefore, we introduce the $\texttt{BirdSet}$ dataset, comprising approximately 520,000 global bird recordings for training and over 400 hours PAM recordings for testing in a multi-label classification setting.
 
 Our datasets are shared via Hugging Face 🤗 Datasets in our [BirdSet repository](https://huggingface.co/datasets/DBD-research-group/BirdSet). Our accompanying code package includes modules for further data preparation, model training, and evaluation.
 
@@ -46,9 +46,9 @@ We offer an in-depth [tutorial notebook](https://github.com/DBD-research-group/B
 
 You can manually download the datasets from Hugging Face. We offer a uniform metadata format but also provide flexibility on how to prepare the data (e.g. you can manually decide which events to filter from the training data). The dataset dictionary comes with: 
 
-- `train`: Focal instance with variable lengths. Possible `detected_events` are provided.  
-- `test_5s`: Each soundscape instance corresponds to a 5-second clip with a `ebird_code_multilabel` format.  
-- `test`: Each soundscape instance is the full recording without any preprocessing and the correspoding ebird_code with ground truth `start_time` and `end_time`.
+- `train`: Focal instance with variable lengths. Possible `detected_events` and corresponding event clusters are provided.  
+- `test_5s`: Processed test datasets where each soundscape instance corresponds to a 5-second clip with a `ebird_code_multilabel` format.  
+- `test`: Unprocessed test datasets where each soundscape instance points to the full soundscape recording and the correspoding `ebird_code` with ground truth `start_time` and `end_time`.
 
  
 ```python
