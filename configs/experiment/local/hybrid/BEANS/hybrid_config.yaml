@@ -25,7 +25,7 @@ logger:
 
 module:
   _target_: birdset.modules.hybrid_module.HybridModule
-  ft_max_epochs: 20
+  ft_max_epochs: 10
   ft_lr: 1e-4
 
   network:
@@ -40,7 +40,7 @@ module:
 trainer:
   devices: [2]
   min_epochs: 1
-  max_epochs: 50
+  max_epochs: 25
 
 datamodule:
   transforms:
@@ -53,22 +53,21 @@ datamodule:
 
   loaders:
     train:
-      batch_size: 32
+      batch_size: 16
       shuffle: True
       num_workers: 16
       drop_last: True
     valid:
-      batch_size: 32
+      batch_size: 16
       num_workers: 16
       shuffle: False
     test:
-      batch_size: 32
+      batch_size: 16
       num_workers: 16
       shuffle: False
   
 callbacks:
   model_checkpoint:
-    save_last: True
-    every_n_epochs: 3
-    monitor: "val/CrossEntropyLoss"
+    monitor: "val/MulticlassAccuracy"
+    mode: "max"
 
