@@ -196,6 +196,24 @@ Our experiments are defined in the `configs/experiment` folder. To run an experi
 ``` bash
 python birdset/train.py experiment="EXPERIMENT_PATH"
 ```
+
+## Citation
+
+```
+@misc{rauch2024birdsetdatasetbenchmarkclassification,
+      title={BirdSet: A Dataset and Benchmark for Classification in Avian Bioacoustics}, 
+      author={Lukas Rauch and Raphael Schwinger and Moritz Wirth and René Heinrich and Denis Huseljic and Jonas Lange and Stefan Kahl and Bernhard Sick and Sven Tomforde and Christoph Scholz},
+      year={2024},
+      eprint={2403.10380},
+      archivePrefix={arXiv},
+      primaryClass={cs.SD},
+      url={https://arxiv.org/abs/2403.10380}, 
+}
+```
+
+
+
+
 Replace `EXPERIMENT_PATH` with the path to the disired experiment YAML config originating from the `experiment` directory. For example, here's a command for training an EfficientNet on HSN: 
 
 ``` bash
