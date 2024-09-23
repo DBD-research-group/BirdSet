@@ -153,12 +153,11 @@ trainer.fit(model, dm)
 
 > This repository is still under active development. You can access the NeurIPS 24 code at the tag  `neurips2024`
 > ```bash
-> git checkout neurips2024
-```
+> git checkout neurips2024 
 
 First, you have to download the background noise files for augmentations
 
-``` bash
+```bash
 python resources/utils/download_background_noise.py
 ```
 
@@ -200,10 +199,10 @@ python birdset/eval.py experiment="birdset_neurips24/$EXPERIMENT_PATH" module.mo
 | <sub>Title</sub> | <sub>Notes</sub> |<sub>PER</sub> | <sub>NES</sub> | <sub>UHH</sub> | <sub>HSN</sub> | <sub>NBP</sub> | <sub>POW</sub> | <sub>SSW</sub> | <sub>SNE</sub>  | <sub>Overall</sub> | <sub>Code</sub> |
 | :----| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | <sub>**BirdSet: A Multi-Task Benchmark For Classification In Avian Bioacoustics**</sub> | | | | | | | |
-| <sub>**BIRB: A Generalization Benchmark for Information Retrieval in Bioacoustics**</sub> | | | | | | | |  | | | |-->
+| <sub>**BIRB: A Generalization Benchmark for Information Retrieval in Bioacoustics**</sub> | | | | | | | |  | | | |
 ## Logging
 Logs will be written to [Weights&Biases](https://wandb.ai/) by default.
-
+-->
 ## Background noise
 To enhance model performance we mix in additional background noise from downloaded from the [DCASE18](https://dcase.community/challenge2018/index). To download the files and convert them to the correct format, run the notebook 'download_background_noise.ipynb' in the 'notebooks' folder.
 
@@ -215,10 +214,16 @@ Our experiments are defined in the `configs/experiment` folder. To run an experi
 python birdset/train.py experiment="EXPERIMENT_PATH"
 ```
 
+Replace `EXPERIMENT_PATH` with the path to the experiment YAML config originating from the `experiment` directory. Here's a command for training an EfficientNet on HSN: 
+
+``` bash
+python birdset/train.py experiment="local/HSN/efficientnet.yaml"
+```
+
 ## Citation
 
 ```
-@misc{rauch2024birdsetdatasetbenchmarkclassification,
+@misc{rauch2024birdset,
       title={BirdSet: A Dataset and Benchmark for Classification in Avian Bioacoustics}, 
       author={Lukas Rauch and Raphael Schwinger and Moritz Wirth and René Heinrich and Denis Huseljic and Jonas Lange and Stefan Kahl and Bernhard Sick and Sven Tomforde and Christoph Scholz},
       year={2024},
@@ -229,14 +234,6 @@ python birdset/train.py experiment="EXPERIMENT_PATH"
 }
 ```
 
-
-
-
-Replace `EXPERIMENT_PATH` with the path to the disired experiment YAML config originating from the `experiment` directory. For example, here's a command for training an EfficientNet on HSN: 
-
-``` bash
-python birdset/train.py experiment="local/HSN/efficientnet.yaml"
-```
 <!-- 
 # Data pipeline
 
