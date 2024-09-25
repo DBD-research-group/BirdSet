@@ -12,11 +12,3 @@ trainer:
   min_epochs: 1
   max_epochs: 25
   precision: 32
-
-module:
-  ft_max_epochs: 10
-  ft_lr: 1e-4
-
-  optimizer:
-    lr: 1e-2
-    weight_decay: 5e-4  

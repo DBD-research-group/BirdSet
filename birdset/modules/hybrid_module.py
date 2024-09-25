@@ -39,7 +39,7 @@ class HybridModule(FinetuneModule):
             pretrain_info = None,
             embedding_model: EmbeddingModuleConfig = EmbeddingModuleConfig(), # Model for extracting the embeddings
             ft_lr: int = 1e-2,
-            ft_max_epochs: int = 10,
+            ft_at_epoch: int = 10,
             ):
         super().__init__(
             network = network,
@@ -58,17 +58,13 @@ class HybridModule(FinetuneModule):
             embedding_model=embedding_model
         )
         self.embedding_model.train()
-        #self.linear_probing = True
         self.ft_lr = ft_lr
-        self.ft_max_epochs = ft_max_epochs
+        self.ft_at_epoch = ft_at_epoch
         # Freeze the embedding model at the start
         self.freeze_embedding_model()
         
     def configure_optimizers(self):
-        # Set the AdamW optimizer with the initial learning rate
         self.optimizer = self.optimizer(self.model.parameters())
-        #self.optimizer = Adam(self.model.parameters(), lr=1e-2) 
-        # Attach the learning rate scheduler
         return {"optimizer": self.optimizer}
         #optimizer = self.optimizer([{'name':'classifier','params': list(self.model.parameters())+list(self.embedding_model.parameters()), 'lr': 1e-2}])#, {'name':'embedding','params': self.embedding_model.parameters(), 'lr': 0.0}])
 
@@ -93,11 +89,10 @@ class HybridModule(FinetuneModule):
         #for param_group in self.optimizer.param_groups:
             #print(self.current_epoch,param_group['lr'])
         # Change the learning rate after epoch 15
-        if self.current_epoch == self.ft_max_epochs:
+        if self.current_epoch == self.ft_at_epoch:
             print(f"Changing learning rate to {self.ft_lr}")
             self.unfreeze_embedding_model()    
             #optimizer = self.optimizers()
-            #optimizer.add_param_group({'name':'embedding','params': self.embedding_model.parameters(), 'lr': 0.0})
             #for param_group in optimizer.param_groups:
                 #param_group['lr'] = self.ft_lr
             
@@ -109,7 +104,7 @@ class HybridModule(FinetuneModule):
             ])
             self.trainer.optimizers = [optimizer]
         #print(self.lr_schedulers())
-        print(self.optimizers())  
+        #print(self.optimizers())  
 
     def freeze_embedding_model(self):
         """Freeze the embedding model's parameters."""

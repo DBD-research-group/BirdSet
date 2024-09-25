@@ -8,12 +8,12 @@ tags: ["BEANS", "hybrid", "aves", "multiclass"]
 seed: 2
 
 trainer:
-  devices: [0]
+  devices: [3]
   min_epochs: 1
-  max_epochs: 30
+  max_epochs: 25
 
 module:
-  ft_max_epochs: 10
+  ft_at_epoch: 15
   ft_lr: 1e-5
 
   optimizer:
