@@ -17,6 +17,6 @@ for i in "${!dnames[@]}"; do
   echo "Running with dataset_name=$dname and n_classes=$dclass"
   for experiment in "$@"; do
     echo "Running experiment $experiment"
-    python birdset/train.py --multirun experiment="local/hybrid/BEANS/$experiment" seed=1,2,3 logger.wandb.group="results_hybrid3" trainer.devices=[3] trainer.min_epochs=1 trainer.max_epochs=25  module.ft_at_epoch=10 module.ft_lr=1e-5 datamodule.dataset.dataset_name=$dname datamodule.dataset.hf_path="DBD-research-group/$dname" datamodule.dataset.n_classes=$dclass
+    python birdset/train.py --multirun experiment="local/hybrid/BEANS/$experiment" seed=1,2,3 logger.wandb.group="results_hybrid3" trainer.devices=[2] trainer.min_epochs=1 trainer.max_epochs=25  module.ft_at_epoch=10 module.ft_lr=1e-5 datamodule.dataset.dataset_name=$dname datamodule.dataset.hf_path="DBD-research-group/$dname" datamodule.dataset.n_classes=$dclass
   done
 done
