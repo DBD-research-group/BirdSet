@@ -30,7 +30,7 @@ class BirdSetDataModule(BaseDataModuleHF):
         self,
         dataset: DatasetConfig = DatasetConfig(
             data_dir='data_birdset/HSN',
-            hf_path='DBD-research-group/BirdSet',
+            hf_path='anonymous-birder/BirdSet',
             hf_name='HSN',
             n_workers=3,
             val_split=0.2,
