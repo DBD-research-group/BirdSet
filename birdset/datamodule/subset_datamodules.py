@@ -2,7 +2,7 @@ from . import BirdSetDataModule
 from birdset.configs import DatasetConfig
 from typing import Literal
 
-HF_PATH = 'DBD-research-group/BirdSet'
+HF_PATH = 'anonymous-birder/BirdSet'
 
 
 class HSNDataModule(BirdSetDataModule):

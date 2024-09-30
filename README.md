@@ -1,8 +1,4 @@
-<div align="center">
-  <img src="https://github.com/DBD-research-group/BirdSet/blob/main/resources/perch/birdsetsymbol.png" alt="logo" width="100">
-</div>
-
-# $\texttt{BirdSet}$ - A Benchmark in Avian Bioacoustics 🤗
+# $\texttt{BirdSet}$ - : A Large-Scale Dataset for Audio Classification in Avian Bioacoustics
 [![python](https://img.shields.io/badge/-Python_3.10-blue?logo=python&logoColor=white)](https://github.com/pre-commit/pre-commit)
 <a href="https://huggingface.co/"><img alt="Hugging Face" src="https://img.shields.io/badge/HuggingFace-ffcc00?logo=huggingface&logoColor=white"></a>
 <a href="https://pytorch.org/get-started/locally/"><img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-ee4c2c?logo=pytorch&logoColor=white"></a>
@@ -69,7 +65,7 @@ You can manually download the datasets from Hugging Face. We offer a uniform met
 from datasets import load_dataset, dataset, Audio
 
 # download the dataset 
-dataset = load_dataset("DBD-research-group/BirdSet","HSN")
+dataset = load_dataset("anonymous-birder/BirdSet","HSN")
 
 # set HF decoder (decodes the complete file!)
 dataset = dataset.cast_column("audio", Audio(sampling_rate=32_000)
@@ -97,7 +93,7 @@ from datasets import load_from_disk
 dm = BirdSetDataModule(
     dataset= DatasetConfig(
         data_dir='data_birdset/HSN', # specify your data directory!
-        hf_path='DBD-research-group/BirdSet',
+        hf_path='anonymous-birder/BirdSet',
         hf_name='HSN',
         n_classes=21,
         n_workers=3,

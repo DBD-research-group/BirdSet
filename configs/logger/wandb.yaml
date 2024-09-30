@@ -6,7 +6,7 @@ wandb:
   id: null # pass correct id to resume experiment!
   project: "birdset"
   log_model: False # upload lightning ckpts
-  entity: "deepbirddetect" 
+  entity: "..."
   group: ""
   tags: []
   job_type: ""
