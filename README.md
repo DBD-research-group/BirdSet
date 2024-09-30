@@ -8,11 +8,10 @@
 <a href="https://pytorch.org/get-started/locally/"><img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-ee4c2c?logo=pytorch&logoColor=white"></a>
 <a href="https://www.pytorchlightning.ai/"><img alt="PyTorch Lightning" src="https://img.shields.io/badge/PyTorch_Lightning-792ee5?logo=pytorch-lightning&logoColor=white"></a>
 <a href="https://hydra.cc/"><img alt="Config: Hydra" src="https://img.shields.io/badge/Config-Hydra-89b8cd"></a>
-[![arXiv paper](https://img.shields.io/badge/arXiv-1234.56789-b31b1b.svg)](https://arxiv.org/abs/2403.10380)
 
 Deep learning models have emerged as a powerful tool in avian bioacoustics to assess environmental health. To maximize the potential of cost-effective and minimal-invasive passive acoustic monitoring (PAM), models must analyze bird vocalizations across a wide range of species and environmental conditions. However, data fragmentation challenges a evaluation of generalization performance. Therefore, we introduce the $\texttt{BirdSet}$ dataset, comprising approximately 520,000 global bird recordings for training and over 400 hours PAM recordings for testing in a multi-label classification setting.
 
-Our **datasets** are shared via Hugging Face 🤗 Datasets in our [BirdSet repository](https://huggingface.co/datasets/DBD-research-group/BirdSet). Our accompanying code package includes modules for further data preparation, model training, and evaluation.
+Our **datasets** are shared via Hugging Face 🤗 Datasets in our [BirdSet repository](https://huggingface.co/datasets/anonymous-birder/BirdSet). Our accompanying code package includes modules for further data preparation, model training, and evaluation.
 
 <div align="center">
   
@@ -39,10 +38,7 @@ The simplest way to install $\texttt{BirdSet}$ is to clone this repository and i
 conda create -n birdset python=3.10
 pip install -e .
 ```
-or editable in your own repository: 
-```
-pip install -e git+https://github.com/DBD-research-group/BirdSet.git#egg=birdset
-```
+
 <!-- 
 You can also use the [devcontainer](https://code.visualstudio.com/docs/devcontainers/containers) configured as as git submodule:
 ```bash
@@ -58,7 +54,7 @@ poetry shell
 
 ## Examples 🐤
 
-We offer an in-depth [tutorial notebook](https://github.com/DBD-research-group/BirdSet/blob/main/notebooks/tutorials/birdset-pipeline_tutorial.ipynb) on how to use this repository. In the following, we provide simple code snippets:
+We offer an in-depth tutorial notebook on how to use this repository. In the following, we provide simple code snippets:
 
 ### Manual Data Preparation
 
@@ -149,11 +145,11 @@ model = MultilabelModule(
 
 trainer.fit(model, dm)
 ```
-## Reproduce Neurips2024 Baselines 🚧
+## Reproduce ICLR2024 Baselines 🚧
 
 > This repository is still under active development. You can access the NeurIPS 24 code at the tag  `neurips2024`
 > ```bash
-> git checkout neurips2024 
+> git checkout ICLR2024 
 
 First, you have to download the background noise files for augmentations
 
@@ -168,7 +164,7 @@ We provide all experiment YAML files used to generate our results in the path `b
 The experiments for `DT` with the dedicated subset can be easily run with a single line: 
 
 ``` bash
-python birdset/train.py experiment="birdset_neurips24/$Dataset/DT/$Model"
+python birdset/train.py experiment="birdset_iclr24/$Dataset/DT/$Model"
 ```
 
 ### Medium Training (MT) and Large Training (LT)
@@ -176,7 +172,7 @@ Experiments for training scenarios `MT` and `LT` are harder to reproduce since t
 Additionally, the datasets are quite large (90GB for XCM and 480GB for XCL). Therefore, we provide the best model checkpoints via Hugging Face in the experiment files to avoid the need for retraining. These checkpoints can be executed by running the evaluation script, which will automatically download the model and perform inference on the test datasets:
 
 ``` bash
-python birdset/eval.py experiment="birdset_neurips24/$EXPERIMENT_PATH"
+python birdset/eval.py experiment="birdset_iclr24/$EXPERIMENT_PATH"
 ```
 
 As the model EAT is not implemented in Hugging Face transformer (yet), the checkpoints are available to download from the tracked experiments on [Weights and Biases LT_XCL_eat](https://wandb.ai/deepbirddetect/birdset/runs/pretrain_eat_3_2024-05-17_075334/files?nw=nwuserraphaelschwinger).
@@ -184,12 +180,12 @@ As the model EAT is not implemented in Hugging Face transformer (yet), the check
 If you want to start the large-scale trainings and download the big training datasets, you can also employ the `XCM` and `XCL` trainings via the experiment YAML files. 
 
 ``` bash
-python birdset/train.py experiment="birdset_neurips24/$EXPERIMENT_PATH"
+python birdset/train.py experiment="birdset_icrl24/$EXPERIMENT_PATH"
 ```
 After training, the best model checkpoint is saved based on the validation loss and can then be used for inference:
 
 ``` bash
-python birdset/eval.py experiment="birdset_neurips24/$EXPERIMENT_PATH" module.model.network.local_checkpoint="$CHECKPOINT_PATH"
+python birdset/eval.py experiment="birdset_iclr24/$EXPERIMENT_PATH" module.model.network.local_checkpoint="$CHECKPOINT_PATH"
 ```
 
 **Disclaimer on results:** The results obtained using the `eval.py` script may differ from those reported in the paper. This discrepancy is because only the "best" model checkpoint was uploaded to Hugging Face, whereas the paper’s results were averaged over three different random seeds for a more robust evaluation.
@@ -220,24 +216,10 @@ Replace `EXPERIMENT_PATH` with the path to the experiment YAML config originatin
 python birdset/train.py experiment="local/HSN/efficientnet.yaml"
 ```
 
-## Citation
-
-```
-@misc{rauch2024birdset,
-      title={BirdSet: A Dataset and Benchmark for Classification in Avian Bioacoustics}, 
-      author={Lukas Rauch and Raphael Schwinger and Moritz Wirth and René Heinrich and Denis Huseljic and Jonas Lange and Stefan Kahl and Bernhard Sick and Sven Tomforde and Christoph Scholz},
-      year={2024},
-      eprint={2403.10380},
-      archivePrefix={arXiv},
-      primaryClass={cs.SD},
-      url={https://arxiv.org/abs/2403.10380}, 
-}
-```
-
 <!-- 
 # Data pipeline
 
-Our datasets are shared via Hugging Face Datasets in our [BirdSet repository](https://huggingface.co/datasets/DBD-research-group/BirdSet).
+Our datasets are shared via Hugging Face Datasets in our [BirdSet repository](https://huggingface.co/datasets/anonymous-birder/BirdSet).
 First log in to Hugging Face with:
 ```bash
 huggingface-cli login

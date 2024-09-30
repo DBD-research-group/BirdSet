@@ -7,7 +7,7 @@ defaults:
   - override /callbacks: default.yaml
   - override /trainer: single_gpu.yaml
   - override /datamodule/transforms: bird_default_multilabel.yaml
-  - override /paths: default.yaml
+  - override /paths: cluster.yaml
   - override /hydra: default.yaml
  
 tags: ["birdsetDT"]

@@ -13,6 +13,11 @@ tags: ["birdsetMT", "inference"]
 seed: 2
 train: False
 
+paths:
+  output_dir: /mnt/work/bird2vec/logs_mw/output
+  dataset_path: /mnt/work/bird2vec/logs_mw/data_gadme
+  log_dir: /mnt/work/bird2vec/logs_mw/gadme_logs/
+
 logger:
   wandb:
     tags: ${tags}
