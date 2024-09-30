@@ -143,7 +143,7 @@ trainer.fit(model, dm)
 ```
 ## Reproduce ICLR2024 Baselines 🚧
 
-> This repository is still under active development. You can access the NeurIPS 24 code at the tag  `neurips2024`
+> This repository is still under active development. You can access the ICLR 24 code at the tag  `iclr2024`
 > ```bash
 > git checkout ICLR2024 
 
@@ -153,7 +153,7 @@ First, you have to download the background noise files for augmentations
 python resources/utils/download_background_noise.py
 ```
 
-We provide all experiment YAML files used to generate our results in the path `birdset/configs/experiment/birdset_neurips24`. For each dataset, we specify the parameters for all training scenario: `DT`, `MT`, and `LT`
+We provide all experiment YAML files used to generate our results in the path `birdset/configs/experiment/birdset_iclr24`. For each dataset, we specify the parameters for all training scenario: `DT`, `MT`, and `LT`
 
 ### Dedicated Training (DT)
 
@@ -170,8 +170,6 @@ Additionally, the datasets are quite large (90GB for XCM and 480GB for XCL). The
 ``` bash
 python birdset/eval.py experiment="birdset_iclr24/$EXPERIMENT_PATH"
 ```
-
-As the model EAT is not implemented in Hugging Face transformer (yet), the checkpoints are available to download from the tracked experiments on [Weights and Biases LT_XCL_eat](https://wandb.ai/deepbirddetect/birdset/runs/pretrain_eat_3_2024-05-17_075334/files?nw=nwuserraphaelschwinger).
 
 If you want to start the large-scale trainings and download the big training datasets, you can also employ the `XCM` and `XCL` trainings via the experiment YAML files. 
 
