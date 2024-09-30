@@ -33,7 +33,7 @@ module:
       #local_checkpoint : /mnt/work/bird2vec/birdset_logs/train/runs/XCM/ast/22024-04-15_111606/callback_checkpoints/last.ckpt
       local_checkpoint: /mnt/work/bird2vec/birdset_logs/train/runs/XCL/ast/22024-05-06_173427_seed2/callback_checkpoints/checkpoint-06.ckpt
       pretrain_info:
-        hf_path: DBD-research-group/BirdSet
+        hf_path: anonymous-birder/BirdSet
         hf_name: NES
         hf_pretrain_name: XCL
 

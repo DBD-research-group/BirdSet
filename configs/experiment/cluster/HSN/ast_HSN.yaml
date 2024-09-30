@@ -32,7 +32,7 @@ module:
   network:
     torch_compile: False
     # pretrain_info:
-    #   hf_path: DBD-research-group/BirdSet
+    #   hf_path: anonymous-birder/BirdSet
     #   hf_name: HSN
     #   hf_pretrain_name: null
 

@@ -32,7 +32,7 @@ module:
     model:
       local_checkpoint: null #TODO: Add the path to the XCL pretraining checkpoint here.
       pretrain_info:
-        hf_path: DBD-research-group/BirdSet
+        hf_path: anonymous-birder/BirdSet
         hf_name: NBP
         hf_pretrain_name: XCL
 

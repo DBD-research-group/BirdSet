@@ -9,7 +9,7 @@ defaults:
 
 dataset:
   data_dir: ${paths.dataset_path}
-  hf_path: DBD-research-group/BirdSet
+  hf_path: anonymous-birder/BirdSet
   hf_name: SNE
   seed: ${seed}
   n_workers: 5

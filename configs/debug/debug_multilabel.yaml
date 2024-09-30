@@ -34,7 +34,7 @@ module:
     #   checkpoint: /home/lrauch/EAT-base_epoch30.pt
       local_checkpoint: /home/lrauch/mnt/train/runs/XCM/ast/2024-04-03_133040/callback_checkpoints/last.ckpt
       pretrain_info:
-        hf_path: DBD-research-group/BirdSet
+        hf_path: anonymous-birder/BirdSet
         hf_name: UHH
         hf_pretrain_name: XCM
 

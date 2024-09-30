@@ -31,7 +31,7 @@ module:
   network:
     model:
       local_checkpoint: null #Add the path to your XCM pretraining checkpoint here, if it is saved locally.
-      checkpoint: DBD-research-group/Wav2Vec2-Base-BirdSet-XCM #Add the HuggingFace path to your XCM pretraining checkpoint here if it is uploaded on HuggingFace.
+      checkpoint: anonymous-birder/Wav2Vec2-Base-BirdSet-XCM #Add the HuggingFace path to your XCM pretraining checkpoint here if it is uploaded on HuggingFace.
       pretrain_info:
         hf_pretrain_name: XCM
 

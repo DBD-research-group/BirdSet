@@ -27,7 +27,7 @@ module:
       #local_checkpoint : /home/lrauch/mnt/train/runs/XCL/ast/22024-04-29_201120/callback_checkpoints/checkpoint-11-1220000.ckpt
       #local_checkpoint: /home/lrauch/mnt/train/runs/XCL/ast/12024-05-10_175757_seed1/callback_checkpoints/checkpoint-05.ckpt
       local_checkpoint: null
-      checkpoint: DBD-research-group/AST-BirdSet-XCL #Add the Hugging Face path to your XCL pretraining checkpoint here if it is uploaded on HuggingFace.
+      checkpoint: anonymous-birder/AST-BirdSet-XCL #Add the Hugging Face path to your XCL pretraining checkpoint here if it is uploaded on HuggingFace.
       pretrain_info:
         hf_path: ${datamodule.dataset.hf_path}
         hf_name: ${datamodule.dataset.hf_name}
