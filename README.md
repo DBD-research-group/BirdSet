@@ -153,14 +153,14 @@ First, you have to download the background noise files for augmentations
 python resources/utils/download_background_noise.py
 ```
 
-We provide all experiment YAML files used to generate our results in the path `birdset/configs/experiment/birdset_iclr24`. For each dataset, we specify the parameters for all training scenario: `DT`, `MT`, and `LT`
+We provide all experiment YAML files used to generate our results in the path `birdset/configs/experiment/birdset_iclr25`. For each dataset, we specify the parameters for all training scenario: `DT`, `MT`, and `LT`
 
 ### Dedicated Training (DT)
 
 The experiments for `DT` with the dedicated subset can be easily run with a single line: 
 
 ``` bash
-python birdset/train.py experiment="birdset_iclr24/$Dataset/DT/$Model"
+python birdset/train.py experiment="birdset_iclr25/$Dataset/DT/$Model"
 ```
 
 ### Medium Training (MT) and Large Training (LT)
@@ -168,7 +168,7 @@ Experiments for training scenarios `MT` and `LT` are harder to reproduce since t
 Additionally, the datasets are quite large (90GB for XCM and 480GB for XCL). Therefore, we provide the best model checkpoints via Hugging Face in the experiment files to avoid the need for retraining. These checkpoints can be executed by running the evaluation script, which will automatically download the model and perform inference on the test datasets:
 
 ``` bash
-python birdset/eval.py experiment="birdset_iclr24/$EXPERIMENT_PATH"
+python birdset/eval.py experiment="birdset_iclr25/$EXPERIMENT_PATH"
 ```
 
 If you want to start the large-scale trainings and download the big training datasets, you can also employ the `XCM` and `XCL` trainings via the experiment YAML files. 
@@ -179,7 +179,7 @@ python birdset/train.py experiment="birdset_icrl24/$EXPERIMENT_PATH"
 After training, the best model checkpoint is saved based on the validation loss and can then be used for inference:
 
 ``` bash
-python birdset/eval.py experiment="birdset_iclr24/$EXPERIMENT_PATH" module.model.network.local_checkpoint="$CHECKPOINT_PATH"
+python birdset/eval.py experiment="birdset_iclr25/$EXPERIMENT_PATH" module.model.network.local_checkpoint="$CHECKPOINT_PATH"
 ```
 
 **Disclaimer on results:** The results obtained using the `eval.py` script may differ from those reported in the paper. This discrepancy is because only the "best" model checkpoint was uploaded to Hugging Face, whereas the paper’s results were averaged over three different random seeds for a more robust evaluation.
