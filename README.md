@@ -174,7 +174,7 @@ python birdset/eval.py experiment="birdset_iclr25/$EXPERIMENT_PATH"
 If you want to start the large-scale trainings and download the big training datasets, you can also employ the `XCM` and `XCL` trainings via the experiment YAML files. 
 
 ``` bash
-python birdset/train.py experiment="birdset_icrl24/$EXPERIMENT_PATH"
+python birdset/train.py experiment="birdset_icrl25/$EXPERIMENT_PATH"
 ```
 After training, the best model checkpoint is saved based on the validation loss and can then be used for inference:
 
