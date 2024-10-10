@@ -10,9 +10,23 @@
 <a href="https://hydra.cc/"><img alt="Config: Hydra" src="https://img.shields.io/badge/Config-Hydra-89b8cd"></a>
 [![arXiv paper](https://img.shields.io/badge/arXiv-1234.56789-b31b1b.svg)](https://arxiv.org/abs/2403.10380)
 
-Deep learning models have emerged as a powerful tool in avian bioacoustics to assess environmental health. To maximize the potential of cost-effective and minimal-invasive passive acoustic monitoring (PAM), models must analyze bird vocalizations across a wide range of species and environmental conditions. However, data fragmentation challenges a evaluation of generalization performance. Therefore, we introduce the $\texttt{BirdSet}$ dataset, comprising approximately 520,000 global bird recordings for training and over 400 hours PAM recordings for testing in a multi-label classification setting.
 
-Our **datasets** are shared via Hugging Face 🤗 Datasets in our [BirdSet repository](https://huggingface.co/datasets/DBD-research-group/BirdSet). Our accompanying code package includes modules for further data preparation, model training, and evaluation.
+Deep learning (DL) has greatly advanced audio classification, yet the field is limited by the scarcity of large-scale benchmark datasets that have propelled progress in other domains. While AudioSet aims to bridge this gap as a universal-domain dataset, its restricted accessibility and lack of diverse real-world evaluation use cases challenge its role as the only resource. Additionally, to maximize the potential of cost-effective and minimal-invasive passive acoustic monitoring (PAM), models must analyze bird vocalizations across a wide range of species and environmental conditions. Therefore, we introduce $\texttt{BirdSet}$, a large-scale benchmark dataset for audio classification focusing on avian bioacoustics. $\texttt{BirdSet}$ surpasses AudioSet with over 6,800 recording hours ($\uparrow\!17\%$) from nearly 10,000 classes ($\uparrow\!18\times$) for training and more than 400 hours ($\uparrow\!7\times$) across eight strongly labeled evaluation datasets. It serves as a versatile resource for use cases such as multi-label classification, covariate shift or self-supervised learning.
+
+<br>
+<div align="center">
+  <img src="https://github.com/DBD-research-group/BirdSet/blob/main/resources/graphical_abstract.png" alt="logo">
+</div>
+
+<br>
+
+> **TL;DR**
+> - Explore our **datasets** shared on Hugging Face 🤗 in the [BirdSet repository](https://huggingface.co/datasets/DBD-research-group/BirdSet).
+> - This accompanying **code** provides comprehensive support tool for data preparation, model training, and evaluation. 
+> - Participate in our Hugging Face [leaderboard](https://huggingface.co/spaces/DBD-research-group/BirdSet-Leaderboard) by submitting new results and comparing performance across models.
+> - Access our pre-trained [model checkpoints](https://huggingface.co/collections/DBD-research-group/birdset-dataset-and-models-665ef710a28cbe70dfaa028a) on Hugging Face, ready to fine-tune or evaluate for various tasks.
+
+<br>
 
 <div align="center">
   
@@ -149,6 +163,7 @@ model = MultilabelModule(
 
 trainer.fit(model, dm)
 ```
+<!-- 
 ## Reproduce Neurips2024 Baselines 🚧
 
 > This repository is still under active development. You can access the NeurIPS 24 code at the tag  `neurips2024`
@@ -193,7 +208,7 @@ python birdset/eval.py experiment="birdset_neurips24/$EXPERIMENT_PATH" module.mo
 ```
 
 **Disclaimer on results:** The results obtained using the `eval.py` script may differ from those reported in the paper. This discrepancy is because only the "best" model checkpoint was uploaded to Hugging Face, whereas the paper’s results were averaged over three different random seeds for a more robust evaluation.
-
+-->
 <!---
 ## Results (AUROC)
 | <sub>Title</sub> | <sub>Notes</sub> |<sub>PER</sub> | <sub>NES</sub> | <sub>UHH</sub> | <sub>HSN</sub> | <sub>NBP</sub> | <sub>POW</sub> | <sub>SSW</sub> | <sub>SNE</sub>  | <sub>Overall</sub> | <sub>Code</sub> |
