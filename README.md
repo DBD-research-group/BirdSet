@@ -84,13 +84,13 @@ You can manually download the datasets from Hugging Face. We offer a uniform met
 
  
 ```python
-from datasets import load_dataset, dataset, Audio
+from datasets import load_dataset, Audio
 
 # download the dataset 
 dataset = load_dataset("DBD-research-group/BirdSet","HSN")
 
 # set HF decoder (decodes the complete file!)
-dataset = dataset.cast_column("audio", Audio(sampling_rate=32_000)
+dataset = dataset.cast_column("audio", Audio(sampling_rate=32_000))
 
 ```
 ### BirdSet: Data Preparation :bird:
