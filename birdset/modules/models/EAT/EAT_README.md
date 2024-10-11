@@ -107,11 +107,11 @@ This script will give you the evaluation value of mAP on AudioSet test dataset. 
 
 ### Performance
 Pre-training on AS-2M, EAT gains state-of-the-art (SOTA) performance on several audio and speech classification datasets including AS-20K, AS-2M, ESC-50 and SPC-2.
-![alt text](Results/EAT_performance.png)
+![alt text](src/EAT_performance.png)
 
 ### Efficiency
 EAT achieves a total pre-training time reduction of ~15x compared to BEATs and ~10x relative to Audio-MAE. It costs only 10 epochs during EAT's pre-training on AS-2M.
-![alt text](Results/EAT_efficiency.png)
+![alt text](src/EAT_efficiency.png)
 
 ### Experiment Logs
 We report the experiment logs using [wandb](https://wandb.ai/). We have published a short WandB report detailing the training process and performance metrics of the EAT model. You could visit it [here](https://api.wandb.ai/links/wxc12/obqrpq36).
