@@ -1,0 +1,13 @@
+model: 
+  _target_: birdset.modules.models.eat.EATModel
+  num_classes: null
+  train_classifier: True
+
+model_name: eat
+model_type: waveform
+torch_compile: False
+sampling_rate: 16_000
+normalize_spectrogram: False
+normalize_waveform: False
+embedding_size: 768
+length: 10
