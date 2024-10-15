@@ -5,15 +5,20 @@ from typing import Tuple
 from birdset.configs import PretrainInfoConfig
 from torchaudio.models import wav2vec2_model
 import json
+from typing import Optional
 
 class AvesClassifier(nn.Module):
+    
+    EMBEDDING_SIZE = 768
+    
     def __init__(self, 
                  model_path: str, 
                  config_path: str,
                  num_classes: int = None, 
                  local_checkpoint: str = None,
                  pretrain_info: PretrainInfoConfig = None,
-                 n_last_hidden_layer: int = 1
+                 n_last_hidden_layer: int = 1,
+                 train_classifier: bool = False
                  ):
 
         super().__init__()
@@ -50,7 +55,21 @@ class AvesClassifier(nn.Module):
         self.model = wav2vec2_model(**self.config, aux_num_out=None)
         self.model.load_state_dict(torch.load(model_path))
         self.model.feature_extractor.requires_grad_(True) #! Taken out
-        #self.head = nn.Linear(in_features=embeddings_dim, out_features=num_classes)
+        
+        self.train_classifier = train_classifier
+        # Define a linear classifier to use on top of the embeddings
+        self.classifier = nn.Sequential(
+            nn.Linear(self.EMBEDDING_SIZE, 128),
+            nn.ReLU(),
+            nn.Dropout(0.5),
+            nn.Linear(128, 64),
+            nn.ReLU(),
+            nn.Linear(64, self.num_classes),
+        )
+        
+        if self.train_classifier:
+            for param in self.model.parameters():
+                param.requires_grad = False
 
     def load_config(self, config_path):
         with open(config_path, 'r') as ff:
@@ -58,11 +77,17 @@ class AvesClassifier(nn.Module):
 
         return obj
         
-    def forward(self, x, y=None):
-        # This function isn't tested at all as it's not needed with this model really
-        out = self.model.extract_features(x)[0][-1]
-        
-        return out
+    def forward(self, input_values: torch.Tensor, labels: Optional[torch.Tensor] = None
+        ) -> torch.Tensor:
+        embeddings = self.get_embeddings(input_values)[0]
+        if self.train_classifier:
+            flattend_embeddings = embeddings.reshape(embeddings.size(0), -1)
+            # Pass embeddings through the classifier to get the final output
+            output = self.classifier(flattend_embeddings)
+        else:
+            output = embeddings
+
+        return output
     
     
     def get_embeddings(
