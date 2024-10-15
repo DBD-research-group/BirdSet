@@ -5,15 +5,20 @@ from transformers import ClapModel, ClapProcessor
 import datasets
 from typing import Tuple
 from birdset.configs import PretrainInfoConfig
+from typing import Optional
 
 class BioLingualClassifier(nn.Module):
+    
+    EMBEDDING_SIZE = 512
+    
     def __init__(self,
                  checkpoint: str,
                  num_classes: int = None,
                  local_checkpoint: str = None,
                  cache_dir: str = None,
                  pretrain_info: PretrainInfoConfig = None,
-                 n_last_hidden_layer: int = 1):
+                 n_last_hidden_layer: int = 1,
+                 train_classifier: bool = False):
         """
         Note: Either num_classes or pretrain_info must be given
         Args:
@@ -59,6 +64,32 @@ class BioLingualClassifier(nn.Module):
         
         self.model = ClapModel.from_pretrained(checkpoint)
         self.processor = ClapProcessor.from_pretrained(checkpoint)
+        
+        self.train_classifier = train_classifier
+        # Define a linear classifier to use on top of the embeddings
+        self.classifier = nn.Sequential(
+            nn.Linear(self.EMBEDDING_SIZE, 128),
+            nn.ReLU(),
+            nn.Dropout(0.5),
+            nn.Linear(128, 64),
+            nn.ReLU(),
+            nn.Linear(64, self.num_classes),
+        )
+        if self.train_classifier:
+            for param in self.model.parameters():
+                param.requires_grad = False
+        
+    def forward(self, input_values: torch.Tensor, labels: Optional[torch.Tensor] = None
+        ) -> torch.Tensor:
+        embeddings = self.get_embeddings(input_values)[0]
+        if self.train_classifier:
+            flattend_embeddings = embeddings.reshape(embeddings.size(0), -1)
+            # Pass embeddings through the classifier to get the final output
+            output = self.classifier(flattend_embeddings)
+        else:
+            output = embeddings
+
+        return output
         
     def get_embeddings(self, input_tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         input_tensor = input_tensor.squeeze(1)
