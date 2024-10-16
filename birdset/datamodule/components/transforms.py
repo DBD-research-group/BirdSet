@@ -260,7 +260,6 @@ class BirdSetTransformsWrapper(BaseTransforms):
         input_values = waveform_batch["input_values"]
         input_values = input_values.unsqueeze(1)
         labels = torch.tensor(batch["labels"])
-
         if self.wave_aug: 
             input_values, labels = self._waveform_augmentation(input_values, labels)
         
@@ -451,23 +450,56 @@ class BirdSetTransformsWrapper(BaseTransforms):
             self.spec_aug = None
             self.nocall_sampler = None
         return
-
-
-class EmbeddingTransforms(BaseTransforms):
-    def __init__(self, task: Literal['multiclass', 'multilabel'] = "multiclass", sampling_rate: int = 3200, max_length: int = 5, decoding: EventDecoding | None = None, feature_extractor: DefaultFeatureExtractor | None = None) -> None:
-        super().__init__(task, sampling_rate, max_length, decoding, feature_extractor)
     
-    def _transform(self, batch):
-        embeddings = [embedding for embedding in batch["embeddings"]]
+class EmbeddingTransforms(BirdSetTransformsWrapper):
+    def __init__(self,
+                task: Literal['multiclass', 'multilabel'] = "multilabel",
+                sampling_rate: int = 32000,
+                model_type: Literal['vision', 'waveform'] = "vision",
+                spectrogram_augmentations: DictConfig = DictConfig({}), # TODO: typing is wrong, can also be List of Augmentations
+                waveform_augmentations: DictConfig = DictConfig({}), # TODO: typing is wrong, can also be List of Augmentations
+                decoding: EventDecoding | None = None,
+                feature_extractor: DefaultFeatureExtractor = DefaultFeatureExtractor(),
+                max_length: int = 5,
+                nocall_sampler: NoCallMixer | None = None, 
+                preprocessing: PreprocessingConfig | None = PreprocessingConfig()) -> None:
+        super().__init__(task, sampling_rate, model_type, spectrogram_augmentations, waveform_augmentations, decoding, feature_extractor, max_length, nocall_sampler, preprocessing)
+    
+    
+    def transform_values(self, batch):
+        if "embedding" not in batch.keys():
+            raise ValueError(f"There is no embedding in batch {batch.keys()}")
         
-        embeddings = torch.tensor(embeddings)
+        # audio collating and padding
+        waveform_batch = self._get_waveform_batch(batch)
         
-        if self.task == "multiclass":
-            labels = batch["labels"]
+        attention_mask = waveform_batch["attention_mask"]
+        input_values = waveform_batch["input_values"]
+        input_values = input_values.unsqueeze(1)
+        labels = torch.tensor(batch["labels"])
+        if self.wave_aug: 
+            input_values, labels = self._waveform_augmentation(input_values, labels)
         
-        else:
-            # self.task == "multilabel"
-            # datatype of labels must be float32 to support BCEWithLogitsLoss
-            labels = torch.tensor(batch["labels"], dtype=torch.float32)
+        if self.nocall_sampler and self.task == "multilabel":
+            input_values, labels = self.nocall_sampler(input_values, labels) 
+        
+        if self.preprocessing is not None:
+            input_values = self._preprocess(input_values, attention_mask)
+        
+        return input_values, labels
+    
+    def _get_waveform_batch(self, batch):
+        waveform_batch = [audio["array"] for audio in batch["embedding"]]
+        #! max_length here is the embedding size of the model
 
-        return {"input_values": embeddings, "labels": labels}
+        if (len(batch["embedding"][0]["array"]) != self.max_length):
+            log.error("Input embeddings don't match classifier input size")  
+        
+        waveform_batch = self.feature_extractor(
+            waveform_batch,
+            padding='max_length',
+            max_length=self.max_length, 
+            truncation=True,
+            return_attention_mask=True
+        )
+        return waveform_batch

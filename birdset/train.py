@@ -151,4 +151,6 @@ def train(cfg):
     utils.close_loggers()
 
 if __name__ == "__main__":    
+# Set TensorFlow logging level
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  
     train()

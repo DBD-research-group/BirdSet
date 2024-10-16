@@ -1,7 +1,8 @@
 import torch
 import torch.nn as nn
-from transformers import AutoModelForAudioClassification, AutoConfig
+from transformers import AutoModelForAudioClassification, AutoConfig, HubertModel, Wav2Vec2FeatureExtractor, HubertModel, HubertConfig
 import datasets
+from typing import Tuple
 from birdset.configs import PretrainInfoConfig
 
 
@@ -32,15 +33,19 @@ class HubertSequenceClassifier(nn.Module):
                 if not pretrain_info.hf_pretrain_name
                 else pretrain_info.hf_pretrain_name
             )
-            self.num_classes = len(
-                datasets.load_dataset_builder(self.hf_path, self.hf_name)
-                .info.features["ebird_code"]
-                .names
-            )
+            if self.hf_path == 'DBD-research-group/BirdSet':
+                self.num_classes = len(
+                    datasets.load_dataset_builder(self.hf_path, self.hf_name)
+                    .info.features["ebird_code"]
+                    .names
+                )
+            else:
+                self.num_classes = num_classes
         else:
             self.hf_path = None
             self.hf_name = None
             self.num_classes = num_classes
+                
 
         self.cache_dir = cache_dir
 
@@ -49,6 +54,7 @@ class HubertSequenceClassifier(nn.Module):
             state_dict = torch.load(local_checkpoint)["state_dict"]
             state_dict = {key.replace('model.model.', ''): weight for key, weight in state_dict.items()}
 
+        
         self.model = AutoModelForAudioClassification.from_pretrained(
             self.checkpoint,
             num_labels=self.num_classes,
@@ -56,7 +62,7 @@ class HubertSequenceClassifier(nn.Module):
             state_dict=state_dict,
             ignore_mismatched_sizes=True
         )
-        
+            
     def forward(self, input_values, attention_mask=None, labels=None, return_hidden_state=False):
         """
         This method processes the input tensor, primarily by adjusting its dimensions to match the expected
@@ -74,7 +80,6 @@ class HubertSequenceClassifier(nn.Module):
 
         # Squeeze the channel dimension so that the tensor has shape (batch size, wavelength)
         input_values = input_values.squeeze(1)
-
         outputs = self.model(
             input_values, 
             attention_mask,
@@ -83,12 +88,10 @@ class HubertSequenceClassifier(nn.Module):
             return_dict=True,
             labels=None
         )
-
         logits = outputs["logits"]
 
         last_hidden_state = outputs["hidden_states"][-1] #(batch, sequence, dim)
         cls_state = last_hidden_state[:,0,:] #(batch, dim)
-
         if return_hidden_state:
             output = (logits, cls_state)
 
@@ -96,6 +99,28 @@ class HubertSequenceClassifier(nn.Module):
             output = logits
 
         return output
+
+    def get_embeddings(
+        self, input_tensor
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        input_tensor = input_tensor.squeeze(1)
+
+        outputs = self.model(
+            input_tensor,
+            output_attentions=False,
+            output_hidden_states=True,
+            return_dict=True,
+            #labels=None
+        )
+        logits = outputs['logits']
+
+        last_hidden_state = outputs["hidden_states"][-1] #(batch, sequence, dim)
+        cls_state = last_hidden_state[:,0,:]
+        
+        
+        
+        return cls_state, logits
+        
 
     @torch.inference_mode()
     def get_logits(self, dataloader, device):
