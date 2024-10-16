@@ -7,6 +7,8 @@ from timm.models.layers import to_2tuple
 from random import randrange
 import random
 from typing import Tuple
+from torchaudio.compliance import kaldi
+import torch.nn.functional as F
 
 # override the timm package to relax the input shape constraint.
 class PatchEmbed(nn.Module):
@@ -28,7 +30,7 @@ class PatchEmbed(nn.Module):
         return x
 
 class ASTModel(nn.Module):
-    def __init__(self, label_dim=527,
+    def __init__(self, num_classes=527,
                  fshape=16, tshape=16, fstride=128, tstride=2,
                  input_fdim=128, input_tdim=1024, model_size='base',
                  pretrain_stage=True, load_pretrained_mdl_path=None):
@@ -141,7 +143,7 @@ class ASTModel(nn.Module):
 
             # mlp head for fine-tuning
             self.mlp_head = nn.Sequential(nn.LayerNorm(self.original_embedding_dim),
-                                          nn.Linear(self.original_embedding_dim, label_dim))
+                                          nn.Linear(self.original_embedding_dim, num_classes))
 
             f_dim, t_dim = self.get_shape(fstride, tstride, input_fdim, input_tdim, fshape, tshape)
             # patch array dimension during pretraining
@@ -220,27 +222,61 @@ class ASTModel(nn.Module):
         mask_id = random.sample(range(0, sequence_len), mask_size)
         return torch.tensor(mask_id)
 
-    def get_embeddings(
-        self, input_tensor
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
+    def preprocess(self, input_values: torch.Tensor, input_tdim=500, sampling_rate=16000) -> torch.Tensor:
+        """
+        Preprocesses the input values by applying mel-filterbank transformation.
+        Args:
+            input_values (torch.Tensor): Input tensor of shape (batch_size, num_samples).
+            input_tdim (int): The number of frames to keep. Defaults to 500.
+            sampling_rate (int): The sampling rate of the input tensor. Defaults to 16000.
+        Returns:
+            torch.Tensor: Preprocessed tensor of shape (batch_size, 1, num_mel_bins, num_frames).
+        """
+        device = input_values.device
+        melspecs = []
+        for waveform in input_values:
+            melspec = kaldi.fbank(waveform, htk_compat=True, window_type="hanning", num_mel_bins=128, use_energy=False, sample_frequency=sampling_rate, frame_shift=10)  # shape (n_frames, 128)
+            if melspec.shape[0] < input_tdim:
+                melspec = F.pad(melspec, (0, 0, 0, input_tdim - melspec.shape[0]))
+            else:
+                melspec = melspec[:input_tdim]
+            melspecs.append(melspec)
+        melspecs = torch.stack(melspecs).to(device)
+        melspecs = melspecs.unsqueeze(1)  # shape (batch_size, 1, 128, 1024)
+        #melspecs = (melspecs - self.MEAN) / (self.STD * 2)
+        return melspecs
+
+    def get_embeddings(self, input_tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+        """
+        Calculates embeddings for the given input tensor which is first converted to frequency bins.
+        Args:
+            input_tensor (torch.Tensor): The input tensor of shape (batch_size, 1, waveform).
+        Returns:
+            Tuple[torch.Tensor, torch.Tensor]: A tuple containing the embeddings tensor and the output of the MLP head.
+        """
+        input_tensor=self.preprocess(input_tensor) # Convert to spectrogram
+        # expect input x = (batch_size, time_frame_num, frequency_bins), e.g., (12, 1024, 128)
+        input_tensor = input_tensor.transpose(2, 3)
         B = input_tensor.shape[0]
         x = self.v.patch_embed(input_tensor)
+
         if self.cls_token_num == 2:
             cls_tokens = self.v.cls_token.expand(B, -1, -1)
             dist_token = self.v.dist_token.expand(B, -1, -1)
             x = torch.cat((cls_tokens, dist_token, x), dim=1)
         else:
             cls_tokens = self.v.cls_token.expand(B, -1, -1)
-            x = torch.cat((cls_tokens, x), dim=1)
+            x = torch.cat((cls_tokens, x), dim=1)   
+            
         x = x + self.v.pos_embed
         x = self.v.pos_drop(x)
-
+        
         for blk_id, blk in enumerate(self.v.blocks):
-            x = blk(x)
-        x = self.v.norm(x)
-
+            x = blk(x) 
+            
+        x = self.v.norm(x) 
         # average output of all tokens except cls token(s)
-        x = torch.mean(x[:, self.cls_token_num:, :], dim=1)
+        x = torch.mean(x[:, self.cls_token_num:, :], dim=1)   
         
         return x, self.mlp_head(x)
         # x should go into the classifier with self.original_embedding_dim
@@ -440,7 +476,7 @@ class ASTModel(nn.Module):
         #print(input_values.shape)
         #input_values = input_values.unsqueeze(1)
         #print(input_values.shape)
-        input_values = input_values.transpose(2, 3)
+        #input_values = input_values.transpose(2, 3)
         #print(input_values.shape)
 
         # finetuning (ft), use the mean of all token (patch) output as clip-level representation.
