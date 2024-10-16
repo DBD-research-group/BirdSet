@@ -10,6 +10,9 @@ from typing import Tuple
 from torchaudio.compliance import kaldi
 import torch.nn.functional as F
 from typing import Optional
+from birdset.utils import pylogger
+
+log = pylogger.get_pylogger(__name__)
 
 #! Most of the code is from the SSAST Github and just reordered and modified to fit the BirdSet project: https://github.com/YuanGongND/ssast
 
@@ -36,7 +39,7 @@ class ASTModel(nn.Module):
     def __init__(self, num_classes,
                  fshape=16, tshape=16, fstride=16, tstride=16,
                  input_fdim=128, input_tdim=500, model_size='base',
-                 pretrain_stage=False, load_pretrained_mdl_path=None):
+                 pretrain_stage=False, load_pretrained_mdl_path=None, train_classifier=False):
         """
         Initialize a SSAST model for finetuning or evaluation. Pretraining is not supported but we need to keep parts of the code to initialize a SSAST model for finetuning/evaluation.
 
@@ -181,8 +184,8 @@ class ASTModel(nn.Module):
             num_patches = f_dim * t_dim
             p_num_patches = p_f_dim * p_t_dim
             self.v.patch_embed.num_patches = num_patches
-            print('fine-tuning patch split stride: frequncey={:d}, time={:d}'.format(fstride, tstride))
-            print('fine-tuning number of patches={:d}'.format(num_patches))
+            log.info('Fine-tuning patch split stride: frequncey={:d}, time={:d}'.format(fstride, tstride))
+            log.info('Fine-tuning number of patches={:d}'.format(num_patches))
 
             # patch shape should be same for pretraining and fine-tuning
             if fshape != p_fshape or tshape != p_tshape:
@@ -211,6 +214,10 @@ class ASTModel(nn.Module):
             # Error here
             new_pos_embed = new_pos_embed.reshape(1, self.original_embedding_dim, num_patches).transpose(1, 2)
             self.v.pos_embed = nn.Parameter(torch.cat([self.v.pos_embed[:, :self.cls_token_num, :].detach(), new_pos_embed], dim=1))
+        
+            if train_classifier:
+                for param in self.v.parameters():
+                    param.requires_grad = False
 
     # Get the shape of intermediate representation.
     def get_shape(self, fstride, tstride, input_fdim, input_tdim, fshape, tshape):
