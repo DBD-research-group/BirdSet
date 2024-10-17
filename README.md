@@ -124,8 +124,8 @@ dm = BirdSetDataModule(
         n_workers=3,
         val_split=0.2,
         task="multilabel",
-        classlimit=500,
-        eventlimit=5,
+        classlimit=500, #limit of samples per class 
+        eventlimit=5, #limit of events that are extracted for each sample
         sampling_rate=32000,
     ),
 )
