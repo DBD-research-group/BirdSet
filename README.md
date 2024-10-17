@@ -93,6 +93,9 @@ dataset = load_dataset("DBD-research-group/BirdSet","HSN")
 dataset = dataset.cast_column("audio", Audio(sampling_rate=32_000))
 
 ```
+
+The `audio` column natively contains only file paths. While automatic decoding via HF can be enabled (as shown above), decoding the entire audio files can introduce computational redundancies. This is because we provide flexible event decoding with varying file lengths that are often much longer than the targeted 5 seconds. To optimize, consider using a custom decoding scheme (e.g., with soundfile/BirdSet) or preprocessing the dataset with `.map` to include only the relevant audio segments.
+
 ### BirdSet: Data Preparation :bird:
 
 This code snippet utilizes the datamodule for an example dataset $\texttt{HSN}$. 
