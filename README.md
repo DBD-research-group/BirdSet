@@ -120,7 +120,6 @@ dm = BirdSetDataModule(
         data_dir='data_birdset/HSN', # specify your data directory!
         hf_path='DBD-research-group/BirdSet',
         hf_name='HSN',
-        n_classes=21,
         n_workers=3,
         val_split=0.2,
         task="multilabel",
