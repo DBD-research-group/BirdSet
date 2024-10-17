@@ -102,15 +102,19 @@ This code snippet utilizes the datamodule for an example dataset $\texttt{HSN}$.
 
 >**prepare_data**
 >- downloads the data (or loads from cache)
->- preprocesses the data (event_mapping/sampling, one-hot encodes classes, create splits)
->- saves dataset to disk
+>- preprocesses the data
+>    - event_mapping (extract n events from each sample. this could expand the training dataset and provides event timestamps for each sample)
+>    - one-hot encoding (classses for multi-label)
+>    - create splits
+>- saves dataset to disk (path can be accessed with `dm.disk_save_path` and loaded with `datasets.load_from_disk`)
 
 >**setup**
 >- sets up and loads the dataset for training and evaluating
 >- adds `set_transforms` that transforms on-the-fly (decoding, spectrogram conversion, augmentation etc.)
   
 ```python
-from birdset.datamodule.base_datamodule import DatasetConfig
+from birdset.configs.datamodule_configs import DatasetConfig, LoadersConfig
+from birdset.datamodule.components.transforms import BirdSetTransformsWrapper
 from birdset.datamodule.birdset_datamodule import BirdSetDataModule
 from datasets import load_from_disk
 
@@ -127,6 +131,8 @@ dm = BirdSetDataModule(
         eventlimit=5, #limit of events that are extracted for each sample
         sampling_rate=32000,
     ),
+    loaders=LoadersConfig(), # only utilized in setup
+    transforms=BirdSetTransformsWrapper() # set_transform after .setup
 )
 
 # prepare the data
@@ -136,6 +142,7 @@ dm.prepare_data()
 ds = load_from_disk(dm.disk_save_path)
 
 # OR setup the datasets with BirdSet ("test" for testdata)
+# this includes the set_transform with processing/specrogram conversion etc. 
 dm.setup(stage="fit")
 
 # audio is now decoded when a sample is called
