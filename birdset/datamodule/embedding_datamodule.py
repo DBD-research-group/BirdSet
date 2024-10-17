@@ -94,7 +94,6 @@ class EmbeddingDataModule(BaseDataModuleHF):
             dataset = self._compute_embeddings(dataset)
 
         dataset = self._preprocess_data(dataset)
-        dataset = self._create_splits(dataset)
 
         # set the length of the training set to be accessed by the model
         self.len_trainset = len(dataset["train"])
@@ -167,9 +166,13 @@ class EmbeddingDataModule(BaseDataModuleHF):
             # Split the selected samples into training, validation, and testing sets
 
             if self.val_batches == 0:
-                train_data = selected_samples
-                test_data = rest_samples
-                val_data = Dataset.from_dict({})
+                train_data = Dataset.from_dict({key: [sample[key] for sample in selected_samples] for key in selected_samples[0]})
+                test_data = Dataset.from_dict({key: [sample[key] for sample in rest_samples] for key in rest_samples[0]})
+                dataset = DatasetDict({
+                    'train': train_data,
+                    'test': test_data
+                })
+
             
             else:    
                 num_samples = len(rest_samples)
@@ -179,20 +182,21 @@ class EmbeddingDataModule(BaseDataModuleHF):
                 test_data = rest_samples[:num_test_samples]
                 val_data = rest_samples[num_test_samples:]
                 val_data = Dataset.from_dict({key: [sample[key] for sample in val_data] for key in val_data[0]}) #! Use first test sample as val cant be empty
-            
-            train_data = Dataset.from_dict({key: [sample[key] for sample in train_data] for key in train_data[0]})
-            test_data = Dataset.from_dict({key: [sample[key] for sample in test_data] for key in test_data[0]})
 
-            # Combine into a DatasetDict
-            dataset = DatasetDict({
-                'train': train_data,
-                'valid': val_data,
-                'test': test_data
-            })
+                train_data = Dataset.from_dict({key: [sample[key] for sample in train_data] for key in train_data[0]})
+                test_data = Dataset.from_dict({key: [sample[key] for sample in test_data] for key in test_data[0]})
+
+                # Combine into a DatasetDict
+                dataset = DatasetDict({
+                    'train': train_data,
+                    'valid': val_data,
+                    'test': test_data
+                })
         else:
             if self.val_batches == 0:
                 dataset['test'] = concatenate_datasets([dataset['valid'], dataset['test']])
-                dataset['valid'] = Dataset.from_dict({}) #! So that no split is created in the dataloader
+                # remove the valid key
+                del dataset['valid']
                 
             if self.low_train:
                 del dataset['train']
@@ -202,6 +206,19 @@ class EmbeddingDataModule(BaseDataModuleHF):
             
             
         return dataset
+    
+    def setup(self, stage=None):
+        if not self.train_dataset and not self.val_dataset:
+            if stage == "fit":
+                log.info("fit")
+                if self.val_batches != 0:
+                    self.val_dataset = self._get_dataset("valid")
+                self.train_dataset = self._get_dataset("train")
+ 
+        if not self.test_dataset:
+            if stage == "test":
+                log.info("test")
+                self.test_dataset = self._get_dataset("test")
 
 
 
