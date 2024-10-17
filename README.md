@@ -107,7 +107,7 @@ This code snippet utilizes the datamodule for an example dataset $\texttt{HSN}$.
 
 >**setup**
 >- sets up and loads the dataset for training and evaluating
->- adds `set_transforms` that transforms on-the-fly (decoding, augmentation etc.)
+>- adds `set_transforms` that transforms on-the-fly (decoding, spectrogram conversion, augmentation etc.)
   
 ```python
 from birdset.datamodule.base_datamodule import DatasetConfig
