@@ -29,7 +29,6 @@ class BirdSetDataModule(BaseDataModuleHF):
     def __init__(
         self,
         dataset: DatasetConfig = DatasetConfig(
-            data_dir='data_birdset/HSN',
             dataset_name='HSN',
             hf_path='DBD-research-group/BirdSet',
             hf_name='HSN',

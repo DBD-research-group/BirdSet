@@ -5,6 +5,7 @@ from datasets import DatasetDict, Dataset, concatenate_datasets, load_from_disk
 from dataclasses import asdict
 from collections import defaultdict
 from tabulate import tabulate
+from birdset.modules.models.convnext import ConvNextClassifier
 from birdset.utils import pylogger
 from tqdm import tqdm
 from dataclasses import dataclass
@@ -22,7 +23,10 @@ class EmbeddingModuleConfig(NetworkConfig):
     A dataclass that makes sure the model inherits from EmbeddingClassifier.
 
     """
-    model: Union[torch.nn.Module] = None # Model for extracting the embeddings
+    model: Union[torch.nn.Module] = ConvNextClassifier(
+        checkpoint="DBD-research-group/ConvNeXT-Base-BirdSet-XCL",
+        num_classes=21,
+    ) # Model for extracting the embeddings
 
 class EmbeddingDataModule(BaseDataModuleHF):
     def __init__(
@@ -34,7 +38,11 @@ class EmbeddingDataModule(BaseDataModuleHF):
             val_batches: int = None, # Should val set be created
             test_ratio: float = 0.5, # Ratio of test set if val set is also created
             low_train: bool = False, # If low train set is used
-            embedding_model: EmbeddingModuleConfig = EmbeddingModuleConfig(),
+            embedding_model: EmbeddingModuleConfig = EmbeddingModuleConfig(
+                model_name="ConvNeXT-Base-BirdSet-XCL",
+                sample_rate=32000,
+                input_length_in_s=5,
+            ),
             average: bool = True,
             gpu_to_use: int = 0
     ):
@@ -68,13 +76,13 @@ class EmbeddingDataModule(BaseDataModuleHF):
         self.embedding_model_name = embedding_model.model_name
         self.embedding_model = embedding_model.model.to(self.device) # Move Model to GPU
         self.embedding_model.eval()  # Set the model to evaluation mode
-        self.sampling_rate = embedding_model.sampling_rate
-        self.max_length = embedding_model.length
+        self.sample_rate = embedding_model.sample_rate
+        self.input_length_in_s = embedding_model.input_length_in_s
         self.embeddings_save_path = os.path.join(
             self.dataset_config.data_dir,
-            f"{self.dataset_config.dataset_name}_processed_embedding_model_{self.embedding_model_name}_{self.average}_{self.sampling_rate}_{self.max_length}",
+            f"{self.dataset_config.dataset_name}_processed_embedding_model_{self.embedding_model_name}_{self.average}_{self.sample_rate}_{self.input_length_in_s}",
         )
-        log.info(f"Using embedding model:{embedding_model.model_name} (Sampling Rate:{self.sampling_rate}, Window Size:{self.max_length})")
+        log.info(f"Using embedding model:{embedding_model.model_name} (Sampling Rate:{self.sample_rate}, Window Size:{self.input_length_in_s})")
 
     def prepare_data(self):
         """
@@ -238,15 +246,13 @@ class EmbeddingDataModule(BaseDataModuleHF):
                 sample.pop('audio') # Remove audio to save space
             return sample
         
-        def get_new_fingerprint(split):
-            old_fingerprint =  dataset[split]._fingerprint
-            return f"{old_fingerprint}_embedding_model_{self.embedding_model_name}_{self.average}_{self.sampling_rate}_{self.max_length}"
+
 
         # Apply the transformation to each split in the dataset
         for split in dataset.keys():
             log.info(f">> Extracting Embeddings for {split} Split")
             # Apply the embedding function to each sample in the split
-            dataset[split] = dataset[split].map(compute_and_update_embedding, desc="Extracting Embeddings", load_from_cache_file=True, new_fingerprint=get_new_fingerprint(split), num_proc=self.dataset_config.n_workers)
+            dataset[split] = dataset[split].map(compute_and_update_embedding, desc="Extracting Embeddings", load_from_cache_file=True)
         
         log.info(f"Saving emebeddings to disk: {self.embeddings_save_path}")
         dataset.save_to_disk(self.embeddings_save_path)
@@ -264,23 +270,23 @@ class EmbeddingDataModule(BaseDataModuleHF):
         audio = self._zero_pad(waveform)
 
         # Check if audio is too long 
-        if waveform.shape[0] > self.max_length * self.sampling_rate:
+        if waveform.shape[0] > self.input_length_in_s * self.sample_rate:
             if self.average:
                 return self._frame_and_average(waveform) 
             else:
-                audio = audio[:self.max_length * self.sampling_rate]
+                audio = audio[:self.input_length_in_s * self.sample_rate]
                 return self.embedding_model.get_embeddings(audio.view(1, 1, -1))[0] 
         else:
             return self.embedding_model.get_embeddings(audio.view(1, 1, -1))[0]
 
     # Resample function
     def _resample_audio(self, audio, orig_sr):
-        resampler = torchaudio.transforms.Resample(orig_freq=orig_sr, new_freq=self.sampling_rate)
+        resampler = torchaudio.transforms.Resample(orig_freq=orig_sr, new_freq=self.sample_rate)
         return resampler(audio)
 
     # Zero-padding function
     def _zero_pad(self, audio):
-        desired_num_samples = self.max_length * self.sampling_rate 
+        desired_num_samples = self.input_length_in_s * self.sample_rate 
         current_num_samples = audio.shape[0]
         padding = desired_num_samples - current_num_samples
         if padding > 0:
@@ -293,8 +299,8 @@ class EmbeddingDataModule(BaseDataModuleHF):
     # Average multiple embeddings function
     def _frame_and_average(self, audio):
         # Frame the audio
-        frame_size = self.max_length * self.sampling_rate
-        hop_size = self.max_length * self.sampling_rate
+        frame_size = self.input_length_in_s * self.sample_rate
+        hop_size = self.input_length_in_s * self.sample_rate
         frames = audio.unfold(0, frame_size, hop_size)
         
         # Generate embeddings for each frame

@@ -35,6 +35,7 @@ class NetworkConfig:
     model_type: Literal['vision', 'waveform'] = "vision"
     torch_compile: bool = False
     sample_rate: int = 32000
+    input_length_in_s: int = 5 
     normalize_waveform: bool = False
     normalize_spectrogram: bool = True
 
