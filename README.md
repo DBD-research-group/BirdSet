@@ -20,7 +20,7 @@ Deep learning (DL) has greatly advanced audio classification, yet the field is l
 
 <br>
 
-> **TL;DR**
+**TL;DR**
 > - Explore our **datasets** shared on Hugging Face 🤗 in the [BirdSet repository](https://huggingface.co/datasets/DBD-research-group/BirdSet).
 > - This accompanying **code** provides comprehensive support tool for data preparation, model training, and evaluation. 
 > - Participate in our Hugging Face [leaderboard](https://huggingface.co/spaces/DBD-research-group/BirdSet-Leaderboard) by submitting new results and comparing performance across models.
@@ -100,7 +100,7 @@ The `audio` column natively contains only file paths. While automatic decoding v
 
 This code snippet utilizes the datamodule for an example dataset $\texttt{HSN}$. 
 
->**prepare_data**
+**prepare_data**
 >- downloads the data (or loads from cache)
 >- preprocesses the data
 >    - event_mapping (extract n events from each sample. this could expand the training dataset and provides event timestamps for each sample)
@@ -205,7 +205,7 @@ audio_test, _ = load_audio(ds["test"][30], min_len=5, max_len=5, sampling_rate=3
 
 or utilize the BirdSet `set_transform` with built-in event decoding etc.: 
 
->**setup**
+**setup**
 >- sets up and loads the dataset for training and evaluating
 >- adds `set_transforms` that transforms on-the-fly (decoding, spectrogram conversion, augmentation etc.)
 
