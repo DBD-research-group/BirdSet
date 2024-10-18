@@ -15,7 +15,7 @@ Deep learning (DL) has greatly advanced audio classification, yet the field is l
 
 <br>
 <div align="center">
-  <img src="https://github.com/DBD-research-group/BirdSet/blob/main/resources/graphical_abstract.png" alt="logo">
+  <img src="https://github.com/DBD-research-group/BirdSet/blob/main/resources/graphical_abstract.png" alt="logo", width=950>
 </div>
 
 <br>
@@ -107,10 +107,6 @@ This code snippet utilizes the datamodule for an example dataset $\texttt{HSN}$.
 >    - one-hot encoding (classses for multi-label)
 >    - create splits
 >- saves dataset to disk (path can be accessed with `dm.disk_save_path` and loaded with `datasets.load_from_disk`)
-
->**setup**
->- sets up and loads the dataset for training and evaluating
->- adds `set_transforms` that transforms on-the-fly (decoding, spectrogram conversion, augmentation etc.)
   
 ```python
 from birdset.configs.datamodule_configs import DatasetConfig, LoadersConfig
@@ -131,8 +127,8 @@ dm = BirdSetDataModule(
         eventlimit=5, #limit of events that are extracted for each sample
         sampling_rate=32000,
     ),
-    loaders=LoadersConfig(), # only utilized in setup
-    transforms=BirdSetTransformsWrapper() # set_transform after .setup
+    loaders=LoadersConfig(), # only utilized in setup; default settings
+    transforms=BirdSetTransformsWrapper() # set_transform in setup; default settings to spectrogram
 )
 
 # prepare the data
@@ -140,7 +136,80 @@ dm.prepare_data()
 
 # manually load the complete prepared dataset (without any transforms). you have to cast the column with audio for decoding
 ds = load_from_disk(dm.disk_save_path)
+```
 
+The dataset is now split into training, validation, and test sets, with each sample corresponding to a unique event in a sound file. A sample output from the training set looks like this:
+
+```python
+{
+ 'filepath': 'filepath.ogg',
+ 'labels': array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+ 'detected_events': array([1.216, 3.76 ], dtype=float32), # only in train. begin and end of event within the file 
+ 'start_time': nan, # only in test, segment start and segment end within the soundfile
+ 'end_time': nan
+}
+```
+
+You can now create a custom loading script. For instance: 
+
+```python
+def load_audio(sample, min_len, max_len, sampling_rate):
+    path = sample["filepath"]
+    
+    if sample["detected_events"] is not None:
+        start = sample["detected_events"][0]
+        end = sample["detected_events"][1]
+        event_duration = end - start
+        
+        if event_duration < min_len:
+            extension = (min_len - event_duration) / 2
+            
+            # try to extend equally 
+            new_start = max(0, start - extension)
+            new_end = min(total_duration, end + extension)
+            
+            if new_start == 0:
+                new_end = min(total_duration, new_end + (start - new_start))
+            elif new_end == total_duration:
+                new_start = max(0, new_start - (new_end - end))
+            
+            start, end = new_start, new_end
+
+        if end - start > max_len:
+            # if longer than max_len
+            end = min(start + max_len, total_duration)
+            if end - start > max_len:
+                end = start + max_len
+    else:
+        start = sample["start_time"]
+        end = sample["end_time"]
+
+    file_info = sf.info(path)
+    sr = file_info.samplerate
+    total_duration = file_info.duration
+
+    start, end = int(start * sr), int(end * sr)
+    audio, sr = sf.read(path, start=start, stop=end)
+
+    if audio.ndim != 1:
+        audio = audio.swapaxes(1, 0)
+        audio = librosa.to_mono(audio)
+    if sr != sampling_rate:
+        audio = librosa.resample(audio, orig_sr=sr, target_sr=sampling_rate)
+        sr = sampling_rate
+    return audio, sr
+
+audio_train, _ = load_audio(ds["train"][11], min_len=5, max_len=5, sampling_rate=32_000) # loads a 5 second clip around the detected event
+audio_test, _ = load_audio(ds["test"][30], min_len=5, max_len=5, sampling_rate=32_000) # loads a 5 second test segment
+```
+
+or utilize the BirdSet `set_transform` with built-in event decoding etc.: 
+
+>**setup**
+>- sets up and loads the dataset for training and evaluating
+>- adds `set_transforms` that transforms on-the-fly (decoding, spectrogram conversion, augmentation etc.)
+
+```python
 # OR setup the datasets with BirdSet ("test" for testdata)
 # this includes the set_transform with processing/specrogram conversion etc. 
 dm.setup(stage="fit")
@@ -152,8 +221,6 @@ val_ds = dm.val_dataset
 # get the dataloaders
 train_loader = dm.train_dataloader()
 ```
-
-More details are available in the `datamodule_configs.py`and the tutorial notebook. 
 
 ### BirdSet: Prepare Model and Start Training  :bird:
 
@@ -248,8 +315,8 @@ python birdset/train.py experiment="local/HSN/efficientnet.yaml"
 
 ```
 @misc{rauch2024birdset,
-      title={BirdSet: A Dataset and Benchmark for Classification in Avian Bioacoustics}, 
-      author={Lukas Rauch and Raphael Schwinger and Moritz Wirth and René Heinrich and Denis Huseljic and Jonas Lange and Stefan Kahl and Bernhard Sick and Sven Tomforde and Christoph Scholz},
+      title={BirdSet: A Large-Scale Dataset for Audio Classification in Avian Bioacoustics}, 
+      author={Lukas Rauch and Raphael Schwinger and Moritz Wirth and René Heinrich and Denis Huseljic and Marek Herde and Jonas Lange and Stefan Kahl and Bernhard Sick and Sven Tomforde and Christoph Scholz},
       year={2024},
       eprint={2403.10380},
       archivePrefix={arXiv},
