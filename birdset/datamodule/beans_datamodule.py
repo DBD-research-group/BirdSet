@@ -106,5 +106,4 @@ class BEANSDataModule(BaseDataModuleHF):
                 load_from_cache_file=True,
                 num_proc=self.dataset_config.n_workers,
             )
-
         return dataset
