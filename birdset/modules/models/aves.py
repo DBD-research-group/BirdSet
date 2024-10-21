@@ -7,6 +7,11 @@ from torchaudio.models import wav2vec2_model
 import json
 from typing import Optional
 
+#! This file includes code from AVES by Masato Hagiwara, licensed under the MIT License
+#! Copyright (c) 2022 Earth Species Project
+#! Github-Repository: https://github.com/earthspecies/aves 
+#! Paper: https://arxiv.org/abs/2210.14493
+
 class AvesClassifier(nn.Module):
     
     EMBEDDING_SIZE = 768

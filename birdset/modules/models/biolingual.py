@@ -7,6 +7,11 @@ from typing import Tuple
 from birdset.configs import PretrainInfoConfig
 from typing import Optional
 
+#! This file includes code from BioLingual by David Robinson, licensed under the Apache-2.0 License
+#! Github-Repository: https://github.com/david-rx/BioLingual 
+#! Paper: https://arxiv.org/abs/2308.04978
+
+
 class BioLingualClassifier(nn.Module):
     
     EMBEDDING_SIZE = 512
