@@ -98,6 +98,14 @@ Compared to linear probing embeddings can't be computed beforehand which is why 
 
 For this the [hybrid_module](birdset/modules/hybrid_module.py) is used and the experiments can be found in the hybrid [folder](configs/experiment/local/hybrid/BEANS/)
 
+## Results
+The results [folder](results) contains plots and plot-code that gives insights on the different performance between linear probing, finetuning and the hybrid method.
+
+![averaged_results](results/model_radar.png)
+
+As a reference the embedding results can be used for future work:
+![embedding_results](results/probing_hm.png)
+
 
 ## Example
 
