@@ -1,6 +1,5 @@
-from birdset.modules.base_module import BaseModule
 from functools import partial
-from typing import Callable, Literal, Type, Optional, Union
+from typing import Callable, Literal, Type, Optional
 from torch.nn import CrossEntropyLoss
 from torch.nn.modules.loss import _Loss
 from torch.optim import AdamW, Optimizer, Adam
@@ -8,13 +7,33 @@ from birdset.configs import NetworkConfig, LoggingParamsConfig, LRSchedulerConfi
 from birdset.datamodule.embedding_datamodule import EmbeddingModuleConfig
 from birdset.utils import pylogger
 from birdset.modules.finetune_module import FinetuneModule
-from torch.optim.lr_scheduler import LambdaLR
 
 import torch
-import math
 
 log = pylogger.get_pylogger(__name__)
 class HybridModule(FinetuneModule):
+    """
+    HybridModule is an extension of the FinetuneModule that enables first only training the classifier and then after a specified amount of epochs doing complete finetuning.
+    The default parameters are used for the task of 'multiclass' classification.
+
+    Attributes:
+        network (NetworkConfig): Configuration for the network.
+        output_activation (Callable): The output activation function.
+        loss (_Loss): The loss function.
+        optimizer (partial): The optimizer function to be initalized in configure_optimizers.
+        lr_scheduler (LRSchedulerConfig, optional): The learning rate scheduler configuration.
+        metrics (MetricsConfig): The metrics configuration.
+        logging_params (LoggingParamsConfig): The logging parameters configuration.
+        num_epochs (int): The number of epochs for training.
+        len_trainset (int): The length of the training set.
+        batch_size (int): The batch size for training.
+        task (str): The task type, can be either 'multiclass' or 'multilabel'.
+        num_gpus (int): The number of GPUs to use for training.
+        pretrain_info: Information about the pretraining of the model.
+        embedding_model: Model for extracting the embeddings.
+        ft_lr: Learning rate for the finetuning part as it can differ from linear probing LR.
+        ft_at_epoch: Epoch at which to start finetuning the feature extractor.
+    """
     def __init__(
             self,
             network: NetworkConfig = NetworkConfig(),
@@ -64,47 +83,21 @@ class HybridModule(FinetuneModule):
         self.freeze_embedding_model()
         
     def configure_optimizers(self):
-        self.optimizer = self.optimizer(self.model.parameters())
+        self.optimizer = self.optimizer(self.model.parameters()) # Model is the classifier
         return {"optimizer": self.optimizer}
-        #optimizer = self.optimizer([{'name':'classifier','params': list(self.model.parameters())+list(self.embedding_model.parameters()), 'lr': 1e-2}])#, {'name':'embedding','params': self.embedding_model.parameters(), 'lr': 0.0}])
-
-        # Custom scheduler: starts with warmup, then reduces to 0, and gradually increases after unfreezing
-        '''def lr_lambda(epoch):
-            if epoch < self.ft_max_epochs:
-                # Linearly increase the learning rate during warmup
-                return 1.0
-            elif epoch == self.ft_max_epochs:
-                # Reduce LR to zero after warmup
-                return 0.0
-            else:
-                # Gradually increase LR from 0 to max_lr after unfreezing
-                total_epochs = self.trainer.max_epochs
-                progress = (epoch - self.ft_max_epochs+1) / (total_epochs - self.ft_max_epochs+1)
-                return progress * (self.ft_lr / 1e-2)
-        
-        scheduler = LambdaLR(optimizer, lr_lambda=lr_lambda)
-        return [optimizer], [scheduler]'''
 
     def on_train_epoch_start(self):
-        #for param_group in self.optimizer.param_groups:
-            #print(self.current_epoch,param_group['lr'])
-        # Change the learning rate after epoch 15
+        # Change the learning rate after specified epoch
         if self.current_epoch == self.ft_at_epoch:
-            print(f"Changing learning rate to {self.ft_lr}")
+            log.info(f"Changing learning rate to {self.ft_lr}")
             self.unfreeze_embedding_model()    
-            #optimizer = self.optimizers()
-            #for param_group in optimizer.param_groups:
-                #param_group['lr'] = self.ft_lr
             
-            
-            
+            # Define new optimizer with different learning rate
             optimizer = AdamW([
-                {'params': self.model.parameters(), 'lr': self.ft_lr, 'weight_decay': 5e-4},  # Lower LR for feature extractor
-                {'params': self.embedding_model.parameters(), 'lr': self.ft_lr, 'weight_decay': 5e-4}    # Higher LR for classifier head
+                {'params': self.model.parameters(), 'lr': self.ft_lr, 'weight_decay': 5e-4},  
+                {'params': self.embedding_model.parameters(), 'lr': self.ft_lr, 'weight_decay': 5e-4}
             ])
             self.trainer.optimizers = [optimizer]
-        #print(self.lr_schedulers())
-        #print(self.optimizers())  
 
     def freeze_embedding_model(self):
         """Freeze the embedding model's parameters."""

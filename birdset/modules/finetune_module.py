@@ -13,6 +13,26 @@ import math
 
 log = pylogger.get_pylogger(__name__)
 class FinetuneModule(BaseModule):
+    """
+    FinetuneModule is an extension of the BaseModule that enables finetuning of compatible models (Check README). Embeddings are extracted from the model and passed to a classifier. The loss is then calculated to update the feature extractor.
+    The default parameters are used for the task of 'multiclass' classification.
+
+    Attributes:
+        network (NetworkConfig): Configuration for the network.
+        output_activation (Callable): The output activation function.
+        loss (_Loss): The loss function.
+        optimizer (partial): The optimizer function to be initalized in configure_optimizers.
+        lr_scheduler (LRSchedulerConfig, optional): The learning rate scheduler configuration.
+        metrics (MetricsConfig): The metrics configuration.
+        logging_params (LoggingParamsConfig): The logging parameters configuration.
+        num_epochs (int): The number of epochs for training.
+        len_trainset (int): The length of the training set.
+        batch_size (int): The batch size for training.
+        task (str): The task type, can be either 'multiclass' or 'multilabel'.
+        num_gpus (int): The number of GPUs to use for training.
+        pretrain_info: Information about the pretraining of the model.
+        embedding_model: Model for extracting the embeddings.
+    """
     def __init__(
             self,
             network: NetworkConfig = NetworkConfig(),

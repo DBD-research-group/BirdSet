@@ -7,13 +7,20 @@ from typing import Tuple
 from birdset.configs import PretrainInfoConfig
 from typing import Optional
 
-#! This file includes code from BioLingual by David Robinson, licensed under the Apache-2.0 License
-#! Github-Repository: https://github.com/david-rx/BioLingual 
-#! Paper: https://arxiv.org/abs/2308.04978
-
-
 class BioLingualClassifier(nn.Module):
+    """
+    Pretrained model for audio classification using the Biolingual model.
     
+    This file includes code from BioLingual by David Robinson, licensed under the Apache-2.0 License
+    Github-Repository: https://github.com/david-rx/BioLingual 
+    Paper: https://arxiv.org/abs/2308.04978
+
+    Important Parameters:
+    ---------------------
+    checkpoint: Path to the AVES model checkpoint.
+    n_last_hidden_layer: Number of last hidden layer (from the back) to extract the embeddings from. Default is 1.
+    train_classifier: If True, the model will output the embeddings and freeze the feature extractor. Default is False. 
+    """
     EMBEDDING_SIZE = 512
     
     def __init__(self,

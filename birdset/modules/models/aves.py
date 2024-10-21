@@ -7,13 +7,23 @@ from torchaudio.models import wav2vec2_model
 import json
 from typing import Optional
 
-#! This file includes code from AVES by Masato Hagiwara, licensed under the MIT License
-#! Copyright (c) 2022 Earth Species Project
-#! Github-Repository: https://github.com/earthspecies/aves 
-#! Paper: https://arxiv.org/abs/2210.14493
+
 
 class AvesClassifier(nn.Module):
+    """
+    Pretrained model for audio classification using the AVES model.
     
+    This file includes code from AVES by Masato Hagiwara, licensed under the MIT License
+    Copyright (c) 2022 Earth Species Project
+    Github-Repository: https://github.com/earthspecies/aves 
+    Paper: https://arxiv.org/abs/2210.14493
+
+    Important Parameters:
+    ---------------------
+    model_path: Path to the AVES model checkpoint.
+    n_last_hidden_layer: Number of last hidden layer (from the back) to extract the embeddings from. Default is 1.
+    train_classifier: If True, the model will output the embeddings and freeze the feature extractor. Default is False. 
+    """
     EMBEDDING_SIZE = 768
     
     def __init__(self, 
