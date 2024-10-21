@@ -30,10 +30,18 @@ Foundation Models are tested on the Benchmark of Animal Sounds (BEANS) which we 
 `$./projects/biofoundation/scripts/run_beans_embeddings_experiments.sh embedding/BEANS/perch [additional experiments]`
 
 Currently the available embedding experiments are:
-- [perch](configs/experiment/local/embedding/BEANS/perch.yaml)
-- [birdnet](configs/experiment/local/embedding/BEANS/birdnet.yaml)
-- [hubert](configs/experiment/local/embedding/BEANS/hubert.yaml)
-- [wav2vec2](configs/experiment/local/embedding/BEANS/wav2vec2.yaml)
+- [Perch](configs/experiment/biofoundation/embedding/BEANS/perch.yaml)
+- [BirdNET](configs/experiment/biofoundation/embedding/BEANS/birdnet.yaml)
+- [Hubert](configs/experiment/biofoundation/embedding/BEANS/hubert.yaml)
+- [Wav2Vec2](configs/experiment/biofoundation/embedding/BEANS/wav2vec2.yaml)
+- [AudioMAE](configs/experiment/biofoundation/embedding/BEANS/audiomae.yaml)
+- [AVES](configs/experiment/local/embedding/BEANS/aves.yaml)
+- [BEATS](configs/experiment/local/embedding/BEANS/beats.yaml)
+- [BioLingual](configs/experiment/local/embedding/BEANS/biolingual.yaml)
+- [ConvNeXt](configs/experiment/local/embedding/BEANS/convnext.yaml)
+- [EAT](configs/experiment/local/embedding/BEANS/eat.yaml)
+- [SSAST](configs/experiment/local/embedding/BEANS/ssast.yaml)
+
 
 They all inherit from the base configuration [embedding_config.yaml](configs/experiment/biofoundation/embedding/BEANS/embedding_config.yaml) where most changes for extracting Embeddings are set.
 To execute an experiment on a specific dataset you have to change the following lines in the experiment file:
@@ -80,6 +88,15 @@ datamodule:
 
 
 The classifier can also be changed and right now [this](birdset/modules/models/linear_classifier.py) is used.
+
+
+## Running Finetuning Experiments
+
+The same models can also be finetuned and the experiments can be found in the respective [folder](configs/experiment/local/finetune/BEANS/) (except Perch). For finetuning a much lower learning rate is recommended and the [finetune_module](birdset/modules/finetune_module.py) is used. 
+
+Compared to linear probing embeddings can't be computed beforehand which is why the computation times are considerably longer. To reduce these a bit, a hybrid method can be used that first applies linear probing and then a few epochs of finetuning. The results are usually better than linear probing but worse than finetuning. ATM the embeddings are not computed beforehand for the linear probing phase but the hybrid approach is still faster.
+
+For this the [hybrid_module](birdset/modules/hybrid_module.py) is used and the experiments can be found in the hybrid [folder](configs/experiment/local/hybrid/BEANS/)
 
 
 ## Example
