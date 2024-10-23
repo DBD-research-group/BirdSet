@@ -1,0 +1,25 @@
+model:
+  _target_: birdset.modules.models.vit.VIT
+  img_size_x: 128
+  img_size_y: 501
+  patch_size: 16
+  in_chans: 1
+  embed_dim: 768
+  norm_layer: nn.LayerNorm
+  global_pool: True
+  mlp_ratio: 4
+  qkv_bias: True
+  eps: 1e-6
+  drop_path: 0.1
+  num_heads: 12
+  depth: 12
+  target_length: 128
+  num_classes: 1000
+  pretrained_weights_path: ${paths.root_dir}/weights/vit_pretrained.pth
+
+model_name: vit
+model_type: vision
+torch_compile: False
+sampling_rate: 32_000
+normalize_waveform: null
+normalize_spectrogram: True

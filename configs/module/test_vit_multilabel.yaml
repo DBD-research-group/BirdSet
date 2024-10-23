@@ -1,0 +1,48 @@
+_target_: birdset.modules.multilabel_module.MultilabelModule
+
+defaults:
+  - _self_
+  - network: test_vit.yaml
+
+task: multilabel
+prediction_table: False
+num_gpus: ${trainer.devices}
+
+optimizer:
+  _target_: torch.optim.AdamW
+  _partial_: true
+  lr: 1e-5
+  weight_decay: 0.01
+
+metrics:
+  _target_: birdset.configs.module_configs.MultilabelMetricsConfig
+  num_labels: ${datamodule.dataset.n_classes}
+  
+
+loss:
+  #_target_: birdset.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
+  _target_: torch.nn.BCEWithLogitsLoss
+  #_target_: birdset.modules.losses.focal_loss.MultiLabelFocalLoss
+  
+# lr_scheduler:
+#   scheduler:
+#     _target_: torch.optim.lr_scheduler.LambdaLR
+#     _partial_: true
+#     lr_lambda: {lambda epoch: epoch // 30}
+#     # TODO: add lr_lambda
+#   extras:
+#     interval: step
+#     warmup_ratio: 0.05
+
+
+output_activation: 
+  _target_: "torch.sigmoid"
+  _partial_: true
+
+logging_params:
+  _target_: birdset.modules.base_module.LoggingParamsConfig 
+  on_step: False
+  on_epoch: True
+  sync_dist: False
+  prog_bar: True  
+

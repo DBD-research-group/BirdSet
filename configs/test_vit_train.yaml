@@ -1,0 +1,32 @@
+# @package _global_
+defaults:
+  - datamodule: HSN
+  - module: test_vit_multilabel
+  - callbacks: default
+  - paths: default
+  - trainer: single_gpu
+  - hydra: default
+  - extras: default
+
+  - experiment: null
+  - hparams_search: null
+  - debug: null
+  - _self_
+
+task_name: "train"
+ckpt_path: null
+seed: 1
+
+trainer:
+  max_epochs: 2
+
+logger:
+  TBlogger:
+    _target_: birdset.utils.pylogger.TBLogger
+    save_dir: ${paths.log_dir}
+
+train: True
+test: True
+save_state_dict: True
+start_time: ${now:%Y-%m-%d_%H%M%S}
+dump_metrics: True
