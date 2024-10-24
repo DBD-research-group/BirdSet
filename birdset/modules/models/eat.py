@@ -1,16 +1,27 @@
 from typing import Optional, Tuple
-import timm
 import torch
 from torch import nn
 import torch.nn.functional as F
 from torchaudio.compliance import kaldi
 #from birdset.modules.models.EAT.models.EAT_audio_classification import MaeImageClassificationModel, MaeImageClassificationConfig
 from dataclasses import dataclass
-import fairseq
 
 @dataclass
 class UserDirModule:
     user_dir: str
+
+
+class EATTransform(nn.Module):
+    def __init__(self, test):
+        super(EATTransform, self).__init__()
+        # Define layers here (e.g., using parts of Fairseq's model architecture)
+        print(test)
+
+    def forward(self, x):
+        # Define forward pass for feature extraction
+        pass
+
+
 
 class EATModel(nn.Module):
     """
@@ -49,13 +60,19 @@ class EATModel(nn.Module):
 
 
     def load_model(self) -> None:
+        self.model = EATTransform("Hello Model World")  # Use the first model in case of ensemble
+        # Try loading the checkpoint into this model as a starting point
+        # Load the model using torch
+        model_path = '/workspace/models/eat_ssl/EAT-base_epoch30_ft.pt'  # '/workspace/birdset/modules/models/EAT/models/EAT_audio_classification'  # ('/path/to/model/dir')
+        
+        checkpoint = torch.load(model_path)
 
-        # Load the model using fairseq
-        model_path = UserDirModule('/workspace/birdset/modules/models/EAT')  # '/workspace/birdset/modules/models/EAT/models/EAT_audio_classification'  # ('/path/to/model/dir')
-        fairseq.utils.import_user_module(model_path)
-        model, _, _ = fairseq.checkpoint_utils.load_model_ensemble_and_task(['/workspace/models/eat_ssl/EAT-base_epoch30_ft.pt']) #'/path/to/checkpoint'
-        self.model = model[0].eval()  # Use the first model in case of ensemble
+        #for key in checkpoint['cfg']:
+            #print(key, checkpoint['cfg'][key])
     
+        self.model.load_state_dict(checkpoint['model'])
+
+
     def preprocess(self, input_values: torch.Tensor) -> torch.Tensor:
         device = input_values.device
         melspecs = []
