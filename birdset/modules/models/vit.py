@@ -25,7 +25,7 @@ class VIT(LightningModule, VisionTransformer):
                  depth,
                  target_length,
                  num_classes,
-                 pretrained_weights_path: str,
+                 pretrained_weights_path: str = "",
     ):
         
         LightningModule.__init__(self)
@@ -53,7 +53,8 @@ class VIT(LightningModule, VisionTransformer):
 
         self.pretrained_weights_path =  pretrained_weights_path
         self.target_length = target_length
-        self.load_pretrained_weights()
+        if self.pretrained_weights_path:
+            self.load_pretrained_weights()
 
     def load_pretrained_weights(self): 
         img_size = (self.target_length, self.img_size[1])
