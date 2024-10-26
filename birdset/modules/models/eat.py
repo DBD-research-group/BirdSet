@@ -3,25 +3,7 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 from torchaudio.compliance import kaldi
-#from birdset.modules.models.EAT.models.EAT_audio_classification import MaeImageClassificationModel, MaeImageClassificationConfig
-from dataclasses import dataclass
-
-@dataclass
-class UserDirModule:
-    user_dir: str
-
-
-class EATTransform(nn.Module):
-    def __init__(self, test):
-        super(EATTransform, self).__init__()
-        # Define layers here (e.g., using parts of Fairseq's model architecture)
-        print(test)
-
-    def forward(self, x):
-        # Define forward pass for feature extraction
-        pass
-
-
+from birdset.modules.models.EAT.data2vecmultimodel import Data2VecMultiModel
 
 class EATModel(nn.Module):
     """
@@ -34,10 +16,14 @@ class EATModel(nn.Module):
 
     def __init__(
             self,
+            multimodel,
+            modality,
             num_classes: int,
             train_classifier: bool = False,
         ) -> None:
         super().__init__()
+        self.multimodel = multimodel
+        self.modality = modality
         self.model = None  # Placeholder for the loaded model
         self.load_model()
         self.num_classes = num_classes
@@ -55,22 +41,24 @@ class EATModel(nn.Module):
         #     nn.Linear(64, self.num_classes),
         # )
         # freeze the model
-        for param in self.model.parameters():
-            param.requires_grad = False
+        if self.train_classifier:
+            for param in self.model.parameters():
+                param.requires_grad = False
 
 
     def load_model(self) -> None:
-        self.model = EATTransform("Hello Model World")  # Use the first model in case of ensemble
-        # Try loading the checkpoint into this model as a starting point
-        # Load the model using torch
-        model_path = '/workspace/models/eat_ssl/EAT-base_epoch30_ft.pt'  # '/workspace/birdset/modules/models/EAT/models/EAT_audio_classification'  # ('/path/to/model/dir')
-        
-        checkpoint = torch.load(model_path)
+        backbone = Data2VecMultiModel(multimodel=self.multimodel, modality=self.modality, skip_ema=True)
 
-        #for key in checkpoint['cfg']:
-            #print(key, checkpoint['cfg'][key])
-    
-        self.model.load_state_dict(checkpoint['model'])
+        checkpoint = torch.load('/workspace/models/eat_ssl/EAT-base_epoch30_ft.pt')['model']
+        checkpoint = {k.replace('model.', ''): v for k, v in checkpoint.items()}
+        checkpoint = {k.replace('modality_encoders.IMAGE', 'modality_encoder'): v for k, v in checkpoint.items()}
+
+        missing_keys, unexpected_keys = backbone.load_state_dict(checkpoint, strict=False)
+        print(f"Missing keys: {missing_keys}")
+        print(f"Unexpected keys: {unexpected_keys}")
+        # We don't need the decoder so it is fine that the keys are missing
+        backbone.remove_pretrain_components()
+        self.model = backbone 
 
 
     def preprocess(self, input_values: torch.Tensor) -> torch.Tensor:
@@ -103,15 +91,17 @@ class EATModel(nn.Module):
             torch.Tensor: The output of the classifier.
         """
         melspec = self.preprocess(input_values)
-        embeddings = self.model(melspec)
+        embeddings = self.get_embeddings(melspec)
 
         if self.train_classifier:
+            flattend_embeddings = embeddings.reshape(embeddings.size(0), -1)
             # Pass embeddings through the classifier to get the final output
-            output = self.classifier(embeddings)
+            output = self.classifier(flattend_embeddings)
         else:
             output = embeddings
 
         return output
+
 
     def get_embeddings(
         self, input_tensor: torch.Tensor
@@ -126,6 +116,9 @@ class EATModel(nn.Module):
             torch.Tensor: The embeddings from the model.
         """
         melspecs = self.preprocess(input_tensor)
-        embeddings = self.model(melspecs)
-        return embeddings, None
+        # Utterance level here
+        result = self.model(melspecs, features_only=True, padding_mask=None,mask=False, remove_extra_tokens=False)
+        embeddings = result['x']
+        cls_state = embeddings[:, 0]
+        return cls_state, None
 

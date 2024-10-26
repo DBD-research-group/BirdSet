@@ -1,9 +1,133 @@
 model: 
   _target_: birdset.modules.models.eat.EATModel
+  modality:
+    prenet_depth: 0
+    prenet_layerdrop: 0
+    prenet_dropout: 0
+    start_drop_path_rate: 0
+    end_drop_path_rate: 0
+
+    num_extra_tokens: 1
+    init_extra_token_zero: True
+
+    mask_noise_std: 0.01
+    mask_prob_min: null
+    mask_prob: 0.7
+    inverse_mask: True
+    mask_prob_adjust: 0.07
+    keep_masked_pct: 0
+
+    mask_length: 5
+    add_masks: False
+    remove_masks: False
+    mask_dropout: 0.0
+    encoder_zero_mask: True
+
+    mask_channel_prob: 0.0
+    mask_channel_length: 64
+
+    ema_local_encoder: True
+    local_grad_mult: 1.0
+
+
+    ######
+    input_size: 224
+    in_chans: 1
+    patch_size: 16
+    embed_dim: 768
+
+    fixed_positions: True
+
+    target_length: 1024
+    target_height: 128
+    max_length: 768
+
+
+    #######
+    decoder:
+      decoder_dim: 768
+      decoder_groups: 16
+      decoder_kernel: 3
+      decoder_layers: 6
+      input_dropout: 0
+
+      add_positions_masked: False
+      add_positions_all: False
+
+      decoder_residual: True
+      projection_layers: 1
+      projection_ratio: 2.0
+
+  multimodel:
+    loss_beta: 0
+    loss_scale: null
+    depth: 12
+
+    # standard vision Transformer
+    start_drop_path_rate: 0
+    end_drop_path_rate: 0
+    num_heads: 12
+    norm_eps: 1e-6
+    norm_affine: True
+    encoder_dropout: 0.1
+    post_mlp_drop: 0.1
+    attention_dropout: 0.1
+    activation_dropout: 0.0
+    dropout_input: 0.0
+    layerdrop: 0.0
+    embed_dim: 768
+    mlp_ratio: 4
+    layer_norm_first: False
+
+    # EAT averages all Transformer block output (12 layers in total) 
+    average_top_k_layers: 12
+
+    end_of_block_targets: False
+
+    # clone batch for multi-mask strategy
+    clone_batch: 16
+
+    # Normalization for teacher transformer layer output
+    layer_norm_target_layer: False
+    batch_norm_target_layer: False
+    instance_norm_target_layer: True
+    instance_norm_targets: False
+    layer_norm_targets: True
+
+    # EMA settings
+    ema_same_dtype: True
+    ema_end_decay: 0.9999
+    ema_decay: 0.9998
+    ema_fp32: True
+    log_norms: null
+    add_missing_params: False
+    ema_anneal_end_step: 100000
+
+    # In EAT, the Transformer encoder and the CNN encoder are both EMA updated
+    ema_encoder_only: True
+
+    max_update: 200
+
+    min_target_var: 0.1
+    min_pred_var: 0.01
+
+    mae_init: False
+
+    seed: 42
+
+    skip_ema: False
+
+    # d2v_loss is the frame-level loss while cls_loss is the utterance-level loss
+    cls_loss: 1
+    recon_loss: 0
+    d2v_loss: 1
+
+    decoder_group: False
+
   num_classes: null
   train_classifier: True
 
-model_name: eat
+model_name: eat_ssl
 model_type: waveform
 torch_compile: False
 sampling_rate: 16_000
