@@ -1,0 +1,70 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - override /datamodule: beans.yaml
+  - override /module: multiclass.yaml
+  - override /module/network: eat.yaml
+  - override /callbacks: multiclass.yaml
+  - override /trainer: single_gpu.yaml
+  - override /paths: default.yaml
+  - override /hydra: default.yaml
+
+
+tags: ["eat_ssl", "multiclass"]
+seed: 1
+train: True
+test: True
+
+logger:
+  wandb:
+    tags: ${tags}
+    group: "test"
+    mode: online
+
+module:
+  optimizer:
+    _target_: torch.optim.AdamW
+    lr: 1e-2
+    weight_decay: 5e-4
+  network: 
+    pretrain_info: Null
+    torch_compile: False
+    model:
+      train_classifier: True # Freezes feature extractor and passes embeddings to a classifier
+
+trainer:
+  min_epochs: 1
+  max_epochs: 10
+  precision: 32
+  devices: [2]
+
+datamodule:
+  transforms:
+    max_length: ${module.network.length}
+  dataset:
+    dataset_name: beans_watkins
+    hf_path: DBD-research-group/beans_watkins
+    hf_name: default
+    n_classes: 31
+
+  loaders:
+    train:
+      batch_size: 32
+      shuffle: True
+      num_workers: 16
+      drop_last: True
+    valid:
+      batch_size: 32
+      num_workers: 16
+      shuffle: False
+    test:
+      batch_size: 32
+      num_workers: 16
+      shuffle: False
+
+
+callbacks:
+  model_checkpoint:
+    save_last: True
+    every_n_epochs: 3
+    monitor: "val/CrossEntropyLoss"

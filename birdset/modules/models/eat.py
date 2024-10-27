@@ -7,8 +7,23 @@ from birdset.modules.models.EAT.data2vecmultimodel import Data2VecMultiModel
 
 class EATModel(nn.Module):
     """
-    Pretrained model for audio classification using EAT model.
+    Pretrained model for audio classification using the Efficient Audio Transformer (EAT) model.
     
+    This file and the EAT folder includes code that is based on EAT by Wenxi Chen, licensed under the MIT License
+    Copyright (c) 2024 Wenxi Chen
+    Github-Repository: https://github.com/cwx-worst-one/EAT 
+    Paper: https://arxiv.org/abs/2401.03497
+
+    We use a modified version of the EAT implementation that only relies on small local fairseq files and is compatible with Pytorch Lightning.
+    This adaptation is by Paul Hahn and is also licensed under the MIT License.
+    Github-Repository: https://github.com/nhaH-luaP/PyEat
+
+    Important Parameters:
+    ---------------------
+    multimodel: The settings for the Data2vec multimodel to be used in the model. This should best be defined in a hydra yaml.
+    modality: The settings for the Image Encoder to be used in the model. This should best be defined in a hydra yaml.
+    num_classes: Number of classification heads to be used in the model.
+    train_classifier: If True, the model will output the embeddings and freeze the feature extractor. Default is False. 
     """
     EMBEDDING_SIZE = 768
     MEAN = 0
@@ -42,11 +57,15 @@ class EATModel(nn.Module):
         # )
         # freeze the model
         if self.train_classifier:
+            self.model.eval()
             for param in self.model.parameters():
                 param.requires_grad = False
 
 
     def load_model(self) -> None:
+        """
+        Load the model by using the Data2VecMultiModel and loading a local checkpoint. The decoder is not needed to extract features so we remove it and ignore its weights from the checkpoint.
+        """
         backbone = Data2VecMultiModel(multimodel=self.multimodel, modality=self.modality, skip_ema=True)
 
         checkpoint = torch.load('/workspace/models/eat_ssl/EAT-base_epoch30_ft.pt')['model']
@@ -90,8 +109,7 @@ class EATModel(nn.Module):
         Returns:
             torch.Tensor: The output of the classifier.
         """
-        melspec = self.preprocess(input_values)
-        embeddings = self.get_embeddings(melspec)
+        embeddings = self.get_embeddings(input_values)[0]
 
         if self.train_classifier:
             flattend_embeddings = embeddings.reshape(embeddings.size(0), -1)
