@@ -1,5 +1,6 @@
 model: 
   _target_: birdset.modules.models.eat.EATModel
+  checkpoint: ${paths.root_dir}/models/eat_ssl/EAT-base_epoch30_ft.pt
   modality:
     prenet_depth: 0
     prenet_layerdrop: 0
