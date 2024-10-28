@@ -27,8 +27,9 @@ class EATModel(nn.Module):
     train_classifier: If True, the model will output the embeddings and freeze the feature extractor. Default is False. 
     """
     EMBEDDING_SIZE = 768
-    MEAN = 0
-    STD = 0.5
+    MEAN = -4.2677393
+    STD = 4.5689974
+
 
     def __init__(
             self,
