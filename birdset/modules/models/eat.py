@@ -85,6 +85,13 @@ class EATModel(nn.Module):
 
 
     def preprocess(self, input_values: torch.Tensor) -> torch.Tensor:
+        """
+        Preprocesses the input values by applying mel-filterbank transformation. Similar as function for AudioMae, ConvNeXt and SSAST.
+        Args:
+            input_values (torch.Tensor): Input tensor of shape (batch_size, num_samples).
+        Returns:
+            torch.Tensor: Preprocessed tensor of shape (batch_size, 1, num_mel_bins, num_frames).
+        """
         device = input_values.device
         melspecs = []
         for waveform in input_values:
