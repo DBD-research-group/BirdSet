@@ -16,30 +16,34 @@ train: True
 test: True
 
 paths:
+  dataset_path: ${paths.root_dir}/data
+  background_path: /mnt/datasets/bird_recordings/data/dcase18/wav
   log_dir: ${paths.root_dir}/logs
+  model_path: ${paths.root_dir}/model
 
 logger:
-  wandb: null
-  TBlogger:
-    _target_: birdset.utils.pylogger.TBLogger
-    save_dir: ${paths.log_dir}
+  wandb:
+    tags: ${tags}
+    group: "HSN_subset_vit"
+    mode: online
+    version: subset_vit_${start_time} #to resume train run # needs to be tested
 
 module:
   optimizer:
-    lr: 1e-5
+    lr: 3e-4
   loss:
   #  _target_: birdset.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
     _target_: torch.nn.BCEWithLogitsLoss 
   #_target_: birdset.modules.losses.focal_loss.MultiLabelFocalLoss
   network:
     model:
-      img_size_y: 1024
-      pretrained_weights_path: null
+      img_size_y: 512
+      pretrained_weights_pathh: null
     torch_compile: False
 
 trainer:
   min_epochs: 1
-  max_epochs: 15
+  max_epochs: 50
 
 datamodule:
   dataset:
@@ -51,7 +55,7 @@ datamodule:
   transforms:
     preprocessing:
       resizer:
-        target_width: 1_024
+        target_width: 512
 
 
   loaders:
