@@ -1,4 +1,5 @@
-from birdset.datamodule.components.transforms import EmbeddingTransforms
+from birdset.datamodule.components.transforms import EmbeddingTransforms, BirdSetTransformsWrapper
+from birdset.datamodule.components.event_decoding import EventDecoding
 from birdset.datamodule.base_datamodule import BaseDataModuleHF
 from birdset.configs import NetworkConfig, DatasetConfig, LoadersConfig
 from datasets import DatasetDict, Dataset, concatenate_datasets, load_from_disk
@@ -12,7 +13,7 @@ from typing import Union
 import torch
 import torchaudio
 import os
-
+from copy import deepcopy
 
 log = pylogger.get_pylogger(__name__)
 
@@ -35,6 +36,7 @@ class EmbeddingDataModule(BaseDataModuleHF):
             test_ratio: float = 0.5, # Ratio of test set if val set is also created
             low_train: bool = False, # If low train set is used
             embedding_model: EmbeddingModuleConfig = EmbeddingModuleConfig(),
+            #pre_transforms: BirdSetTransformsWrapper = None,
             average: bool = True,
             gpu_to_use: int = 0
     ):
@@ -70,6 +72,10 @@ class EmbeddingDataModule(BaseDataModuleHF):
         self.embedding_model.eval()  # Set the model to evaluation mode
         self.sampling_rate = embedding_model.sampling_rate
         self.max_length = embedding_model.length
+        #self.pre_transforms = pre_transforms
+        self.decoder = EventDecoding(min_len=0,
+                                          max_len=self.max_length,
+                                          sampling_rate=self.sampling_rate)
         self.embeddings_save_path = os.path.join(
             self.dataset_config.data_dir,
             f"{self.dataset_config.dataset_name}_processed_embedding_model_{self.embedding_model_name}_{self.average}_{self.sampling_rate}_{self.max_length}",
@@ -109,8 +115,8 @@ class EmbeddingDataModule(BaseDataModuleHF):
 
         # Check if actually a dict
         dataset = self._ksamples(dataset)
-
-        if self.dataset_config.task == 'multilabel':
+        # Probably wrong here
+        '''if self.dataset_config.task == 'multilabel':
             log.info(">> One-hot-encode classes")
             dataset = dataset.map(
                 self._classes_one_hot,
@@ -118,7 +124,7 @@ class EmbeddingDataModule(BaseDataModuleHF):
                 batch_size=500,
                 load_from_cache_file=True,
                 num_proc=self.dataset_config.n_workers,
-            )
+            )'''
 
         return dataset
 
@@ -231,6 +237,14 @@ class EmbeddingDataModule(BaseDataModuleHF):
         def compute_and_update_embedding(sample):
             with torch.no_grad():
                 # Get the embedding for the audio sample
+                if self.decoder:
+                    for key, value in sample.items():
+                        sample[key] = [value]
+                    
+                    sample = self.decoder(sample)
+                
+                sample['audio'] = sample['audio'][0]
+                sample['audio']['sampling_rate'] = sample['audio']['samplerate'] #TODO Remove if naming fixed
                 embedding = self._get_embedding(sample['audio'])
                 # Update the sample with the new embedding
                 sample['embedding'] = {}
@@ -244,6 +258,13 @@ class EmbeddingDataModule(BaseDataModuleHF):
 
         # Apply the transformation to each split in the dataset
         for split in dataset.keys():
+            '''if self.pre_transforms:
+                transforms = deepcopy(self.pre_transforms)
+                transforms.set_mode(split)
+                if split == "train":  # we need this for sampler, cannot be done later because set_transform
+                    self.train_label_list = dataset["train"]["labels"]
+                dataset.set_transform(transforms, output_all_columns=False)    '''  
+            
             log.info(f">> Extracting Embeddings for {split} Split")
             # Apply the embedding function to each sample in the split
             dataset[split] = dataset[split].map(compute_and_update_embedding, desc="Extracting Embeddings", load_from_cache_file=True, new_fingerprint=get_new_fingerprint(split), num_proc=self.dataset_config.n_workers)
