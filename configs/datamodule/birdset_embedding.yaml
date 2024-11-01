@@ -2,7 +2,8 @@ _target_: birdset.datamodule.birdset_embedding_datamodule.BirdSetEmbeddingDataMo
 
 defaults: 
   - _self_
-  - transforms: bird_default.yaml
+  - transforms: embedding_transform.yaml
+  #- pre_transforms: ../transforms/bird_default_multilabel.yaml
   - loaders: default.yaml
   - mapper: xc_bambird_mapper.yaml
   - embedding_model: ../../module/network/convnext.yaml
@@ -13,7 +14,7 @@ dataset:
   hf_path: DBD-research-group/BirdSet
   hf_name: HSN
   seed: ${seed}
-  n_workers: 3
+  n_workers: 1
   val_split: null # Split is done in the dataset
   task: ${module.task}
   subset: null

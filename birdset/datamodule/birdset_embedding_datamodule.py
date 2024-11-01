@@ -56,10 +56,6 @@ class BirdSetEmbeddingDataModule(EmbeddingDataModule, BirdSetDataModule):
             gpu_to_use=gpu_to_use
         )
     
-    @property
-    def num_classes(self):
-        return super(BirdSetDataModule, self).num_classes
-    
     def prepare_data(self):
         """
         Same as prepare_data in BaseDataModuleHF but checks if path exists and skips rest otherwise
@@ -74,7 +70,7 @@ class BirdSetEmbeddingDataModule(EmbeddingDataModule, BirdSetDataModule):
             dataset = load_from_disk(self.embeddings_save_path)
         else:
             log.info("Prepare Data")
-            dataset = self._load_data(decode=True)
+            dataset = self._load_data(decode=False)
             dataset = BirdSetDataModule._preprocess_data(self, dataset)
             dataset = self._compute_embeddings(dataset)
 
