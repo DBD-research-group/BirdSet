@@ -298,7 +298,7 @@ Logs will be written to [Weights&Biases](https://wandb.ai/) by default.
 To enhance model performance we mix in additional background noise from downloaded from the [DCASE18](https://dcase.community/challenge2018/index). To download the files and convert them to the correct format, run the notebook 'download_background_noise.ipynb' in the 'notebooks' folder.
 
 
-## Reproduce Paper
+## Reproduce Baselines
 
 First, you have to download the background noise files for augmentations
 
