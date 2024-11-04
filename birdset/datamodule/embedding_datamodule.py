@@ -36,7 +36,7 @@ class EmbeddingDataModule(BaseDataModuleHF):
             test_ratio: float = 0.5, # Ratio of test set if val set is also created
             low_train: bool = False, # If low train set is used
             embedding_model: EmbeddingModuleConfig = EmbeddingModuleConfig(),
-            #pre_transforms: BirdSetTransformsWrapper = None,
+            decoder: EventDecoding | None = None,
             average: bool = True,
             gpu_to_use: int = 0
     ):
@@ -73,9 +73,7 @@ class EmbeddingDataModule(BaseDataModuleHF):
         self.sampling_rate = embedding_model.sampling_rate
         self.max_length = embedding_model.length
         #self.pre_transforms = pre_transforms
-        self.decoder = EventDecoding(min_len=0,
-                                          max_len=self.max_length,
-                                          sampling_rate=self.sampling_rate)
+        self.decoder = decoder
         self.embeddings_save_path = os.path.join(
             self.dataset_config.data_dir,
             f"{self.dataset_config.dataset_name}_processed_embedding_model_{self.embedding_model_name}_{self.average}_{self.sampling_rate}_{self.max_length}",
@@ -128,6 +126,11 @@ class EmbeddingDataModule(BaseDataModuleHF):
 
         return dataset
 
+    def _concatenate_dataset(self, dataset):
+        """
+        Concatenate the dataset to a single dataset
+        """
+        return concatenate_datasets([dataset['train'], dataset['valid'], dataset['test']])
 
     def _ksamples(self, dataset):
         """
@@ -136,7 +139,10 @@ class EmbeddingDataModule(BaseDataModuleHF):
         """
         if self.k_samples > 0:
             log.info(f">> Selecting {self.k_samples} Samples per Class this may take a bit...")
-            merged_data = concatenate_datasets([dataset['train'], dataset['valid'], dataset['test']])
+            for split in dataset.keys():
+                log.info(f"First sample from {split} split: {dataset[split][35]}"
+                         )
+            merged_data = self._concatenate_dataset(dataset)
 
             # Shuffle the merged data
             merged_data.shuffle() #TODO: Check if this is affected by the public seed
@@ -149,6 +155,8 @@ class EmbeddingDataModule(BaseDataModuleHF):
             # Iterate over the merged data and select the desired number of samples per class
             for sample in tqdm(merged_data, total=len(merged_data), desc="Selecting samples"):
                 label = sample['labels']
+                if isinstance(label, list): # For multilabel
+                    label = label.index(1)
                 if len(selected_samples[label]) < self.k_samples:
                     selected_samples[label].append(sample)
                     train_count[label] += 1
@@ -200,9 +208,10 @@ class EmbeddingDataModule(BaseDataModuleHF):
                 })
         else:
             if self.val_batches == 0:
-                dataset['test'] = concatenate_datasets([dataset['valid'], dataset['test']])
-                # remove the valid key
-                del dataset['valid']
+                if 'valid' in dataset:
+                    dataset['test'] = concatenate_datasets([dataset['valid'], dataset['test']])
+                    # remove the valid key
+                    del dataset['valid']
                 
             if self.low_train:
                 del dataset['train']
@@ -243,8 +252,8 @@ class EmbeddingDataModule(BaseDataModuleHF):
                     
                     sample = self.decoder(sample)
                 
-                sample['audio'] = sample['audio'][0]
-                sample['audio']['sampling_rate'] = sample['audio']['samplerate'] #TODO Remove if naming fixed
+                sample['audio'] = sample['audio'][0] #TODO Remove/change for BEANS compat
+                sample['audio']['sampling_rate'] = sample['audio']['sampling_rate'] #TODO Remove if naming fixed
                 embedding = self._get_embedding(sample['audio'])
                 # Update the sample with the new embedding
                 sample['embedding'] = {}
