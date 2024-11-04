@@ -455,7 +455,7 @@ class EmbeddingTransforms(BirdSetTransformsWrapper):
     def __init__(self,
                 task: Literal['multiclass', 'multilabel'] = "multilabel",
                 sampling_rate: int = 32000,
-                model_type: Literal['vision', 'waveform'] = "vision",
+                model_type: Literal['vision', 'waveform'] = "waveform",
                 spectrogram_augmentations: DictConfig = DictConfig({}), # TODO: typing is wrong, can also be List of Augmentations
                 waveform_augmentations: DictConfig = DictConfig({}), # TODO: typing is wrong, can also be List of Augmentations
                 decoding: EventDecoding | None = None,
