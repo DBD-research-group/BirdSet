@@ -8,7 +8,7 @@ defaults:
   - override /trainer: single_gpu.yaml
   - override /paths: default.yaml
   - override /hydra: default.yaml
-  - override /datamodule/transforms: embedding_transform.yaml # Here the audio is transformed to a spectrogram
+  - override /datamodule/transforms: embedding_transform.yaml  # Here the audio is transformed to a spectrogram
   - override /datamodule/transforms/waveform_augmentations: none.yaml # No augmentations for now
   - override /datamodule/transforms/spectrogram_augmentations: none.yaml
 
@@ -24,6 +24,7 @@ logger:
 
 module:
   # Multilabel stuff:
+  _target_: birdset.modules.multilabel_module.MultilabelModule
   task: multilabel
   metrics:
     _target_: birdset.configs.module_configs.MultilabelMetricsConfig
@@ -51,8 +52,7 @@ datamodule:
     model:
       num_classes: null
 
-
-  k_samples: 32
+  k_samples: 0
 
   loaders:
     train:
@@ -76,7 +76,7 @@ callbacks:
     every_n_train_steps: null
   early_stopping:
     _target_: lightning.pytorch.callbacks.EarlyStopping
-    monitor: "train/CrossEntropyLoss_epoch"
+    monitor: "train/BCEWithLogitsLoss_epoch"
     patience: 2
     min_delta: 1e-3
     verbose: False
