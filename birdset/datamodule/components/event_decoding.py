@@ -23,8 +23,8 @@ class EventDecoding:
     def __init__(self,
                  min_len: float = 1,
                  max_len: float = 5,
-                 sampling_rate: int = 32000,
-                 extension_time: float = 8,
+                 sampling_rate: int = 32_000,
+                 extension_time: float = 6,
                  extracted_interval: float = 5):
         self.min_len = min_len # in seconds
         self.max_len = max_len
