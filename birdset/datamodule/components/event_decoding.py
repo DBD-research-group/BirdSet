@@ -23,8 +23,8 @@ class EventDecoding:
     def __init__(self,
                  min_len: float = 1,
                  max_len: float = 5,
-                 sampling_rate: int = 32000,
-                 extension_time: float = 8,
+                 sampling_rate: int = 32_000,
+                 extension_time: float = 6,
                  extracted_interval: float = 5):
         self.min_len = min_len # in seconds
         self.max_len = max_len
@@ -96,6 +96,8 @@ class EventDecoding:
             sr = file_info.samplerate
             duration = file_info.duration
 
+            if not isinstance(batch.get("detected_events", []), list):
+                batch["detected_events"] = batch["detected_events"].tolist()
             if batch.get("detected_events", []) and batch["detected_events"][b_idx]:
                 start, end = batch["detected_events"][b_idx]
                 if self.extension_time:
@@ -108,6 +110,9 @@ class EventDecoding:
             audio, sr = self._load_audio(batch["filepath"][b_idx], start, end, sr)
             audios.append(audio)
             srs.append(sr)
+
+        if not isinstance(batch.get("filepath", []), list):
+            batch["filepath"] = batch["filepath"].tolist()
         if batch.get("filepath", None):
             batch["audio"] = [{"path": path, "array": audio, "samplerate": sr} for audio, path, sr in zip(audios, batch["filepath"], srs)]
         return batch
