@@ -27,5 +27,6 @@ dataset:
 
 k_samples: 0
 gpu_to_use: ${trainer.devices[0]} 
+average: True
 
 

@@ -7,7 +7,7 @@ model:
   n_layers: 6
   nhead: 16
   factors: [4, 4, 4, 4]
-  n_classes: ${datamodule.dataset.n_classes}
+  num_classes: ${datamodule.dataset.n_classes}
   dim_feedforward: 2048
   pretrain_info: null
   
@@ -16,3 +16,5 @@ model_type: waveform
 sampling_rate: 22050
 normalize_spectrogram: False
 normalize_waveform: instance_min_max
+embedding_size: 256
+length: 5

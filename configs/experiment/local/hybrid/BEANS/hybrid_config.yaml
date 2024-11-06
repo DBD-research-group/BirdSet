@@ -1,0 +1,73 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - override /logger: wandb_default.yaml
+  - override /datamodule: beans.yaml
+  - override /module: finetune.yaml
+  - override /callbacks: default.yaml
+  - override /trainer: single_gpu.yaml
+  - override /paths: default.yaml
+  - override /hydra: default.yaml
+  - override /datamodule/transforms: bird_default.yaml # Here the audio is transformed to a spectrogram
+  - override /datamodule/transforms/waveform_augmentations: none.yaml # No augmentations for now
+  - override /datamodule/transforms/spectrogram_augmentations: none.yaml
+
+tags: ["BEANS", "hybrid", "multiclass"]
+seed: 2
+train: True
+test: True
+
+logger:
+  wandb:
+    tags: ${tags}
+    mode: online
+    group: ${module.network.model_name}_${datamodule.dataset.dataset_name}
+
+module:
+  _target_: birdset.modules.hybrid_module.HybridModule
+  ft_at_epoch: 10
+  ft_lr: 1e-5
+
+  network:
+    model_name: ${module.embedding_model.model_name}_hybrid
+  embedding_model:  # This is needed to provide num_classes to the classifier model (Isn't used but set to 0 by default and injected to late in train.py)
+      model:
+        num_classes: ${datamodule.dataset.n_classes} 
+  optimizer:
+    lr: 1e-2
+    weight_decay: 5e-4
+    
+trainer:
+  devices: [2]
+  min_epochs: 1
+  max_epochs: 25
+
+datamodule:
+  transforms:
+    max_length: ${module.embedding_model.length}
+  dataset:
+    dataset_name: beans_watkins
+    hf_path: DBD-research-group/beans_watkins
+    hf_name: default
+    n_classes: 31
+
+  loaders:
+    train:
+      batch_size: 16
+      shuffle: True
+      num_workers: 16
+      drop_last: True
+    valid:
+      batch_size: 16
+      num_workers: 16
+      shuffle: False
+    test:
+      batch_size: 16
+      num_workers: 16
+      shuffle: False
+  
+callbacks:
+  model_checkpoint:
+    monitor: "val/MulticlassAccuracy"
+    mode: "max"
+

@@ -257,8 +257,7 @@ class EmbeddingDataModule(BaseDataModuleHF):
         # Get waveform and sampling rate
         waveform = torch.tensor(audio['array'], dtype=torch.float32).to(self.device) # Get waveform audio and move to GPU
         dataset_sampling_rate = audio['sampling_rate']
-        # Resample audio
-        audio = self._resample_audio(waveform, dataset_sampling_rate)
+        # Resample audio is done in load_data()
         
         # Zero-padding
         audio = self._zero_pad(waveform)
@@ -273,10 +272,6 @@ class EmbeddingDataModule(BaseDataModuleHF):
         else:
             return self.embedding_model.get_embeddings(audio.view(1, 1, -1))[0]
 
-    # Resample function
-    def _resample_audio(self, audio, orig_sr):
-        resampler = torchaudio.transforms.Resample(orig_freq=orig_sr, new_freq=self.sampling_rate)
-        return resampler(audio)
 
     # Zero-padding function
     def _zero_pad(self, audio):
@@ -284,10 +279,7 @@ class EmbeddingDataModule(BaseDataModuleHF):
         current_num_samples = audio.shape[0]
         padding = desired_num_samples - current_num_samples
         if padding > 0:
-            #print('padding')
-            pad_left = padding // 2
-            pad_right = padding - pad_left
-            audio = torch.nn.functional.pad(audio, (pad_left, pad_right))
+            audio = torch.nn.functional.pad(audio, (0, padding))
         return audio
 
     # Average multiple embeddings function

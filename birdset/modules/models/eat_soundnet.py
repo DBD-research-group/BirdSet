@@ -8,6 +8,7 @@ import lightning as L
 from dataclasses import dataclass, field
 import warnings 
 import datasets
+from typing import Tuple
 log = pylogger.get_pylogger(__name__)
 
 class ResBlock1dTF(nn.Module):
@@ -106,7 +107,7 @@ class SoundNet(nn.Module):
     '''
     NeuralNetwork for sound classification
     expected input shape: (batch_size, clip_length)
-    output shape: (batch_size, n_classes)
+    output shape: (batch_size, num_classes)
 
     Parameters:
     nf (int): Number of filters in the convolutional layers. Default is 32.
@@ -115,7 +116,7 @@ class SoundNet(nn.Module):
     n_layers (int): Number of transformer layers. Default is 4.
     nhead (int): Number of heads in the multihead attention models. Default is 8.
     factors (List[int]): List of factors for the convolutional layers. Default is [4, 4, 4, 4].
-    n_classes (Optional[int]): Number of classes for classification. Default is None.
+    num_classes (Optional[int]): Number of classes for classification. Default is None.
     dim_feedforward (int): Dimension of the feedforward network model. Default is 512.
     '''
     def __init__(
@@ -126,7 +127,7 @@ class SoundNet(nn.Module):
             n_layers: int = 4,
             nhead: int = 8,
             factors: List[int] = [4, 4, 4, 4],
-            n_classes: int | None = None,
+            num_classes: int | None = None,
             dim_feedforward: int = 512 ,
             local_checkpoint: str | None = None,
             pretrain_info = None,
@@ -141,7 +142,7 @@ class SoundNet(nn.Module):
             self.num_classes = len(
                 datasets.load_dataset_builder(self.hf_path, self.hf_name).info.features["ebird_code"].names)
         else:
-            self.num_classes = n_classes
+            self.num_classes = num_classes
 
         ds_fac = np.prod(np.array(factors)) * 4
         clip_length = seq_len // ds_fac
@@ -179,11 +180,13 @@ class SoundNet(nn.Module):
             self.down.load_state_dict(self.load_state_dict_from_file(local_checkpoint, model_name='down'))
             self.down2.load_state_dict(self.load_state_dict_from_file(local_checkpoint, model_name='down2'))
             self.project.load_state_dict(self.load_state_dict_from_file(local_checkpoint, model_name='project'))
-            self.tf.load_state_dict(self.load_state_dict_from_file(local_checkpoint, model_name='tf'))
+            self.tf.load_state_dict(self.load_state_dict_from_file(local_checkpoint, model_name='tf'), strict=False)
 
     def load_state_dict_from_file(self, file_path, model_name= 'model'):
         state_dict = torch.load(file_path, map_location=self.device)["state_dict"]
         # select only models where the key starts with `model.` + model_name + `.`
+        # TODO: Only do this if classifier varies 
+        state_dict = {k: v for k, v in state_dict.items() if not k.startswith('model.tf.fc')}
         state_dict = {key: weight for key, weight in state_dict.items() if key.startswith('model.' + model_name + '.')}
         state_dict = {key.replace('model.' + model_name + '.', ''): weight for key, weight in state_dict.items()}
 
@@ -212,3 +215,27 @@ class SoundNet(nn.Module):
         x = self.project(x)
         pred = self.tf(x)
         return pred
+    
+    def get_embeddings(self, input_tensor: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+        if len(input_tensor.shape) < 3:
+            input_tensor = input_tensor.unsqueeze(1)
+
+        # Pass through the initial layers
+        x = self.start(input_tensor)
+        x = self.down(x)
+        x = self.down2(x)
+
+        # Get the projected embeddings
+        embeddings = self.project(x)
+        
+        # Create embeddings from transformer
+        cls_tokens = self.tf.cls_token.expand(embeddings.shape[0], -1, -1)
+        embeddings_with_pos = torch.cat((cls_tokens, embeddings.permute(0, 2, 1).contiguous()), dim=1)
+        embeddings_with_pos += self.tf.pos_embed
+        embeddings_with_pos.transpose_(1, 0)
+        transformer_output = self.tf.transformer_enc(embeddings_with_pos)
+        
+        # cls_embeddings are the transformer embeddings corresponding to the class token
+        cls_embeddings = transformer_output[0]
+        
+        return cls_embeddings, None

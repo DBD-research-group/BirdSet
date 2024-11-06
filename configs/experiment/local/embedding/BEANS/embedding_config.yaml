@@ -65,6 +65,6 @@ datamodule:
   
 callbacks:
   model_checkpoint:
-    save_last: True
-    every_n_epochs: 3
-    monitor: "val/CrossEntropyLoss"
+    monitor: "val/MulticlassAccuracy"
+    mode: "max"
+
