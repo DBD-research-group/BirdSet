@@ -30,7 +30,7 @@ class ResBlock1dTF(nn.Module):
 
 
 class TAggregate(nn.Module):
-    def __init__(self, clip_length=None, embed_dim=64, n_layers=6, nhead=6, n_classes=None, dim_feedforward=512):
+    def __init__(self, clip_length=None, embed_dim=64, n_layers=6, nhead=6, num_classes=None, dim_feedforward=512):
         super(TAggregate, self).__init__()
         self.num_tokens = 2 # TODO: changed this from 1 to 2
         drop_rate = 0.1
@@ -38,7 +38,7 @@ class TAggregate(nn.Module):
         self.transformer_enc = nn.TransformerEncoder(enc_layer, num_layers=n_layers, norm=nn.LayerNorm(embed_dim))
         self.cls_token = nn.Parameter(torch.zeros(1, 1, embed_dim))
         self.pos_embed = nn.Parameter(torch.zeros(1, clip_length + self.num_tokens, embed_dim))
-        self.fc = nn.Linear(embed_dim, n_classes)
+        self.fc = nn.Linear(embed_dim, num_classes)
         self.apply(self._init_weights)
 
     def _init_weights(self, m):
@@ -106,7 +106,7 @@ class SoundNet(nn.Module):
     '''
     NeuralNetwork for sound classification
     expected input shape: (batch_size, clip_length)
-    output shape: (batch_size, n_classes)
+    output shape: (batch_size, num_classes)
 
     Parameters:
     nf (int): Number of filters in the convolutional layers. Default is 32.
@@ -115,7 +115,7 @@ class SoundNet(nn.Module):
     n_layers (int): Number of transformer layers. Default is 4.
     nhead (int): Number of heads in the multihead attention models. Default is 8.
     factors (List[int]): List of factors for the convolutional layers. Default is [4, 4, 4, 4].
-    n_classes (Optional[int]): Number of classes for classification. Default is None.
+    num_classes (Optional[int]): Number of classes for classification. Default is None.
     dim_feedforward (int): Dimension of the feedforward network model. Default is 512.
     '''
     def __init__(
@@ -126,7 +126,7 @@ class SoundNet(nn.Module):
             n_layers: int = 4,
             nhead: int = 8,
             factors: List[int] = [4, 4, 4, 4],
-            n_classes: int | None = None,
+            num_classes: int | None = None,
             dim_feedforward: int = 512 ,
             local_checkpoint: str | None = None,
             pretrain_info = None,
@@ -141,7 +141,7 @@ class SoundNet(nn.Module):
             self.num_classes = len(
                 datasets.load_dataset_builder(self.hf_path, self.hf_name).info.features["ebird_code"].names)
         else:
-            self.num_classes = n_classes
+            self.num_classes = num_classes
 
         ds_fac = np.prod(np.array(factors)) * 4
         clip_length = seq_len // ds_fac
@@ -171,7 +171,7 @@ class SoundNet(nn.Module):
         self.down2 = nn.Sequential(*model)
         self.project = nn.Conv1d(nf, embed_dim, 1)
         self.clip_length = clip_length
-        self.tf = TAggregate(embed_dim=embed_dim, clip_length=clip_length, n_layers=n_layers, nhead=nhead, n_classes=self.num_classes, dim_feedforward=dim_feedforward)
+        self.tf = TAggregate(embed_dim=embed_dim, clip_length=clip_length, n_layers=n_layers, nhead=nhead, num_classes=self.num_classes, dim_feedforward=dim_feedforward)
         self.apply(self._init_weights)
         if local_checkpoint:
             log.info(f">> Loading state dict from local checkpoint: {local_checkpoint}")
