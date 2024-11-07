@@ -72,7 +72,6 @@ class EmbeddingDataModule(BaseDataModuleHF):
         self.embedding_model.eval()  # Set the model to evaluation mode
         self.sampling_rate = embedding_model.sampling_rate
         self.max_length = embedding_model.length
-        #self.pre_transforms = pre_transforms
         self.decoder = decoder
         self.embeddings_save_path = os.path.join(
             self.dataset_config.data_dir,
