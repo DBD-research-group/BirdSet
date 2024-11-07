@@ -3,7 +3,7 @@
 defaults:
   - override /logger: wandb_embedding.yaml
   - override /datamodule: birdset_embedding.yaml
-  - override /module: embedding.yaml
+  - override /module: multilabel_embedding.yaml
   - override /callbacks: default.yaml
   - override /trainer: single_gpu.yaml
   - override /paths: default.yaml
@@ -12,7 +12,7 @@ defaults:
   - override /datamodule/transforms/waveform_augmentations: none.yaml # No augmentations for now
   - override /datamodule/transforms/spectrogram_augmentations: none.yaml
 
-tags: ["BEANS", "embeddings", "multiclass", "k-32"]
+tags: ["BEANS", "embeddings", "multiclass"]
 seed: 1
 train: True
 test: True

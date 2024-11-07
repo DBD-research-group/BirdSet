@@ -246,14 +246,16 @@ class EmbeddingDataModule(BaseDataModuleHF):
         def compute_and_update_embedding(sample):
             with torch.no_grad():
                 # Get the embedding for the audio sample
-                if self.decoder:
-                    for key, value in sample.items():
-                        sample[key] = [value]
+                if self.decoder: # This part is specific for BirdSet Data as it uses the decoder
+                    for key, value in sample.items(): # Convert to batch of 1
+                        if key == 'filepath' or 'start_time' or 'end_time':
+                            sample[key] = [value]
                     
                     sample = self.decoder(sample)
+                    sample['audio'] = sample['audio'][0]
+                    sample['labels'] = sample['labels'][0]
+                    sample['audio']['sampling_rate'] = sample['audio']['samplerate']
 
-                sample['audio'] = sample['audio'][0] #TODO Remove/change for BEANS compat
-                sample['audio']['sampling_rate'] = sample['audio']['samplerate'] #TODO Remove if naming fixed
                 embedding = self._get_embedding(sample['audio'])
                 # Update the sample with the new embedding
                 sample['embedding'] = {}
@@ -267,13 +269,6 @@ class EmbeddingDataModule(BaseDataModuleHF):
 
         # Apply the transformation to each split in the dataset
         for split in dataset.keys():
-            '''if self.pre_transforms:
-                transforms = deepcopy(self.pre_transforms)
-                transforms.set_mode(split)
-                if split == "train":  # we need this for sampler, cannot be done later because set_transform
-                    self.train_label_list = dataset["train"]["labels"]
-                dataset.set_transform(transforms, output_all_columns=False)    '''  
-            
             log.info(f">> Extracting Embeddings for {split} Split")
             # Apply the embedding function to each sample in the split
             dataset[split] = dataset[split].map(compute_and_update_embedding, desc="Extracting Embeddings", load_from_cache_file=False, new_fingerprint=get_new_fingerprint(split), num_proc=self.dataset_config.n_workers)
