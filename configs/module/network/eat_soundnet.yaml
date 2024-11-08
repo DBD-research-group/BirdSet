@@ -16,3 +16,5 @@ model_type: waveform
 sampling_rate: 22050
 normalize_spectrogram: False
 normalize_waveform: instance_min_max
+embedding_size: 128
+length: 5

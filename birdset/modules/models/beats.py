@@ -10,7 +10,7 @@ class BEATsModel(nn.Module):
     """
     Pretrained model for audio classification using the BEATs model.
     """
-    EMBEDDING_SIZE = 496*768
+    EMBEDDING_SIZE = 768
 
     def __init__(
             self,
@@ -74,7 +74,7 @@ class BEATsModel(nn.Module):
             Returns:
                 torch.Tensor: The output of the classifier.
             """
-            embeddings = self.get_embeddings(input_values)
+            embeddings = self.get_embeddings(input_values)[0]
             if self.train_classifier:
                 flattend_embeddings = embeddings.reshape(embeddings.size(0), -1)
                 # Pass embeddings through the classifier to get the final output

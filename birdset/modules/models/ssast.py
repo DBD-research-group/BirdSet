@@ -14,7 +14,10 @@ from birdset.utils import pylogger
 
 log = pylogger.get_pylogger(__name__)
 
-#! Most of the code is from the SSAST Github and just reordered and modified to fit the BirdSet project: https://github.com/YuanGongND/ssast
+#! This file includes code from SSAST by Yuan Gong, licensed under the BSD 3-Clause License
+#! Copyright (c) 2022, Yuan Gong. All rights reserved.
+#! Github-Repository: https://github.com/YuanGongND/ssast
+#! Paper: https://ojs.aaai.org/index.php/AAAI/article/view/21315
 
 # Custom PatchEmbed class
 class PatchEmbed(nn.Module):

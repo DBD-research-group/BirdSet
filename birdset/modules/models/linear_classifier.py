@@ -7,7 +7,7 @@ class LinearClassifier(nn.Module):
     def __init__(
         self,
         num_classes: int,
-        in_features: int   
+        in_features: int
     ) -> None:
         """
         Initialize the LinearClassifier.
@@ -18,8 +18,8 @@ class LinearClassifier(nn.Module):
         """
         super().__init__()
         self.classifier = nn.Linear(in_features, num_classes)
-        
-    
+         
+
     def forward(
         self, input_values: torch.Tensor, labels: Optional[torch.Tensor] = None
     ) -> torch.Tensor:
