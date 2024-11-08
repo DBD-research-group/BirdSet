@@ -30,20 +30,21 @@ class AudioMAEModel(nn.Module):
         self.num_classes = num_classes
         self.train_classifier = train_classifier
          # Define a linear classifier to use on top of the embeddings
-        self.classifier = nn.Linear(
-            in_features=self.EMBEDDING_SIZE, out_features=num_classes
-        )
-        # self.classifier = nn.Sequential(
-        #     nn.Linear(self.EMBEDDING_SIZE, 128),
-        #     nn.ReLU(),
-        #     nn.Dropout(0.5),
-        #     nn.Linear(128, 64),
-        #     nn.ReLU(),
-        #     nn.Linear(64, self.num_classes),
-        # )
-        # freeze the model
-        for param in self.model.parameters():
-            param.requires_grad = False
+        if self.train_classifier: 
+            self.classifier = nn.Linear(
+                in_features=self.EMBEDDING_SIZE, out_features=num_classes
+            )
+            # self.classifier = nn.Sequential(
+            #     nn.Linear(self.EMBEDDING_SIZE, 128),
+            #     nn.ReLU(),
+            #     nn.Dropout(0.5),
+            #     nn.Linear(128, 64),
+            #     nn.ReLU(),
+            #     nn.Linear(64, self.num_classes),
+            # )
+            # freeze the model
+            for param in self.model.parameters():
+                param.requires_grad = False
 
 
     def load_model(self) -> None:
