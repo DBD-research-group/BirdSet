@@ -26,18 +26,18 @@ class BEATsModel(nn.Module):
         # self.classifier = nn.Linear(
         #     in_features=self.EMBEDDING_SIZE, out_features=num_classes
         # )
-        self.classifier = nn.Sequential(
-            nn.Linear(self.EMBEDDING_SIZE, 128),
-            nn.ReLU(),
-            nn.Dropout(0.5),
-            nn.Linear(128, 64),
-            nn.ReLU(),
-            nn.Linear(64, self.num_classes),
-        )
-        
-        # freeze the model
-        #! Dont freeze when finetuning
         if self.train_classifier:
+            self.classifier = nn.Sequential(
+                nn.Linear(self.EMBEDDING_SIZE, 128),
+                nn.ReLU(),
+                nn.Dropout(0.5),
+                nn.Linear(128, 64),
+                nn.ReLU(),
+                nn.Linear(64, self.num_classes),
+            )
+        
+            # freeze the model
+            #! Dont freeze when finetuning
             for param in self.model.parameters():
                 param.requires_grad = False
 

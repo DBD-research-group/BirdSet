@@ -38,6 +38,7 @@ trainer:
   devices: [0]
   min_epochs: 1
   max_epochs: 10
+  precision: 32
 
 datamodule:
   transforms:
