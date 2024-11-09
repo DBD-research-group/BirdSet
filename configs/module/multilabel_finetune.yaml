@@ -1,0 +1,45 @@
+_target_: birdset.modules.finetune_module.FinetuneModule
+
+defaults:
+  - _self_
+  - embedding_model: ../network/hubert.yaml
+
+network:
+  model:
+    _target_: birdset.modules.models.linear_classifier.LinearClassifier
+    in_features: ${module.embedding_model.embedding_size}
+
+  model_name: ${module.embedding_model.model_name}_finetune # Most values are just taken from embedding model as it is the first part
+  model_type: waveform
+  torch_compile: ${module.embedding_model.torch_compile}
+  sampling_rate: ${module.embedding_model.sampling_rate}
+  normalize_spectrogram: null
+  normalize_waveform: False
+
+task: multilabel
+#class_weights_loss: ${datamodule.dataset.class_weights_loss}
+num_gpus: ${trainer.devices}
+
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 1e-4
+  _partial_: true
+  weight_decay: 5e-4
+
+loss:
+  _target_: torch.nn.BCEWithLogitsLoss
+
+metrics:
+  _target_: birdset.configs.module_configs.MultilabelMetricsConfig
+  num_labels: ${datamodule.dataset.n_classes}
+
+output_activation: 
+  _target_: "torch.sigmoid"
+  _partial_: true
+
+logging_params:
+  _target_: birdset.modules.base_module.LoggingParamsConfig 
+  on_step: False
+  on_epoch: True
+  sync_dist: False
+  prog_bar: True  
