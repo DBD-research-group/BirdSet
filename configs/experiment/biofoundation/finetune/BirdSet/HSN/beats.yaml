@@ -3,4 +3,8 @@
 defaults:
   - biofoundation/finetune/BirdSet/BirdSet_config.yaml
   - override /module/embedding_model: ../../module/network/beats.yaml  
-  
+
+module:
+  embedding_model:
+    model:
+      train_classifier: False
