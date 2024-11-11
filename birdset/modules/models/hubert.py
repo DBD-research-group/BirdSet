@@ -12,7 +12,8 @@ class HubertSequenceClassifier(nn.Module):
                  num_classes: int = None,
                  local_checkpoint: str = None,
                  cache_dir: str = None,
-                 pretrain_info: PretrainInfoConfig = None):
+                 pretrain_info: PretrainInfoConfig = None,
+                 n_last_hidden_layer: int = 1):
         """
         Note: Either num_classes or pretrain_info must be given
         Args:
@@ -25,6 +26,7 @@ class HubertSequenceClassifier(nn.Module):
         super(HubertSequenceClassifier, self).__init__()
 
         self.checkpoint = checkpoint
+        self.n_last_hidden_layer = n_last_hidden_layer
 
         if pretrain_info:
             self.hf_path = pretrain_info.hf_path
@@ -77,7 +79,6 @@ class HubertSequenceClassifier(nn.Module):
         - return_hidden_state (bool, optional): A flag to determine whether to return hidden states of the
           model. Defaults to False.
         """
-
         # Squeeze the channel dimension so that the tensor has shape (batch size, wavelength)
         input_values = input_values.squeeze(1)
         outputs = self.model(
@@ -113,11 +114,9 @@ class HubertSequenceClassifier(nn.Module):
             #labels=None
         )
         logits = outputs['logits']
-
-        last_hidden_state = outputs["hidden_states"][-1] #(batch, sequence, dim)
+        # There are 13 layers
+        last_hidden_state = outputs["hidden_states"][-self.n_last_hidden_layer] #(batch, sequence, dim)
         cls_state = last_hidden_state[:,0,:]
-        
-        
         
         return cls_state, logits
         

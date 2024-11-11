@@ -120,6 +120,8 @@ class pcmAP(MultilabelAveragePrecision):
         pcmap = super().__call__(logits, targets, **kwargs)
         return pcmap
 
+class MultilabelMetricsConfig: # Dummy for loading old checkpoints from BirdSet (Pickle)
+    pass
 
 # class TopKAccuracy(torchmetrics.Metric):
 #     def __init__(self, topk=1, **kwargs):

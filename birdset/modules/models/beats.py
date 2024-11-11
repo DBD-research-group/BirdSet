@@ -4,18 +4,19 @@ from typing import Optional
 from birdset.modules.models.BEATs import BEATs, BEATsConfig
 import torch
 from torch import nn
+from typing import Tuple
 
 class BEATsModel(nn.Module):
     """
     Pretrained model for audio classification using the BEATs model.
     """
-    EMBEDDING_SIZE = 496*768
-    
+    EMBEDDING_SIZE = 768
+
 
     def __init__(
             self,
             num_classes: int,
-            train_classifier: bool = False,
+            train_classifier: bool = False
         ) -> None:
         super().__init__()
         self.model = None  # Placeholder for the loaded model
@@ -34,9 +35,12 @@ class BEATsModel(nn.Module):
             nn.ReLU(),
             nn.Linear(64, self.num_classes),
         )
-           # freeze the model
-        for param in self.model.parameters():
-            param.requires_grad = False
+        
+        # freeze the model
+        #! Dont freeze when finetuning
+        if self.train_classifier:
+            for param in self.model.parameters():
+                param.requires_grad = False
 
 
     def load_model(self) -> None:
@@ -66,7 +70,7 @@ class BEATsModel(nn.Module):
             Returns:
                 torch.Tensor: The output of the classifier.
             """
-            embeddings = self.get_embeddings(input_values)
+            embeddings = self.get_embeddings(input_values)[0]
             if self.train_classifier:
                 flattend_embeddings = embeddings.reshape(embeddings.size(0), -1)
                 # Pass embeddings through the classifier to get the final output
@@ -78,7 +82,7 @@ class BEATsModel(nn.Module):
 
     def get_embeddings(
         self, input_values: torch.Tensor
-    ) -> torch.Tensor:
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Get the embeddings and logits from the BEATs model.
 
@@ -89,5 +93,6 @@ class BEATsModel(nn.Module):
             torch.Tensor: The embeddings from the model.
         """
         embeddings = self.model.extract_features(input_values)[0] # outputs a tensor of size 496x768
-
-        return embeddings
+        cls_state = embeddings[:,0,:]
+        
+        return cls_state, None

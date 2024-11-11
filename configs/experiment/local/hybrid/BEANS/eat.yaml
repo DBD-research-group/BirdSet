@@ -1,0 +1,25 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - local/hybrid/BEANS/hybrid_config.yaml 
+  - override /module/embedding_model: ../../module/network/eat_soundnet.yaml 
+
+tags: ["BEANS", "finetune", "eat", "multiclass"]
+seed: 2
+
+trainer:
+  devices: [1]
+  min_epochs: 1
+  
+
+module:
+  embedding_model:
+    model:
+      local_checkpoint: ${paths.root_dir}/models/eat/birdset/checkpoint-20.ckpt
+
+datamodule:
+  dataset:
+    dataset_name: beans_dogs
+    hf_path: DBD-research-group/beans_dogs
+    hf_name: default
+    n_classes: 10

@@ -72,7 +72,7 @@ class BaseModule(L.LightningModule):
             pretrain_info = None,
             ):
 
-        super(BaseModule, self).__init__()
+        super().__init__()
         self.network = network
         self.output_activation = output_activation
         # TODO: refactor load_loss
@@ -190,8 +190,7 @@ class BaseModule(L.LightningModule):
         return {"loss": train_loss}
 
     def validation_step(self, batch, batch_idx):
-        val_loss, preds, targets = self.model_step(batch, batch_idx)
-       
+        val_loss, preds, targets = self.model_step(batch, batch_idx)       
         self.log(
             f"val/{self.loss.__class__.__name__}",
             val_loss,
@@ -200,12 +199,12 @@ class BaseModule(L.LightningModule):
             prog_bar=True
         )
 
-        # self.valid_metric(preds, targets.int())
-        # self.log(
-        #     f"val/{self.valid_metric.__class__.__name__}",
-        #     self.valid_metric,
-        #     **asdict(self.logging_params),
-        # )
+        self.valid_metric(preds, targets)
+        self.log(
+            f"val/{self.valid_metric.__class__.__name__}",
+            self.valid_metric,
+            **asdict(self.logging_params),
+        )
 
         # self.valid_add_metrics(preds, targets.int())
         # self.log_dict(self.valid_add_metrics, **asdict(self.logging_params))
