@@ -28,6 +28,11 @@ class EATModel(nn.Module):
     EMBEDDING_SIZE = 768
     MEAN = 0
     STD = 0.5
+    #MEAN = -4.2677393
+    #STD = 4.5689974
+    #MEAN =15.41663
+    #STD =6.55582
+
 
     def __init__(
             self,

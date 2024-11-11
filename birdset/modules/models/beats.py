@@ -10,6 +10,7 @@ class BEATsModel(nn.Module):
     Pretrained model for audio classification using the BEATs model.
     """
     EMBEDDING_SIZE = 496*768
+    
 
     def __init__(
             self,
