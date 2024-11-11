@@ -1,11 +1,14 @@
 from torch import Tensor
 import torch.nn.functional as F
 
+
 class Resizer:
-    def __init__(self,
-                 db_scale: bool = False,
-                 target_height: int | None = None,
-                 target_width: int = 1024 ) -> None:
+    def __init__(
+        self,
+        db_scale: bool = False,
+        target_height: int | None = None,
+        target_width: int = 1024,
+    ) -> None:
         """
         Initializes the Resizer object.
 
@@ -17,9 +20,9 @@ class Resizer:
         self.target_width = target_width
 
         if db_scale:
-            self.padding_value = -80.
+            self.padding_value = -80.0
         else:
-            self.padding_value = 0.
+            self.padding_value = 0.0
 
     def pad_spectrogram_height(self, spectrogram: Tensor) -> Tensor:
         """
@@ -55,7 +58,7 @@ class Resizer:
             return F.pad(spectrogram, padding, value=self.padding_value)
         return spectrogram
 
-    def truncate_spectrogram_height(self,spectrogram: Tensor) -> Tensor:
+    def truncate_spectrogram_height(self, spectrogram: Tensor) -> Tensor:
         """
         Truncates the height of a 3D spectrogram to a given target height.
 
@@ -66,9 +69,9 @@ class Resizer:
         Returns:
             Tensor: The truncated 3D spectrogram.
         """
-        return spectrogram[:, :, :self.target_height, :]
+        return spectrogram[:, :, : self.target_height, :]
 
-    def truncate_spectrogram_width(self,spectrogram: Tensor) -> Tensor:
+    def truncate_spectrogram_width(self, spectrogram: Tensor) -> Tensor:
         """
         Truncates the width of a 3D spectrogram to a given target width.
 
@@ -79,8 +82,8 @@ class Resizer:
         Returns:
             Tensor: The truncated 3D spectrogram.
         """
-        return spectrogram[:, :, :, :self.target_width]
-    
+        return spectrogram[:, :, :, : self.target_width]
+
     def resize_spectrogram_batch(self, spectrogram: Tensor) -> Tensor:
         """
         Resizes a 3D spectrogram to a given maximum height and width by either padding or truncating.
