@@ -20,28 +20,28 @@ class EATModel(nn.Module):
 
     Important Parameters:
     ---------------------
+    checkpoint: The path to the checkpoint to be loaded.
     multimodel: The settings for the Data2vec multimodel to be used in the model. This should best be defined in a hydra yaml.
     modality: The settings for the Image Encoder to be used in the model. This should best be defined in a hydra yaml.
     num_classes: Number of classification heads to be used in the model.
     train_classifier: If True, the model will output the embeddings and freeze the feature extractor. Default is False. 
     """
     EMBEDDING_SIZE = 768
-    MEAN = 0
-    STD = 0.5
-    #MEAN = -4.2677393
-    #STD = 4.5689974
-    #MEAN =15.41663
-    #STD =6.55582
+    MEAN = -4.2677393
+    STD = 4.5689974
+
 
 
     def __init__(
             self,
+            checkpoint,
             multimodel,
             modality,
             num_classes: int,
             train_classifier: bool = False,
         ) -> None:
         super().__init__()
+        self.checkpoint = checkpoint
         self.multimodel = multimodel
         self.modality = modality
         self.model = None  # Placeholder for the loaded model
@@ -73,7 +73,7 @@ class EATModel(nn.Module):
         """
         backbone = Data2VecMultiModel(multimodel=self.multimodel, modality=self.modality, skip_ema=True)
 
-        checkpoint = torch.load('/workspace/models/eat_ssl/EAT-base_epoch30_ft.pt')['model']
+        checkpoint = torch.load(self.checkpoint)['model']
         checkpoint = {k.replace('model.', ''): v for k, v in checkpoint.items()}
         checkpoint = {k.replace('modality_encoders.IMAGE', 'modality_encoder'): v for k, v in checkpoint.items()}
 
@@ -86,6 +86,13 @@ class EATModel(nn.Module):
 
 
     def preprocess(self, input_values: torch.Tensor) -> torch.Tensor:
+        """
+        Preprocesses the input values by applying mel-filterbank transformation. Similar as function for AudioMae, ConvNeXt and SSAST.
+        Args:
+            input_values (torch.Tensor): Input tensor of shape (batch_size, num_samples).
+        Returns:
+            torch.Tensor: Preprocessed tensor of shape (batch_size, 1, num_mel_bins, num_frames).
+        """
         device = input_values.device
         melspecs = []
         for waveform in input_values:

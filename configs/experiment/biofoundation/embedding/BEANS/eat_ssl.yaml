@@ -10,10 +10,8 @@ seed: 2
 trainer:
   devices: [2]
   min_epochs: 1
-  max_epochs: 4
+  max_epochs: 20
 
 datamodule:
   k_samples: 0  
   val_batches: null # Use null to use all batches; 0 for no validation at all
-  
-
