@@ -2,7 +2,7 @@
 #package global is neccessary!
 defaults:
   - biofoundation/embedding/BEANS/embedding_config.yaml 
-  - override /datamodule/embedding_model: ../../module/network/beats_logreg.yaml  
+  - override /datamodule/embedding_model: ../../module/network/beats.yaml  
 
 tags: ["BEANS", "embeddings", "beats", "multiclass"]
 seed: 2
