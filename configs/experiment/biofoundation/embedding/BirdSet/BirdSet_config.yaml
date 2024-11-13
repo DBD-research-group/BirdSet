@@ -42,18 +42,19 @@ module:
     
 trainer:
   limit_val_batches: ${datamodule.val_batches} 
-  devices: [0]
+  devices: [2]
   min_epochs: 1
   max_epochs: 50
 
 datamodule:
-  val_batches: 0
+  val_batches: null
   embedding_model:  # This is needed to provide num_classes to the classifier model (Isn't used but set to 0 by default and injected too late in train.py)
     model:
       num_classes: null
       #train_classifier: False
 
   k_samples: 0
+  average: False
 
   loaders:
     train:

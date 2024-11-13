@@ -7,6 +7,5 @@ defaults:
 tags: ["HSN", "embeddings", "perch", "multilabel"]
 
 datamodule:
-  embedding_model:  # This is needed to provide num_classes to the classifier model (Isn't used but set to 0 by default and injected too late in train.py)
-    model:
+  embedding_model:
       train_classifier: False
