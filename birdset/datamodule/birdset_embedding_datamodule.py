@@ -79,6 +79,7 @@ class BirdSetEmbeddingDataModule(EmbeddingDataModule, BirdSetDataModule):
             dataset = BirdSetDataModule._preprocess_data(self, dataset)
             if "test_5s" in dataset: # Can be removed as it is copied to 'test' split in _preprocess_data
                 del dataset["test_5s"]
+            dataset = self._create_splits(dataset)
             dataset = self._compute_embeddings(dataset)
 
         dataset = self._preprocess_data(dataset)
