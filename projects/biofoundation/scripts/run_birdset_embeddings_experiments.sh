@@ -11,14 +11,14 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --models)
       shift
-      while [[ $# -gt 0 && $1 != "--datasets" ]]; do
+      while [[ $# -gt 0 && $1 != --* ]]; do  # Collect models until next flag
         models+=("$1")
         shift
       done
       ;;
     --datasets)
       shift
-      while [[ $# -gt 0 ]]; do
+      while [[ $# -gt 0 && $1 != --* ]]; do  # Collect datasets until next flag
         datasets+=("$1")
         shift
       done
@@ -29,7 +29,7 @@ while [[ $# -gt 0 ]]; do
       shift
       ;;
     *)
-      echo "Unknown option $1. Usage: $0 --models beats convnext ...  --datasets HSN NBP ..."
+      echo "Unknown option $1. Usage: $0 --models beats convnext ...  --datasets HSN NBP ... --gpu 1"
       exit 1
       ;;
   esac

@@ -44,7 +44,7 @@ trainer:
   limit_val_batches: ${datamodule.val_batches} 
   devices: [2]
   min_epochs: 1
-  max_epochs: 50
+  max_epochs: 30
 
 datamodule:
   val_batches: null
