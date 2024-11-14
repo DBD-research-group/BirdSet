@@ -1,4 +1,3 @@
-.vscode/*
 __pycache__
 wandb/
 *.egg-info
@@ -153,7 +152,6 @@ venv.bak/
 
 # mypygit add .vscode/settings.json
 The following paths are ignored by one of your .gitignore files:
-.vscode
 .mypy_cache/
 .dmypy.json
 dmypy.json
@@ -168,7 +166,6 @@ dmypy.json
 !.vscode/launch.json
 !.vscode/extensions.json
 *.code-workspace
-**/.vscode
 
 # JetBrains
 .idea/
@@ -193,5 +190,3 @@ saved_models/*
 lightning_logs/
 
 models/*
-
-!.vscode/settings.json
