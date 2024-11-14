@@ -272,6 +272,10 @@ class EmbeddingDataModule(BaseDataModuleHF):
             # Apply the embedding function to each sample in the split
             dataset[split] = dataset[split].map(compute_and_update_embedding, desc="Extracting Embeddings", load_from_cache_file=False, new_fingerprint=get_new_fingerprint(split), num_proc=self.dataset_config.n_workers)
         
+            # Remove 'filepath' attribute if decoder present as decoding then already done
+            if self.decoder and 'filepath' in dataset[split].features:
+                dataset[split] = dataset[split].remove_columns('filepath')
+
         log.info(f"Saving emebeddings to disk: {self.embeddings_save_path}")
         dataset.save_to_disk(self.embeddings_save_path)
 

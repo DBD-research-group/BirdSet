@@ -91,10 +91,7 @@ class BirdSetEmbeddingDataModule(EmbeddingDataModule, BirdSetDataModule):
         # set to done so that lightning does not call it again
         self._prepare_done = True
     
-    def _preprocess_data(self, dataset):
-        # Remove so that the decoder from embedding_transform is not used (Decoding is done before in the embedding_datamodule)
-        dataset["train"] = dataset["train"].remove_columns("filepath")
-        dataset["test"] = dataset["test"].remove_columns("filepath")
+    def _preprocess_data(self, dataset):    
         return EmbeddingDataModule._preprocess_data(self,dataset)
     
     def _concatenate_dataset(self, dataset):
