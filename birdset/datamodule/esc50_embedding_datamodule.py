@@ -24,7 +24,8 @@ class ESC50EmbeddingDataModule(EmbeddingDataModule, ESC50DataModule):
             embedding_model: EmbeddingModuleConfig = EmbeddingModuleConfig(),
             average: bool = True,
             gpu_to_use: int = 0,
-            
+            cross_valid: bool = False,
+            fold : int = 1,
             
             
     ):
@@ -44,12 +45,16 @@ class ESC50EmbeddingDataModule(EmbeddingDataModule, ESC50DataModule):
             embedding_model (EmbeddingModuleConfig, optional): Model for extracting the embeddings. Defaults to EmbeddingModuleConfig().
             average (bool, optional): If embeddings should be averaged if the audio clip is too long. Defaults to True.
             gpu_to_use (int, optional): Which GPU should be used for extracting the embeddings. Defaults to 0.
+            cross_valid (bool, optional): If a cross_valid set should be used or not. Defaults to False which means that the normal split of dataset is used.
+            fold (int, optional) : fold defines which combination of data should assume as subsection in cross_validation structure. Defult 1, it can be 1 to 5.
         """
         ESC50DataModule.__init__(
             self,
             dataset=dataset,
             loaders=loaders,
             transforms=transforms,
+            cross_valid= cross_valid
+            fold= fold
             
             
         )
@@ -77,6 +82,7 @@ class ESC50EmbeddingDataModule(EmbeddingDataModule, ESC50DataModule):
         dataset = dataset.select_columns(["embedding", "labels"])
 
         dataset = EmbeddingDataModule._preprocess_data(self, dataset)
+        
             
         return dataset
         
