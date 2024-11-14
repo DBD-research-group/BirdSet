@@ -20,3 +20,6 @@ dataset:
   sampling_rate: ${module.network.sampling_rate}
   class_weights_loss: False
   class_weights_sampler: null
+  
+cross_valid: True
+fold : 1

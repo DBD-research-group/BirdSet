@@ -14,6 +14,8 @@ tags: ["esc50", "efficientnet", "multiclass"]
 seed: 1
 train: True
 test: True
+cross_valid: True
+fold : [1,2,3,4,5]
 
 logger:
   wandb:
