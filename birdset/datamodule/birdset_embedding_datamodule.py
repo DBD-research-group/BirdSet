@@ -8,6 +8,7 @@ from birdset.datamodule.components.event_decoding import EventDecoding
 from birdset.datamodule.embedding_datamodule import EmbeddingDataModule, EmbeddingModuleConfig
 from birdset.configs import DatasetConfig, LoadersConfig
 from datasets import load_from_disk
+from birdset.datamodule.components.augmentations import MultilabelMix
 
 log = utils.get_pylogger(__name__)
 
@@ -46,6 +47,7 @@ class BirdSetEmbeddingDataModule(EmbeddingDataModule, BirdSetDataModule):
             mapper=mapper
         )
         decoder = EventDecoding(min_len=0, max_len=embedding_model.length, sampling_rate=embedding_model.sampling_rate)
+        waveform_augmentations = {'multilabel_mix': MultilabelMix(p=0.7,  min_snr_in_db= 3.0, max_snr_in_db= 30.0, mix_target="union")}
         EmbeddingDataModule.__init__(
             self,
             dataset=dataset,
@@ -57,6 +59,7 @@ class BirdSetEmbeddingDataModule(EmbeddingDataModule, BirdSetDataModule):
             low_train=low_train,
             embedding_model=embedding_model,
             decoder = decoder,
+            waveform_augmentations=waveform_augmentations,
             average=average,
             gpu_to_use=gpu_to_use
         )

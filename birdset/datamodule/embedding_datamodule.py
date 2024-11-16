@@ -13,7 +13,9 @@ from typing import Union
 import torch
 import torchaudio
 import os
+import torch_audiomentations
 from copy import deepcopy
+from omegaconf import DictConfig
 
 log = pylogger.get_pylogger(__name__)
 
@@ -37,6 +39,7 @@ class EmbeddingDataModule(BaseDataModuleHF):
             low_train: bool = False, # If low train set is used
             embedding_model: EmbeddingModuleConfig = EmbeddingModuleConfig(),
             decoder: EventDecoding | None = None,
+            waveform_augmentations: DictConfig = DictConfig({}),
             average: bool = True,
             gpu_to_use: int = 0
     ):
@@ -73,6 +76,18 @@ class EmbeddingDataModule(BaseDataModuleHF):
         self.sampling_rate = embedding_model.sampling_rate
         self.max_length = embedding_model.length
         self.decoder = decoder
+
+        # waveform augmentations
+        self.waveform_augmentations = waveform_augmentations
+        wave_aug = []
+        for wave_aug_name in waveform_augmentations:
+            aug = self.waveform_augmentations.get(wave_aug_name)
+            wave_aug.append(aug)
+
+        self.wave_aug = torch_audiomentations.Compose(
+            transforms=wave_aug,
+            output_type="object_dict")
+        print(self.wave_aug)
         self.embeddings_save_path = os.path.join(
             self.dataset_config.data_dir,
             f"{self.dataset_config.dataset_name}_processed_embedding_model_{self.embedding_model_name}_{self.average}_{self.sampling_rate}_{self.max_length}",
