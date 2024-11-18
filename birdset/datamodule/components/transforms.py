@@ -476,7 +476,7 @@ class EmbeddingTransforms(BirdSetTransformsWrapper):
         attention_mask = waveform_batch["attention_mask"]
         input_values = waveform_batch["input_values"]
         input_values = input_values.unsqueeze(1)
-        labels = torch.tensor(batch["labels"])
+        labels = torch.tensor(batch["labels"]).squeeze(1) # FOr now hotfix
         if self.wave_aug: 
             input_values, labels = self._waveform_augmentation(input_values, labels)
         

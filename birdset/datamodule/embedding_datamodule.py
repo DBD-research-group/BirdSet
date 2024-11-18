@@ -84,10 +84,13 @@ class EmbeddingDataModule(BaseDataModuleHF):
             aug = self.waveform_augmentations.get(wave_aug_name)
             wave_aug.append(aug)
 
-        self.wave_aug = torch_audiomentations.Compose(
-            transforms=wave_aug,
-            output_type="object_dict")
-        print(self.wave_aug)
+        self.wave_aug = None
+        if len(wave_aug) > 0:
+            self.wave_aug = torch_audiomentations.Compose(
+                transforms=wave_aug,
+                output_type="object_dict")
+            print(self.wave_aug)
+            
         self.embeddings_save_path = os.path.join(
             self.dataset_config.data_dir,
             f"{self.dataset_config.dataset_name}_processed_embedding_model_{self.embedding_model_name}_{self.average}_{self.sampling_rate}_{self.max_length}",
@@ -251,7 +254,6 @@ class EmbeddingDataModule(BaseDataModuleHF):
 
 
 
-
     def _compute_embeddings(self, dataset):
         """
         Compute Embeddings for the entire dataset and store them in a new DatasetDict to disk. If the embeddings have already been computed, the dataset will be loaded from disk.
@@ -264,13 +266,21 @@ class EmbeddingDataModule(BaseDataModuleHF):
                     for key, value in sample.items(): # Convert to batch of 1
                         if key == 'filepath' or 'start_time' or 'end_time':
                             sample[key] = [value]
-                    
+                            
                     sample = self.decoder(sample)
                     sample['audio'] = sample['audio'][0]
                     sample['labels'] = sample['labels'][0]
-                    sample['audio']['sampling_rate'] = sample['audio']['samplerate']
+                    #sample['audio']['sampling_rate'] = sample['audio']['samplerate']
 
-                embedding = self._get_embedding(sample['audio'])
+                waveform = torch.tensor(sample['audio']['array'], dtype=torch.float32).to(self.device) # Get waveform audio and move to GPU
+                sample['labels'] = torch.tensor(sample['labels'])
+                
+                if self.wave_aug: 
+                    waveform, sample['labels'] = self._waveform_augmentation(waveform, sample['labels'].to(self.device))  
+                    sample['labels'] = sample['labels'].cpu().squeeze(0)
+                
+                sample['labels'] = sample['labels'].numpy()
+                embedding = self._get_embedding(waveform)
                 # Update the sample with the new embedding
                 sample['embedding'] = {}
                 sample['embedding']['array'] = embedding.squeeze(0).cpu().numpy()
@@ -285,6 +295,7 @@ class EmbeddingDataModule(BaseDataModuleHF):
         for split in dataset.keys():
             log.info(f">> Extracting Embeddings for {split} Split")
             # Apply the embedding function to each sample in the split
+            #dataset[split] = dataset[split].select(range(5))
             dataset[split] = dataset[split].map(compute_and_update_embedding, desc="Extracting Embeddings", load_from_cache_file=False, new_fingerprint=get_new_fingerprint(split), num_proc=self.dataset_config.n_workers)
         
             # Remove 'filepath' attribute if decoder present as decoding then already done
@@ -296,10 +307,35 @@ class EmbeddingDataModule(BaseDataModuleHF):
 
         return dataset        
 
-    def _get_embedding(self, audio):
+    def _waveform_augmentation(self, input_values, labels):
+        """
+        Apply all provided waveform augmentations to the input values and labels. This model is slightly modified from the transforms.py from the BirdSetTransformsWrapper to fit the embedding setup.
+        """
+        input_values = input_values.unsqueeze(0).unsqueeze(0)
+        if self.task == "multilabel":
+            labels = labels.unsqueeze(0).unsqueeze(0).unsqueeze(1)
+            output_dict = self.wave_aug(
+                samples=input_values, 
+                sample_rate=self.sampling_rate,
+                targets=labels
+            )
+            labels = output_dict.targets.squeeze(0).squeeze(0).squeeze(1)
+
+        elif self.task == "multiclass": #multilabel mix is questionable
+            output_dict = self.wave_aug(
+                    samples=input_values, 
+                    sample_rate=self.sampling_rate,
+                )
+            
+        input_values = output_dict.samples
+        input_values = input_values.squeeze(0).squeeze(0)
+        
+        return input_values, labels
+
+    def _get_embedding(self, waveform):
         # Get waveform and sampling rate
-        waveform = torch.tensor(audio['array'], dtype=torch.float32).to(self.device) # Get waveform audio and move to GPU
-        dataset_sampling_rate = audio['sampling_rate']
+
+        #dataset_sampling_rate = audio['sampling_rate']
         # Resample audio is done in load_data()
         
         # Zero-padding
