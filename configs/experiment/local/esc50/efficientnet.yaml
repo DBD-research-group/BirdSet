@@ -38,6 +38,8 @@ trainer:
   #devices: [1]
 
 datamodule:  
+  cross_valid: ${cross_valid}
+  fold: ${fold} 
   loaders:
     train:
       batch_size: 32

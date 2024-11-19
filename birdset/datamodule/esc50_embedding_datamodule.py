@@ -53,7 +53,7 @@ class ESC50EmbeddingDataModule(EmbeddingDataModule, ESC50DataModule):
             dataset=dataset,
             loaders=loaders,
             transforms=transforms,
-            cross_valid= cross_valid
+            cross_valid= cross_valid,
             fold= fold
             
             
