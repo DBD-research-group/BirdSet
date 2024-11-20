@@ -150,8 +150,6 @@ venv.bak/
 # mkdocs documentation
 /site
 
-# mypygit add .vscode/settings.json
-The following paths are ignored by one of your .gitignore files:
 .mypy_cache/
 .dmypy.json
 dmypy.json
