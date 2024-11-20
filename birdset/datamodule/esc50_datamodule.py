@@ -30,7 +30,6 @@ class ESC50DataModule(BaseDataModuleHF):
         )
         self.cross_valid = cross_valid
         self.fold = fold
-        print("foooooooold", self.fold)
     
 
     def prepare_data(self):

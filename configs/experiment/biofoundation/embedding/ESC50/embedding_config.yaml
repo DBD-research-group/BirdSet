@@ -17,6 +17,8 @@ tags: ["esc50", "embeddings", "multiclass"]
 seed: 1
 train: True
 test: True
+cross_valid: True
+fold : 1
 
 logger:
   wandb:
@@ -46,7 +48,8 @@ datamodule:
     hf_name: default
     n_classes: 50
     
-
+  cross_valid: ${cross_valid}
+  fold: ${fold} 
   k_samples: 0
 
   loaders:
