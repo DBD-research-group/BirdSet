@@ -5,6 +5,7 @@ import warnings
 from pathlib import Path
 from typing import List, Text, TypedDict, Union
 import torch.nn as nn
+
 # Related third-party imports
 import audiomentations
 import librosa
@@ -20,12 +21,13 @@ from torch_audiomentations.utils.file import find_audio_files_in_paths
 
 from typing import Optional
 import torch
-import os 
+import os
 from torch import Tensor
 from torch_audiomentations.core.transforms_interface import BaseWaveformTransform
 from torch_audiomentations.utils.dsp import calculate_rms
 from torch_audiomentations.utils.object_dict import ObjectDict
 from torch_audiomentations.utils.io import Audio
+
 
 def pad_spectrogram_width(
     spectrogram: torch.Tensor, target_width: int, value: float
@@ -485,21 +487,22 @@ class AudioAugmentor:
             return spectrogram_augmented
 
         return waveform_augmented
-    
+
+
 class AddBackgroundNoiseHf(torch_audiomentations.AddBackgroundNoise):
     def __init__(
-            self, 
-            noise_data,
-            min_snr_in_db: float = 3.0, 
-            max_snr_in_db: float = 30.0, 
-            p: float = 0.5):
-        
-        self.noise_data = noise_data 
+        self,
+        noise_data,
+        min_snr_in_db: float = 3.0,
+        max_snr_in_db: float = 30.0,
+        p: float = 0.5,
+    ):
+
+        self.noise_data = noise_data
         self.min_snr_in_db = min_snr_in_db
         self.max_snr_in_db = max_snr_in_db
-        self.p = p 
+        self.p = p
 
-    
     # def random_background(self, noise_data, target_num_samples):
     #     pieces = []
     #     while missing_num_samples > 0:
@@ -528,34 +531,40 @@ class AddBackgroundNoiseHf(torch_audiomentations.AddBackgroundNoise):
     #         torch.cat([audio.rms_normalize(piece) for piece in pieces], dim=1)
     #     )
 
+
 class Compose:
     def __init__(self, transforms):
         self.transforms = transforms
-    
+
     def __call__(self, inputs, *args, **kwargs):
-        for transforms in self.transforms: 
+        for transforms in self.transforms:
             inputs = transforms(inputs, *args, **kwargs)
-        return inputs 
+        return inputs
+
 
 class AudioTransforms:
     def __init__(self, p=0.5):
-        self.p = p 
+        self.p = p
 
-    def __call__(self, inputs,):
+    def __call__(
+        self,
+        inputs,
+    ):
         if np.random.rand() < self.p:
             return self.apply(inputs)
         else:
-            return inputs    
+            return inputs
+
 
 class BackgroundNoise(AudioTransforms):
     def __init__(self, noise_events=None, p=0.5):
         super().__init__(p=p)
-        
+
         self.noise_events = noise_events
-        self.p = p 
+        self.p = p
         self.max_length = 5
         self.min_length = 1
-    
+
     def _decode(self, path, start, end):
         sr = sf.info(path).samplerate
         if start is not None and end is not None:
@@ -575,35 +584,36 @@ class BackgroundNoise(AudioTransforms):
 
         return audio
 
-         
     def apply(self, inputs):
 
         augmented_audio = []
         for i, sample in enumerate(inputs):
-            random_idx = random.randint(0, len(self.noise_events["filepath"])-1) # exclude the file itself? 
+            random_idx = random.randint(
+                0, len(self.noise_events["filepath"]) - 1
+            )  # exclude the file itself?
             noise_path = self.noise_events["filepath"][random_idx]
             if self.noise_events["no_call_events"][random_idx]:
-                noise_event = random.choice(self.noise_events["no_call_events"][random_idx])
-            else: # can be empty! 16 times in training high sierras (how?)
-                noise_event = [0,0]
+                noise_event = random.choice(
+                    self.noise_events["no_call_events"][random_idx]
+                )
+            else:  # can be empty! 16 times in training high sierras (how?)
+                noise_event = [0, 0]
 
             noise = self._decode(
-                path = noise_path, 
-                start = noise_event[0],
-                end = noise_event[1]
+                path=noise_path, start=noise_event[0], end=noise_event[1]
             )
-            
+
             noise = torch.Tensor(noise).unsqueeze(0)
 
             if sample.size(1) != noise.size(1):
                 padding_length = sample.size(1) - noise.size(1)
-                noise = F.pad(noise, (0,padding_length), "constant", 0)
-            
+                noise = F.pad(noise, (0, padding_length), "constant", 0)
+
             augmented = torchaudio.functional.add_noise(
-                waveform = sample,
-                noise = noise,
-                snr = torch.Tensor([15]) # should also work on a batch?? 
-                #expects no_samples x length
+                waveform=sample,
+                noise=noise,
+                snr=torch.Tensor([15]),  # should also work on a batch??
+                # expects no_samples x length
             )
             augmented_audio.append(augmented)
 
@@ -611,7 +621,8 @@ class BackgroundNoise(AudioTransforms):
 
         return augmented_audio
 
-#Mix not officially released yet 
+
+# Mix not officially released yet
 class MultilabelMix(BaseWaveformTransform):
 
     supported_modes = {"per_example", "per_channel"}
@@ -723,10 +734,10 @@ class MultilabelMix(BaseWaveformTransform):
             sample_rate=sample_rate,
             targets=mixed_targets,
             target_rate=target_rate,
-        )          
-        
-        
-class NoCallMixer():
+        )
+
+
+class NoCallMixer:
     """
     A class used to mix no-call samples into the dataset.
 
@@ -735,7 +746,7 @@ class NoCallMixer():
     _target_ : str
         Specifies the no-call sampler component in the pipeline.
     directory : str
-        The directory containing the no-call data. The directory should contain audio files in a format that can be read by torchaudio (e.g. .wav). 
+        The directory containing the no-call data. The directory should contain audio files in a format that can be read by torchaudio (e.g. .wav).
     p : float
         The probability of a sample being replaced with a no-call sample. This parameter allows you to control the frequency of no-call samples in your dataset.
     sampling_rate : int
@@ -743,42 +754,49 @@ class NoCallMixer():
     length : int
         The length of the audio samples. This parameter should align with the rest of your dataset and model configuration.
     """
+
     def __init__(self, directory, p, sampling_rate, length=5, *args, **kwargs):
         self.p = p
         self.sampling_rate = sampling_rate
-        self.length = length 
+        self.length = length
 
         self.paths = self.get_all_file_paths(directory)
 
     def get_all_file_paths(self, directory):
-        pattern = os.path.join(directory, '**', '*')
-        file_paths = [path for path in glob.glob(pattern, recursive=True) if os.path.isfile(path)]
-        
+        pattern = os.path.join(directory, "**", "*")
+        file_paths = [
+            path for path in glob.glob(pattern, recursive=True) if os.path.isfile(path)
+        ]
+
         absolute_file_paths = [os.path.abspath(path) for path in file_paths]
-        
+
         return absolute_file_paths
 
     def __call__(self, input_values, labels):
         b, c = labels.shape
         for idx in range(len(input_values)):
-            if random.random() < self.p: 
+            if random.random() < self.p:
                 selected_path = random.choice(self.paths)
                 info = sf.info(selected_path)
                 sr = info.samplerate
                 duration = info.duration
-                
+
                 if duration >= self.length:
-                    latest_start = int(duration-self.length) * sr
+                    latest_start = int(duration - self.length) * sr
 
                     start_frame = int(random.randint(0, latest_start))
                     end_frame = start_frame + self.length * sr
-                    audio, sr = sf.read(selected_path, start=start_frame, stop=end_frame)
-                
+                    audio, sr = sf.read(
+                        selected_path, start=start_frame, stop=end_frame
+                    )
+
                 else:
                     audio, sr = sf.read(selected_path)
-                
+
                 if sr != self.sampling_rate:
-                    audio = librosa.resample(audio, orig_sr=sr, target_sr=self.sampling_rate)
+                    audio = librosa.resample(
+                        audio, orig_sr=sr, target_sr=self.sampling_rate
+                    )
                     sr = self.sampling_rate
 
                 audio = torch.tensor(audio)
@@ -787,12 +805,10 @@ class NoCallMixer():
                     padding = input_values[idx].numel() - audio.numel()
                     audio = torch.nn.functional.pad(audio, (0, padding))
 
-
                 input_values[idx] = audio
                 labels[idx] = torch.zeros(c)
         return input_values, labels
 
-    
 
 AudioFile = Union[Path, Text, dict]
 """
@@ -1026,7 +1042,7 @@ class Audio:
 
         if original_sample_offset + original_num_samples > original_total_num_samples:
             original_sample_offset = original_total_num_samples - original_num_samples
-            #raise ValueError() # rounding error i guess
+            # raise ValueError() # rounding error i guess
 
         if original_samples is None:
             try:
@@ -1043,7 +1059,8 @@ class Audio:
 
         else:
             original_data = original_samples[
-                :, original_sample_offset : original_sample_offset + original_num_samples
+                :,
+                original_sample_offset : original_sample_offset + original_num_samples,
             ]
 
         if channel is not None:
@@ -1060,7 +1077,8 @@ class Audio:
                 result = torch.nn.functional.pad(result, (0, diff))
 
         return result
-    
+
+
 class AddBackgroundNoise(BaseWaveformTransform):
     """
     Add background noise to the input audio.
@@ -1139,7 +1157,9 @@ class AddBackgroundNoise(BaseWaveformTransform):
                 )
                 num_samples = missing_num_samples
                 background_samples = audio(
-                    background_path, sample_offset=sample_offset, num_samples=num_samples
+                    background_path,
+                    sample_offset=sample_offset,
+                    num_samples=num_samples,
                 )
                 missing_num_samples = 0
             else:
@@ -1231,7 +1251,7 @@ class PowerToDB(nn.Module):
         self.ref = ref
         self.amin = amin
         self.top_db = top_db
-    
+
     def forward(self, S):
         # Convert S to a PyTorch tensor if it is not already
         S = torch.as_tensor(S, dtype=torch.float32)
@@ -1257,8 +1277,12 @@ class PowerToDB(nn.Module):
             ref_value = torch.abs(torch.tensor(self.ref, dtype=S.dtype))
 
         # Compute the log spectrogram
-        log_spec = 10.0 * torch.log10(torch.maximum(magnitude, torch.tensor(self.amin, device=magnitude.device)))
-        log_spec -= 10.0 * torch.log10(torch.maximum(ref_value, torch.tensor(self.amin, device=magnitude.device)))
+        log_spec = 10.0 * torch.log10(
+            torch.maximum(magnitude, torch.tensor(self.amin, device=magnitude.device))
+        )
+        log_spec -= 10.0 * torch.log10(
+            torch.maximum(ref_value, torch.tensor(self.amin, device=magnitude.device))
+        )
 
         # Apply top_db threshold if necessary
         if self.top_db is not None:
@@ -1267,5 +1291,3 @@ class PowerToDB(nn.Module):
             log_spec = torch.maximum(log_spec, log_spec.max() - self.top_db)
 
         return log_spec
-
-

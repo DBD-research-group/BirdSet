@@ -40,6 +40,7 @@ class DatasetConfig:
     direct_fingerprint: int, optional
         Only works with PretrainDatamodule. Path to a saved preprocessed dataset path
     """
+
     data_dir: str = "/workspace/data_birdset"
     dataset_name: str = "esc50"
     hf_path: str = "ashraq/esc50"
@@ -55,7 +56,9 @@ class DatasetConfig:
     class_weights_sampler: Optional[bool] = None
     classlimit: Optional[int] = None
     eventlimit: Optional[int] = None
-    direct_fingerprint: Optional[str] = None  # TODO only supported in PretrainDatamodule
+    direct_fingerprint: Optional[str] = (
+        None  # TODO only supported in PretrainDatamodule
+    )
 
 
 @dataclass
@@ -80,6 +83,7 @@ class LoaderConfig:
     prefetch_factor : int
         Defines the number of samples loaded in advance by each worker. This parameter is commented out here and can be adjusted based on specific requirements.
     """
+
     batch_size: int = 32
     shuffle: bool = True
     num_workers: int = 1
