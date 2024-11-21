@@ -112,16 +112,6 @@ class EmbeddingDataModule(BaseDataModuleHF):
 
         # Check if actually a dict
         dataset = self._ksamples(dataset)
-        # Probably wrong here
-        '''if self.dataset_config.task == 'multilabel':
-            log.info(">> One-hot-encode classes")
-            dataset = dataset.map(
-                self._classes_one_hot,
-                batched=True,
-                batch_size=500,
-                load_from_cache_file=True,
-                num_proc=self.dataset_config.n_workers,
-            )'''
 
         return dataset
 
