@@ -41,7 +41,7 @@ class EfficientNetClassifier(nn.Module):
                 if not pretrain_info.hf_pretrain_name
                 else pretrain_info.hf_pretrain_name
             )
-            if self.hf_path is 'DBD-research-group/BirdSet':
+            if self.hf_path is "DBD-research-group/BirdSet":
                 self.num_classes = len(
                     datasets.load_dataset_builder(self.hf_path, self.hf_name)
                     .info.features["ebird_code"]

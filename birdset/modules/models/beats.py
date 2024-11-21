@@ -6,10 +6,12 @@ import torch
 from torch import nn
 from typing import Tuple
 
+
 class BEATsModel(nn.Module):
     """
     Pretrained model for audio classification using the BEATs model.
     """
+
     EMBEDDING_SIZE = 768
 
     def __init__(
@@ -29,7 +31,7 @@ class BEATsModel(nn.Module):
 
         self.num_classes = num_classes
         self.train_classifier = train_classifier
-         # Define a linear classifier to use on top of the embeddings
+        # Define a linear classifier to use on top of the embeddings
         # self.classifier = nn.Linear(
         #     in_features=self.EMBEDDING_SIZE, out_features=num_classes
         # )
@@ -46,43 +48,40 @@ class BEATsModel(nn.Module):
             for param in self.model.parameters():
                 param.requires_grad = False
 
-
     def load_model(self) -> None:
         """
         Load the model from shared storage.
         """
         # load the pre-trained checkpoints
-        checkpoint = torch.load('/workspace/models/beats/BEATs_iter3_plus_AS2M.pt')
+        checkpoint = torch.load("/workspace/models/beats/BEATs_iter3_plus_AS2M.pt")
 
-        cfg = BEATsConfig(checkpoint['cfg'])
+        cfg = BEATsConfig(checkpoint["cfg"])
         self.model = BEATs(cfg)
-        self.model.load_state_dict(checkpoint['model'])
+        self.model.load_state_dict(checkpoint["model"])
         self.model.eval()
 
-
-    
     def forward(
-            self, input_values: torch.Tensor, labels: Optional[torch.Tensor] = None
-        ) -> torch.Tensor:
-            """
-            Forward pass through the model.
+        self, input_values: torch.Tensor, labels: Optional[torch.Tensor] = None
+    ) -> torch.Tensor:
+        """
+        Forward pass through the model.
 
-            Args:
-                input_values (torch.Tensor): The input tensor for the classifier.
-                labels (Optional[torch.Tensor]): The true labels for the input values. Default is None.
+        Args:
+            input_values (torch.Tensor): The input tensor for the classifier.
+            labels (Optional[torch.Tensor]): The true labels for the input values. Default is None.
 
-            Returns:
-                torch.Tensor: The output of the classifier.
-            """
-            embeddings = self.get_embeddings(input_values)[0]
-            if self.train_classifier:
-                flattend_embeddings = embeddings.reshape(embeddings.size(0), -1)
-                # Pass embeddings through the classifier to get the final output
-                output = self.classifier(flattend_embeddings)
-            else:
-                output = embeddings
+        Returns:
+            torch.Tensor: The output of the classifier.
+        """
+        embeddings = self.get_embeddings(input_values)[0]
+        if self.train_classifier:
+            flattend_embeddings = embeddings.reshape(embeddings.size(0), -1)
+            # Pass embeddings through the classifier to get the final output
+            output = self.classifier(flattend_embeddings)
+        else:
+            output = embeddings
 
-            return output
+        return output
 
     def get_embeddings(
         self, input_values: torch.Tensor
@@ -96,7 +95,9 @@ class BEATsModel(nn.Module):
         Returns:
             torch.Tensor: The embeddings from the model.
         """
-        embeddings = self.model.extract_features(input_values)[0] # outputs a tensor of size 496x768
-        cls_state = embeddings[:,0,:]
-        
+        embeddings = self.model.extract_features(input_values)[
+            0
+        ]  # outputs a tensor of size 496x768
+        cls_state = embeddings[:, 0, :]
+
         return cls_state, None

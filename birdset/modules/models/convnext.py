@@ -44,7 +44,7 @@ class ConvNextClassifier(nn.Module):
                 if not pretrain_info.hf_pretrain_name
                 else pretrain_info.hf_pretrain_name
             )
-            if self.hf_path == 'DBD-research-group/BirdSet':
+            if self.hf_path == "DBD-research-group/BirdSet":
                 self.num_classes = len(
                     datasets.load_dataset_builder(self.hf_path, self.hf_name)
                     .info.features["ebird_code"]
@@ -67,8 +67,7 @@ class ConvNextClassifier(nn.Module):
         self._initialize_model()
 
     def _initialize_model(self):
-        """Initializes the ConvNext model based on specified attributes.
-        """
+        """Initializes the ConvNext model based on specified attributes."""
 
         adjusted_state_dict = None
 
@@ -121,7 +120,7 @@ class ConvNextClassifier(nn.Module):
         logits = output.logits
 
         return logits
-    
+
     @torch.inference_mode()
     def get_logits(self, dataloader, device):
         pass
@@ -139,6 +138,7 @@ class ConvNextEmbedding(nn.Module):
     """
     ConvNext model for audio classification.
     """
+
     MEAN = -4.2677393
     STD = 4.5689974
 
@@ -183,8 +183,7 @@ class ConvNextEmbedding(nn.Module):
         self._initialize_model()
 
     def _initialize_model(self):
-        """Initializes the ConvNext model based on specified attributes.
-        """
+        """Initializes the ConvNext model based on specified attributes."""
 
         adjusted_state_dict = None
 
@@ -204,7 +203,6 @@ class ConvNextEmbedding(nn.Module):
                     # Assign the adjusted key
                     adjusted_state_dict[new_key] = value
 
-            
             self.model = ConvNextModel.from_pretrained(
                 self.checkpoint,
                 num_channels=self.num_channels,
@@ -212,7 +210,7 @@ class ConvNextEmbedding(nn.Module):
                 state_dict=adjusted_state_dict,
                 ignore_mismatched_sizes=True,
             )
-            
+
         else:
             print("Using pretrained convnext")
             config = AutoConfig.from_pretrained(
@@ -220,9 +218,10 @@ class ConvNextEmbedding(nn.Module):
                 num_channels=self.num_channels,
             )
             self.model = ConvNextModel(config)
-     
-            
-    def preprocess(self, input_values: torch.Tensor, input_tdim=500, sampling_rate=32000) -> torch.Tensor:
+
+    def preprocess(
+        self, input_values: torch.Tensor, input_tdim=500, sampling_rate=32000
+    ) -> torch.Tensor:
         """
         Preprocesses the input values by applying mel-filterbank transformation.
         Args:
@@ -235,8 +234,16 @@ class ConvNextEmbedding(nn.Module):
         device = input_values.device
         melspecs = []
         for waveform in input_values:
-            melspec = kaldi.fbank(waveform, htk_compat=True, window_type="hanning", num_mel_bins=128, use_energy=False, sample_frequency=sampling_rate, frame_shift=10)  # shape (n_frames, 128)
-            #print(melspec.shape)
+            melspec = kaldi.fbank(
+                waveform,
+                htk_compat=True,
+                window_type="hanning",
+                num_mel_bins=128,
+                use_energy=False,
+                sample_frequency=sampling_rate,
+                frame_shift=10,
+            )  # shape (n_frames, 128)
+            # print(melspec.shape)
             if melspec.shape[0] < input_tdim:
                 melspec = F.pad(melspec, (0, 0, 0, input_tdim - melspec.shape[0]))
             else:
@@ -245,17 +252,10 @@ class ConvNextEmbedding(nn.Module):
         melspecs = torch.stack(melspecs).to(device)
         melspecs = melspecs.unsqueeze(1)  # shape (batch_size, 1, 128, 1024)
         melspecs = (melspecs - self.MEAN) / (self.STD * 2)
-        return melspecs    
-    
-    
-    def get_embeddings(
-        self, input_tensor
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        return melspecs
+
+    def get_embeddings(self, input_tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         input_tensor = self.preprocess(input_tensor)
         input_tensor = input_tensor.transpose(2, 3)
-        output = self.model(
-            input_tensor,
-            output_hidden_states=True,
-            return_dict=True
-            )
+        output = self.model(input_tensor, output_hidden_states=True, return_dict=True)
         return output.pooler_output, None

@@ -1,6 +1,7 @@
-import torch 
+import torch
 import warnings
 import torchmetrics
+
 
 class MulticlassMetricsConfig:
     """
@@ -13,10 +14,7 @@ class MulticlassMetricsConfig:
         eval_complete (MetricCollection): A collection of metrics used during model evaluation.
     """
 
-    def __init__(
-        self,
-        num_labels: int = 21
-    ):
+    def __init__(self, num_labels: int = 21):
         """
         Initializes the MetricsConfig class.
 
@@ -27,20 +25,27 @@ class MulticlassMetricsConfig:
             task="multiclass",
             num_classes=num_labels,
         )
-        self.val_metric_best: torchmetrics.Metric =torchmetrics.MaxMetric()
-     
-        self.add_metrics: torchmetrics.MetricCollection = torchmetrics.MetricCollection({
-            'F1': torchmetrics.F1Score(
-                task="multiclass",
-                num_classes=num_labels,
-            ),
-        })
-        self.eval_complete: torchmetrics.MetricCollection = torchmetrics.MetricCollection({
-            'acc': torchmetrics.Accuracy(
-            task="multiclass",
-            num_classes=num_labels,
+        self.val_metric_best: torchmetrics.Metric = torchmetrics.MaxMetric()
+
+        self.add_metrics: torchmetrics.MetricCollection = torchmetrics.MetricCollection(
+            {
+                "F1": torchmetrics.F1Score(
+                    task="multiclass",
+                    num_classes=num_labels,
+                ),
+            }
         )
-        })
+        self.eval_complete: torchmetrics.MetricCollection = (
+            torchmetrics.MetricCollection(
+                {
+                    "acc": torchmetrics.Accuracy(
+                        task="multiclass",
+                        num_classes=num_labels,
+                    )
+                }
+            )
+        )
+
 
 class EmbeddingMetricsConfig(MulticlassMetricsConfig):
     """
@@ -53,10 +58,7 @@ class EmbeddingMetricsConfig(MulticlassMetricsConfig):
         eval_complete (MetricCollection): A collection of metrics used during model evaluation.
     """
 
-    def __init__(
-        self,
-        num_labels: int = 21
-    ):
+    def __init__(self, num_labels: int = 21):
         """
         Initializes the MetricsConfig class.
 
@@ -64,42 +66,45 @@ class EmbeddingMetricsConfig(MulticlassMetricsConfig):
             num_labels (int): The number of labels in the dataset. Defaults to 21 as in the HSN dataset.
         """
         self.main_metric: torchmetrics.Metric = torchmetrics.Accuracy(
-            task="multiclass",
-            num_classes=num_labels,
-            top_k=1
+            task="multiclass", num_classes=num_labels, top_k=1
         )
-        self.val_metric_best: torchmetrics.Metric =torchmetrics.MaxMetric()
-     
-        self.add_metrics: torchmetrics.MetricCollection = torchmetrics.MetricCollection({
-            'T1Accuracy': torchmetrics.Accuracy(
-            task="multiclass",
-            num_classes=num_labels,
-            #average='macro',
-            top_k=1
-            ),
-            'T3Accuracy': torchmetrics.Accuracy(
-            task="multiclass",
-            num_classes=num_labels,
-            #average='macro',
-            top_k=3
-            ),
-            'AUROC': torchmetrics.AUROC(
-                task="multiclass",
-                num_classes=num_labels,
-                average='macro',
-            ),
-            'F1': torchmetrics.F1Score(
-                task="multiclass",
-                num_classes=num_labels,
+        self.val_metric_best: torchmetrics.Metric = torchmetrics.MaxMetric()
+
+        self.add_metrics: torchmetrics.MetricCollection = torchmetrics.MetricCollection(
+            {
+                "T1Accuracy": torchmetrics.Accuracy(
+                    task="multiclass",
+                    num_classes=num_labels,
+                    # average='macro',
+                    top_k=1,
+                ),
+                "T3Accuracy": torchmetrics.Accuracy(
+                    task="multiclass",
+                    num_classes=num_labels,
+                    # average='macro',
+                    top_k=3,
+                ),
+                "AUROC": torchmetrics.AUROC(
+                    task="multiclass",
+                    num_classes=num_labels,
+                    average="macro",
+                ),
+                "F1": torchmetrics.F1Score(
+                    task="multiclass",
+                    num_classes=num_labels,
+                ),
+            }
+        )
+        self.eval_complete: torchmetrics.MetricCollection = (
+            torchmetrics.MetricCollection(
+                {  # Only used in multilabel module
+                    "acc": torchmetrics.Accuracy(
+                        task="multiclass", num_classes=num_labels, top_k=1
+                    )
+                }
             )
-        })
-        self.eval_complete: torchmetrics.MetricCollection = torchmetrics.MetricCollection({ # Only used in multilabel module 
-            'acc': torchmetrics.Accuracy(
-            task="multiclass",
-            num_classes=num_labels,
-            top_k=1
-            )
-        })  
+        )
+
 
 class AUROCMetricWrapper(torchmetrics.AUROC):
     def update(self, preds: torch.Tensor, target: torch.Tensor) -> None:
@@ -114,7 +119,11 @@ class BalancedAccuracy(torchmetrics.Metric):
         super().__init__(dist_sync_on_step=False)
         self.adjusted = adjusted
         self.num_classes = num_classes
-        self.add_state("conf_matrix", default=torch.zeros(num_classes, num_classes), dist_reduce_fx="sum")
+        self.add_state(
+            "conf_matrix",
+            default=torch.zeros(num_classes, num_classes),
+            dist_reduce_fx="sum",
+        )
 
     def update(self, y_pred: torch.Tensor, y_true: torch.Tensor):
         preds = torch.argmax(y_pred, dim=1)
@@ -122,31 +131,40 @@ class BalancedAccuracy(torchmetrics.Metric):
             self.num_classes * preds.float() + y_true.float(),
             bins=self.num_classes**2,
             min=0,
-            max=self.num_classes**2-1
+            max=self.num_classes**2 - 1,
         ).view(self.num_classes, self.num_classes)
 
     def compute(self):
         with torch.no_grad():
-            per_class_recall = torch.diag(self.conf_matrix) / self.conf_matrix.sum(dim=1)
+            per_class_recall = torch.diag(self.conf_matrix) / self.conf_matrix.sum(
+                dim=1
+            )
             per_class_recall = per_class_recall[~torch.isnan(per_class_recall)]
             score = torch.mean(per_class_recall)
 
             if self.adjusted:
                 if self.num_classes is None:
-                    warnings.warn("Number of classes should be specified for adjusted score.")
+                    warnings.warn(
+                        "Number of classes should be specified for adjusted score."
+                    )
                     return score
                 chance = 1 / self.num_classes
                 score -= chance
                 score /= 1 - chance
 
-            return score     
+            return score
+
 
 class BalancedAccuracyTop5(torchmetrics.Metric):
     def __init__(self, adjusted=False, num_classes=None):
         super().__init__(dist_sync_on_step=False)
         self.adjusted = adjusted
         self.num_classes = num_classes
-        self.add_state("conf_matrix", default=torch.zeros(num_classes, num_classes), dist_reduce_fx="sum")
+        self.add_state(
+            "conf_matrix",
+            default=torch.zeros(num_classes, num_classes),
+            dist_reduce_fx="sum",
+        )
         self.add_state("top5_correct", default=torch.tensor(0), dist_reduce_fx="sum")
         self.add_state("total", default=torch.tensor(0), dist_reduce_fx="sum")
 
@@ -157,7 +175,7 @@ class BalancedAccuracyTop5(torchmetrics.Metric):
             self.num_classes * preds.float() + y_true.float(),
             bins=self.num_classes**2,
             min=0,
-            max=self.num_classes**2-1
+            max=self.num_classes**2 - 1,
         ).view(self.num_classes, self.num_classes)
 
         # Update for top-5 accuracy
@@ -169,13 +187,17 @@ class BalancedAccuracyTop5(torchmetrics.Metric):
     def compute(self):
         with torch.no_grad():
             # Balanced accuracy computation
-            per_class_recall = torch.diag(self.conf_matrix) / self.conf_matrix.sum(dim=1)
+            per_class_recall = torch.diag(self.conf_matrix) / self.conf_matrix.sum(
+                dim=1
+            )
             per_class_recall = per_class_recall[~torch.isnan(per_class_recall)]
             balanced_accuracy = torch.mean(per_class_recall)
 
             if self.adjusted:
                 if self.num_classes is None:
-                    warnings.warn("Number of classes should be specified for adjusted score.")
+                    warnings.warn(
+                        "Number of classes should be specified for adjusted score."
+                    )
                     return balanced_accuracy
                 chance = 1 / self.num_classes
                 balanced_accuracy -= chance
