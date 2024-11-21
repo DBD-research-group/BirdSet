@@ -6,11 +6,11 @@ defaults:
 
 tags: ["ESC50", "embeddings", "eat", "multiclass"]
 seed: 2
-
+cross_valid: True
 trainer:
   devices: [2]
   min_epochs: 1
-  max_epochs: 20
+  max_epochs: 5
 
 datamodule:
   k_samples: 0  
