@@ -23,8 +23,9 @@ With [poetry](https://python-poetry.org/).
 poetry install
 poetry shell
 ```
+# Experiments
 
-## Running Linear Probing Experiments
+### Running Linear Probing Experiments on BEANS
 Foundation Models are tested on the Benchmark of Animal Sounds (BEANS) which we host on [Huggingface](https://huggingface.co/collections/DBD-research-group/beans-datasets-6611bd670cd7eb7b0bfc614e) and we focus on the classification datasets (watkins bats, cbi, dogs & humbugdb). Using the [beans.sh](scripts/beans.sh) script you can specify one or multiple experiment Paths to execute linear probing on all the BEANS datasets:
 
 `$./projects/biofoundation/scripts/run_beans_embeddings_experiments.sh embedding/BEANS/perch [additional experiments]`
@@ -86,9 +87,22 @@ datamodule:
     average: True 
 ```
 
-
 The classifier can also be changed and right now [this](birdset/modules/models/linear_classifier.py) is used.
 
+### Running Linear Probing Experiments on BirdSet
+
+Experiments with precomputed embeddings:
+```bash
+python birdset/train.py experiment=biofoundation/embedding/BirdSet/{beats, convnext, perch}
+```
+
+#### Results
+
+| Model | cmAp |
+|-------| -------|
+| BEATs| 0.08|
+| convnext | 0.04 |
+| perch | 0.16 |
 
 ## Running Finetuning Experiments
 

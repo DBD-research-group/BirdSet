@@ -220,7 +220,8 @@ class BaseModule(L.LightningModule):
             prog_bar=True,
         )
 
-        self.valid_metric(preds, targets)
+        #! Comment out for performance increase
+        self.valid_metric(preds, targets.int())
         self.log(
             f"val/{self.valid_metric.__class__.__name__}",
             self.valid_metric,

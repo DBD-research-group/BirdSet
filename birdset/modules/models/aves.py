@@ -76,16 +76,16 @@ class AvesClassifier(nn.Module):
 
         self.train_classifier = train_classifier
         # Define a linear classifier to use on top of the embeddings
-        self.classifier = nn.Sequential(
-            nn.Linear(self.EMBEDDING_SIZE, 128),
-            nn.ReLU(),
-            nn.Dropout(0.5),
-            nn.Linear(128, 64),
-            nn.ReLU(),
-            nn.Linear(64, self.num_classes),
-        )
-
         if self.train_classifier:
+            self.classifier = nn.Sequential(
+                nn.Linear(self.EMBEDDING_SIZE, 128),
+                nn.ReLU(),
+                nn.Dropout(0.5),
+                nn.Linear(128, 64),
+                nn.ReLU(),
+                nn.Linear(64, self.num_classes),
+            )
+
             for param in self.model.parameters():
                 param.requires_grad = False
 

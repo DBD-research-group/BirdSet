@@ -1,0 +1,29 @@
+_target_: birdset.datamodule.birdset_embedding_datamodule.BirdSetEmbeddingDataModule
+
+defaults: 
+  - _self_
+  - transforms: embedding_transform.yaml
+  #- pre_transforms: ../transforms/bird_default_multilabel.yaml
+  - loaders: default.yaml
+  - mapper: xc_bambird_mapper.yaml
+  - embedding_model: ../../module/network/convnext.yaml
+
+dataset:
+  data_dir: ${paths.dataset_path}
+  dataset_name: HSN # Overwrite these through the experiment config
+  hf_path: DBD-research-group/BirdSet
+  hf_name: HSN
+  seed: ${seed}
+  n_workers: 1
+  val_split: null # Split is done in the dataset
+  task: ${module.task}
+  subset: null
+  sampling_rate: ${module.network.sampling_rate}
+  class_weights_loss: null
+  class_weights_sampler: null
+  classlimit: 500
+  eventlimit: 5
+
+k_samples: 0
+gpu_to_use: ${trainer.devices[0]} 
+

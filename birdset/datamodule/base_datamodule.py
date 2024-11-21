@@ -142,12 +142,13 @@ class BaseDataModuleHF(L.LightningDataModule):
             None
         """
         dataset.set_format("np")
-
-        fingerprint = (
-            dataset[next(iter(dataset))]._fingerprint
-            if isinstance(dataset, DatasetDict)
-            else dataset._fingerprint
-        )  # changed to next_iter to be more robust
+        if isinstance(dataset, DatasetDict):
+            fingerprints = [dataset[split]._fingerprint for split in dataset]
+            fingerprint = "_".join(fingerprints)
+        elif isinstance(dataset, Dataset):
+            fingerprint = dataset._fingerprint
+        else:
+            raise ValueError("dataset must be a Dataset or DatasetDict")
 
         self.disk_save_path = os.path.join(
             self.dataset_config.data_dir,

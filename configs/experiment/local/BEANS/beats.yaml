@@ -3,7 +3,7 @@
 defaults:
   - override /datamodule: beans.yaml
   - override /module: multiclass.yaml
-  - override /module/network: beats_logreg.yaml
+  - override /module/network: beats.yaml
   - override /callbacks: multiclass.yaml
   - override /trainer: single_gpu.yaml
   - override /paths: default.yaml

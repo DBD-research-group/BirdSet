@@ -14,28 +14,40 @@ class BEATsModel(nn.Module):
 
     EMBEDDING_SIZE = 768
 
-    def __init__(self, num_classes: int, train_classifier: bool = False) -> None:
+    def __init__(
+        self,
+        num_classes: int,
+        local_checkpoint: str = None,
+        train_classifier: bool = False,
+    ) -> None:
         super().__init__()
         self.model = None  # Placeholder for the loaded model
         self.load_model()
+
+        if local_checkpoint:
+            state_dict = torch.load(local_checkpoint)["state_dict"]
+            state_dict = {
+                key.replace("model.model.", ""): weight
+                for key, weight in state_dict.items()
+            }
+            self.model.load_state_dict(state_dict)
+
         self.num_classes = num_classes
         self.train_classifier = train_classifier
         # Define a linear classifier to use on top of the embeddings
         # self.classifier = nn.Linear(
         #     in_features=self.EMBEDDING_SIZE, out_features=num_classes
         # )
-        self.classifier = nn.Sequential(
-            nn.Linear(self.EMBEDDING_SIZE, 128),
-            nn.ReLU(),
-            nn.Dropout(0.5),
-            nn.Linear(128, 64),
-            nn.ReLU(),
-            nn.Linear(64, self.num_classes),
-        )
-
-        # freeze the model
-        #! Dont freeze when finetuning
         if self.train_classifier:
+            self.classifier = nn.Sequential(
+                nn.Linear(self.EMBEDDING_SIZE, 128),
+                nn.ReLU(),
+                nn.Dropout(0.5),
+                nn.Linear(128, 64),
+                nn.ReLU(),
+                nn.Linear(64, self.num_classes),
+            )
+            # freeze the model
             for param in self.model.parameters():
                 param.requires_grad = False
 
