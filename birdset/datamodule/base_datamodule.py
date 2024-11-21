@@ -17,6 +17,7 @@ from datasets import (
 )
 from torch.utils.data import DataLoader
 from copy import deepcopy
+from tqdm import tqdm
 
 from birdset.datamodule.components.transforms import BirdSetTransformsWrapper
 from birdset.utils import pylogger
@@ -405,14 +406,14 @@ class BaseDataModuleHF(L.LightningDataModule):
 
         class_limit = class_limit if class_limit else -float("inf")
         dataset = dataset.map(
-            lambda x: _unique_identifier(x, label_name), desc="smart-sampling-1"
+            lambda x: _unique_identifier(x, label_name), desc="sampling: unique-identifier"
         )
         df = pd.DataFrame(dataset)
         path_label_count = df.groupby(["id", label_name], as_index=False).size()
         path_label_count = path_label_count.set_index("id")
         class_sizes = df.groupby(label_name).size()
 
-        for label in class_sizes.index:
+        for label in tqdm(class_sizes.index, desc="sampling"):
             current = path_label_count[path_label_count[label_name] == label]
             total = current["size"].sum()
             most = current["size"].max()
