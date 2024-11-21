@@ -8,4 +8,5 @@ tags: ["HSN", "embeddings", "perch", "multilabel"]
 
 datamodule:
   embedding_model:
+    model:
       train_classifier: False
