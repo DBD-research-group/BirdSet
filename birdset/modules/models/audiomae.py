@@ -29,8 +29,8 @@ class AudioMAEModel(nn.Module):
         self.load_model()
         self.num_classes = num_classes
         self.train_classifier = train_classifier
-         # Define a linear classifier to use on top of the embeddings
-        if self.train_classifier: 
+        # Define a linear classifier to use on top of the embeddings
+        if self.train_classifier:
             self.classifier = nn.Linear(
                 in_features=self.EMBEDDING_SIZE, out_features=num_classes
             )

@@ -15,18 +15,21 @@ class BEATsModel(nn.Module):
     EMBEDDING_SIZE = 768
 
     def __init__(
-            self,
-            num_classes: int,
-            local_checkpoint: str = None,
-            train_classifier: bool = False,
-        ) -> None:
+        self,
+        num_classes: int,
+        local_checkpoint: str = None,
+        train_classifier: bool = False,
+    ) -> None:
         super().__init__()
         self.model = None  # Placeholder for the loaded model
         self.load_model()
-        
+
         if local_checkpoint:
             state_dict = torch.load(local_checkpoint)["state_dict"]
-            state_dict = {key.replace('model.model.', ''): weight for key, weight in state_dict.items()}
+            state_dict = {
+                key.replace("model.model.", ""): weight
+                for key, weight in state_dict.items()
+            }
             self.model.load_state_dict(state_dict)
 
         self.num_classes = num_classes

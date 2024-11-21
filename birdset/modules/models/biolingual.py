@@ -94,7 +94,7 @@ class BioLingualClassifier(nn.Module):
                 nn.ReLU(),
                 nn.Linear(64, self.num_classes),
             )
-        
+
             for param in self.model.parameters():
                 param.requires_grad = False
 

@@ -1,4 +1,7 @@
-from birdset.datamodule.components.transforms import EmbeddingTransforms, BirdSetTransformsWrapper
+from birdset.datamodule.components.transforms import (
+    EmbeddingTransforms,
+    BirdSetTransformsWrapper,
+)
 from birdset.datamodule.components.event_decoding import EventDecoding
 from birdset.datamodule.base_datamodule import BaseDataModuleHF
 from birdset.configs import NetworkConfig, DatasetConfig, LoadersConfig
@@ -30,18 +33,18 @@ class EmbeddingModuleConfig(NetworkConfig):
 
 class EmbeddingDataModule(BaseDataModuleHF):
     def __init__(
-            self,
-            dataset: DatasetConfig = DatasetConfig(),
-            loaders: LoadersConfig = LoadersConfig(),
-            transforms: EmbeddingTransforms = EmbeddingTransforms(),
-            k_samples: int = 0,
-            val_batches: int = None, # Should val set be created
-            test_ratio: float = 0.5, # Ratio of test set if val set is also created
-            low_train: bool = False, # If low train set is used
-            embedding_model: EmbeddingModuleConfig = EmbeddingModuleConfig(),
-            decoder: EventDecoding | None = None,
-            average: bool = True,
-            gpu_to_use: int = 0
+        self,
+        dataset: DatasetConfig = DatasetConfig(),
+        loaders: LoadersConfig = LoadersConfig(),
+        transforms: EmbeddingTransforms = EmbeddingTransforms(),
+        k_samples: int = 0,
+        val_batches: int = None,  # Should val set be created
+        test_ratio: float = 0.5,  # Ratio of test set if val set is also created
+        low_train: bool = False,  # If low train set is used
+        embedding_model: EmbeddingModuleConfig = EmbeddingModuleConfig(),
+        decoder: EventDecoding | None = None,
+        average: bool = True,
+        gpu_to_use: int = 0,
     ):
         """
         DataModule for extracting embeddings as a preprocessing step from audio data.
@@ -124,7 +127,9 @@ class EmbeddingDataModule(BaseDataModuleHF):
         """
         Concatenate the dataset to a single dataset
         """
-        return concatenate_datasets([dataset['train'], dataset['valid'], dataset['test']])
+        return concatenate_datasets(
+            [dataset["train"], dataset["valid"], dataset["test"]]
+        )
 
     def _ksamples(self, dataset):
         """
@@ -132,10 +137,11 @@ class EmbeddingDataModule(BaseDataModuleHF):
         If test_ratio == 1 then no validation set even if k_samples == 0!
         """
         if self.k_samples > 0:
-            log.info(f">> Selecting {self.k_samples} Samples per Class this may take a bit...")
+            log.info(
+                f">> Selecting {self.k_samples} Samples per Class this may take a bit..."
+            )
             for split in dataset.keys():
-                log.info(f"First sample from {split} split: {dataset[split][35]}"
-                         )
+                log.info(f"First sample from {split} split: {dataset[split][35]}")
             merged_data = self._concatenate_dataset(dataset)
 
             # Shuffle the merged data
@@ -147,9 +153,11 @@ class EmbeddingDataModule(BaseDataModuleHF):
             testval_count = defaultdict(int)
             rest_samples = []
             # Iterate over the merged data and select the desired number of samples per class
-            for sample in tqdm(merged_data, total=len(merged_data), desc="Selecting samples"):
-                label = sample['labels']
-                if isinstance(label, list): # For multilabel
+            for sample in tqdm(
+                merged_data, total=len(merged_data), desc="Selecting samples"
+            ):
+                label = sample["labels"]
+                if isinstance(label, list):  # For multilabel
                     label = label.index(1)
                 if len(selected_samples[label]) < self.k_samples:
                     selected_samples[label].append(sample)
@@ -222,11 +230,13 @@ class EmbeddingDataModule(BaseDataModuleHF):
                 )
         else:
             if self.val_batches == 0:
-                if 'valid' in dataset:
-                    dataset['test'] = concatenate_datasets([dataset['valid'], dataset['test']])
+                if "valid" in dataset:
+                    dataset["test"] = concatenate_datasets(
+                        [dataset["valid"], dataset["test"]]
+                    )
                     # remove the valid key
-                    del dataset['valid']
-                
+                    del dataset["valid"]
+
             if self.low_train:
                 del dataset["train"]
                 dataset["train"] = dataset["train_low"]
@@ -256,17 +266,19 @@ class EmbeddingDataModule(BaseDataModuleHF):
         def compute_and_update_embedding(sample):
             with torch.no_grad():
                 # Get the embedding for the audio sample
-                if self.decoder: # This part is specific for BirdSet Data as it uses the decoder
-                    for key, value in sample.items(): # Convert to batch of 1
-                        if key == 'filepath' or 'start_time' or 'end_time':
+                if (
+                    self.decoder
+                ):  # This part is specific for BirdSet Data as it uses the decoder
+                    for key, value in sample.items():  # Convert to batch of 1
+                        if key == "filepath" or "start_time" or "end_time":
                             sample[key] = [value]
-                    
-                    sample = self.decoder(sample)
-                    sample['audio'] = sample['audio'][0]
-                    sample['labels'] = sample['labels'][0]
-                    sample['audio']['sampling_rate'] = sample['audio']['samplerate']
 
-                embedding = self._get_embedding(sample['audio'])
+                    sample = self.decoder(sample)
+                    sample["audio"] = sample["audio"][0]
+                    sample["labels"] = sample["labels"][0]
+                    sample["audio"]["sampling_rate"] = sample["audio"]["samplerate"]
+
+                embedding = self._get_embedding(sample["audio"])
                 # Update the sample with the new embedding
                 sample["embedding"] = {}
                 sample["embedding"]["array"] = embedding.squeeze(0).cpu().numpy()
@@ -281,11 +293,17 @@ class EmbeddingDataModule(BaseDataModuleHF):
         for split in dataset.keys():
             log.info(f">> Extracting Embeddings for {split} Split")
             # Apply the embedding function to each sample in the split
-            dataset[split] = dataset[split].map(compute_and_update_embedding, desc="Extracting Embeddings", load_from_cache_file=False, new_fingerprint=get_new_fingerprint(split), num_proc=self.dataset_config.n_workers)
-        
+            dataset[split] = dataset[split].map(
+                compute_and_update_embedding,
+                desc="Extracting Embeddings",
+                load_from_cache_file=False,
+                new_fingerprint=get_new_fingerprint(split),
+                num_proc=self.dataset_config.n_workers,
+            )
+
             # Remove 'filepath' attribute if decoder present as decoding then already done
-            if self.decoder and 'filepath' in dataset[split].features:
-                dataset[split] = dataset[split].remove_columns('filepath')
+            if self.decoder and "filepath" in dataset[split].features:
+                dataset[split] = dataset[split].remove_columns("filepath")
 
         log.info(f"Saving emebeddings to disk: {self.embeddings_save_path}")
         dataset.save_to_disk(self.embeddings_save_path)
