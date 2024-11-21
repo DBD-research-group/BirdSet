@@ -91,10 +91,18 @@ The classifier can also be changed and right now [this](birdset/modules/models/l
 
 ### Running Linear Probing Experiments on BirdSet
 
-
+Experiments with precomputed embeddings:
 ```bash
 python birdset/train.py experiment=biofoundation/embedding/BirdSet/{beats, convnext, perch}
 ```
+
+#### Results
+
+| Model | cmAp |
+|-------| -------|
+| BEATs| 0.08|
+| convnext | 0.04 |
+| perch | 0.16 |
 
 ## Running Finetuning Experiments
 
