@@ -39,6 +39,7 @@ class BirdSetDataModule(BaseDataModuleHF):
             classlimit=500,
             eventlimit=5,
             sampling_rate=32000,
+            fewshot=None,
         ),
         loaders: LoadersConfig = LoadersConfig(),
         transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
@@ -200,5 +201,6 @@ class BirdSetDataModule(BaseDataModuleHF):
         dataset["test"] = dataset["test"].select_columns(
             ["filepath", "labels", "detected_events", "start_time", "end_time"]
         )
-
+        if self.dataset_config.get("fewshot") is not None:
+            dataset = self._fewshot_preprocess(dataset)
         return dataset

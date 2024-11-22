@@ -1,8 +1,9 @@
 from dataclasses import asdict
+from tabulate import tabulate
 import torch
 import random
 import os
-from collections import Counter
+from collections import Counter, defaultdict
 import lightning as L
 import pandas as pd
 from datasets import (
@@ -16,6 +17,8 @@ from datasets import (
 )
 from torch.utils.data import DataLoader
 from copy import deepcopy
+
+from tqdm import tqdm
 
 from birdset.datamodule.components.transforms import BirdSetTransformsWrapper
 from birdset.utils import pylogger
@@ -125,7 +128,8 @@ class BaseDataModuleHF(L.LightningDataModule):
         Preprocesses the dataset.
         This includes stuff that only needs to be done once.
         """
-
+        if self.dataset_config.get("fewshot") is not None:
+            dataset = self._fewshot_preprocess(dataset)
         return dataset
 
     def _save_dataset_to_disk(self, dataset: Dataset | DatasetDict):
@@ -477,3 +481,92 @@ class BaseDataModuleHF(L.LightningDataModule):
 
     def test_dataloader(self):
         return DataLoader(self.test_dataset, **asdict(self.loaders_config.test))  # type: ignore
+
+    def _fewshot_preprocess(self, dataset) -> DatasetDict:
+        """
+        Preprocesses the dataset for few-shot learning.
+
+        This method preprocesses the dataset for few-shot learning. It takes a dataset and creates a new dataset with a
+        specified number of examples for each class. The number
+        of examples for each class is specified in the `fewshot` configuration.
+        """
+        """
+        Extract only k samples per class for training.
+        dataset: DatasetDict containing the train, valid, and test splits.
+        k: Number of samples per class to extract.
+        use_train: If True, the training set will be used to extract samples.
+        use_val: If True, the validation set will also be used to extract samples.
+        use_test: If True, the test set will also be used to extract samples.
+        Returns a DatasetDict with the selected samples per class in the training set, the validation and test sets are left unchanged if use_val and use_test are False. If use_val or use_test are True, the selected samples will be removed from the validation and test sets.
+        Use k_samples > 0 if you want control over amount of samples per class. The rest is used for validation and testing.
+        If test_ratio == 1 then no validation set even if k_samples == 0!
+        """
+        log.info(
+            f">> Selecting {self.dataset_config.fewshot.k_samples} Samples per Class this may take a bit..."
+        )
+
+        id_to_label = defaultdict(str)
+
+        if not self.dataset_config.fewshot.use_train:
+            log.info("Selecting no samples from train set")
+            dataset["train"] = Dataset.from_dict(
+                {key: [] for key in dataset["train"][0]}
+            )
+
+        # TODO: implement selecting from valid and test, for now just use train
+
+        log.info(
+            f"Selecting {self.dataset_config.fewshot.k_samples} samples per class from train set"
+        )
+
+        # shuffle the dataset to ensure a random selection of samples
+        dataset["train"].shuffle()
+
+        # Create a dictionary to store the selected samples per class
+        selected_samples = defaultdict(list)
+        train_count = defaultdict(int)
+        testval_count = defaultdict(int)
+        rest_samples = []
+
+        # Iterate over the merged data and select the desired number of samples per class
+        for sample in tqdm(
+            dataset["train"], total=len(dataset["train"]), desc="Selecting samples"
+        ):
+            label = sample["labels"]
+            if isinstance(label, list):  # For multilabel
+                label = label.index(1)
+            if len(selected_samples[label]) < self.dataset_config.fewshot.k_samples:
+                selected_samples[label].append(sample)
+                train_count[label] += 1
+            else:
+                rest_samples.append(sample)
+                testval_count[label] += 1
+
+        # Create and print table to show class distribution
+        headers = ["Class", "#Train-Samples", "#Not used sampels"]
+        rows = []
+
+        for class_id in selected_samples.keys():
+            rows.append(
+                [
+                    id_to_label[class_id],
+                    train_count[class_id],
+                    testval_count[class_id],
+                ]
+            )
+
+        print(tabulate(rows, headers, tablefmt="rounded_grid"))
+
+        # Flatten the selected samples into a single list
+        selected_samples = [
+            sample for samples in selected_samples.values() for sample in samples
+        ]
+        # overwrite the train set with the selected samples
+        dataset["train"] = Dataset.from_dict(
+            {
+                key: [sample[key] for sample in selected_samples]
+                for key in selected_samples[0]
+            }
+        )
+
+        return dataset

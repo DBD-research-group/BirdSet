@@ -3,6 +3,24 @@ from typing import Literal, Optional
 
 
 @dataclass
+class FewShotConfig:
+    """
+    Configuration for few-shot learning.
+
+    Attributes:
+        k_samples (int): Number of samples per class. Default is 32.
+        use_train (bool): Whether to use training data. Default is True.
+        use_valid (bool): Whether to use validation data. Default is False.
+        use_test (bool): Whether to use test data. Default is False.
+    """
+
+    k_samples: int = 32
+    use_train: bool = True
+    use_valid: bool = False
+    use_test: bool = False
+
+
+@dataclass
 class DatasetConfig:
     """
     A class used to configure the dataset for the model.
@@ -39,6 +57,8 @@ class DatasetConfig:
         Defines the maximum number of audio events processed per audio file, capping the quantity to ensure balance across files. If None, all events are processed.
     direct_fingerprint: int, optional
         Only works with PretrainDatamodule. Path to a saved preprocessed dataset path
+    fewshot: FewShotConfig, optional
+        Configuration for few-shot learning.
     """
 
     data_dir: str = "/workspace/data_birdset"
@@ -59,6 +79,7 @@ class DatasetConfig:
     direct_fingerprint: Optional[str] = (
         None  # TODO only supported in PretrainDatamodule
     )
+    fewshot: Optional[FewShotConfig] = None
 
 
 @dataclass
