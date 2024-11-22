@@ -51,8 +51,10 @@ class PretrainDataModule(BaseDataModuleHF):
 
         transforms = deepcopy(self.transforms)
         transforms.set_mode(split)
+        
         if split == "train":  # we need this for sampler, cannot be done later because set_transform
-            self.train_label_list = dataset["labels"]
+            if self.dataset_config.class_weights_sampler:
+                self.train_label_list = dataset["labels"]
 
         if split == "valid":
             transforms.modes_to_skip.append("valid")
