@@ -39,7 +39,6 @@ class BirdSetDataModule(BaseDataModuleHF):
             classlimit=500,
             eventlimit=5,
             sampling_rate=32000,
-            fewshot=None,
         ),
         loaders: LoadersConfig = LoadersConfig(),
         transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
