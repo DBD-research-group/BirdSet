@@ -321,10 +321,9 @@ class BaseDataModuleHF(L.LightningDataModule):
         transforms = deepcopy(self.transforms)
         transforms.set_mode(split)
 
-        if (
-            split == "train"
-        ):  # we need this for sampler, cannot be done later because set_transform
-            self.train_label_list = dataset["labels"]
+        if split == "train":  # we need this for sampler, cannot be done later because set_transform
+            if self.dataset_config.class_weights_sampler:
+                self.train_label_list = dataset["labels"]
 
         # add run-time transforms to dataset
         dataset.set_transform(transforms, output_all_columns=False)
