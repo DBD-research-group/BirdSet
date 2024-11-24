@@ -1,5 +1,6 @@
 from pytorch_lightning import Callback
 
+
 class MetricCollector(Callback):
     def __init__(self):
         super().__init__()

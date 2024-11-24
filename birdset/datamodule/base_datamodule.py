@@ -5,7 +5,15 @@ import os
 from collections import Counter
 import lightning as L
 import pandas as pd
-from datasets import load_dataset, load_from_disk, Audio, DatasetDict, Dataset, IterableDataset, IterableDatasetDict
+from datasets import (
+    load_dataset,
+    load_from_disk,
+    Audio,
+    DatasetDict,
+    Dataset,
+    IterableDataset,
+    IterableDatasetDict,
+)
 from torch.utils.data import DataLoader
 from copy import deepcopy
 
@@ -36,10 +44,10 @@ class BaseDataModuleHF(L.LightningDataModule):
     """
 
     def __init__(
-            self,
-            dataset: DatasetConfig = DatasetConfig(),
-            loaders: LoadersConfig = LoadersConfig(),
-            transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
+        self,
+        dataset: DatasetConfig = DatasetConfig(),
+        loaders: LoadersConfig = LoadersConfig(),
+        transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
     ):
         super().__init__()
         self.dataset_config = dataset
@@ -60,9 +68,6 @@ class BaseDataModuleHF(L.LightningDataModule):
         # Make some config parameters accessible
         self.task = self.dataset_config.task
         self.train_batch_size = self.loaders_config.train.batch_size
-
-
-    
 
     @property
     def num_classes(self):
@@ -137,8 +142,13 @@ class BaseDataModuleHF(L.LightningDataModule):
             None
         """
         dataset.set_format("np")
-
-        fingerprint = dataset[next(iter(dataset))]._fingerprint if isinstance(dataset, DatasetDict) else dataset._fingerprint  # changed to next_iter to be more robust
+        if isinstance(dataset, DatasetDict):
+            fingerprints = [dataset[split]._fingerprint for split in dataset]
+            fingerprint = "_".join(fingerprints)
+        elif isinstance(dataset, Dataset):
+            fingerprint = dataset._fingerprint
+        else:
+            raise ValueError("dataset must be a Dataset or DatasetDict")
 
         self.disk_save_path = os.path.join(
             self.dataset_config.data_dir,
@@ -146,7 +156,9 @@ class BaseDataModuleHF(L.LightningDataModule):
         )
 
         if os.path.exists(self.disk_save_path):
-            log.info(f"Train fingerprint found in {self.disk_save_path}, saving to disk is skipped")
+            log.info(
+                f"Train fingerprint found in {self.disk_save_path}, saving to disk is skipped"
+            )
         else:
             log.info(f"Saving to disk: {self.disk_save_path}")
             dataset.save_to_disk(self.disk_save_path)
@@ -154,7 +166,9 @@ class BaseDataModuleHF(L.LightningDataModule):
     def _ensure_train_test_splits(self, dataset: Dataset | DatasetDict) -> DatasetDict:
         if isinstance(dataset, Dataset):
             split_1 = dataset.train_test_split(
-                self.dataset_config.val_split, shuffle=True, seed=self.dataset_config.seed
+                self.dataset_config.val_split,
+                shuffle=True,
+                seed=self.dataset_config.seed,
             )
             return DatasetDict({"train": split_1["train"], "test": split_1["test"]})
         else:
@@ -182,22 +196,43 @@ class BaseDataModuleHF(L.LightningDataModule):
         """
         if isinstance(dataset, Dataset):
             split_1 = dataset.train_test_split(
-                self.dataset_config.val_split, shuffle=True, seed=self.dataset_config.seed
+                self.dataset_config.val_split,
+                shuffle=True,
+                seed=self.dataset_config.seed,
             )
             split_2 = split_1["test"].train_test_split(
-                0.2, shuffle=False, seed=self.dataset_config.seed)
-            return DatasetDict({"train": split_1["train"], "valid": split_2["train"], "test": split_2["test"]})
+                0.2, shuffle=False, seed=self.dataset_config.seed
+            )
+            return DatasetDict(
+                {
+                    "train": split_1["train"],
+                    "valid": split_2["train"],
+                    "test": split_2["test"],
+                }
+            )
         elif isinstance(dataset, DatasetDict):
             # check if dataset has train, valid, test splits
             if "train" in dataset.keys() and "valid" in dataset.keys():
-                 return dataset
-            if "train" in dataset.keys() and "valid" in dataset.keys() and "test" in dataset.keys():
+                return dataset
+            if (
+                "train" in dataset.keys()
+                and "valid" in dataset.keys()
+                and "test" in dataset.keys()
+            ):
                 return dataset
             if "train" in dataset.keys() and "test" in dataset.keys():
                 split = dataset["train"].train_test_split(
-                    self.dataset_config.val_split, shuffle=True, seed=self.dataset_config.seed
+                    self.dataset_config.val_split,
+                    shuffle=True,
+                    seed=self.dataset_config.seed,
                 )
-                return DatasetDict({"train": split["train"], "valid": split["test"], "test": dataset["test"]})
+                return DatasetDict(
+                    {
+                        "train": split["train"],
+                        "valid": split["test"],
+                        "test": dataset["test"],
+                    }
+                )
             else:
                 return self._create_splits(dataset[list(dataset.keys())[0]])
 
@@ -252,7 +287,7 @@ class BaseDataModuleHF(L.LightningDataModule):
             random_indices = random.sample(range(len(dataset[split])), size)
             dataset[split] = dataset[split].select(random_indices)
         return dataset
- 
+
     def _get_dataset(self, split):
         """
         Get Dataset from disk and add run-time transforms to a specified split.
@@ -263,14 +298,16 @@ class BaseDataModuleHF(L.LightningDataModule):
         transforms = deepcopy(self.transforms)
         transforms.set_mode(split)
 
-        if split == "train":  # we need this for sampler, cannot be done later because set_transform
+        if (
+            split == "train"
+        ):  # we need this for sampler, cannot be done later because set_transform
             self.train_label_list = dataset["labels"]
 
         # add run-time transforms to dataset
         dataset.set_transform(transforms, output_all_columns=False)
 
         return dataset
-    
+
     def _create_weighted_sampler(self):
         label_counts = torch.tensor(self.num_train_labels)
         # calculate sample weights
@@ -279,13 +316,15 @@ class BaseDataModuleHF(L.LightningDataModule):
         sample_weights = torch.where(
             condition=torch.isinf(sample_weights),
             input=torch.tensor(0),
-            other=sample_weights
+            other=sample_weights,
         )
 
         if self.task == "multiclass":
             weight_list = [sample_weights[classes] for classes in self.train_label_list]
         elif self.task == "multilabel":  # sum up weights if multilabel
-            weight_list = torch.matmul(torch.tensor(self.train_label_list, dtype=torch.float32), sample_weights)
+            weight_list = torch.matmul(
+                torch.tensor(self.train_label_list, dtype=torch.float32), sample_weights
+            )
         else:
             raise f"dataset config task can not be {self.task}"
 
@@ -294,14 +333,14 @@ class BaseDataModuleHF(L.LightningDataModule):
         )
 
         return weighted_sampler
-    
+
     def setup(self, stage=None):
         if not self.train_dataset and not self.val_dataset:
             if stage == "fit":
                 log.info("fit")
                 self.val_dataset = self._get_dataset("valid")
                 self.train_dataset = self._get_dataset("train")
- 
+
         if not self.test_dataset:
             if stage == "test":
                 log.info("test")
@@ -313,10 +352,10 @@ class BaseDataModuleHF(L.LightningDataModule):
 
         if 0 not in label_counts:
             label_counts[0] = 0
-        
+
         num_labels = max(label_counts)
-        counts = [label_counts[i] for i in range(num_labels+1)]
-        
+        counts = [label_counts[i] for i in range(num_labels + 1)]
+
         return counts
 
     def _limit_classes(self, dataset, label_name, limit):
@@ -345,7 +384,9 @@ class BaseDataModuleHF(L.LightningDataModule):
             return {"id": f"{file}-{label}"}
 
         class_limit = class_limit if class_limit else -float("inf")
-        dataset = dataset.map(lambda x: _unique_identifier(x, label_name), desc="smart-sampling-1")
+        dataset = dataset.map(
+            lambda x: _unique_identifier(x, label_name), desc="smart-sampling-1"
+        )
         df = pd.DataFrame(dataset)
         path_label_count = df.groupby(["id", label_name], as_index=False).size()
         path_label_count = path_label_count.set_index("id")
@@ -359,14 +400,20 @@ class BaseDataModuleHF(L.LightningDataModule):
             while total > class_limit or most != event_limit:
                 largest_count = current["size"].value_counts()[current["size"].max()]
                 n_largest = current.nlargest(largest_count + 1, "size")
-                to_del = (n_largest["size"].max() - n_largest["size"].min())
+                to_del = n_largest["size"].max() - n_largest["size"].min()
 
                 idxs = n_largest[n_largest["size"] == n_largest["size"].max()].index
-                if total - (to_del * largest_count) < class_limit or most == event_limit or most == 1:
+                if (
+                    total - (to_del * largest_count) < class_limit
+                    or most == event_limit
+                    or most == 1
+                ):
                     break
                 for idx in idxs:
                     current.at[idx, "size"] = current.at[idx, "size"] - to_del
-                    path_label_count.at[idx, "size"] = path_label_count.at[idx, "size"] - to_del
+                    path_label_count.at[idx, "size"] = (
+                        path_label_count.at[idx, "size"] - to_del
+                    )
 
                 total = current["size"].sum()
                 most = current["size"].max()
@@ -399,7 +446,9 @@ class BaseDataModuleHF(L.LightningDataModule):
             dict: The batch with the "labels" field converted to one-hot encoding. The keys are the field names and the values are the field data.
         """
         label_list = [y for y in batch["labels"]]
-        class_one_hot_matrix = torch.zeros((len(label_list), self.num_classes), dtype=torch.float)
+        class_one_hot_matrix = torch.zeros(
+            (len(label_list), self.num_classes), dtype=torch.float
+        )
 
         for class_idx, idx in enumerate(label_list):
             class_one_hot_matrix[class_idx, idx] = 1
@@ -410,9 +459,15 @@ class BaseDataModuleHF(L.LightningDataModule):
     def train_dataloader(self):
         if self.dataset_config.class_weights_sampler:
             weighted_sampler = self._create_weighted_sampler()
-            self.loaders_config.train.shuffle = False  # Mutually exclusive with sampler!
+            self.loaders_config.train.shuffle = (
+                False  # Mutually exclusive with sampler!
+            )
             # Use the weighted_sampler in the DataLoader
-            return DataLoader(self.train_dataset, sampler=weighted_sampler, **asdict(self.loaders_config.train))
+            return DataLoader(
+                self.train_dataset,
+                sampler=weighted_sampler,
+                **asdict(self.loaders_config.train),
+            )
         else:
             # If class_weights_sampler is not True, return a regular DataLoader without the weighted sampler
             return DataLoader(self.train_dataset, **asdict(self.loaders_config.train))  # type: ignore

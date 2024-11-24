@@ -1,0 +1,6 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - biofoundation/embedding/BirdSet/BirdSet_config.yaml
+  - override /datamodule/embedding_model: ../../module/network/beats.yaml  
+  

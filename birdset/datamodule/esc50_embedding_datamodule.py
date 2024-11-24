@@ -1,10 +1,20 @@
 from datasets import Audio
 
 from birdset.datamodule.components.transforms import BirdSetTransformsWrapper
-from birdset.datamodule.embedding_datamodule import EmbeddingDataModule, EmbeddingModuleConfig
+from birdset.datamodule.embedding_datamodule import (
+    EmbeddingDataModule,
+    EmbeddingModuleConfig,
+)
 from birdset.datamodule.esc50_datamodule import ESC50DataModule
 from birdset.configs import DatasetConfig, LoadersConfig
-from datasets import load_dataset, IterableDataset, IterableDatasetDict, DatasetDict, Audio, Dataset
+from datasets import (
+    load_dataset,
+    IterableDataset,
+    IterableDatasetDict,
+    DatasetDict,
+    Audio,
+    Dataset,
+)
 from birdset.utils import pylogger
 
 
@@ -13,23 +23,18 @@ log = pylogger.get_pylogger(__name__)
 
 class ESC50EmbeddingDataModule(EmbeddingDataModule, ESC50DataModule):
     def __init__(
-            self,
-            dataset: DatasetConfig = DatasetConfig(),
-            loaders: LoadersConfig = LoadersConfig(),
-            transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
-            k_samples: int = 0,
-            val_batches: int = None, # Should val set be created
-            test_ratio: float = 0.5, # Ratio of test set if val set is also created
-            low_train: bool = False, # If low train set is used
-            embedding_model: EmbeddingModuleConfig = EmbeddingModuleConfig(),
-            average: bool = True,
-            gpu_to_use: int = 0,
-            
-            
-            
+        self,
+        dataset: DatasetConfig = DatasetConfig(),
+        loaders: LoadersConfig = LoadersConfig(),
+        transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
+        k_samples: int = 0,
+        val_batches: int = None,  # Should val set be created
+        test_ratio: float = 0.5,  # Ratio of test set if val set is also created
+        low_train: bool = False,  # If low train set is used
+        embedding_model: EmbeddingModuleConfig = EmbeddingModuleConfig(),
+        average: bool = True,
+        gpu_to_use: int = 0,
     ):
-        
-        
         """
         DataModule for using BEANS and extracting embeddings.
 
@@ -50,38 +55,27 @@ class ESC50EmbeddingDataModule(EmbeddingDataModule, ESC50DataModule):
             dataset=dataset,
             loaders=loaders,
             transforms=transforms,
-            
-            
         )
-        
 
         EmbeddingDataModule.__init__(
             self,
             dataset=dataset,
             loaders=loaders,
             transforms=transforms,
-            k_samples = k_samples,
-            val_batches = val_batches,
-            test_ratio = test_ratio,
-            low_train = low_train,
-            embedding_model = embedding_model,
-            average = average,
-            gpu_to_use = gpu_to_use
-            
+            k_samples=k_samples,
+            val_batches=val_batches,
+            test_ratio=test_ratio,
+            low_train=low_train,
+            embedding_model=embedding_model,
+            average=average,
+            gpu_to_use=gpu_to_use,
         )
-        
-        
-    def _preprocess_data(self, dataset: Dataset|DatasetDict):
-    
+
+    def _preprocess_data(self, dataset: Dataset | DatasetDict):
+
         dataset = dataset.rename_column("target", "labels")
         dataset = dataset.select_columns(["embedding", "labels"])
 
         dataset = EmbeddingDataModule._preprocess_data(self, dataset)
-            
+
         return dataset
-        
-        
-        
-        
-          
-       

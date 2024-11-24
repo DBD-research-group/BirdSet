@@ -10,6 +10,7 @@ from torch import nn
 
 from birdset.configs import PretrainInfoConfig
 
+
 class PerchModel(nn.Module):
     """
     A PyTorch model for bird vocalization classification, integrating a TensorFlow Hub model.
@@ -76,14 +77,15 @@ class PerchModel(nn.Module):
         # self.classifier = nn.Linear(
         #     in_features=self.EMBEDDING_SIZE, out_features=num_classes
         # )
-        self.classifier = nn.Sequential(
-            nn.Linear(self.EMBEDDING_SIZE, 128),
-            nn.ReLU(),
-            nn.Dropout(0.5),
-            nn.Linear(128, 64),
-            nn.ReLU(),
-            nn.Linear(64, self.num_classes),
-        )
+        if self.train_classifier:
+            self.classifier = nn.Sequential(
+                nn.Linear(self.EMBEDDING_SIZE, 128),
+                nn.ReLU(),
+                nn.Dropout(0.5),
+                nn.Linear(128, 64),
+                nn.ReLU(),
+                nn.Linear(64, self.num_classes),
+            )
         self.load_model()
 
     def load_model(self) -> None:
@@ -92,12 +94,16 @@ class PerchModel(nn.Module):
         """
 
         model_url = f"{self.PERCH_TF_HUB_URL}/{self.tfhub_version}"
-        #self.model = hub.load(model_url)
-        #with tf.device('/CPU:0'):
-            #self.model = hub.load(model_url)
-        physical_devices = tf.config.list_physical_devices('GPU')
-        tf.config.experimental.set_visible_devices(physical_devices[self.gpu_to_use], 'GPU')
-        tf.config.experimental.set_memory_growth(physical_devices[self.gpu_to_use], True)
+        # self.model = hub.load(model_url)
+        # with tf.device('/CPU:0'):
+        # self.model = hub.load(model_url)
+        physical_devices = tf.config.list_physical_devices("GPU")
+        tf.config.experimental.set_visible_devices(
+            physical_devices[self.gpu_to_use], "GPU"
+        )
+        tf.config.experimental.set_memory_growth(
+            physical_devices[self.gpu_to_use], True
+        )
 
         tf.config.optimizer.set_jit(True)
         self.model = hub.load(model_url)
@@ -169,7 +175,7 @@ class PerchModel(nn.Module):
         device = input_values.device  # Get the device of the input tensor
 
         # Move the tensor to the CPU and convert it to a NumPy array.
-        #input_values = input_values.cpu().numpy()
+        # input_values = input_values.cpu().numpy()
 
         # Get embeddings from the Perch model and move to the same device as input_values
         embeddings, logits = self.get_embeddings(input_tensor=input_values)
@@ -195,8 +201,10 @@ class PerchModel(nn.Module):
         Returns:
             Tuple[torch.Tensor, torch.Tensor]: A tuple of two tensors (embeddings, logits).
         """
-        device = input_tensor.device # Get the device of the input tensor 
-        input_tensor = input_tensor.cpu().numpy()  # Move the tensor to the CPU and convert it to a NumPy array.
+        device = input_tensor.device  # Get the device of the input tensor
+        input_tensor = (
+            input_tensor.cpu().numpy()
+        )  # Move the tensor to the CPU and convert it to a NumPy array.
 
         input_tensor = input_tensor.reshape([-1, input_tensor.shape[-1]])
 
@@ -208,7 +216,7 @@ class PerchModel(nn.Module):
         logits = torch.from_numpy(outputs["output_0"].numpy())
         embeddings = embeddings.to(device)
         logits = logits.to(device)
-        
+
         if self.class_mask:
             # Initialize full_logits to a large negative value for penalizing non-present classes
             full_logits = torch.full(

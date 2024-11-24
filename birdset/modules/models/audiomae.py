@@ -6,7 +6,6 @@ import torch.nn.functional as F
 from torchaudio.compliance import kaldi
 
 
-
 class AudioMAEModel(nn.Module):
     """
     Pretrained model for audio classification using the AUDIOMAE model.
@@ -15,50 +14,55 @@ class AudioMAEModel(nn.Module):
 
     The model expect a 1D audio signale sampled with 16kHz and a length of 10s.
     """
+
     EMBEDDING_SIZE = 768
     MEAN = -4.2677393
     STD = 4.5689974
 
     def __init__(
-            self,
-            num_classes: int,
-            train_classifier: bool = False,
-        ) -> None:
+        self,
+        num_classes: int,
+        train_classifier: bool = False,
+    ) -> None:
         super().__init__()
         self.model = None  # Placeholder for the loaded model
         self.load_model()
         self.num_classes = num_classes
         self.train_classifier = train_classifier
-         # Define a linear classifier to use on top of the embeddings
-        self.classifier = nn.Linear(
-            in_features=self.EMBEDDING_SIZE, out_features=num_classes
-        )
-        # self.classifier = nn.Sequential(
-        #     nn.Linear(self.EMBEDDING_SIZE, 128),
-        #     nn.ReLU(),
-        #     nn.Dropout(0.5),
-        #     nn.Linear(128, 64),
-        #     nn.ReLU(),
-        #     nn.Linear(64, self.num_classes),
-        # )
-        # freeze the model
-        for param in self.model.parameters():
-            param.requires_grad = False
-
+        # Define a linear classifier to use on top of the embeddings
+        if self.train_classifier:
+            self.classifier = nn.Linear(
+                in_features=self.EMBEDDING_SIZE, out_features=num_classes
+            )
+            # self.classifier = nn.Sequential(
+            #     nn.Linear(self.EMBEDDING_SIZE, 128),
+            #     nn.ReLU(),
+            #     nn.Dropout(0.5),
+            #     nn.Linear(128, 64),
+            #     nn.ReLU(),
+            #     nn.Linear(64, self.num_classes),
+            # )
+            # freeze the model
+            for param in self.model.parameters():
+                param.requires_grad = False
 
     def load_model(self) -> None:
         """
         Load the model from Huggingface.
         """
-        self.model = timm.create_model("hf_hub:gaunernst/vit_base_patch16_1024_128.audiomae_as2m", pretrained=True)
+        self.model = timm.create_model(
+            "hf_hub:gaunernst/vit_base_patch16_1024_128.audiomae_as2m", pretrained=True
+        )
 
         self.model.eval()
-    
+
     def preprocess(self, input_values: torch.Tensor) -> torch.Tensor:
         device = input_values.device
         melspecs = []
         for waveform in input_values:
-            melspec = kaldi.fbank(waveform, htk_compat=True, window_type="hanning", num_mel_bins=128)  # shape (n_frames, 128)
+            melspec = kaldi.fbank(
+                waveform, htk_compat=True, window_type="hanning", num_mel_bins=128
+            )  # shape (n_frames, 128)
             if melspec.shape[0] < 1024:
                 melspec = F.pad(melspec, (0, 0, 0, 1024 - melspec.shape[0]))
             else:
@@ -69,7 +73,6 @@ class AudioMAEModel(nn.Module):
         melspecs = (melspecs - self.MEAN) / (self.STD * 2)
         return melspecs
 
-    
     def forward(
         self, input_values: torch.Tensor, labels: Optional[torch.Tensor] = None
     ) -> torch.Tensor:
@@ -94,9 +97,7 @@ class AudioMAEModel(nn.Module):
 
         return output
 
-    def get_embeddings(
-        self, input_tensor: torch.Tensor
-    ) -> Tuple[torch.Tensor, None]:
+    def get_embeddings(self, input_tensor: torch.Tensor) -> Tuple[torch.Tensor, None]:
         """
         Get the embeddings and logits from the AUDIOMAE model.
 
@@ -109,4 +110,3 @@ class AudioMAEModel(nn.Module):
         melspecs = self.preprocess(input_tensor)
         embeddings = self.model(melspecs)
         return embeddings, None
-
