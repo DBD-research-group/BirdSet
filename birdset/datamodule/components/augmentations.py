@@ -312,8 +312,7 @@ class MultilabelMix(BaseWaveformTransform):
         elif mix_target == "union":
             self._mix_target = lambda target, background_target, snr: torch.maximum(
                 target, background_target
-            )
-
+            )           
         else:
             raise ValueError("mix_target must be one of 'original' or 'union'.")
 
@@ -328,6 +327,7 @@ class MultilabelMix(BaseWaveformTransform):
     ):
 
         batch_size, num_channels, num_samples = samples.shape
+        
         snr_distribution = torch.distributions.Uniform(
             low=torch.tensor(
                 self.min_snr_in_db,
@@ -369,8 +369,13 @@ class MultilabelMix(BaseWaveformTransform):
 
         for i in range(batch_size):
             possible_indices = list(range(batch_size))
-            possible_indices.remove(i)  # Remove the current index to avoid self-mixing
-            sample_indices[i] = torch.tensor([possible_indices[torch.randint(0, batch_size - 1, (1,)).item()]])
+
+            if len(possible_indices) > 1:# avoid error if only one sample is chosen
+                possible_indices.remove(i)  # Remove the current index to avoid self-mixing
+                sample_indices[i] = torch.tensor([possible_indices[torch.randint(0, len(possible_indices), (1,)).item()]])
+            else:
+                # If there's only one sample, we can set the index to a default value or skip
+                sample_indices[i] = torch.tensor([0]) 
         self.transform_parameters["sample_indices"] = sample_indices
 
     def apply_transform(
