@@ -3,3 +3,12 @@
 defaults:
   - biofoundation/birdset/linearprobing/linearprobing_config.yaml 
   - override /module/network: beats.yaml  
+
+tags: ["biofoundation", "beats", "linearprobing", "augs_birdset"]
+ 
+logger:
+  wandb:
+    tags: ${tags}
+    group: "biofoundation_beats_linearprobing_BirdSet__${datamodule.dataset.dataset_name}"
+    mode: online
+    version: beats_linearprobing_BirdSet_${datamodule.dataset.dataset_name}_${seed}_${start_time} #to resume train run # needs to be tested

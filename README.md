@@ -136,13 +136,15 @@ python birdset/train.py experiment=biofoundation/birdset/linearprobing/{model_na
 
 | Model | cmAP | AUROC | Wandb |
 |-------| -------| ---- | ---- |
-| BEATS | 0.11 | 0.73 | [BEATs_HSN#1_2024-11-25_155526](https://wandb.ai/deepbirddetect/BioFoundation/runs/beats_linearprobing_BirdSet_HSN_1_2024-11-25_155526) |
+| BEATS | 0.11 | **0.73** | [BEATs_HSN#1_2024-11-25_155526](https://wandb.ai/deepbirddetect/BioFoundation/runs/beats_linearprobing_BirdSet_HSN_1_2024-11-25_155526) |
+| Perch | **0.22** | 0.66 | [perch_HSN#1_2024-11-25_175223](https://wandb.ai/deepbirddetect/BioFoundation/runs/perch_linearprobing_BirdSet_HSN_1_2024-11-25_175223) |
 
 ### Running FewShot Experiments on BirdSet
 
 | Model | cmAP | AUROC | Wandb |
 |-------| -------| ---- | ---- |
-| BEATS | 0.10 | 0.66 | [BEATs_HSN#3_2024-11-25_160815](https://wandb.ai/deepbirddetect/BioFoundation/runs/beats_fewshot_BirdSet_HSN_3_2024-11-25_160815) |
+| BEATS | 0.10 | **0.66** | [BEATs_HSN#3_2024-11-25_160815](https://wandb.ai/deepbirddetect/BioFoundation/runs/beats_fewshot_BirdSet_HSN_3_2024-11-25_160815) |
+| Perch | **0.14** | 0.65 | [perch_HSN#1_2024-11-25_180458](https://wandb.ai/deepbirddetect/BioFoundation/runs/perch_fewshot_BirdSet_HSN_1_2024-11-25_180458) |
 
 ## Example
 

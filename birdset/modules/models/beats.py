@@ -11,7 +11,7 @@ from typing import Tuple
 class BEATsModel(BirdSetModel):
     """
     Pretrained model for audio classification using the BEATs model.
-    Expects a 1-channel waveform input, all preprocessing is done in the network.
+    Expects a 1-channel 10s waveform input, all preprocessing is done in the network.
     """
 
     EMBEDDING_SIZE = 768
