@@ -76,6 +76,8 @@ def train(cfg):
         cfg.module.network.model["num_classes"] = (
             datamodule.num_classes
         )  # TODO not the correct classes when masking in valid/test only
+        if cfg.module.network.model.get("classifier"):
+            cfg.module.network.model.classifier["num_classes"] = datamodule.num_classes
 
     model = hydra.utils.instantiate(
         cfg.module,

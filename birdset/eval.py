@@ -50,6 +50,8 @@ def eval(cfg):
     with open_dict(cfg):
         cfg.module.metrics["num_labels"] = datamodule.num_classes
         cfg.module.network.model["num_classes"] = datamodule.num_classes
+        if cfg.module.network.model.get("classifier:"):
+            cfg.module.network.model.classifier["num_classes"] = datamodule.num_classes
     model = hydra.utils.instantiate(
         cfg.module,
         num_epochs=cfg.trainer.max_epochs,

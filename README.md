@@ -25,6 +25,8 @@ poetry shell
 ```
 # Experiments
 
+## BEANS
+
 ### Running Linear Probing Experiments on BEANS
 Foundation Models are tested on the Benchmark of Animal Sounds (BEANS) which we host on [Huggingface](https://huggingface.co/collections/DBD-research-group/beans-datasets-6611bd670cd7eb7b0bfc614e) and we focus on the classification datasets (watkins bats, cbi, dogs & humbugdb). Using the [beans.sh](scripts/beans.sh) script you can specify one or multiple experiment Paths to execute linear probing on all the BEANS datasets:
 
@@ -89,21 +91,6 @@ datamodule:
 
 The classifier can also be changed and right now [this](birdset/modules/models/linear_classifier.py) is used.
 
-### Running Linear Probing Experiments on BirdSet
-
-Experiments with precomputed embeddings:
-```bash
-python birdset/train.py experiment=biofoundation/embedding/BirdSet/{beats, convnext, perch}
-```
-
-#### Results
-
-| Model | cmAp |
-|-------| -------|
-| BEATs| 0.08|
-| convnext | 0.04 |
-| perch | 0.16 |
-
 ## Running Finetuning Experiments
 
 The same models can also be finetuned and the experiments can be found in the respective [folder](configs/experiment/local/finetune/BEANS/) (except Perch). For finetuning a much lower learning rate is recommended and the [finetune_module](birdset/modules/finetune_module.py) is used. 
@@ -120,6 +107,44 @@ The results [folder](results) contains plots and plot-code that gives insights o
 As a reference the embedding results can be used for future work:
 ![embedding_results](results/probing_hm.png)
 
+## BirdSet
+
+On the BirdSet benchmark we run three different experiments:
+- Fine-tuning: The pretrained model is fine-tuned on the BirdSet dataset, similar to the dedicated training (DT) approach of the BirdSet paper.
+- Linear Probing: The pretrained model is used as a fixed feature extractor and a linear classifier is trained on top of the extracted features.
+- Few-shot: A small subset (k) samples per class are used for training, ether from the training set or from a split of the test data to evaluate the impact of the covariate shift.
+
+### Running Fine-tuning Experiments on BirdSet
+
+```bash
+python birdset/train.py experiment=biofoundation/birdset/finetuning/{model_name}
+```
+
+#### Results
+
+| Model | cmAP | AUROC | Wandb |
+|-------| -------| ---- | ---- |
+| BEATs| 0.44 | 0.87 | [BEATs_HSN#1_2024-11-22_135915](https://wandb.ai/deepbirddetect/BioFoundation/runs/beats_finetune_HSN_1_2024-11-22_135915) |
+
+
+
+### Running Linear Probing Experiments on BirdSet
+
+```bash
+python birdset/train.py experiment=biofoundation/birdset/linearprobing/{model_name}
+```
+
+| Model | cmAP | AUROC | Wandb |
+|-------| -------| ---- | ---- |
+| BEATS | 0.11 | **0.73** | [BEATs_HSN#1_2024-11-25_155526](https://wandb.ai/deepbirddetect/BioFoundation/runs/beats_linearprobing_BirdSet_HSN_1_2024-11-25_155526) |
+| Perch | **0.22** | 0.66 | [perch_HSN#1_2024-11-25_175223](https://wandb.ai/deepbirddetect/BioFoundation/runs/perch_linearprobing_BirdSet_HSN_1_2024-11-25_175223) |
+
+### Running FewShot Experiments on BirdSet
+
+| Model | cmAP | AUROC | Wandb |
+|-------| -------| ---- | ---- |
+| BEATS | 0.10 | **0.66** | [BEATs_HSN#3_2024-11-25_160815](https://wandb.ai/deepbirddetect/BioFoundation/runs/beats_fewshot_BirdSet_HSN_3_2024-11-25_160815) |
+| Perch | **0.14** | 0.65 | [perch_HSN#1_2024-11-25_180458](https://wandb.ai/deepbirddetect/BioFoundation/runs/perch_fewshot_BirdSet_HSN_1_2024-11-25_180458) |
 
 ## Example
 
