@@ -2,27 +2,44 @@ from typing import Optional
 
 
 from birdset.modules.models.BEATs import BEATs, BEATsConfig
+from birdset.modules.models.birdset_model import BirdSetModel
 import torch
 from torch import nn
 from typing import Tuple
 
 
-class BEATsModel(nn.Module):
+class BEATsModel(BirdSetModel):
     """
     Pretrained model for audio classification using the BEATs model.
+    Expects a 1-channel 10s waveform input, all preprocessing is done in the network.
     """
 
     EMBEDDING_SIZE = 768
+    MEAN = torch.tensor(-4.268)
+    STD = torch.tensor(4.569)
 
     def __init__(
         self,
-        num_classes: int,
+        num_classes: int | None,
+        embedding_size: int = EMBEDDING_SIZE,
         local_checkpoint: str = None,
-        train_classifier: bool = False,
+        freeze_backbone: bool = False,
+        preprocess_in_model: bool = True,
+        classifier: nn.Module | None = None,
     ) -> None:
-        super().__init__()
+        super().__init__(
+            num_classes=num_classes,
+            embedding_size=embedding_size,
+            local_checkpoint=local_checkpoint,
+            freeze_backbone=freeze_backbone,
+            preprocess_in_model=preprocess_in_model,
+        )
         self.model = None  # Placeholder for the loaded model
         self.load_model()
+        if classifier is None:
+            self.classifier = nn.Linear(embedding_size, num_classes)
+        else:
+            self.classifier = classifier
 
         if local_checkpoint:
             state_dict = torch.load(local_checkpoint)["state_dict"]
@@ -32,23 +49,7 @@ class BEATsModel(nn.Module):
             }
             self.model.load_state_dict(state_dict)
 
-        self.num_classes = num_classes
-        self.train_classifier = train_classifier
-        # Define a linear classifier to use on top of the embeddings
-        # self.classifier = nn.Linear(
-        #     in_features=self.EMBEDDING_SIZE, out_features=num_classes
-        # )
-        if self.train_classifier:
-            self.classifier = nn.Sequential(
-                nn.Linear(self.EMBEDDING_SIZE, 128),
-                nn.ReLU(),
-                nn.Dropout(0.5),
-                nn.Linear(128, 64),
-                nn.ReLU(),
-                nn.Linear(64, self.num_classes),
-            )
-        
-            # freeze the model
+        if freeze_backbone:
             for param in self.model.parameters():
                 param.requires_grad = False
 
@@ -64,6 +65,13 @@ class BEATsModel(nn.Module):
         self.model.load_state_dict(checkpoint["model"])
         self.model.eval()
 
+    def _preprocess(self, input_values: torch.Tensor) -> torch.Tensor:
+        """
+        Preprocessing for the input values is done in BETAs.py
+        The waveform gets resampled to 16kHz, transformed into a fbank and then normalized.
+        """
+        return input_values
+
     def forward(
         self, input_values: torch.Tensor, labels: Optional[torch.Tensor] = None
     ) -> torch.Tensor:
@@ -77,19 +85,11 @@ class BEATsModel(nn.Module):
         Returns:
             torch.Tensor: The output of the classifier.
         """
-        embeddings = self.get_embeddings(input_values)[0]
-        if self.train_classifier:
-            flattend_embeddings = embeddings.reshape(embeddings.size(0), -1)
-            # Pass embeddings through the classifier to get the final output
-            output = self.classifier(flattend_embeddings)
-        else:
-            output = embeddings
+        embeddings = self.get_embeddings(input_values)
+        # flattend_embeddings = embeddings.reshape(embeddings.size(0), -1)
+        return self.classifier(embeddings)
 
-        return output
-
-    def get_embeddings(
-        self, input_values: torch.Tensor
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
+    def get_embeddings(self, input_values: torch.Tensor) -> torch.Tensor:
         """
         Get the embeddings and logits from the BEATs model.
 
@@ -99,9 +99,11 @@ class BEATsModel(nn.Module):
         Returns:
             torch.Tensor: The embeddings from the model.
         """
+        if self.preprocess_in_model:
+            input_values = self._preprocess(input_values)
         embeddings = self.model.extract_features(input_values)[
             0
         ]  # outputs a tensor of size 496x768
         cls_state = embeddings[:, 0, :]
 
-        return cls_state, None
+        return cls_state

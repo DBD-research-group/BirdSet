@@ -9,11 +9,14 @@ import torch
 from torch import nn
 
 from birdset.configs import PretrainInfoConfig
+from birdset.modules.models.birdset_model import BirdSetModel
 
 
-class PerchModel(nn.Module):
+class PerchModel(BirdSetModel):
     """
     A PyTorch model for bird vocalization classification, integrating a TensorFlow Hub model.
+
+    Expects 5 seconds of mono (1D) 32 kHz waveform input, all preprocessing is done in the network.
 
     Attributes:
         PERCH_TF_HUB_URL (str): URL to the TensorFlow Hub model for bird vocalization.
@@ -35,11 +38,15 @@ class PerchModel(nn.Module):
         self,
         num_classes: int,
         tfhub_version: str,
-        train_classifier: bool = False,
         restrict_logits: bool = False,
         label_path: Optional[str] = None,
         pretrain_info: Optional[PretrainInfoConfig] = None,
         gpu_to_use: int = 0,
+        embedding_size: int = EMBEDDING_SIZE,
+        local_checkpoint: str = None,
+        freeze_backbone: bool = True,  # Finetuning Perch is not supported
+        preprocess_in_model: bool = True,
+        classifier: nn.Module | None = None,
     ) -> None:
         """
         Initializes the PerchModel with configuration for loading the TensorFlow Hub model,
@@ -54,14 +61,24 @@ class PerchModel(nn.Module):
             pretrain_info: A dictionary containing information about the pretraining of the model.
             gpu_to_use: The GPU index to use for the model.
         """
-        super().__init__()
+        super().__init__(
+            num_classes=num_classes,
+            embedding_size=embedding_size,
+            local_checkpoint=local_checkpoint,
+            freeze_backbone=freeze_backbone,
+            preprocess_in_model=preprocess_in_model,
+        )
+        self.use_internal_classifier = False
+        if classifier is None:
+            self.use_internal_classifier = True
+        else:
+            self.classifier = classifier
         self.model = None  # Placeholder for the loaded model
         self.class_mask = None
         self.class_indices = None
 
         self.num_classes = num_classes
         self.tfhub_version = tfhub_version
-        self.train_classifier = train_classifier
         self.restrict_logits = restrict_logits
         self.label_path = label_path
         self.gpu_to_use = gpu_to_use
@@ -77,15 +94,7 @@ class PerchModel(nn.Module):
         # self.classifier = nn.Linear(
         #     in_features=self.EMBEDDING_SIZE, out_features=num_classes
         # )
-        if self.train_classifier:
-            self.classifier = nn.Sequential(
-                nn.Linear(self.EMBEDDING_SIZE, 128),
-                nn.ReLU(),
-                nn.Dropout(0.5),
-                nn.Linear(128, 64),
-                nn.ReLU(),
-                nn.Linear(64, self.num_classes),
-            )
+
         self.load_model()
 
     def load_model(self) -> None:
@@ -172,26 +181,53 @@ class PerchModel(nn.Module):
         if input_values.dim() > 2:
             input_values = input_values.squeeze(1)
 
-        device = input_values.device  # Get the device of the input tensor
-
-        # Move the tensor to the CPU and convert it to a NumPy array.
-        # input_values = input_values.cpu().numpy()
-
-        # Get embeddings from the Perch model and move to the same device as input_values
-        embeddings, logits = self.get_embeddings(input_tensor=input_values)
-
-        if self.train_classifier:
-            embeddings = embeddings.to(device)
-            # Pass embeddings through the classifier to get the final output
-            output = self.classifier(embeddings)
+        if self.use_internal_classifier:
+            logits = self.get_logits(input_tensor=input_values)
         else:
-            output = logits.to(device)
+            embeddings = self.get_embeddings(input_tensor=input_values)
+            logits = self.classifier(embeddings)
 
-        return output
+        return logits
 
-    def get_embeddings(
-        self, input_tensor: tf.Tensor
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
+    def get_logits(self, input_tensor: tf.Tensor) -> torch.Tensor:
+        """
+        Get the logits from the Perch model.
+
+        Args:
+            input_tensor (tf.Tensor): The input tensor for the model.
+
+        Returns:
+            Tuple[torch.Tensor, torch.Tensor]: A tuple of two tensors (embeddings, logits).
+        """
+        device = input_tensor.device  # Get the device of the input tensor
+        input_tensor = (
+            input_tensor.cpu().numpy()
+        )  # Move the tensor to the CPU and convert it to a NumPy array.
+
+        input_tensor = input_tensor.reshape([-1, input_tensor.shape[-1]])
+
+        # Run the model and get the outputs using the optimized TensorFlow function
+        outputs = self.run_tf_model(input_tensor=input_tensor)
+
+        # Extract logits, convert them to PyTorch tensors
+        logits = torch.from_numpy(outputs["output_0"].numpy())
+        logits = logits.to(device)
+
+        if self.class_mask:
+            # Initialize full_logits to a large negative value for penalizing non-present classes
+            full_logits = torch.full(
+                (logits.shape[0], self.num_classes),
+                -10.0,
+                device=logits.device,
+                dtype=logits.dtype,
+            )
+            # Extract valid logits using indices from class_mask and directly place them
+            full_logits[:, self.class_indices] = logits[:, self.class_mask]
+            logits = full_logits
+
+        return logits
+
+    def get_embeddings(self, input_tensor: tf.Tensor) -> torch.Tensor:
         """
         Get the embeddings and logits from the Perch model.
 
@@ -213,20 +249,6 @@ class PerchModel(nn.Module):
 
         # Extract embeddings and logits, convert them to PyTorch tensors
         embeddings = torch.from_numpy(outputs["output_1"].numpy())
-        logits = torch.from_numpy(outputs["output_0"].numpy())
         embeddings = embeddings.to(device)
-        logits = logits.to(device)
 
-        if self.class_mask:
-            # Initialize full_logits to a large negative value for penalizing non-present classes
-            full_logits = torch.full(
-                (logits.shape[0], self.num_classes),
-                -10.0,
-                device=logits.device,
-                dtype=logits.dtype,
-            )
-            # Extract valid logits using indices from class_mask and directly place them
-            full_logits[:, self.class_indices] = logits[:, self.class_mask]
-            logits = full_logits
-
-        return embeddings, logits
+        return embeddings

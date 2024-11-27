@@ -1,7 +1,7 @@
 model: 
   _target_: birdset.modules.models.beats.BEATsModel
   num_classes: null
-  train_classifier: False
+
 
 model_name: BEATs
 model_type: waveform
