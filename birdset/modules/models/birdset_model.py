@@ -1,5 +1,5 @@
 from torch import nn
-
+import torch
 
 class BirdSetModel(nn.Module):
     def __init__(
@@ -16,3 +16,10 @@ class BirdSetModel(nn.Module):
         self.local_checkpoint = local_checkpoint
         self.freeze_backbone = freeze_backbone
         self.preprocess_in_model = preprocess_in_model
+
+    def _preprocess(self, input_values: torch.Tensor) -> torch.Tensor:
+        """
+        Preprocessing for the input values is done in BETAs.py
+        The waveform gets resampled to 16kHz, transformed into a fbank and then normalized.
+        """
+        return input_values

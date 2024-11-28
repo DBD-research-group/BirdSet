@@ -127,9 +127,17 @@ Results on HSN:
 | Model | cmAP | AUROC | Wandb |
 |-------| -------| ---- | ---- |
 | BEATs| 0.44 | 0.87 | [BEATs_HSN#1_2024-11-22_135915](https://wandb.ai/deepbirddetect/BioFoundation/runs/beats_finetune_HSN_1_2024-11-22_135915) |
-
-
-
+| BioLingual| ? | ? | ? |
+| ConvNext| ? | ? | ? |
+| EAT| ? | ? | ? |
+| AVES| ? | ? | ? |
+| AST| ? | ? | ? |
+| AudioMAE| ? | ? | ? |
+| ConvNext_BS| ? | ? | ? |
+| HUBERT| ? | ? | ? |
+| SSAST| ? | ? | ? |
+| Wav2Vec2| ? | ? | ? |
+| BirdNET| ? | ? | ? |
 ### Running Linear Probing Experiments on BirdSet
 
 ```bash
@@ -142,16 +150,42 @@ Results on HSN:
 |-------| -------| ---- | ---- |
 | BEATS | 0.11 | **0.73** | [BEATs_HSN#1_2024-11-25_155526](https://wandb.ai/deepbirddetect/BioFoundation/runs/beats_linearprobing_BirdSet_HSN_1_2024-11-25_155526) |
 | Perch | **0.22** | 0.66 | [perch_HSN#1_2024-11-25_175223](https://wandb.ai/deepbirddetect/BioFoundation/runs/perch_linearprobing_BirdSet_HSN_1_2024-11-25_175223) |
+| BioLingual| ? | ? | ? |
+| ConvNext| ? | ? | ? |
+| EAT| ? | ? | ? |
+| AVES| 0.04 | 0.63 | [aves_HSN#1_2024-11-28_112422](https://wandb.ai/deepbirddetect/BioFoundation/runs/aves_linearprobing_BirdSet_HSN_1_2024-11-28_112422) |
+| AST| ? | ? | ? |
+| AudioMAE| ? | ? | ? |
+| ConvNext_BS| ? | ? | ? |
+| HUBERT| ? | ? | ? |
+| SSAST| ? | ? | ? |
+| Wav2Vec2| ? | ? | ? |
+| BirdNET| ? | ? | ? |
 
 ### Running FewShot Experiments on BirdSet
 
+```bash
+python birdset/train.py experiment=biofoundation/birdset/fewshot/{model_name}
+```
+
 Results on HSN with 32 samples per class:
 
-```bash
+
 | Model | cmAP | AUROC | Wandb |
 |-------| -------| ---- | ---- |
 | BEATS | 0.10 | **0.66** | [BEATs_HSN#3_2024-11-25_160815](https://wandb.ai/deepbirddetect/BioFoundation/runs/beats_fewshot_BirdSet_HSN_3_2024-11-25_160815) |
 | Perch | **0.14** | 0.65 | [perch_HSN#1_2024-11-25_180458](https://wandb.ai/deepbirddetect/BioFoundation/runs/perch_fewshot_BirdSet_HSN_1_2024-11-25_180458) |
+| BioLingual| ? | ? | ? |
+| ConvNext| ? | ? | ? |
+| EAT| ? | ? | ? |
+| AVES| ? | ? | ? |
+| AST| ? | ? | ? |
+| AudioMAE| ? | ? | ? |
+| ConvNext_BS| ? | ? | ? |
+| HUBERT| ? | ? | ? |
+| SSAST| ? | ? | ? |
+| Wav2Vec2| ? | ? | ? |
+| BirdNET| ? | ? | ? |
 
 ## Example
 
