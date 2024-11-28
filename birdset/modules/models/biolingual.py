@@ -37,6 +37,7 @@ class BioLingualClassifier(BirdSetModel):
         preprocess_in_model: bool = True,
         classifier: nn.Module = None,
         pretrain_info: PretrainInfoConfig = None,
+        device: int | str = "cuda",
     ):
         """
         Note: Either num_classes or pretrain_info must be given
@@ -56,6 +57,7 @@ class BioLingualClassifier(BirdSetModel):
         )
 
         self.checkpoint = checkpoint
+        self.device = device
 
         if pretrain_info:
             self.hf_path = pretrain_info.hf_path
@@ -85,7 +87,7 @@ class BioLingualClassifier(BirdSetModel):
                 for key, weight in state_dict.items()
             }
 
-        self.model = ClapModel.from_pretrained(checkpoint)
+        self.model = ClapModel.from_pretrained(checkpoint).to(self.device)
 
         if classifier is None:
             self.classifier = nn.Linear(embedding_size, num_classes)
@@ -105,7 +107,7 @@ class BioLingualClassifier(BirdSetModel):
         """
         if self.preprocess_in_model:
             return self.processor(
-                audios=input_values,
+                audios=input_values.cpu().numpy(),
                 return_tensors="pt",
                 sampling_rate=48000,
             ).to(input_values.device)
