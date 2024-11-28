@@ -8,6 +8,7 @@ model:
     hf_name: ${datamodule.dataset.hf_name}
     hf_pretrain_name: null
     valid_test_only: False
+  device: ${trainer.devices[0]}
   
 model_name: biolingual
 model_type: waveform
