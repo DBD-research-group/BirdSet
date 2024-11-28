@@ -5,7 +5,6 @@ from birdset.modules.models.BEATs import BEATs, BEATsConfig
 from birdset.modules.models.birdset_model import BirdSetModel
 import torch
 from torch import nn
-from typing import Tuple
 
 
 class BEATsModel(BirdSetModel):

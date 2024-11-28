@@ -122,6 +122,8 @@ python birdset/train.py experiment=biofoundation/birdset/finetuning/{model_name}
 
 #### Results
 
+Results on HSN:
+
 | Model | cmAP | AUROC | Wandb |
 |-------| -------| ---- | ---- |
 | BEATs| 0.44 | 0.87 | [BEATs_HSN#1_2024-11-22_135915](https://wandb.ai/deepbirddetect/BioFoundation/runs/beats_finetune_HSN_1_2024-11-22_135915) |
@@ -134,6 +136,8 @@ python birdset/train.py experiment=biofoundation/birdset/finetuning/{model_name}
 python birdset/train.py experiment=biofoundation/birdset/linearprobing/{model_name}
 ```
 
+Results on HSN:
+
 | Model | cmAP | AUROC | Wandb |
 |-------| -------| ---- | ---- |
 | BEATS | 0.11 | **0.73** | [BEATs_HSN#1_2024-11-25_155526](https://wandb.ai/deepbirddetect/BioFoundation/runs/beats_linearprobing_BirdSet_HSN_1_2024-11-25_155526) |
@@ -141,6 +145,9 @@ python birdset/train.py experiment=biofoundation/birdset/linearprobing/{model_na
 
 ### Running FewShot Experiments on BirdSet
 
+Results on HSN with 32 samples per class:
+
+```bash
 | Model | cmAP | AUROC | Wandb |
 |-------| -------| ---- | ---- |
 | BEATS | 0.10 | **0.66** | [BEATs_HSN#3_2024-11-25_160815](https://wandb.ai/deepbirddetect/BioFoundation/runs/beats_fewshot_BirdSet_HSN_3_2024-11-25_160815) |

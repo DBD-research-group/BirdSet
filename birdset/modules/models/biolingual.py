@@ -7,9 +7,10 @@ import datasets
 from typing import Tuple
 from birdset.configs import PretrainInfoConfig
 from typing import Optional
+from birdset.modules.models.birdset_model import BirdSetModel
 
 
-class BioLingualClassifier(nn.Module):
+class BioLingualClassifier(BirdSetModel):
     """
     Pretrained model for audio classification using the Biolingual model.
 
@@ -28,13 +29,14 @@ class BioLingualClassifier(nn.Module):
 
     def __init__(
         self,
-        checkpoint: str,
         num_classes: int = None,
+        embedding_size: int = EMBEDDING_SIZE,
+        checkpoint: str = "laion/clap-htsat-unfused",
         local_checkpoint: str = None,
-        cache_dir: str = None,
+        freeze_backbone: bool = False,
+        preprocess_in_model: bool = True,
+        classifier: nn.Module = None,
         pretrain_info: PretrainInfoConfig = None,
-        n_last_hidden_layer: int = 1,
-        train_classifier: bool = False,
     ):
         """
         Note: Either num_classes or pretrain_info must be given
@@ -45,10 +47,15 @@ class BioLingualClassifier(nn.Module):
             cache_dir: specified cache dir to save model files at
             pretrain_info: hf_path and hf_name of info will be used to infer if num_classes is None
         """
-        super(BioLingualClassifier, self).__init__()
+        super().__init__(
+            num_classes=num_classes,
+            embedding_size=embedding_size,
+            local_checkpoint=local_checkpoint,
+            freeze_backbone=freeze_backbone,
+            preprocess_in_model=preprocess_in_model,
+        )
 
         self.checkpoint = checkpoint
-        self.n_last_hidden_layer = n_last_hidden_layer
 
         if pretrain_info:
             self.hf_path = pretrain_info.hf_path
@@ -70,8 +77,6 @@ class BioLingualClassifier(nn.Module):
             self.hf_name = None
             self.num_classes = num_classes
 
-        self.cache_dir = cache_dir
-
         state_dict = None
         if local_checkpoint:
             state_dict = torch.load(local_checkpoint)["state_dict"]
@@ -81,44 +86,44 @@ class BioLingualClassifier(nn.Module):
             }
 
         self.model = ClapModel.from_pretrained(checkpoint)
+
+        if classifier is None:
+            self.classifier = nn.Linear(embedding_size, num_classes)
+        else:
+            self.classifier = classifier
+
         self.processor = ClapProcessor.from_pretrained(checkpoint)
 
-        self.train_classifier = train_classifier
-        # Define a linear classifier to use on top of the embeddings
-        if self.train_classifier:
-            self.classifier = nn.Sequential(
-                nn.Linear(self.EMBEDDING_SIZE, 128),
-                nn.ReLU(),
-                nn.Dropout(0.5),
-                nn.Linear(128, 64),
-                nn.ReLU(),
-                nn.Linear(64, self.num_classes),
-            )
-
+        if freeze_backbone:
             for param in self.model.parameters():
                 param.requires_grad = False
+
+    def _preprocess(self, input_values: torch.Tensor) -> torch.Tensor:
+        """
+        Preprocessing for the input values is done in BETAs.py
+        The waveform gets resampled to 16kHz, transformed into a fbank and then normalized.
+        """
+        if self.preprocess_in_model:
+            return self.processor(
+                audios=input_values,
+                return_tensors="pt",
+                sampling_rate=48000,
+            ).to(input_values.device)
+        else:
+            return input_values
 
     def forward(
         self, input_values: torch.Tensor, labels: Optional[torch.Tensor] = None
     ) -> torch.Tensor:
-        embeddings = self.get_embeddings(input_values)[0]
-        if self.train_classifier:
-            flattend_embeddings = embeddings.reshape(embeddings.size(0), -1)
-            # Pass embeddings through the classifier to get the final output
-            output = self.classifier(flattend_embeddings)
-        else:
-            output = embeddings
+        embeddings = self.get_embeddings(input_values)
 
-        return output
+        return self.classifier(embeddings)
 
-    def get_embeddings(self, input_tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+    def get_embeddings(self, input_tensor) -> torch.Tensor:
         input_tensor = input_tensor.squeeze(1)
-        device = input_tensor.device
-        inputs = self.processor(
-            audios=input_tensor.cpu().numpy(), return_tensors="pt", sampling_rate=48000
-        ).to(device)
+        inputs = self._preprocess(input_tensor)
         audio_embed = self.model.get_audio_features(
             **inputs, output_hidden_states=True, return_dict=True
         )
         # audio_embed doesnt return hidden states for some reason
-        return audio_embed, None
+        return audio_embed

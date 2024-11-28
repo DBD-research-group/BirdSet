@@ -32,7 +32,6 @@ module:
   network:
     torch_compile: False
     model:
-      embedding_size: 768
       preprocess_in_model: True
     # pretrain_info:
     #   hf_path: DBD-research-group/BirdSet
