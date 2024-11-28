@@ -9,7 +9,7 @@ defaults:
   - override /datamodule/transforms: bird_default_multilabel.yaml
   - override /paths: default.yaml
   - override /hydra: default.yaml
-tags: ["biofoundation", "beats", "finetune"]
+tags: ["biofoundation", "${module.network.model_name}", "finetune"]
 seed: 1
 train: True
 test: True
@@ -17,9 +17,9 @@ test: True
 logger:
   wandb:
     tags: ${tags}
-    group: "biofoundation_beats_finetune_BirdSet__${datamodule.dataset.dataset_name}"
+    group: "biofoundation_${module.network.model_name}_finetune_BirdSet__${datamodule.dataset.dataset_name}"
     mode: online
-    version: beats_finetune_BirdSet_${datamodule.dataset.dataset_name}_${seed}_${start_time} #to resume train run # needs to be tested
+    version: ${module.network.model_name}_finetune_BirdSet_${datamodule.dataset.dataset_name}_${seed}_${start_time} #to resume train run # needs to be tested
  
 module:
   optimizer:
@@ -41,7 +41,7 @@ module:
 trainer:
   min_epochs: 1
   max_epochs: 50
-  devices: [1]
+  devices: [2]
  
 datamodule:
   dataset:
