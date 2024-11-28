@@ -1,0 +1,11 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - biofoundation/birdset/fewshot/fewshot_config.yaml 
+  - override /module/network: ast.yaml  
+
+datamodule:
+  transforms:
+    preprocessing:
+      resizer:
+        target_width: 1_024    
