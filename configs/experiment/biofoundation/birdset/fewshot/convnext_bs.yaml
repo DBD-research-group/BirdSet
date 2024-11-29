@@ -13,3 +13,4 @@ module:
         _target_: birdset.modules.models.linear_classifier.LinearClassifier
         num_classes: ${datamodule.dataset.num_classes}
         in_features: ${module.network.embedding_size}
+    model_name: convnext_bs
