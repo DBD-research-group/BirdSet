@@ -8,4 +8,13 @@ datamodule:
   transforms:
     preprocessing:
       resizer:
-        target_width: 1_024    
+        target_width: 1_024   
+
+module:
+  network:
+    model:
+      preprocess_in_model: False
+      classifier:
+        _target_: birdset.modules.models.linear_classifier.LinearClassifier
+        num_classes: ${datamodule.dataset.num_classes}
+        in_features: ${module.network.embedding_size}         

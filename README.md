@@ -131,7 +131,7 @@ Results on HSN:
 | ConvNext| 0.41 | 0.84 | [convnext_HSN#1_2024-11-29_130206](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_finetune_BirdSet_HSN_1_2024-11-29_130206) |
 | EAT| ? | ? | ? |
 | AVES| 0.19 | 0.68 | [aves_HSN#1_2024-11-28_123701](https://wandb.ai/deepbirddetect/BioFoundation/runs/aves_finetune_BirdSet_HSN_1_2024-11-28_123701) (ES: Only 7 epochs)|
-| AST| ? | ? | ? |
+| AST| 0.21 | 0.70 | [ast_HSN#1_2024-11-28_163020](https://wandb.ai/deepbirddetect/BioFoundation/runs/ast_finetune_BirdSet_HSN_1_2024-11-28_163020) |
 | AudioMAE| ? | ? | ? |
 | ConvNext_BS| ? | ? | ? |
 | HUBERT| ? | ? | ? |
@@ -154,7 +154,7 @@ Results on HSN:
 | ConvNext| 0.03 | 0.52 | [convnext_HSN#1_2024-11-29_131024](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_linearprobing_BirdSet_HSN_1_2024-11-29_131024) # Episode 00  |
 | EAT| ? | ? | ? |
 | AVES| 0.04 | 0.63 | [aves_HSN#1_2024-11-28_112422](https://wandb.ai/deepbirddetect/BioFoundation/runs/aves_linearprobing_BirdSet_HSN_1_2024-11-28_112422) |
-| AST| ? | ? | ? |
+| AST| 0.03 | 0.52 | [ast_HSN#1_2024-11-28_143827](https://wandb.ai/deepbirddetect/BioFoundation/runs/ast_linearprobing_BirdSet_HSN_1_2024-11-28_143827) |
 | AudioMAE| ? | ? | ? |
 | ConvNext_BS| 0.05 | 0.57 | [convnext_HSN#1_2024-11-29_131825](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_linearprobing_BirdSet_HSN_1_2024-11-29_131825) # Episode 00 |
 | HUBERT| ? | ? | ? | 
@@ -179,7 +179,7 @@ Results on HSN with 32 samples per class:
 | ConvNext| 0.03 | 0.48 | [convnext_HSN#1_2024-11-29_125505](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_fewshot_BirdSet_HSN_1_2024-11-29_125505) |
 | EAT| ? | ? | ? |
 | AVES| 0.04 | 0.53 | [aves_HSN#1_2024-11-28_134553](https://wandb.ai/deepbirddetect/BioFoundation/runs/aves_fewshot_BirdSet_HSN_1_2024-11-28_134553) |
-| AST| ? | ? | ? |
+| AST| 0.03 | 0.53 | [ast_HSN#1_2024-11-28_163304](https://wandb.ai/deepbirddetect/BioFoundation/runs/ast_fewshot_BirdSet_HSN_1_2024-11-28_163304) |
 | AudioMAE| ? | ? | ? |
 | ConvNext_BS| 0.04 | 0.50 | [convnext_HSN#1_2024-11-29_130609](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_fewshot_BirdSet_HSN_1_2024-11-29_130609) |
 | HUBERT| ? | ? | ? |

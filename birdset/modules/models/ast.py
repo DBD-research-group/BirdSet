@@ -19,8 +19,8 @@ class ASTSequenceClassifier(BirdSetModel):
         checkpoint: str = "MIT/ast-finetuned-audioset-10-10-0.4593",
         local_checkpoint: str = None,
         freeze_backbone: bool = False,
-        preprocess_in_model: bool = True,
-        classifier: nn.Module = None,
+        preprocess_in_model: bool = False, # This isn't implemented for this model (yet?!)
+        classifier: nn.Module | None = None,
         cache_dir: str = None,
         pretrain_info: PretrainInfoConfig = None,
     ):
@@ -34,6 +34,7 @@ class ASTSequenceClassifier(BirdSetModel):
         )
         self.checkpoint = checkpoint
         self.cache_dir = cache_dir
+        self.classifier = classifier
 
         if pretrain_info:
             self.hf_path = pretrain_info.hf_path
@@ -54,11 +55,6 @@ class ASTSequenceClassifier(BirdSetModel):
             self.hf_path = None
             self.hf_name = None
             self.num_classes = num_classes
-
-        if classifier is None:
-            self.classifier = nn.Linear(embedding_size, num_classes)
-        else:
-            self.classifier = classifier
 
         if (
             local_checkpoint
@@ -130,14 +126,15 @@ class ASTSequenceClassifier(BirdSetModel):
         last_hidden_state = outputs["hidden_states"][-1]  # (batch, sequence, dim)
         cls_state = last_hidden_state[:, 0, :]  # (batch, dim)
 
-        if return_hidden_state:
-            output = (logits, cls_state)
+        if self.classifier is None:
+            if return_hidden_state:
+                output = (logits, cls_state)
 
-        else:
+            else:
+                output = logits
+        else: 
             output = self.classifier(cls_state)
-
-        #print("Logits",logits.shape)
-        #print("Classifier",self.classifier(cls_state).shape)
+            
         return output
 
     @torch.inference_mode()
