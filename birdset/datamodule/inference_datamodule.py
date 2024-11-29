@@ -26,7 +26,7 @@ class InferenceDataModule(BaseDataModuleHF):
         """
         Load audio dataset from Hugging Face Datasets.
 
-        Returns HF dataset with audio column casted to Audio feature, containing audio data as numpy array and sampling rate.
+        Returns HF dataset with audio column casted to Audio feature, containing audio data as numpy array and sample rate.
         """
         log.info("> Loading data set.")
 

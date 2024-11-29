@@ -453,15 +453,15 @@ class NoCallMixer:
         The directory containing the no-call data. The directory should contain audio files in a format that can be read by torchaudio (e.g. .wav).
     p : float
         The probability of a sample being replaced with a no-call sample. This parameter allows you to control the frequency of no-call samples in your dataset.
-    sampling_rate : int
-        The sampling rate at which the audio data should be processed. This parameter should align with the rest of your dataset and model configuration.
+    sample_rate : int
+        The sample rate at which the audio data should be processed. This parameter should align with the rest of your dataset and model configuration.
     length : int
         The length of the audio samples. This parameter should align with the rest of your dataset and model configuration.
     """
 
-    def __init__(self, directory, p, sampling_rate, length=5, *args, **kwargs):
+    def __init__(self, directory, p, sample_rate, length=5, *args, **kwargs):
         self.p = p
-        self.sampling_rate = sampling_rate
+        self.sample_rate = sample_rate
         self.length = length
 
         self.paths = self.get_all_file_paths(directory)
@@ -497,11 +497,11 @@ class NoCallMixer:
                 else:
                     audio, sr = sf.read(selected_path)
 
-                if sr != self.sampling_rate:
+                if sr != self.sample_rate:
                     audio = librosa.resample(
-                        audio, orig_sr=sr, target_sr=self.sampling_rate
+                        audio, orig_sr=sr, target_sr=self.sample_rate
                     )
-                    sr = self.sampling_rate
+                    sr = self.sample_rate
 
                 audio = torch.tensor(audio)
 

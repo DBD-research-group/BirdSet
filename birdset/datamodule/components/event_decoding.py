@@ -13,8 +13,8 @@ class EventDecoding:
         Determines the minimum duration (in seconds) of the audio segments after decoding. This constraint ensures that each processed audio segment is of a suitable length for the model.
     max_len : float
         Determines the maximum duration (in seconds) of the audio segments after decoding. This constraint ensures that each processed audio segment is of a suitable length for the model.
-    sampling_rate : int
-        Defines the sampling rate to which the audio should be resampled. This standardizes the input data's sampling rate, making it consistent for model processing.
+    sample_rate : int
+        Defines the sample rate to which the audio should be resampled. This standardizes the input data's sample rate, making it consistent for model processing.
     extension_time : float
         Refers to the time (in seconds) by which the duration of an audio event is extended. This parameter is crucial for ensuring that shorter audio events are sufficiently long for the model to process effectively.
     extracted_interval : float
@@ -25,13 +25,13 @@ class EventDecoding:
         self,
         min_len: float = 1,
         max_len: float = 5,
-        sampling_rate: int = 32_000,
+        sample_rate: int = 32_000,
         extension_time: float = 6,
         extracted_interval: float = 5,
     ):
         self.min_len = min_len  # in seconds
         self.max_len = max_len
-        self.sampling_rate = sampling_rate
+        self.sample_rate = sample_rate
         self.extension_time = extension_time
         self.extracted_interval = extracted_interval
 
@@ -52,9 +52,9 @@ class EventDecoding:
         if audio.ndim != 1:
             audio = audio.swapaxes(1, 0)
             audio = librosa.to_mono(audio)
-        if sr != self.sampling_rate:
-            audio = librosa.resample(audio, orig_sr=sr, target_sr=self.sampling_rate)
-            sr = self.sampling_rate
+        if sr != self.sample_rate:
+            audio = librosa.resample(audio, orig_sr=sr, target_sr=self.sample_rate)
+            sr = self.sample_rate
         return audio, sr
 
     def _time_shifting(self, start, end, total_duration):

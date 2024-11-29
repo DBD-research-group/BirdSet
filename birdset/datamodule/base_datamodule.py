@@ -105,7 +105,7 @@ class BaseDataModuleHF(L.LightningDataModule):
         Outputs data with the following columns:
             - audio: The preprocessed audio data, containing:
                 - 'array': The audio data as a numpy array.
-                - 'sampling_rate': The sampling rate of the audio data.
+                - 'sample_rate': The sample rate of the audio data.
             - labels: The label for the audio data
 
         """
@@ -260,7 +260,7 @@ class BaseDataModuleHF(L.LightningDataModule):
         """
         Load audio dataset from Hugging Face Datasets.
 
-        Returns HF dataset with audio column casted to Audio feature, containing audio data as numpy array and sampling rate.
+        Returns HF dataset with audio column casted to Audio feature, containing audio data as numpy array and sample rate.
         """
         log.info("> Loading data set.")
 
