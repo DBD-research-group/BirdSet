@@ -6,7 +6,7 @@ from omegaconf import open_dict
 import lightning as L
 from pathlib import Path
 
-from birdset import utils 
+from birdset import utils
 
 root = pyrootutils.setup_root(
     search_from=__file__,
@@ -16,12 +16,13 @@ root = pyrootutils.setup_root(
 )
 
 _HYDRA_PARAMS = {
-    "version_base":None,
+    "version_base": None,
     "config_path": str(root / "configs"),
-    "config_name": "eval.yaml"
+    "config_name": "eval.yaml",
 }
 
 log = utils.get_pylogger(__name__)
+
 
 @hydra.main(**_HYDRA_PARAMS)
 def eval(cfg):
@@ -54,7 +55,7 @@ def eval(cfg):
         num_epochs=cfg.trainer.max_epochs,
         len_trainset=datamodule.len_trainset,
         batch_size=datamodule.loaders_config.train.batch_size,
-        pretrain_info=cfg.module.network.model.pretrain_info
+        pretrain_info=cfg.module.network.model.pretrain_info,
     )
 
     log.info(f"Instantiate logger")
@@ -62,16 +63,14 @@ def eval(cfg):
     # override standard TF logger to handle rare logger error
     logger.append(utils.TBLogger(Path(cfg.paths.log_dir)))
 
-    trainer = hydra.utils.instantiate(
-        cfg.trainer, logger=logger
-    )
+    trainer = hydra.utils.instantiate(cfg.trainer, logger=logger)
 
     object_dict = {
-        "cfg": cfg, 
+        "cfg": cfg,
         "datamodule": datamodule,
         "model": model,
         "logger": logger,
-        "trainer": trainer
+        "trainer": trainer,
     }
 
     log.info("Logging Hyperparams")
@@ -79,31 +78,23 @@ def eval(cfg):
 
     if cfg.get("test"):
         log.info("Starting Testing")
-        trainer.test(
-            model=model,
-            datamodule=datamodule,
-            ckpt_path=None
-        )
+        trainer.test(model=model, datamodule=datamodule, ckpt_path=None)
         test_metrics = trainer.callback_metrics
     else:
         log.info("Predict not yet implemented")
 
     metric_dict = {**test_metrics}
-    metric_dict = [{'name': k, 'value': v.item() if hasattr(v, 'item') else v} for k, v in metric_dict.items()]
+    metric_dict = [
+        {"name": k, "value": v.item() if hasattr(v, "item") else v}
+        for k, v in metric_dict.items()
+    ]
 
     file_path = os.path.join(cfg.paths.output_dir, "finalmetrics.json")
-    with open(file_path, 'w') as json_file:
+    with open(file_path, "w") as json_file:
         json.dump(metric_dict, json_file)
 
     utils.close_loggers()
 
-if __name__ == "__main__":    
+
+if __name__ == "__main__":
     eval()
-
-
-
-
-
-
-
-
