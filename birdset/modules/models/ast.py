@@ -36,25 +36,6 @@ class ASTSequenceClassifier(BirdSetModel):
         self.cache_dir = cache_dir
         self.classifier = classifier
 
-        if pretrain_info:
-            self.hf_path = pretrain_info.hf_path
-            self.hf_name = (
-                pretrain_info.hf_name
-                if not pretrain_info.hf_pretrain_name
-                else pretrain_info.hf_pretrain_name
-            )
-            if self.hf_path == "DBD-research-group/BirdSet":
-                self.num_classes = len(
-                    datasets.load_dataset_builder(self.hf_path, self.hf_name)
-                    .info.features["ebird_code"]
-                    .names
-                )
-            else:
-                self.num_classes = num_classes
-        else:
-            self.hf_path = None
-            self.hf_name = None
-            self.num_classes = num_classes
 
         if (
             local_checkpoint
