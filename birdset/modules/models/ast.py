@@ -4,7 +4,7 @@ import datasets
 from transformers import ASTConfig, ASTForAudioClassification
 from birdset.utils import pylogger
 from birdset.configs import PretrainInfoConfig
-
+from typing import Optional, Tuple
 log = pylogger.get_pylogger(__name__)
 
 
@@ -14,7 +14,8 @@ class ASTSequenceClassifier(nn.Module):
                  num_classes: int = None,
                  local_checkpoint: str = None,
                  cache_dir: str = None,
-                 pretrain_info: PretrainInfoConfig = None):
+                 pretrain_info: PretrainInfoConfig = None,
+                 train_classifier: bool = False):
         """
         Note: Either num_classes or pretrain_info must be given
         Args:
@@ -25,7 +26,7 @@ class ASTSequenceClassifier(nn.Module):
             pretrain_info: hf_path and hf_name of info will be used to infer if num_classes is None
         """
         super(ASTSequenceClassifier, self).__init__()
-
+        self.train_classifier = train_classifier
         self.checkpoint = checkpoint
         if pretrain_info:  # either num_classes if provided or pretrain info
             self.hf_path = pretrain_info.hf_path
@@ -75,12 +76,53 @@ class ASTSequenceClassifier(nn.Module):
           model. Defaults to False.
         """
 
-        # Squeeze the channel dimension so that the tensor has shape (height, width)
         input_values = input_values.squeeze(1)
-
-        # Swap the height and width dimensions so that the tensor has shape (width, height)
-        #6,1,128,1024
         input_values = input_values.transpose(1, 2)
+        outputs = self.model(
+            input_values, 
+            attention_mask,
+            output_attentions=False,
+            output_hidden_states=True,
+            return_dict=True,
+            labels=None
+        )
+        logits = outputs["logits"]
+        last_hidden_state = outputs["hidden_states"][-1] #(batch, sequence, dim)
+        cls_state = last_hidden_state[:,0,:] #(batch, dim)
+
+        if return_hidden_state:
+        
+            embeddings = (logits, cls_state)
+
+        else:
+            embeddings = logits
+
+        if self.train_classifier:
+            output = self.classifier(embeddings)
+        else: 
+            output = embeddings
+
+        
+        
+        return output
+    
+    def get_embeddings(self, input_tensor: torch.Tensor, attention_mask=None, return_hidden_state=False):
+        """
+        Get the embeddings and logits from the model.
+
+        Args:
+            input_tensor (torch.Tensor): The input tensor for the model.
+
+        Returns:
+            torch.Tensor: The embeddings from the model.
+        """
+        # Ensure input tensor has the correct dimensions
+        print("shaaaaaaaap",input_tensor.shape)
+        
+        input_tensor = input_tensor.squeeze(1) 
+        print("shaaaaaaaap",input_tensor.shape)
+        input_values = input_tensor.transpose(1, 2)  # Swap sequence and feature dims
+        
 
         outputs = self.model(
             input_values, 
@@ -90,19 +132,17 @@ class ASTSequenceClassifier(nn.Module):
             return_dict=True,
             labels=None
         )
-
         logits = outputs["logits"]
-
-        last_hidden_state = outputs["hidden_states"][-1] #(batch, sequence, dim)
-        cls_state = last_hidden_state[:,0,:] #(batch, dim)
+        last_hidden_state = outputs["hidden_states"][-1]  # (batch, sequence, dim)
+        cls_state = last_hidden_state[:, 0, :]  # (batch, dim)
 
         if return_hidden_state:
-            output = (logits, cls_state)
-
+            embeddings = (logits, cls_state)
         else:
-            output = logits
+            embeddings = logits
 
-        return output
+        return embeddings, None
+
 
     @torch.inference_mode()
     def get_logits(self, dataloader, device):
