@@ -130,7 +130,7 @@ Results on HSN:
 | BioLingual| ? | ? | ? |
 | ConvNext| ? | ? | ? |
 | EAT| ? | ? | ? |
-| AVES| ? | ? | ? |
+| AVES| 0.19 | 0.68 | [aves_HSN#1_2024-11-28_123701](https://wandb.ai/deepbirddetect/BioFoundation/runs/aves_finetune_BirdSet_HSN_1_2024-11-28_123701) (ES: Only 7 epochs)|
 | AST| ? | ? | ? |
 | AudioMAE| ? | ? | ? |
 | ConvNext_BS| ? | ? | ? |
@@ -178,7 +178,7 @@ Results on HSN with 32 samples per class:
 | BioLingual| ? | ? | ? |
 | ConvNext| 0.03 | 0.48 | [convnext_HSN#1_2024-11-29_125505](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_fewshot_BirdSet_HSN_1_2024-11-29_125505) |
 | EAT| ? | ? | ? |
-| AVES| ? | ? | ? |
+| AVES| 0.04 | 0.53 | [aves_HSN#1_2024-11-28_134553](https://wandb.ai/deepbirddetect/BioFoundation/runs/aves_fewshot_BirdSet_HSN_1_2024-11-28_134553) |
 | AST| ? | ? | ? |
 | AudioMAE| ? | ? | ? |
 | ConvNext_BS| 0.04 | 0.50 | [convnext_HSN#1_2024-11-29_130609](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_fewshot_BirdSet_HSN_1_2024-11-29_130609) |

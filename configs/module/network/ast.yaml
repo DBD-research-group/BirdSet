@@ -1,8 +1,8 @@
 model:
   _target_: birdset.modules.models.ast.ASTSequenceClassifier
+  num_classes: null
   checkpoint: MIT/ast-finetuned-audioset-10-10-0.4593
   local_checkpoint: null
-  num_classes: null
   cache_dir: ${paths.model_path}
   pretrain_info:
     hf_path: ${datamodule.dataset.hf_path}

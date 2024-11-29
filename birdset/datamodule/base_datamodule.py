@@ -543,7 +543,7 @@ class BaseDataModuleHF(L.LightningDataModule):
                 testval_count[label] += 1
 
         # Create and print table to show class distribution
-        headers = ["Class", "#Train-Samples", "#Not used sampels"]
+        headers = ["Class", "#Train-Samples", "#Unused samples"]
         rows = []
 
         for class_id in selected_samples.keys():
