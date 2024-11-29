@@ -47,7 +47,7 @@ Deep learning (DL) has greatly advanced audio classification, yet the field is l
 </div>
 
 ## Update (2024.11.27) 
-- Additional bird taxonomy metadata, including "Genus," "Species Group," and "Order," is provided using the 2021 eBird taxonomy, consistent with the taxonomy used for the 'ebird_code' data. These metadata fields follow the same format and encoding as 'ebird_code' and 'ebird_code_multilabel'. See below for an updated explanation of the metadata.
+- Additional bird taxonomy metadata, including "Genus," "Species Group," and "Order," is provided using the 2021 eBird taxonomy, consistent with the taxonomy used for the 'ebird_code' data. These metadata fields follow the same format and encoding as 'ebird_code' and 'ebird_code_multilabel'. Further explanation can be found on our Hugging Face [BirdSet repository](https://huggingface.co/datasets/DBD-research-group/BirdSet).
 
 - If you don't require the additional taxonomy at the moment and prefer to **avoid re-downloading all files**, you can specify the previous revision directly in load_dataset as follows:
 
