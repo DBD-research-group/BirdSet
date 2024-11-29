@@ -9,3 +9,4 @@ module:
     model:
       preprocess_in_model: False
       checkpoint: DBD-research-group/ConvNeXT-Base-BirdSet-XCL
+    model_name: convnext_bs

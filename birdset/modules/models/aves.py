@@ -39,26 +39,6 @@ class AvesClassifier(BirdSetModel):
             freeze_backbone=freeze_backbone,
             preprocess_in_model=preprocess_in_model,
         )
-        if pretrain_info:
-            self.hf_path = pretrain_info.hf_path
-            self.hf_name = (
-                pretrain_info.hf_name
-                if not pretrain_info.hf_pretrain_name
-                else pretrain_info.hf_pretrain_name
-            )
-            if self.hf_path == "DBD-research-group/BirdSet":
-                self.num_classes = len(
-                    datasets.load_dataset_builder(self.hf_path, self.hf_name)
-                    .info.features["ebird_code"]
-                    .names
-                )
-            else:
-                self.num_classes = num_classes
-        else:
-            self.hf_path = None
-            self.hf_name = None
-            self.num_classes = num_classes
-
 
         self.model = None  # Placeholder for the loaded model
         self.load_model()
