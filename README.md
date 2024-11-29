@@ -176,12 +176,12 @@ Results on HSN with 32 samples per class:
 | BEATS | 0.10 | **0.66** | [BEATs_HSN#3_2024-11-25_160815](https://wandb.ai/deepbirddetect/BioFoundation/runs/beats_fewshot_BirdSet_HSN_3_2024-11-25_160815) |
 | Perch | **0.14** | 0.65 | [perch_HSN#1_2024-11-25_180458](https://wandb.ai/deepbirddetect/BioFoundation/runs/perch_fewshot_BirdSet_HSN_1_2024-11-25_180458) |
 | BioLingual| ? | ? | ? |
-| ConvNext| ? | ? | ? |
+| ConvNext| 0.03 | 0.48 | [convnext_HSN#1_2024-11-29_125505](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_fewshot_BirdSet_HSN_1_2024-11-29_125505) |
 | EAT| ? | ? | ? |
 | AVES| 0.04 | 0.53 | [aves_HSN#1_2024-11-28_134553](https://wandb.ai/deepbirddetect/BioFoundation/runs/aves_fewshot_BirdSet_HSN_1_2024-11-28_134553) |
 | AST| 0.03 | 0.53 | [ast_HSN#1_2024-11-28_163304](https://wandb.ai/deepbirddetect/BioFoundation/runs/ast_fewshot_BirdSet_HSN_1_2024-11-28_163304) |
 | AudioMAE| ? | ? | ? |
-| ConvNext_BS| ? | ? | ? |
+| ConvNext_BS| 0.04 | 0.50 | [convnext_HSN#1_2024-11-29_130609](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_fewshot_BirdSet_HSN_1_2024-11-29_130609) |
 | HUBERT| ? | ? | ? |
 | SSAST| ? | ? | ? |
 | Wav2Vec2| ? | ? | ? |

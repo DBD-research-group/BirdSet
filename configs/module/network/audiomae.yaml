@@ -1,7 +1,7 @@
 model: 
   _target_: birdset.modules.models.audiomae.AudioMAEModel
   num_classes: null
-  train_classifier: True
+  
 
 model_name: audio_mae
 model_type: waveform

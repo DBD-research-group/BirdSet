@@ -1,0 +1,14 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - biofoundation/birdset/linearprobing/linearprobing_config.yaml 
+  - override /module/network: audiomae.yaml 
+
+tags: ["biofoundation", "audiomae", "linearprobing"]
+
+logger:
+  wandb:
+    tags: ${tags}
+    group: "biofoundation_audiomae_linearprobing_BirdSet__${datamodule.dataset.dataset_name}"
+    mode: online
+    version: audiomae_linearprobing_BirdSet_${datamodule.dataset.dataset_name}_${seed}_${start_time} #to resume train run # needs to be tested
