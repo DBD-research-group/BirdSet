@@ -134,8 +134,10 @@ class ESC50EmbeddingDataModule(EmbeddingDataModule, ESC50DataModule):
             None
         """
         dataset.set_format("np")
+        
         if self.cross_valid:
             fingerprint = f"{dataset[next(iter(dataset))]._fingerprint}_{self.fold}" if isinstance(dataset, DatasetDict) else f"{dataset._fingerprint}_{self.fold}"  # changed to next_iter to be more robust
+            log.info("fingerprint updates")
         else:
             fingerprint = dataset[next(iter(dataset))]._fingerprint if isinstance(dataset, DatasetDict) else dataset._fingerprint  # changed to next_iter to be more robust
 

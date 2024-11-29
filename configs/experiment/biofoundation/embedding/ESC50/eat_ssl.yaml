@@ -6,7 +6,7 @@ defaults:
 
 tags: ["ESC50", "embeddings", "eat", "multiclass"]
 seed: 2
-cross_valid: True
+cross_valid: False
 trainer:
   devices: [2]
   min_epochs: 1

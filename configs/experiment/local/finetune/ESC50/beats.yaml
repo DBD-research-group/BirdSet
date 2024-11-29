@@ -4,9 +4,9 @@ defaults:
   - local/finetune/ESC50/finetune_config.yaml 
   - override /module/embedding_model: ../../module/network/beats.yaml  
 
-tags: ["ESC50", "finetune", "beats", "multiclass"]
+tags: ["ESC50", "finetune", "beats", "multiclass","cross_valid"]
 seed: 2
-
+cross_valid: False
 
 trainer:
   devices: [1]
