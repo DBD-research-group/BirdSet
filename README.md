@@ -132,7 +132,7 @@ Results on HSN:
 | EAT| ? | ? | ? |
 | AVES| 0.19 | 0.68 | [aves_HSN#1_2024-11-28_123701](https://wandb.ai/deepbirddetect/BioFoundation/runs/aves_finetune_BirdSet_HSN_1_2024-11-28_123701) (ES: Only 7 epochs)|
 | AST| 0.21 | 0.70 | [ast_HSN#1_2024-11-28_163020](https://wandb.ai/deepbirddetect/BioFoundation/runs/ast_finetune_BirdSet_HSN_1_2024-11-28_163020) |
-| AudioMAE| ? | ? | ? |
+| AudioMAE| 0.34132 | 0.83382 |  [audio_mae_HSN#1_2024-11-29_162609] (https://wandb.ai/deepbirddetect/BioFoundation/runs/audiomae_finetuning_BirdSet_HSN_1_2024-11-29_162609) |
 | ConvNext_BS| ? | ? | ? |
 | HUBERT| ? | ? | ? |
 | SSAST| ? | ? | ? |
@@ -155,7 +155,7 @@ Results on HSN:
 | EAT| ? | ? | ? |
 | AVES| 0.04 | 0.63 | [aves_HSN#1_2024-11-28_112422](https://wandb.ai/deepbirddetect/BioFoundation/runs/aves_linearprobing_BirdSet_HSN_1_2024-11-28_112422) |
 | AST| 0.03 | 0.52 | [ast_HSN#1_2024-11-28_143827](https://wandb.ai/deepbirddetect/BioFoundation/runs/ast_linearprobing_BirdSet_HSN_1_2024-11-28_143827) |
-| AudioMAE| ? | ? | ? |
+| AudioMAE| 0.03807 | 0.54445 | [audio_mae_HSN#1_2024-11-29_175729] (https://wandb.ai/deepbirddetect/BioFoundation/runs/audiomae_linearprobing_BirdSet_HSN_1_2024-11-29_175729) |
 | ConvNext_BS| ? | ? | ? |
 | HUBERT| ? | ? | ? |
 | SSAST| ? | ? | ? |
@@ -180,7 +180,7 @@ Results on HSN with 32 samples per class:
 | EAT| ? | ? | ? |
 | AVES| 0.04 | 0.53 | [aves_HSN#1_2024-11-28_134553](https://wandb.ai/deepbirddetect/BioFoundation/runs/aves_fewshot_BirdSet_HSN_1_2024-11-28_134553) |
 | AST| 0.03 | 0.53 | [ast_HSN#1_2024-11-28_163304](https://wandb.ai/deepbirddetect/BioFoundation/runs/ast_fewshot_BirdSet_HSN_1_2024-11-28_163304) |
-| AudioMAE| ? | ? | ? |
+| AudioMAE| 0.02857 | 0.46822 |[audio_mae_HSN#1_2024-11-29_152352](https://wandb.ai/deepbirddetect/BioFoundation/runs/audiomae_fewshot_BirdSet_HSN_1_2024-11-29_1523) |
 | ConvNext_BS| 0.04 | 0.50 | [convnext_HSN#1_2024-11-29_130609](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_fewshot_BirdSet_HSN_1_2024-11-29_130609) |
 | HUBERT| ? | ? | ? |
 | SSAST| ? | ? | ? |
