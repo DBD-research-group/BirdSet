@@ -126,9 +126,9 @@ Results on HSN:
 
 | Model | cmAP | AUROC | Wandb |
 |-------| -------| ---- | ---- |
-| BEATs| 0.44 | 0.87 | [BEATs_HSN#1_2024-11-22_135915](https://wandb.ai/deepbirddetect/BioFoundation/runs/beats_finetune_HSN_1_2024-11-22_135915) |
-| BioLingual| ? | ? | ? |
-| ConvNext| ? | ? | ? |
+| BEATs| **0.44** | **0.87** | [BEATs_HSN#1_2024-11-22_135915](https://wandb.ai/deepbirddetect/BioFoundation/runs/beats_finetune_HSN_1_2024-11-22_135915) |
+| BioLingual| 0.33 | 0.79 | [biolingual_HSN#1_2024-11-29_110143](https://wandb.ai/deepbirddetect/BioFoundation/runs/biolingual_finetune_BirdSet_HSN_1_2024-11-29_110143) |
+| ConvNext| 0.41 | 0.84 | [convnext_HSN#1_2024-11-29_130206](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_finetune_BirdSet_HSN_1_2024-11-29_130206) |
 | EAT| ? | ? | ? |
 | AVES| 0.19 | 0.68 | [aves_HSN#1_2024-11-28_123701](https://wandb.ai/deepbirddetect/BioFoundation/runs/aves_finetune_BirdSet_HSN_1_2024-11-28_123701) (ES: Only 7 epochs)|
 | AST| ? | ? | ? |
@@ -150,14 +150,14 @@ Results on HSN:
 |-------| -------| ---- | ---- |
 | BEATS | 0.11 | **0.73** | [BEATs_HSN#1_2024-11-25_155526](https://wandb.ai/deepbirddetect/BioFoundation/runs/beats_linearprobing_BirdSet_HSN_1_2024-11-25_155526) |
 | Perch | **0.22** | 0.66 | [perch_HSN#1_2024-11-25_175223](https://wandb.ai/deepbirddetect/BioFoundation/runs/perch_linearprobing_BirdSet_HSN_1_2024-11-25_175223) |
-| BioLingual| ? | ? | ? |
-| ConvNext| ? | ? | ? |
+| BioLingual| 0.12 | 0.75 | [biolingual_HSN#1_2024-11-29_111328](https://wandb.ai/deepbirddetect/BioFoundation/runs/biolingual_linearprobing_BirdSet_HSN_1_2024-11-29_111328) # Episode 26 |
+| ConvNext| 0.03 | 0.52 | [convnext_HSN#1_2024-11-29_131024](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_linearprobing_BirdSet_HSN_1_2024-11-29_131024) # Episode 00  |
 | EAT| ? | ? | ? |
 | AVES| 0.04 | 0.63 | [aves_HSN#1_2024-11-28_112422](https://wandb.ai/deepbirddetect/BioFoundation/runs/aves_linearprobing_BirdSet_HSN_1_2024-11-28_112422) |
 | AST| ? | ? | ? |
 | AudioMAE| ? | ? | ? |
-| ConvNext_BS| ? | ? | ? |
-| HUBERT| ? | ? | ? |
+| ConvNext_BS| 0.05 | 0.57 | [convnext_HSN#1_2024-11-29_131825](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_linearprobing_BirdSet_HSN_1_2024-11-29_131825) # Episode 00 |
+| HUBERT| ? | ? | ? | 
 | SSAST| ? | ? | ? |
 | Wav2Vec2| ? | ? | ? |
 | BirdNET| ? | ? | ? |
