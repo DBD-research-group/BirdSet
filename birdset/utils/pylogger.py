@@ -2,7 +2,7 @@ import logging
 from pytorch_lightning.utilities import rank_zero_only
 from pytorch_lightning import loggers
 from typing import Dict
-from module_configs import NetworkConfig
+from configs.module_configs import NetworkConfig
 
 
 def get_pylogger(name=__name__):
