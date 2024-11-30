@@ -32,7 +32,7 @@ class TBLogger(loggers.TensorBoardLogger):
     ):
         if isinstance(params, dict):
             try:
-                network : NetworkConfig = params.pop("network")  # network is of class NetworkConfig
+                network : NetworkConfig = params.pop("network")
                 params["model_name"] = network.model_name
                 params["model_type"] = network.model_type
                 params["torch_compile"] = network.torch_compile
