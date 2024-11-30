@@ -14,6 +14,6 @@ model:
 model_name: perch
 model_type: waveform
 torch_compile: False
-sampling_rate: 32_000
+sample_rate: 32_000
 normalize_spectrogram: False
 normalize_waveform: "instance_peak_normalization"

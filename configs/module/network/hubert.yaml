@@ -13,7 +13,7 @@ model:
 model_name: hubert
 model_type: raw
 torch_compile: False
-sampling_rate: 16_000
+sample_rate: 16_000
 
 # hubert uses the w2v2 featue extractor 
 

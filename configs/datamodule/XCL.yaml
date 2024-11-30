@@ -16,7 +16,7 @@ dataset:
   val_split: null
   task: ${module.task}
   subset: null
-  sampling_rate: ${module.network.sampling_rate}
+  sample_rate: ${module.network.sample_rate}
   class_weights_loss: null
   class_weights_sampler: null
   classlimit: 500

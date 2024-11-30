@@ -13,7 +13,7 @@ model:
 model_name: ast
 model_type: vision
 torch_compile: False
-sampling_rate: 32_000
+sample_rate: 32_000
 normalize_spectrogram: True
 normalize_waveform: "instance_normalization"
 

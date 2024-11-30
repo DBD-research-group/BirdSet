@@ -1,5 +1,5 @@
 _target_: birdset.datamodule.components.transforms.BirdSetTransformsWrapper
-sampling_rate: ${module.network.sampling_rate}
+sample_rate: ${module.network.sample_rate}
 model_type: ${module.network.model_type}
 task: ${datamodule.dataset.task}
 max_length: 5
