@@ -2,6 +2,7 @@ import logging
 from pytorch_lightning.utilities import rank_zero_only
 from pytorch_lightning import loggers
 from typing import Dict
+from module_configs import NetworkConfig
 
 
 def get_pylogger(name=__name__):
@@ -31,7 +32,7 @@ class TBLogger(loggers.TensorBoardLogger):
     ):
         if isinstance(params, dict):
             try:
-                network = params.pop("network")  # network is of class NetworkConfig
+                network : NetworkConfig = params.pop("network")  # network is of class NetworkConfig
                 params["model_name"] = network.model_name
                 params["model_type"] = network.model_type
                 params["torch_compile"] = network.torch_compile
