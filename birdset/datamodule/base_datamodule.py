@@ -287,7 +287,7 @@ class BaseDataModuleHF(L.LightningDataModule):
         dataset = dataset.cast_column(
             column="audio",
             feature=Audio(
-                sampling_rate=self.dataset_config.sampling_rate,
+                sampling_rate=self.dataset_config.sample_rate,
                 mono=True,
                 decode=decode,
             ),
