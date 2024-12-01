@@ -4,8 +4,9 @@ from torch import nn
 import torch.nn.functional as F
 from torchaudio.compliance import kaldi
 from birdset.modules.models.EAT.data2vecmultimodel import Data2VecMultiModel
+from birdset.modules.models.birdset_model import BirdSetModel
 
-class EATModel(nn.Module):
+class EATModel(BirdSetModel):
     """
     Pretrained model for audio classification using the Efficient Audio Transformer (EAT) model.
     
@@ -27,31 +28,42 @@ class EATModel(nn.Module):
     train_classifier: If True, the model will output the embeddings and freeze the feature extractor. Default is False. 
     """
     EMBEDDING_SIZE = 768
-    MEAN = -4.2677393
-    STD = 4.5689974
+    MEAN = torch.tensor(-4.268)
+    STD = torch.tensor(4.569)
 
 
 
     def __init__(
-            self,
-            checkpoint,
-            multimodel,
-            modality,
-            num_classes: int,
-            train_classifier: bool = False,
-        ) -> None:
-        super().__init__()
+        self,
+        checkpoint,
+        multimodel,
+        modality, 
+        num_classes: int | None,
+        embedding_size: int = EMBEDDING_SIZE,
+        local_checkpoint: str = None,
+        freeze_backbone: bool = False,
+        preprocess_in_model: bool = True,
+        classifier: nn.Module | None = None,
+    ) -> None:
+        super().__init__(
+            num_classes=num_classes,
+            embedding_size=embedding_size,
+            local_checkpoint=local_checkpoint,
+            freeze_backbone=freeze_backbone,
+            preprocess_in_model=preprocess_in_model,
+        )
         self.checkpoint = checkpoint
         self.multimodel = multimodel
         self.modality = modality
         self.model = None  # Placeholder for the loaded model
         self.load_model()
         self.num_classes = num_classes
-        self.train_classifier = train_classifier
+        
          # Define a linear classifier to use on top of the embeddings
-        self.classifier = nn.Linear(
-            in_features=self.EMBEDDING_SIZE, out_features=num_classes
-        )
+        if classifier is None:
+            self.classifier = nn.Linear(embedding_size, num_classes)
+        else:
+            self.classifier = classifier
         # self.classifier = nn.Sequential(
         #     nn.Linear(self.EMBEDDING_SIZE, 128),
         #     nn.ReLU(),
@@ -61,8 +73,17 @@ class EATModel(nn.Module):
         #     nn.Linear(64, self.num_classes),
         # )
         # freeze the model
-        if self.train_classifier:
-            self.model.eval()
+     
+        
+        if local_checkpoint:
+            state_dict = torch.load(local_checkpoint)["state_dict"]
+            state_dict = {
+                key.replace("model.model.", ""): weight
+                for key, weight in state_dict.items()
+            }
+            self.model.load_state_dict(state_dict)
+        # freeze the model
+        if freeze_backbone:
             for param in self.model.parameters():
                 param.requires_grad = False
 
@@ -121,21 +142,20 @@ class EATModel(nn.Module):
         Returns:
             torch.Tensor: The output of the classifier.
         """
-        embeddings = self.get_embeddings(input_values)[0]
+        embeddings = self.get_embeddings(input_values)
 
-        if self.train_classifier:
-            flattend_embeddings = embeddings.reshape(embeddings.size(0), -1)
+        #if self.train_classifier:
+            #flattend_embeddings = embeddings.reshape(embeddings.size(0), -1)
             # Pass embeddings through the classifier to get the final output
-            output = self.classifier(flattend_embeddings)
-        else:
-            output = embeddings
+            #output = self.classifier(flattend_embeddings)
+        #else:
+            #output = embeddings
 
-        return output
+        return self.classifier(embeddings)
 
 
     def get_embeddings(
-        self, input_tensor: torch.Tensor
-    ) -> Tuple[torch.Tensor, None]:
+        self, input_tensor: torch.Tensor) -> torch.Tensor:
         """
         Get the embeddings and logits from the AUDIOMAE model.
 
@@ -145,10 +165,12 @@ class EATModel(nn.Module):
         Returns:
             torch.Tensor: The embeddings from the model.
         """
-        melspecs = self.preprocess(input_tensor)
+        if self.preprocess_in_model:
+            input_values = self.preprocess(input_tensor)
+
         # Utterance level here
-        result = self.model(melspecs, features_only=True, padding_mask=None,mask=False, remove_extra_tokens=False)
+        result = self.model(input_values, features_only=True, padding_mask=None,mask=False, remove_extra_tokens=False)
         embeddings = result['x']
-        cls_state = embeddings[:, 0]
-        return cls_state, None
+        cls_state = embeddings[:, 0,:]
+        return cls_state
 
