@@ -7,10 +7,7 @@ defaults:
 tags: ["biofoundation", "eat_ssl", "linearprobing"]
 
 
-trainer:
-  min_epochs: 1
-  max_epochs: 2
-  devices: [0]
+
 
 logger:
   wandb:
