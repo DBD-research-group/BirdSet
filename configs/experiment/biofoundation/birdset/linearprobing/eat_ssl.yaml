@@ -3,5 +3,3 @@
 defaults:
   - biofoundation/birdset/linearprobing/linearprobing_config.yaml 
   - override /module/network: eat.yaml 
-
-tags: ["biofoundation", "eat_ssl", "linearprobing"]
