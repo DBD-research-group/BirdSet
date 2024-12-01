@@ -31,6 +31,7 @@ class ASTSequenceClassifier(BirdSetModel):
             local_checkpoint=local_checkpoint,
             freeze_backbone=freeze_backbone,
             preprocess_in_model=preprocess_in_model,
+            pretrain_info=pretrain_info,
         )
         self.checkpoint = checkpoint
         self.cache_dir = cache_dir
