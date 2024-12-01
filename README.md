@@ -129,7 +129,7 @@ Results on HSN:
 | BEATs| 0.44 | 0.87 | [BEATs_HSN#1_2024-11-22_135915](https://wandb.ai/deepbirddetect/BioFoundation/runs/beats_finetune_HSN_1_2024-11-22_135915) |
 | BioLingual| 0.33 | 0.79 | [biolingual_HSN#1_2024-11-29_110143](https://wandb.ai/deepbirddetect/BioFoundation/runs/biolingual_finetune_BirdSet_HSN_1_2024-11-29_110143) |
 | ConvNext| 0.41 | 0.84 | [convnext_HSN#1_2024-11-29_130206](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_finetune_BirdSet_HSN_1_2024-11-29_130206) |
-| EAT| ? | ? | ? |
+| EAT| 0.22 | 0.69 | [eat_HSN#1_2024-12-01_174320](https://wandb.ai/deepbirddetect/BioFoundation/runs/eat_finetune_BirdSet_HSN_1_2024-12-01_174320) |
 | AVES| 0.19 | 0.68 | [aves_HSN#1_2024-11-28_123701](https://wandb.ai/deepbirddetect/BioFoundation/runs/aves_finetune_BirdSet_HSN_1_2024-11-28_123701) (ES: Only 7 epochs)|
 | AST| 0.21 | 0.70 | [ast_HSN#1_2024-11-28_163020](https://wandb.ai/deepbirddetect/BioFoundation/runs/ast_finetune_BirdSet_HSN_1_2024-11-28_163020) |
 | AudioMAE| 0.34 | 0.83 |  [audio_mae_HSN#1_2024-11-29_162609](https://wandb.ai/deepbirddetect/BioFoundation/runs/audiomae_finetuning_BirdSet_HSN_1_2024-11-29_162609) |
