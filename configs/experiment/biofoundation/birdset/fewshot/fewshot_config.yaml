@@ -1,0 +1,99 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - override /datamodule: BirdSet.yaml
+  - override /module: multilabel.yaml
+  - override /module/network: beats.yaml
+  - override /callbacks: default.yaml
+  - override /trainer: single_gpu.yaml
+  - override /datamodule/transforms: bird_default_multilabel.yaml
+  - override /paths: default.yaml
+  - override /hydra: default.yaml
+tags: ["biofoundation", "${module.network.model_name}", "fewshot", "k32"]
+seed: 1
+train: True
+test: True
+ 
+logger:
+  wandb:
+    tags: ${tags}
+    group: "biofoundation_${module.network.model_name}_fewshot_BirdSet__${datamodule.dataset.dataset_name}"
+    mode: online
+    version: ${module.network.model_name}_fewshot_BirdSet_${datamodule.dataset.dataset_name}_${seed}_${start_time} #to resume train run # needs to be tested
+ 
+module:
+  optimizer:
+    lr: 1e-2
+    weight_decay: 5e-4
+  loss:
+  #  _target_: birdset.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
+    _target_: torch.nn.BCEWithLogitsLoss
+  #_target_: birdset.modules.losses.focal_loss.MultiLabelFocalLoss
+  network:
+    torch_compile: False
+    model:
+      preprocess_in_model: True
+      freeze_backbone: True
+    # pretrain_info:
+    #   hf_path: DBD-research-group/BirdSet
+    #   hf_name: SNE
+    #   hf_pretrain_name: null
+ 
+trainer:
+  min_epochs: 1
+  max_epochs: 50
+  devices: [0]
+ 
+datamodule:
+  dataset:
+    val_split: 0.2
+    class_weights_loss: null
+    class_weights_sampler: null
+    classlimit: 600
+    eventlimit: 5
+    fewshot:
+      _target_: birdset.configs.datamodule_configs.FewShotConfig
+      k_samples: 32
+      use_train: True
+      use_valid: False
+      use_test: False
+  transforms:
+    preprocessing:
+        normalize_waveform: null
+        normalize_spectrogram: null
+ 
+ 
+  loaders:
+    train:
+      batch_size: 32
+      shuffle: True
+      num_workers: 16
+      drop_last: True
+      prefetch_factor: 2
+ 
+    valid:
+      batch_size: 32
+      num_workers: 16
+      shuffle: False
+   
+    test:
+      batch_size: 16
+      num_workers: 16
+      shuffle: False
+ 
+  mapper:
+    biggest_cluster: True
+    no_call: False
+ 
+callbacks:
+  model_checkpoint:
+    save_last: True
+    # every_n_epochs: 5
+  early_stopping:
+    _target_: lightning.pytorch.callbacks.EarlyStopping
+    monitor: "val/BCEWithLogitsLoss_epoch"
+    patience: 5
+    mode: 'min'
+    min_delta: 1e-3
+    verbose: False
+    check_finite: True

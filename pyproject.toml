@@ -62,6 +62,7 @@ einops = "^0.8.0"
 tensorrt = "8.5.3.1"
 numba = "0.60.0"
 numpy = "^1.26.4"
+black = "^24.10.0"
 
 
 [tool.poetry.group.dev.dependencies]

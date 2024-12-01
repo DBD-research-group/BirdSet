@@ -1,4 +1,3 @@
-
 from importlib.util import find_spec
 from typing import Callable, Any
 from hydra import compose, initialize_config_dir
@@ -14,6 +13,7 @@ import sys
 
 log = pylogger.get_pylogger(__name__)
 
+
 def close_loggers() -> None:
     """Makes sure all loggers closed properly (prevents logging failure during
     multirun)."""
@@ -27,13 +27,14 @@ def close_loggers() -> None:
             log.info("Closing wandb!")
             wandb.finish()
 
+
 @rank_zero_only
 def log_hyperparameters(object_dict):
     hparams = {}
 
     cfg = object_dict["cfg"]
     trainer = object_dict["trainer"]
-  
+
     hparams["datamodule"] = cfg["datamodule"]
     hparams["trainer"] = cfg["trainer"]
 
@@ -46,9 +47,10 @@ def log_hyperparameters(object_dict):
     hparams["seed"] = cfg.get("seed")
     hparams["fold"] = cfg.get("fold")
 
-    #trainer.logger.experiment.config.update(hparams, allow_val_change=True)
+    # trainer.logger.experiment.config.update(hparams, allow_val_change=True)
     trainer.logger.log_hyperparams(OmegaConf.to_container(cfg))
-    #trainer.logger.log_hyperparams(hparams)
+    # trainer.logger.log_hyperparams(hparams)
+
 
 def get_args_parser() -> argparse.ArgumentParser:
     """Get parser for additional Hydra's command line flags."""
@@ -81,6 +83,8 @@ def get_args_parser() -> argparse.ArgumentParser:
         help="Adds an additional config dir to the config search path",
     )
     return parser
+
+
 # flexible metric and loss names for callbacks
 def register_custom_resolvers(
     version_base: str, config_path: str, config_name: str
@@ -105,7 +109,7 @@ def register_custom_resolvers(
             main function.
     """
 
-    #parse additional Hydra's command line flags
+    # parse additional Hydra's command line flags
     parser = get_args_parser()
     args, _ = parser.parse_known_args()
     if args.config_path:
@@ -117,13 +121,12 @@ def register_custom_resolvers(
 
     # register of replace resolver
     if not OmegaConf.has_resolver("replace"):
-        with initialize_config_dir(
-            version_base=version_base, config_dir=config_path
-        ):
-            overrides = sys.argv[1:] # get arguments, except filename
+        with initialize_config_dir(version_base=version_base, config_dir=config_path):
+            overrides = sys.argv[1:]  # get arguments, except filename
 
             cfg = compose(
-                config_name=config_name, return_hydra_config=True, overrides=overrides)
+                config_name=config_name, return_hydra_config=True, overrides=overrides
+            )
         cfg_tmp = cfg.copy()
         loss = load_loss(cfg_tmp.module.loss, None, None)
         metric = load_metrics(cfg_tmp.module.metrics)
@@ -132,10 +135,11 @@ def register_custom_resolvers(
 
         OmegaConf.register_new_resolver(
             "replace",
-            lambda item: item.replace(
-                "__loss__", loss.__class__.__name__
-            ).replace("__metric__", metric.__class__.__name__),
+            lambda item: item.replace("__loss__", loss.__class__.__name__).replace(
+                "__metric__", metric.__class__.__name__
+            ),
         )
+
     def decorator(function: Callable) -> Callable:
         @wraps(function)
         def wrapper(*args: Any, **kwargs: Any) -> Any:

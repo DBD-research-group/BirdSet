@@ -23,6 +23,7 @@ class NetworkConfig:
         normalize_waveform (bool): Whether to normalize the waveform data. Defaults to False.
         normalize_spectrogram (bool): Whether to normalize the spectrogram data. Defaults to True.
     """
+
     model: nn.Module = EfficientNetClassifier(
         num_classes=21,
         num_channels=1,
@@ -32,7 +33,7 @@ class NetworkConfig:
         pretrain_info=None,
     )
     model_name: str = "efficientnet"
-    model_type: Literal['vision', 'waveform'] = "vision"
+    model_type: Literal["vision", "waveform"] = "vision"
     torch_compile: bool = False
     sample_rate: int = 32000
     normalize_waveform: bool = False
@@ -61,19 +62,21 @@ class LRSchedulerConfig:
         scheduler (partial): The scheduler function. Defaults to a cosine scheduler with `num_cycles` set to 0.5 and `last_epoch` set to -1.
         extras (LRSchedulerExtrasConfig): The extras configuration for the scheduler. Defaults to an instance of `LRSchedulerExtrasConfig`.
     """
+
     scheduler = partial(
         get_scheduler,
         name="cosine",
         scheduler_specific_kwargs={
-            'num_cycles': 0.5,
-            'last_epoch': -1,
-        }
+            "num_cycles": 0.5,
+            "last_epoch": -1,
+        },
     )
 
     interval: str = "step"
     warmup_ratio: float = 0.05
 
     # extras: LRSchedulerExtrasConfig = LRSchedulerExtrasConfig()
+
 
 class MulticlassMetricsConfig:
     """
@@ -101,19 +104,24 @@ class MulticlassMetricsConfig:
             num_classes=num_labels,
         )
         self.val_metric_best: Metric = MaxMetric()
-     
-        self.add_metrics: MetricCollection = MetricCollection({
-            'F1': F1Score(
-                task="multiclass",
-                num_classes=num_labels,
-            ),
-        })
-        self.eval_complete: MetricCollection = MetricCollection({
-            'acc': Accuracy(
-            task="multiclass",
-            num_classes=num_labels,
+
+        self.add_metrics: MetricCollection = MetricCollection(
+            {
+                "F1": F1Score(
+                    task="multiclass",
+                    num_classes=num_labels,
+                ),
+            }
         )
-        })
+        self.eval_complete: MetricCollection = MetricCollection(
+            {
+                "acc": Accuracy(
+                    task="multiclass",
+                    num_classes=num_labels,
+                )
+            }
+        )
+
 
 class MultilabelMetricsConfig:
     """
@@ -136,39 +144,34 @@ class MultilabelMetricsConfig:
         Args:
             num_labels (int): The number of labels in the dataset. Defaults to 21 as in the HSN dataset.
         """
-        self.main_metric: Metric = cmAP(
-            num_labels=num_labels,
-            thresholds=None
-        )
+        self.main_metric: Metric = cmAP(num_labels=num_labels, thresholds=None)
         self.val_metric_best: Metric = MaxMetric()
-        self.add_metrics: MetricCollection = MetricCollection({
-            'MultilabelAUROC': AUROC(
-                task="multilabel",
-                num_labels=num_labels,
-                average='macro',
-                thresholds=None
-            ),
-            'T1Accuracy': TopKAccuracy(topk= 1),
-            'T3Accuracy': TopKAccuracy(topk= 3),
-            'mAP': mAP(
-                num_labels= num_labels,
-                thresholds=None
-            )  
-        })
-        self.eval_complete: MetricCollection = MetricCollection({
-            'cmAP5': cmAP5(
-                num_labels=num_labels,
-                sample_threshold=5,
-                thresholds=None
-            ),
-            'pcmAP': pcmAP(
-                num_labels=num_labels,
-                padding_factor=5,
-                average="macro",
-                thresholds=None
-            )
-        })
-
+        self.add_metrics: MetricCollection = MetricCollection(
+            {
+                "MultilabelAUROC": AUROC(
+                    task="multilabel",
+                    num_labels=num_labels,
+                    average="macro",
+                    thresholds=None,
+                ),
+                "T1Accuracy": TopKAccuracy(topk=1),
+                "T3Accuracy": TopKAccuracy(topk=3),
+                "mAP": mAP(num_labels=num_labels, thresholds=None),
+            }
+        )
+        self.eval_complete: MetricCollection = MetricCollection(
+            {
+                "cmAP5": cmAP5(
+                    num_labels=num_labels, sample_threshold=5, thresholds=None
+                ),
+                "pcmAP": pcmAP(
+                    num_labels=num_labels,
+                    padding_factor=5,
+                    average="macro",
+                    thresholds=None,
+                ),
+            }
+        )
 
 
 @dataclass
@@ -182,6 +185,7 @@ class LoggingParamsConfig:
         sync_dist (bool): Whether to synchronize the logging in a distributed setting. Defaults to False.
         prog_bar (bool): Whether to display a progress bar during training. Defaults to True.
     """
+
     on_step: bool = False
     on_epoch: bool = True
     sync_dist: bool = False

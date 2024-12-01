@@ -23,8 +23,11 @@ With [poetry](https://python-poetry.org/).
 poetry install
 poetry shell
 ```
+# Experiments
 
-## Running Linear Probing Experiments
+## BEANS
+
+### Running Linear Probing Experiments on BEANS
 Foundation Models are tested on the Benchmark of Animal Sounds (BEANS) which we host on [Huggingface](https://huggingface.co/collections/DBD-research-group/beans-datasets-6611bd670cd7eb7b0bfc614e) and we focus on the classification datasets (watkins bats, cbi, dogs & humbugdb). Using the [beans.sh](scripts/beans.sh) script you can specify one or multiple experiment Paths to execute linear probing on all the BEANS datasets:
 
 `$./projects/biofoundation/scripts/run_beans_embeddings_experiments.sh embedding/BEANS/perch [additional experiments]`
@@ -86,9 +89,7 @@ datamodule:
     average: True 
 ```
 
-
 The classifier can also be changed and right now [this](birdset/modules/models/linear_classifier.py) is used.
-
 
 ## Running Finetuning Experiments
 
@@ -106,6 +107,85 @@ The results [folder](results) contains plots and plot-code that gives insights o
 As a reference the embedding results can be used for future work:
 ![embedding_results](results/probing_hm.png)
 
+## BirdSet
+
+On the BirdSet benchmark we run three different experiments:
+- Fine-tuning: The pretrained model is fine-tuned on the BirdSet dataset, similar to the dedicated training (DT) approach of the BirdSet paper.
+- Linear Probing: The pretrained model is used as a fixed feature extractor and a linear classifier is trained on top of the extracted features.
+- Few-shot: A small subset (k) samples per class are used for training, ether from the training set or from a split of the test data to evaluate the impact of the covariate shift.
+
+### Running Fine-tuning Experiments on BirdSet
+
+```bash
+python birdset/train.py experiment=biofoundation/birdset/finetuning/{model_name}
+```
+
+#### Results
+
+Results on HSN:
+
+| Model | cmAP | AUROC | Wandb |
+|-------| -------| ---- | ---- |
+| BEATs| **0.44** | **0.87** | [BEATs_HSN#1_2024-11-22_135915](https://wandb.ai/deepbirddetect/BioFoundation/runs/beats_finetune_HSN_1_2024-11-22_135915) |
+| BioLingual| 0.33 | 0.79 | [biolingual_HSN#1_2024-11-29_110143](https://wandb.ai/deepbirddetect/BioFoundation/runs/biolingual_finetune_BirdSet_HSN_1_2024-11-29_110143) |
+| ConvNext| 0.41 | 0.84 | [convnext_HSN#1_2024-11-29_130206](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_finetune_BirdSet_HSN_1_2024-11-29_130206) |
+| EAT| ? | ? | ? |
+| AVES| 0.19 | 0.68 | [aves_HSN#1_2024-11-28_123701](https://wandb.ai/deepbirddetect/BioFoundation/runs/aves_finetune_BirdSet_HSN_1_2024-11-28_123701) (ES: Only 7 epochs)|
+| AST| 0.21 | 0.70 | [ast_HSN#1_2024-11-28_163020](https://wandb.ai/deepbirddetect/BioFoundation/runs/ast_finetune_BirdSet_HSN_1_2024-11-28_163020) |
+| AudioMAE| 0.34132 | 0.83382 |  [audio_mae_HSN#1_2024-11-29_162609] (https://wandb.ai/deepbirddetect/BioFoundation/runs/audiomae_finetuning_BirdSet_HSN_1_2024-11-29_162609) |
+| ConvNext_BS| ? | ? | ? |
+| HUBERT| ? | ? | ? |
+| SSAST| ? | ? | ? |
+| Wav2Vec2| ? | ? | ? |
+| BirdNET| ? | ? | ? |
+### Running Linear Probing Experiments on BirdSet
+
+```bash
+python birdset/train.py experiment=biofoundation/birdset/linearprobing/{model_name}
+```
+
+Results on HSN:
+
+| Model | cmAP | AUROC | Wandb |
+|-------| -------| ---- | ---- |
+| BEATS | 0.11 | **0.73** | [BEATs_HSN#1_2024-11-25_155526](https://wandb.ai/deepbirddetect/BioFoundation/runs/beats_linearprobing_BirdSet_HSN_1_2024-11-25_155526) |
+| Perch | **0.22** | 0.66 | [perch_HSN#1_2024-11-25_175223](https://wandb.ai/deepbirddetect/BioFoundation/runs/perch_linearprobing_BirdSet_HSN_1_2024-11-25_175223) |
+| BioLingual| 0.12 | 0.75 | [biolingual_HSN#1_2024-11-29_111328](https://wandb.ai/deepbirddetect/BioFoundation/runs/biolingual_linearprobing_BirdSet_HSN_1_2024-11-29_111328) # Episode 26 |
+| ConvNext| 0.03 | 0.52 | [convnext_HSN#1_2024-11-29_131024](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_linearprobing_BirdSet_HSN_1_2024-11-29_131024) # Episode 00  |
+| EAT| ? | ? | ? |
+| AVES| 0.04 | 0.63 | [aves_HSN#1_2024-11-28_112422](https://wandb.ai/deepbirddetect/BioFoundation/runs/aves_linearprobing_BirdSet_HSN_1_2024-11-28_112422) |
+| AST| 0.03 | 0.52 | [ast_HSN#1_2024-11-28_143827](https://wandb.ai/deepbirddetect/BioFoundation/runs/ast_linearprobing_BirdSet_HSN_1_2024-11-28_143827) |
+| AudioMAE| ? | ? | ? |
+| ConvNext_BS| ? | ? | ? |
+| HUBERT| ? | ? | ? |
+| SSAST| ? | ? | ? |
+| Wav2Vec2| ? | ? | ? |
+| BirdNET| ? | ? | ? |
+
+### Running FewShot Experiments on BirdSet
+
+```bash
+python birdset/train.py experiment=biofoundation/birdset/fewshot/{model_name}
+```
+
+Results on HSN with 32 samples per class:
+
+
+| Model | cmAP | AUROC | Wandb |
+|-------| -------| ---- | ---- |
+| BEATS | 0.10 | **0.66** | [BEATs_HSN#3_2024-11-25_160815](https://wandb.ai/deepbirddetect/BioFoundation/runs/beats_fewshot_BirdSet_HSN_3_2024-11-25_160815) |
+| Perch | **0.14** | 0.65 | [perch_HSN#1_2024-11-25_180458](https://wandb.ai/deepbirddetect/BioFoundation/runs/perch_fewshot_BirdSet_HSN_1_2024-11-25_180458) |
+| BioLingual| ? | ? | ? |
+| ConvNext| 0.03 | 0.48 | [convnext_HSN#1_2024-11-29_125505](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_fewshot_BirdSet_HSN_1_2024-11-29_125505) |
+| EAT| ? | ? | ? |
+| AVES| 0.04 | 0.53 | [aves_HSN#1_2024-11-28_134553](https://wandb.ai/deepbirddetect/BioFoundation/runs/aves_fewshot_BirdSet_HSN_1_2024-11-28_134553) |
+| AST| 0.03 | 0.53 | [ast_HSN#1_2024-11-28_163304](https://wandb.ai/deepbirddetect/BioFoundation/runs/ast_fewshot_BirdSet_HSN_1_2024-11-28_163304) |
+| AudioMAE| 0.02857 | 0.46822 |[audio_mae_HSN#1_2024-11-29_152352](https://wandb.ai/deepbirddetect/BioFoundation/runs/audiomae_fewshot_BirdSet_HSN_1_2024-11-29_1523) |
+| ConvNext_BS| 0.04 | 0.50 | [convnext_HSN#1_2024-11-29_130609](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_fewshot_BirdSet_HSN_1_2024-11-29_130609) |
+| HUBERT| ? | ? | ? |
+| SSAST| ? | ? | ? |
+| Wav2Vec2| ? | ? | ? |
+| BirdNET| ? | ? | ? |
 
 ## Example
 

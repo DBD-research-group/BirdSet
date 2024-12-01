@@ -20,7 +20,7 @@ class BirdNetModel(nn.Module):
         restrict_logits: bool = False,
         label_path: Optional[str] = None,
         pretrain_info: Optional[Dict] = None,
-        gpu_to_use: int = 0
+        gpu_to_use: int = 0,
     ) -> None:
         """
         Initialize the BirdNetModel.
@@ -53,14 +53,15 @@ class BirdNetModel(nn.Module):
         # self.classifier = nn.Linear(
         #     in_features=self.EMBEDDING_SIZE, out_features=num_classes
         # )
-        self.classifier = nn.Sequential(
-            nn.Linear(self.EMBEDDING_SIZE, 128),
-            nn.ReLU(),
-            nn.Dropout(0.5),
-            nn.Linear(128, 64),
-            nn.ReLU(),
-            nn.Linear(64, self.num_classes),
-        )
+        if self.train_classifier:
+            self.classifier = nn.Sequential(
+                nn.Linear(self.EMBEDDING_SIZE, 128),
+                nn.ReLU(),
+                nn.Dropout(0.5),
+                nn.Linear(128, 64),
+                nn.ReLU(),
+                nn.Linear(64, self.num_classes),
+            )
 
         self.load_model()
 
@@ -69,8 +70,12 @@ class BirdNetModel(nn.Module):
         Load the model from TensorFlow Hub.
         """
         physical_devices = tf.config.list_physical_devices("GPU")
-        tf.config.experimental.set_visible_devices(physical_devices[self.gpu_to_use], 'GPU')
-        tf.config.experimental.set_memory_growth(physical_devices[self.gpu_to_use], True)
+        tf.config.experimental.set_visible_devices(
+            physical_devices[self.gpu_to_use], "GPU"
+        )
+        tf.config.experimental.set_memory_growth(
+            physical_devices[self.gpu_to_use], True
+        )
 
         tf.config.optimizer.set_jit(True)
         self.model = tf.saved_model.load(self.model_path)  # Load the BirdNet model
@@ -174,10 +179,12 @@ class BirdNetModel(nn.Module):
         Returns:
             Tuple[torch.Tensor, torch.Tensor]: A tuple of two tensors (embeddings, logits).
         """
-        device = input_tensor.device # Get the device of the input tensor 
-        input_tensor = input_tensor.cpu().numpy()  # Move the tensor to the CPU and convert it to a NumPy array.
+        device = input_tensor.device  # Get the device of the input tensor
+        input_tensor = (
+            input_tensor.cpu().numpy()
+        )  # Move the tensor to the CPU and convert it to a NumPy array.
         input_tensor = input_tensor.reshape([-1, input_tensor.shape[-1]])
-        
+
         # Process the single input_tensor as usual
         # Run the model and get the outputs using the optimized TensorFlow function
         outputs = self.run_tf_model(input_tensor=input_tensor)
@@ -185,7 +192,7 @@ class BirdNetModel(nn.Module):
         # Extract embeddings and logits, convert them to PyTorch tensors
         embeddings = torch.from_numpy(outputs["embeddings"].numpy())
         logits = torch.from_numpy(outputs["logits"].numpy())
-        embeddings = embeddings.to(device) # Move back to previous device
+        embeddings = embeddings.to(device)  # Move back to previous device
         logits = logits.to(device)
 
         if self.class_mask:

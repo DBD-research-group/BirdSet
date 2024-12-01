@@ -2,45 +2,50 @@ import torch
 import torch.nn as nn
 import datasets
 from transformers import ASTConfig, ASTForAudioClassification
+from birdset.modules.models.birdset_model import BirdSetModel
 from birdset.utils import pylogger
 from birdset.configs import PretrainInfoConfig
 from typing import Optional, Tuple
 log = pylogger.get_pylogger(__name__)
 
 
-class ASTSequenceClassifier(nn.Module):
-    def __init__(self,
-                 checkpoint: str,
-                 num_classes: int = None,
-                 local_checkpoint: str = None,
-                 cache_dir: str = None,
-                 pretrain_info: PretrainInfoConfig = None,
-                 train_classifier: bool = False):
-        """
-        Note: Either num_classes or pretrain_info must be given
-        Args:
-            checkpoint: huggingface checkpoint path of any model of correct type
-            num_classes: number of classification heads to be used in the model
-            local_checkpoint: local path to checkpoint file
-            cache_dir: specified cache dir to save model files at
-            pretrain_info: hf_path and hf_name of info will be used to infer if num_classes is None
-        """
-        super(ASTSequenceClassifier, self).__init__()
-        self.train_classifier = train_classifier
+class ASTSequenceClassifier(BirdSetModel):
+    EMBEDDING_SIZE = 768
+    
+    def __init__(
+        self,
+        num_classes: int = None,
+        embedding_size: int = EMBEDDING_SIZE,
+        checkpoint: str = "MIT/ast-finetuned-audioset-10-10-0.4593",
+        local_checkpoint: str = None,
+        freeze_backbone: bool = False,
+        preprocess_in_model: bool = False, # This isn't implemented for this model (yet?!)
+        classifier: nn.Module | None = None,
+        cache_dir: str = None,
+        pretrain_info: PretrainInfoConfig = None,
+    ):
+
+        super().__init__(
+            num_classes=num_classes,
+            embedding_size=embedding_size,
+            local_checkpoint=local_checkpoint,
+            freeze_backbone=freeze_backbone,
+            preprocess_in_model=preprocess_in_model,
+        )
         self.checkpoint = checkpoint
-        if pretrain_info:  # either num_classes if provided or pretrain info
-            self.hf_path = pretrain_info.hf_path
-            self.hf_name = pretrain_info.hf_name if not pretrain_info.hf_pretrain_name else pretrain_info.hf_pretrain_name
-            self.num_classes = len(datasets.load_dataset_builder(self.hf_path, self.hf_name).info.features["ebird_code"].names)
-        else:
-            self.num_classes = num_classes
-
         self.cache_dir = cache_dir
+        self.classifier = classifier
 
-        if local_checkpoint:  # TODO only loads a pretrained model from a local checkpoint else a randomly init model???
+
+        if (
+            local_checkpoint
+        ):  # TODO only loads a pretrained model from a local checkpoint else a randomly init model???
             log.info(f">> Loading state dict from local checkpoint: {local_checkpoint}")
             state_dict = torch.load(local_checkpoint)["state_dict"]
-            state_dict = {key.replace('model.model.', ''): weight for key, weight in state_dict.items()}
+            state_dict = {
+                key.replace("model.model.", ""): weight
+                for key, weight in state_dict.items()
+            }
 
             self.model = ASTForAudioClassification.from_pretrained(
                 self.checkpoint,
@@ -58,8 +63,13 @@ class ASTSequenceClassifier(nn.Module):
                 ignore_mismatched_sizes=True,
             )
             
-        
-    def forward(self, input_values, attention_mask=None, labels=None, return_hidden_state=False):
+        if freeze_backbone:
+            for param in self.model.parameters():
+                param.requires_grad = False    
+
+    def forward(
+        self, input_values, attention_mask=None, labels=None, return_hidden_state=False
+    ):
         """
         This method processes the input tensor, primarily by adjusting its dimensions to match the expected
         format of the model. It first squeezes out the channel dimension, assuming it's of size one, and then
@@ -77,6 +87,9 @@ class ASTSequenceClassifier(nn.Module):
         """
 
         input_values = input_values.squeeze(1)
+
+        # Swap the height and width dimensions so that the tensor has shape (width, height)
+        # 6,1,128,1024
         input_values = input_values.transpose(1, 2)
         outputs = self.model(
             input_values, 
@@ -125,24 +138,28 @@ class ASTSequenceClassifier(nn.Module):
         
 
         outputs = self.model(
-            input_values, 
+            input_values,
             attention_mask,
             output_attentions=False,
             output_hidden_states=True,
             return_dict=True,
-            labels=None
+            labels=None,
         )
         logits = outputs["logits"]
+
         last_hidden_state = outputs["hidden_states"][-1]  # (batch, sequence, dim)
         cls_state = last_hidden_state[:, 0, :]  # (batch, dim)
 
-        if return_hidden_state:
-            embeddings = (logits, cls_state)
-        else:
-            embeddings = logits
+        if self.classifier is None:
+            if return_hidden_state:
+                output = (logits, cls_state)
 
-        return embeddings, None
-
+            else:
+                output = logits
+        else: 
+            output = self.classifier(cls_state)
+            
+        return output
 
     @torch.inference_mode()
     def get_logits(self, dataloader, device):
@@ -161,5 +178,7 @@ class ASTSequenceClassifierRandomInit(ASTSequenceClassifier):
     def __init__(self, *args, **kwargs):
         super(ASTSequenceClassifierRandomInit, self).__init__(*args, **kwargs)
 
-        config = ASTConfig.from_pretrained(self.checkpoint, num_labels=kwargs["num_classes"])
+        config = ASTConfig.from_pretrained(
+            self.checkpoint, num_labels=kwargs["num_classes"]
+        )
         self.model = ASTForAudioClassification.from_config(config)

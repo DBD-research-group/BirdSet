@@ -14,11 +14,11 @@ log = pylogger.get_pylogger(__name__)
 
 class PretrainDataModule(BaseDataModuleHF):
     def __init__(
-            self,
-            dataset: DatasetConfig = DatasetConfig(),
-            loaders: LoadersConfig = LoadersConfig(),
-            transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
-            mapper: XCEventMapping = XCEventMapping()
+        self,
+        dataset: DatasetConfig = DatasetConfig(),
+        loaders: LoadersConfig = LoadersConfig(),
+        transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
+        mapper: XCEventMapping = XCEventMapping(),
     ):
         super().__init__(
             dataset=dataset,
@@ -40,7 +40,7 @@ class PretrainDataModule(BaseDataModuleHF):
             self._prepare_done = True
         else:
             return super().prepare_data()
-    
+
     def _get_dataset(self, split):
         if self.dataset_config.direct_fingerprint:
             path = os.path.join(self.dataset_config.direct_fingerprint, split)
@@ -51,7 +51,9 @@ class PretrainDataModule(BaseDataModuleHF):
 
         transforms = deepcopy(self.transforms)
         transforms.set_mode(split)
-        if split == "train":  # we need this for sampler, cannot be done later because set_transform
+        if (
+            split == "train"
+        ):  # we need this for sampler, cannot be done later because set_transform
             self.train_label_list = dataset["labels"]
 
         if split == "valid":
@@ -87,8 +89,8 @@ class PretrainDataModule(BaseDataModuleHF):
             ),
         )
 
-        return dataset       
-    
+        return dataset
+
     def _preprocess_data(self, dataset):
         if self.dataset_config.task == "multiclass":
             # we only have train data
@@ -100,31 +102,36 @@ class PretrainDataModule(BaseDataModuleHF):
                 batch_size=300,
                 load_from_cache_file=True,
                 num_proc=self.dataset_config.n_workers,
-                desc="Event Mapping"
+                desc="Event Mapping",
             )
 
-            if self.dataset_config.class_weights_loss or self.dataset_config.class_weights_sampler:
-                self.num_train_labels = self._count_labels((dataset["train"]["ebird_code"]))
-            
+            if (
+                self.dataset_config.class_weights_loss
+                or self.dataset_config.class_weights_sampler
+            ):
+                self.num_train_labels = self._count_labels(
+                    (dataset["train"]["ebird_code"])
+                )
+
             if self.dataset_config.classlimit and not self.dataset_config.eventlimit:
                 dataset["train"] = self._limit_classes(
                     dataset=dataset["train"],
                     label_name="ebird_code",
-                    limit=self.dataset_config.classlimit
+                    limit=self.dataset_config.classlimit,
                 )
             elif self.dataset_config.classlimit or self.dataset_config.eventlimit:
                 dataset["train"] = self._smart_sampling(
                     dataset=dataset["train"],
                     label_name="ebird_code",
                     class_limit=self.dataset_config.classlimit,
-                    event_limit=self.dataset_config.eventlimit
+                    event_limit=self.dataset_config.eventlimit,
                 )
 
             dataset = dataset.rename_column("ebird_code", "labels")
 
         elif self.dataset_config.task == "multilabel":
             # only train data
-            
+
             logging.info("> Mapping data set.")
             dataset["train"] = dataset["train"].map(
                 self.event_mapper,
@@ -133,18 +140,18 @@ class PretrainDataModule(BaseDataModuleHF):
                 batch_size=300,
                 load_from_cache_file=True,
                 num_proc=1,
-                desc="Event Mapping"
+                desc="Event Mapping",
             )
 
             dataset = dataset.rename_column("ebird_code_multilabel", "labels")
 
             if self.dataset_config.classlimit or self.dataset_config.eventlimit:
-                logging.info(">> Smart Sampling") #!TODO: implement custom caching?
+                logging.info(">> Smart Sampling")  #!TODO: implement custom caching?
                 dataset["train"] = self._smart_sampling(
                     dataset=dataset["train"],
                     label_name="ebird_code",
                     class_limit=self.dataset_config.classlimit,
-                    event_limit=self.dataset_config.eventlimit
+                    event_limit=self.dataset_config.eventlimit,
                 )
 
             logging.info(">> One-hot-encode classes")
@@ -154,11 +161,16 @@ class PretrainDataModule(BaseDataModuleHF):
                 batch_size=300,
                 load_from_cache_file=True,
                 num_proc=1,
-                desc="One-hot-encoding"
+                desc="One-hot-encoding",
             )
 
-            if self.dataset_config.class_weights_loss or self.dataset_config.class_weights_sampler:
-                self.num_train_labels = self._count_labels((dataset["train"]["ebird_code"]))
+            if (
+                self.dataset_config.class_weights_loss
+                or self.dataset_config.class_weights_sampler
+            ):
+                self.num_train_labels = self._count_labels(
+                    (dataset["train"]["ebird_code"])
+                )
 
         dataset["train"] = dataset["train"].select_columns(
             ["filepath", "labels", "detected_events", "start_time", "end_time"]

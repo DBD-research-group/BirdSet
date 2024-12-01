@@ -1,9 +1,7 @@
 model:
   _target_: birdset.modules.models.aves.AvesClassifier
-  model_path: ${paths.root_dir}/models/aves/aves-base-bio.torchaudio.pt
-  config_path: ${paths.root_dir}/models/aves/aves-base-bio.torchaudio.model_config.json
-  local_checkpoint: null
   num_classes: null
+  local_checkpoint: null
   pretrain_info:
     hf_path: ${datamodule.dataset.hf_path}
     hf_name: ${datamodule.dataset.hf_name}
@@ -13,7 +11,7 @@ model:
 model_name: aves
 model_type: waveform
 torch_compile: False
-sampling_rate: 16_000 # Or 16k (performed 2% worse)
+sampling_rate: 16_000
 normalize_spectrogram: False
 normalize_waveform: False
 embedding_size: 768
