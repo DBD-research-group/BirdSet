@@ -1,0 +1,5 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - biofoundation/birdset/finetuning/finetuning_config.yaml 
+  - override /module/network: wav2vec2.yaml  
