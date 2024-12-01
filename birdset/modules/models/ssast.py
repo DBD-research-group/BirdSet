@@ -11,6 +11,7 @@ from torchaudio.compliance import kaldi
 import torch.nn.functional as F
 from typing import Optional
 from birdset.utils import pylogger
+from birdset.modules.models.birdset_model import BirdSetModel
 
 log = pylogger.get_pylogger(__name__)
 
@@ -42,10 +43,17 @@ class PatchEmbed(nn.Module):
         return x
 
 
-class ASTModel(nn.Module):
+class ASTModel(BirdSetModel):
+    EMBEDDING_SIZE = 768
+    
     def __init__(
         self,
         num_classes,
+        embedding_size: int = EMBEDDING_SIZE,
+        local_checkpoint: str = None,
+        freeze_backbone: bool = False,
+        preprocess_in_model: bool = True,
+        classifier: nn.Module = None,
         fshape=16,
         tshape=16,
         fstride=16,
@@ -55,7 +63,6 @@ class ASTModel(nn.Module):
         model_size="base",
         pretrain_stage=False,
         load_pretrained_mdl_path=None,
-        train_classifier=False,
     ):
         """
         Initialize a SSAST model for finetuning or evaluation. Pretraining is not supported but we need to keep parts of the code to initialize a SSAST model for finetuning/evaluation.
@@ -102,7 +109,18 @@ class ASTModel(nn.Module):
         --------------
         - Parameters that need adjustment for finetuning or evaluation can be modified in the `ssast.yaml` configuration file.
         """
-        super(ASTModel, self).__init__()
+        super().__init__(
+            num_classes=num_classes,
+            embedding_size=embedding_size,
+            local_checkpoint=local_checkpoint,
+            freeze_backbone=freeze_backbone,
+            preprocess_in_model=preprocess_in_model,
+        )
+        
+        if classifier is None:
+            self.classifier = nn.Linear(embedding_size, num_classes)
+        else:
+            self.classifier = classifier
 
         # Prepare/load the model backbone
         assert (
@@ -240,10 +258,10 @@ class ASTModel(nn.Module):
             self.cls_token_num = audio_model.module.cls_token_num
 
             # Classifier head for fine-tuning
-            self.mlp_head = nn.Sequential(
-                nn.LayerNorm(self.original_embedding_dim),
-                nn.Linear(self.original_embedding_dim, num_classes),
-            )
+            #self.mlp_head = nn.Sequential(
+                #nn.LayerNorm(self.original_embedding_dim),
+                #nn.Linear(self.original_embedding_dim, num_classes),
+            #)
 
             f_dim, t_dim = self.get_shape(
                 fstride, tstride, input_fdim, input_tdim, fshape, tshape
@@ -336,7 +354,7 @@ class ASTModel(nn.Module):
                 )
             )
 
-            if train_classifier:
+            if freeze_backbone:
                 for param in self.v.parameters():
                     param.requires_grad = False
 
@@ -388,7 +406,7 @@ class ASTModel(nn.Module):
         # melspecs = (melspecs - self.MEAN) / (self.STD * 2)
         return melspecs
 
-    def get_embeddings(self, input_tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+    def get_embeddings(self, input_tensor) -> torch.Tensor:
         """
         Calculates embeddings for the given input tensor which is first converted to frequency bins.
         Args:
@@ -396,9 +414,10 @@ class ASTModel(nn.Module):
         Returns:
             Tuple[torch.Tensor, torch.Tensor]: A tuple containing the embeddings tensor and the output of the MLP head.
         """
-        input_tensor = self.preprocess(
-            input_tensor, input_tdim=self.input_tdim
-        )  # Convert to spectrogram
+        if self.preprocess_in_model:
+            input_tensor = self.preprocess(
+                input_tensor, input_tdim=self.input_tdim
+            )  # Convert to spectrogram
         # expect input x = (batch_size, time_frame_num, frequency_bins), e.g., (12, 1024, 128)
         input_tensor = input_tensor.transpose(2, 3)
         B = input_tensor.shape[0]
@@ -422,11 +441,11 @@ class ASTModel(nn.Module):
         # average output of all tokens except cls token(s)
         x = torch.mean(x[:, self.cls_token_num :, :], dim=1)
 
-        return x, self.mlp_head(x)
+        return x
 
     def forward(
         self, input_values: torch.Tensor, labels: Optional[torch.Tensor] = None
     ) -> torch.Tensor:
-        embeddings = self.get_embeddings(input_values)[0]
+        embeddings = self.get_embeddings(input_values)
 
-        return self.mlp_head(embeddings)
+        return self.classifier(embeddings)
