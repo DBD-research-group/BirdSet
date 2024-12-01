@@ -3,17 +3,3 @@
 defaults:
   - biofoundation/birdset/finetuning/finetuning_config.yaml 
   - override /module/network: eat.yaml 
-
-tags: ["biofoundation", "eat_ssl", "finetuning"]
-
-trainer:
-  min_epochs: 1
-  max_epochs: 2
-  devices: [0]
-
-logger:
-  wandb:
-    tags: ${tags}
-    group: "biofoundation_eat_ssl_finetuning_BirdSet__${datamodule.dataset.dataset_name}"
-    mode: online
-    version: eat_ssl_finetuning_BirdSet_${datamodule.dataset.dataset_name}_${seed}_${start_time} #to resume train run # needs to be tested
