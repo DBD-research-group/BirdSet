@@ -1,8 +1,8 @@
 model:
   _target_: birdset.modules.models.hubert.HubertSequenceClassifier
+  num_classes: null
   checkpoint: facebook/hubert-base-ls960
   local_checkpoint: null
-  num_classes: null
   cache_dir: ${paths.model_path}
   pretrain_info:
     hf_path: ${datamodule.dataset.hf_path}
@@ -13,7 +13,7 @@ model:
 model_name: hubert
 model_type: waveform
 torch_compile: False
-sampling_rate: 16_000 # Or 16k (performed 2% worse)
+sampling_rate: 16_000
 normalize_spectrogram: False
 normalize_waveform: False
 embedding_size: 768
