@@ -327,9 +327,9 @@ class EmbeddingDataModule(BaseDataModuleHF):
                 return self._frame_and_average(waveform)
             else:
                 audio = audio[: self.max_length * self.sampling_rate]
-                return self.embedding_model.get_embeddings(audio.view(1, 1, -1))[0]
+                return self.embedding_model.get_embeddings(audio.view(1, 1, -1))
         else:
-            return self.embedding_model.get_embeddings(audio.view(1, 1, -1))[0]
+            return self.embedding_model.get_embeddings(audio.view(1, 1, -1))
 
     # Zero-padding function
     def _zero_pad(self, audio):
@@ -350,8 +350,8 @@ class EmbeddingDataModule(BaseDataModuleHF):
         # Generate embeddings for each frame
         l = []
         for frame in frames:
-            embedding = self.embedding_model.get_embeddings(frame.view(1, 1, -1))[0]
-            l.append(embedding[0])  # To just use embeddings not logits
+            embedding = self.embedding_model.get_embeddings(frame.view(1, 1, -1))
+            l.append(embedding)  # To just use embeddings not logits
 
         embeddings = torch.stack(tuple(l))
 
