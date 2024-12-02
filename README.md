@@ -135,6 +135,7 @@ Results on HSN:
 | AudioMAE| 0.34 | 0.83 |  [audio_mae_HSN#1_2024-11-29_162609](https://wandb.ai/deepbirddetect/BioFoundation/runs/audiomae_finetuning_BirdSet_HSN_1_2024-11-29_162609) |
 | ConvNext_BS| **0.51** | **0.88** | [convnext_bs_HSN#1_2024-11-29_154136](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_bs_finetune_BirdSet_HSN_1_2024-11-29_154136) |
 | HUBERT| 0.32 | 0.80 | [hubert_HSN#1_2024-11-29_142052](https://wandb.ai/deepbirddetect/BioFoundation/runs/hubert_finetune_BirdSet_HSN_1_2024-11-29_142052) |
+| EAT_SSL| 0.10 | 0.61 | [eat_ssl_HSN#1_2024-12-01_181129](https://wandb.ai/deepbirddetect/BioFoundation/runs/eat_ssl_finetune_BirdSet_HSN_1_2024-12-01_181129) |
 | SSAST| ? | ? | ? |
 | Wav2Vec2| ? | ? | ? |
 | BirdNET| ? | ? | ? |
@@ -156,8 +157,9 @@ Results on HSN:
 | AVES| 0.04 | 0.63 | [aves_HSN#1_2024-11-28_112422](https://wandb.ai/deepbirddetect/BioFoundation/runs/aves_linearprobing_BirdSet_HSN_1_2024-11-28_112422) |
 | AST| 0.03 | 0.52 | [ast_HSN#1_2024-11-28_143827](https://wandb.ai/deepbirddetect/BioFoundation/runs/ast_linearprobing_BirdSet_HSN_1_2024-11-28_143827) |
 | AudioMAE| ? | ? | ? |
-| ConvNext_BS| ? | ? | ? |
+| ConvNext_BS| 0.07 | 0.61 | [convnext_bs_HSN#1_2024-11-29_174232](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_bs_linearprobing_BirdSet_HSN_1_2024-11-29_174232) |
 | HUBERT| 0.07 | 0.57 | [hubert_HSN#1_2024-11-29_142350]( https://wandb.ai/deepbirddetect/BioFoundation/runs/hubert_linearprobing_BirdSet_HSN_1_2024-11-29_142350) |
+| EAT_SSL| 0.21 | 0.79 | [eat_ssl_HSN#1_2024-12-01_181122](https://wandb.ai/deepbirddetect/BioFoundation/runs/eat_ssl_linearprobing_BirdSet_HSN_1_2024-12-01_181122) |
 | SSAST| ? | ? | ? |
 | Wav2Vec2| 0.03 | 0.45 | [wav2vec2_HSN#1_2024-11-29_171616](https://wandb.ai/deepbirddetect/BioFoundation/runs/wav2vec2_linearprobing_BirdSet_HSN_1_2024-11-29_171616)  |
 | BirdNET| ? | ? | ? |
@@ -175,14 +177,15 @@ Results on HSN with 32 samples per class:
 |-------| -------| ---- | ---- |
 | BEATS | 0.10 | **0.66** | [BEATs_HSN#3_2024-11-25_160815](https://wandb.ai/deepbirddetect/BioFoundation/runs/beats_fewshot_BirdSet_HSN_3_2024-11-25_160815) |
 | Perch | 0.14 | 0.65 | [perch_HSN#1_2024-11-25_180458](https://wandb.ai/deepbirddetect/BioFoundation/runs/perch_fewshot_BirdSet_HSN_1_2024-11-25_180458) |
-| BioLingual| 0.07 | ? | ? |
+| BioLingual| 0.07 | 0.49 | [biolingual_HSN#1_2024-11-29_171140](https://wandb.ai/deepbirddetect/BioFoundation/runs/biolingual_fewshot_BirdSet_HSN_1_2024-11-29_171140) |
 | ConvNext| 0.03 | 0.48 | [convnext_HSN#1_2024-11-29_125505](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_fewshot_BirdSet_HSN_1_2024-11-29_125505) |
 | EAT| **0.17** | 0.63 | [eat_HSN#1_2024-12-01_170656](https://wandb.ai/deepbirddetect/BioFoundation/runs/eat_fewshot_BirdSet_HSN_1_2024-12-01_170656) |
 | AVES| 0.04 | 0.53 | [aves_HSN#1_2024-11-28_134553](https://wandb.ai/deepbirddetect/BioFoundation/runs/aves_fewshot_BirdSet_HSN_1_2024-11-28_134553) |
 | AST| 0.03 | 0.53 | [ast_HSN#1_2024-11-28_163304](https://wandb.ai/deepbirddetect/BioFoundation/runs/ast_fewshot_BirdSet_HSN_1_2024-11-28_163304) |
 | AudioMAE| 0.03 | 0.47 |[audio_mae_HSN#1_2024-11-29_152352](https://wandb.ai/deepbirddetect/BioFoundation/runs/audiomae_fewshot_BirdSet_HSN_1_2024-11-29_1523) |
 | ConvNext_BS| 0.04 | 0.50 | [convnext_HSN#1_2024-11-29_130609](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_fewshot_BirdSet_HSN_1_2024-11-29_130609) |
-| HUBERT| 0.045 | 0.53 | [hubert_HSN#1_2024-11-29_141537](https://wandb.ai/deepbirddetect/BioFoundation/runs/hubert_fewshot_BirdSet_HSN_1_2024-11-29_141537) |
+| HUBERT| 0.05 | 0.53 | [hubert_HSN#1_2024-11-29_141537](https://wandb.ai/deepbirddetect/BioFoundation/runs/hubert_fewshot_BirdSet_HSN_1_2024-11-29_141537) |
+| EAT_SSL| 0.02 | 0.30 | [eat_ssl_HSN#1_2024-12-01_180844](https://wandb.ai/deepbirddetect/BioFoundation/runs/eat_ssl_fewshot_BirdSet_HSN_1_2024-12-01_180844) |
 | SSAST| ? | ? | ? |
 | Wav2Vec2| 0.03 | 0.47 | [wav2vec2_HSN#1_2024-11-29_172107](https://wandb.ai/deepbirddetect/BioFoundation/runs/wav2vec2_fewshot_BirdSet_HSN_1_2024-11-29_172107) |
 | BirdNET| ? | ? | ? |
