@@ -9,7 +9,7 @@ defaults:
   - override /datamodule/transforms: bird_default_multilabel.yaml
   - override /paths: default.yaml
   - override /hydra: default.yaml
-tags: ["biofoundation", "beats", "linearprobing", "augs_birdset"]
+tags: ["biofoundation", "${module.network.model_name}", "linearprobing", "augs_birdset"]
 seed: 1
 train: True
 test: True
@@ -17,9 +17,9 @@ test: True
 logger:
   wandb:
     tags: ${tags}
-    group: "biofoundation_beats_linearprobing_BirdSet__${datamodule.dataset.dataset_name}"
+    group: "biofoundation_${module.network.model_name}_linearprobing_BirdSet__${datamodule.dataset.dataset_name}"
     mode: online
-    version: beats_linearprobing_BirdSet_${datamodule.dataset.dataset_name}_${seed}_${start_time} #to resume train run # needs to be tested
+    version: ${module.network.model_name}_linearprobing_BirdSet_${datamodule.dataset.dataset_name}_${seed}_${start_time} #to resume train run # needs to be tested
  
 module:
   optimizer:
@@ -52,6 +52,7 @@ datamodule:
     classlimit: 600
     eventlimit: 5
   transforms:
+    max_length: ${module.network.length}
     preprocessing:
         normalize_waveform: null
         normalize_spectrogram: null

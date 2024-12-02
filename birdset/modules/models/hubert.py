@@ -11,17 +11,24 @@ from transformers import (
 import datasets
 from typing import Tuple
 from birdset.configs import PretrainInfoConfig
+from birdset.modules.models.birdset_model import BirdSetModel
 
 
-class HubertSequenceClassifier(nn.Module):
+class HubertSequenceClassifier(BirdSetModel):
+    
+    EMBEDDING_SIZE = 768
+    
     def __init__(
         self,
-        checkpoint: str,
         num_classes: int = None,
+        embedding_size: int = EMBEDDING_SIZE,
+        checkpoint: str = "facebook/hubert-base-ls960",
         local_checkpoint: str = None,
+        freeze_backbone: bool = False,
+        preprocess_in_model: bool = False,
+        classifier: nn.Module | None = None,
         cache_dir: str = None,
-        pretrain_info: PretrainInfoConfig = None,
-        n_last_hidden_layer: int = 1,
+        pretrain_info: PretrainInfoConfig = None
     ):
         """
         Note: Either num_classes or pretrain_info must be given
@@ -32,10 +39,16 @@ class HubertSequenceClassifier(nn.Module):
             cache_dir: specified cache dir to save model files at
             pretrain_info: hf_path and hf_name of info will be used to infer if num_classes is None
         """
-        super(HubertSequenceClassifier, self).__init__()
+        super().__init__(
+            num_classes=num_classes,
+            embedding_size=embedding_size,
+            local_checkpoint=local_checkpoint,
+            freeze_backbone=freeze_backbone,
+            preprocess_in_model=preprocess_in_model,
+        )
 
         self.checkpoint = checkpoint
-        self.n_last_hidden_layer = n_last_hidden_layer
+        self.classifier = classifier
 
         if pretrain_info:
             self.hf_path = pretrain_info.hf_path
@@ -74,6 +87,10 @@ class HubertSequenceClassifier(nn.Module):
             state_dict=state_dict,
             ignore_mismatched_sizes=True,
         )
+        
+        if freeze_backbone:
+            for param in self.model.parameters():
+                param.requires_grad = False
 
     def forward(
         self, input_values, attention_mask=None, labels=None, return_hidden_state=False
@@ -105,15 +122,19 @@ class HubertSequenceClassifier(nn.Module):
 
         last_hidden_state = outputs["hidden_states"][-1]  # (batch, sequence, dim)
         cls_state = last_hidden_state[:, 0, :]  # (batch, dim)
-        if return_hidden_state:
-            output = (logits, cls_state)
+        
+        if self.classifier is None:
+            if return_hidden_state:
+                output = (logits, cls_state)
 
+            else:
+                output = logits
         else:
-            output = logits
-
+            output = self.classifier(cls_state)
+            
         return output
 
-    def get_embeddings(self, input_tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+    def get_embeddings(self, input_tensor) -> torch.Tensor:
         input_tensor = input_tensor.squeeze(1)
 
         outputs = self.model(
@@ -130,7 +151,7 @@ class HubertSequenceClassifier(nn.Module):
         ]  # (batch, sequence, dim)
         cls_state = last_hidden_state[:, 0, :]
 
-        return cls_state, logits
+        return cls_state
 
     @torch.inference_mode()
     def get_logits(self, dataloader, device):

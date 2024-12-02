@@ -9,7 +9,7 @@ defaults:
   - override /datamodule/transforms: bird_default_multilabel.yaml
   - override /paths: default.yaml
   - override /hydra: default.yaml
-tags: ["biofoundation", "beats", "finetune"]
+tags: ["biofoundation", "${module.network.model_name}", "finetune"]
 seed: 1
 train: True
 test: True
@@ -17,9 +17,9 @@ test: True
 logger:
   wandb:
     tags: ${tags}
-    group: "biofoundation_beats_finetune_BirdSet__${datamodule.dataset.dataset_name}"
+    group: "biofoundation_${module.network.model_name}_finetune_BirdSet__${datamodule.dataset.dataset_name}"
     mode: online
-    version: beats_finetune_BirdSet_${datamodule.dataset.dataset_name}_${seed}_${start_time} #to resume train run # needs to be tested
+    version: ${module.network.model_name}_finetune_BirdSet_${datamodule.dataset.dataset_name}_${seed}_${start_time} #to resume train run # needs to be tested
  
 module:
   optimizer:
@@ -32,7 +32,6 @@ module:
   network:
     torch_compile: False
     model:
-      embedding_size: 768
       preprocess_in_model: True
     # pretrain_info:
     #   hf_path: DBD-research-group/BirdSet
@@ -42,7 +41,7 @@ module:
 trainer:
   min_epochs: 1
   max_epochs: 50
-  devices: [1]
+  devices: [2]
  
 datamodule:
   dataset:
@@ -52,7 +51,7 @@ datamodule:
     classlimit: 600
     eventlimit: 5
   transforms:
-    max_length: 10
+    max_length: ${module.network.length}
     preprocessing:
         normalize_waveform: null
         normalize_spectrogram: null

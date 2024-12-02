@@ -1,11 +1,11 @@
 from typing import Optional
 
 
+from birdset.configs.model_configs import PretrainInfoConfig
 from birdset.modules.models.BEATs import BEATs, BEATsConfig
 from birdset.modules.models.birdset_model import BirdSetModel
 import torch
 from torch import nn
-from typing import Tuple
 
 
 class BEATsModel(BirdSetModel):
@@ -26,6 +26,7 @@ class BEATsModel(BirdSetModel):
         freeze_backbone: bool = False,
         preprocess_in_model: bool = True,
         classifier: nn.Module | None = None,
+        pretrain_info: Optional[PretrainInfoConfig] = None,
     ) -> None:
         super().__init__(
             num_classes=num_classes,
@@ -33,6 +34,7 @@ class BEATsModel(BirdSetModel):
             local_checkpoint=local_checkpoint,
             freeze_backbone=freeze_backbone,
             preprocess_in_model=preprocess_in_model,
+            pretrain_info=pretrain_info,
         )
         self.model = None  # Placeholder for the loaded model
         self.load_model()

@@ -1,0 +1,80 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - override /logger: wandb_default.yaml
+  - override /datamodule: HSN.yaml
+  - override /module: multilabel_finetune.yaml
+  - override /callbacks: default.yaml
+  - override /trainer: single_gpu.yaml
+  - override /paths: default.yaml
+  - override /hydra: default.yaml
+  - override /datamodule/transforms: bird_default_multilabel.yaml
+  #- override /datamodule/transforms/waveform_augmentations: none.yaml # No augmentations for now
+  #- override /datamodule/transforms/spectrogram_augmentations: none.yaml
+
+
+tags: ["BirdSet", "finetune", "multilabel"]
+seed: 2
+train: True
+test: True
+
+logger:
+  wandb:
+    tags: ${tags}
+    mode: online
+    group: ${module.network.model_name}_${datamodule.dataset.dataset_name}
+
+
+module:
+  embedding_model:  # This is needed to provide num_classes to the classifier model (Isn't used but set to 0 by default and injected to late in train.py)
+      model:
+        num_classes: null
+  optimizer:
+    lr: 1e-4 # A lot lower than for linear probing
+    weight_decay: 5e-4 
+    
+trainer:
+  devices: [0]
+  min_epochs: 1
+  max_epochs: 10
+  precision: 32
+
+datamodule:
+  transforms:
+    max_length: ${module.embedding_model.length}
+
+  loaders:
+    train:
+      batch_size: 32
+      shuffle: True
+      num_workers: 16
+      drop_last: True
+    valid:
+      batch_size: 32
+      num_workers: 16
+      shuffle: False
+    test:
+      batch_size: 32
+      num_workers: 16
+      shuffle: False
+    
+  dataset:
+    val_split: 0.2
+    class_weights_loss: null
+    class_weights_sampler: null
+    classlimit: 600
+    eventlimit: 5  
+  
+callbacks:
+  model_checkpoint:
+    save_last: False
+    every_n_epochs: null
+    every_n_train_steps: null
+  early_stopping:
+    _target_: lightning.pytorch.callbacks.EarlyStopping
+    monitor: "train/BCEWithLogitsLoss_epoch"
+    patience: 2
+    min_delta: 1e-3
+    verbose: False
+    check_finite: True
+
