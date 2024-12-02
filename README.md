@@ -157,7 +157,7 @@ Results on HSN:
 | AVES| 0.04 | 0.63 | [aves_HSN#1_2024-11-28_112422](https://wandb.ai/deepbirddetect/BioFoundation/runs/aves_linearprobing_BirdSet_HSN_1_2024-11-28_112422) |
 | AST| 0.03 | 0.52 | [ast_HSN#1_2024-11-28_143827](https://wandb.ai/deepbirddetect/BioFoundation/runs/ast_linearprobing_BirdSet_HSN_1_2024-11-28_143827) |
 | AudioMAE| ? | ? | ? |
-| ConvNext_BS| ? | ? | ? |
+| ConvNext_BS| 0.07 | 0.61 | [convnext_bs_HSN#1_2024-11-29_174232](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_bs_linearprobing_BirdSet_HSN_1_2024-11-29_174232) |
 | HUBERT| 0.07 | 0.57 | [hubert_HSN#1_2024-11-29_142350]( https://wandb.ai/deepbirddetect/BioFoundation/runs/hubert_linearprobing_BirdSet_HSN_1_2024-11-29_142350) |
 | EAT_SSL| 0.21 | 0.79 | [eat_ssl_HSN#1_2024-12-01_181122](https://wandb.ai/deepbirddetect/BioFoundation/runs/eat_ssl_linearprobing_BirdSet_HSN_1_2024-12-01_181122) |
 | SSAST| ? | ? | ? |
