@@ -70,6 +70,11 @@ poetry shell
 ```
 -->
 
+## Ebird-Code to ID Maps
+
+You can find JSON files containing `id2label` and `label2id` dictionaries for each dataset under the [resources/ebird_codes](https://github.com/DBD-research-group/BirdSet/tree/main/resources/ebird_codes) directory int he git repository.
+Additionally the pretrained models (e.g. the pretrained [ConvNeXT](https://huggingface.co/DBD-research-group/ConvNeXT-Base-BirdSet-XCL) model) include such dictionaries for the dataset they're trained on in their configs.
+
 ## Examples 🐤
 
 We offer an in-depth [tutorial notebook](https://github.com/DBD-research-group/BirdSet/blob/main/notebooks/tutorials/birdset-pipeline_tutorial.ipynb) on how to use this repository. In the following, we provide simple code snippets:
