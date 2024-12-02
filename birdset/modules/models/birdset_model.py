@@ -45,8 +45,4 @@ class BirdSetModel(nn.Module):
 
 
     def _preprocess(self, input_values: torch.Tensor) -> torch.Tensor:
-        """
-        Preprocessing for the input values is done in BETAs.py
-        The waveform gets resampled to 16kHz, transformed into a fbank and then normalized.
-        """
         return input_values

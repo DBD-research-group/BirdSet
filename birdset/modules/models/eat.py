@@ -6,7 +6,7 @@ from torchaudio.compliance import kaldi
 from birdset.modules.models.EAT.data2vecmultimodel import Data2VecMultiModel
 from birdset.modules.models.birdset_model import BirdSetModel
 
-class EATModel(BirdSetModel):
+class EATSSL(BirdSetModel):
     """
     Pretrained model for audio classification using the Efficient Audio Transformer (EAT) model.
     
@@ -57,23 +57,12 @@ class EATModel(BirdSetModel):
         self.modality = modality
         self.model = None  # Placeholder for the loaded model
         self.load_model()
-        self.num_classes = num_classes
         
          # Define a linear classifier to use on top of the embeddings
         if classifier is None:
             self.classifier = nn.Linear(embedding_size, num_classes)
         else:
             self.classifier = classifier
-        # self.classifier = nn.Sequential(
-        #     nn.Linear(self.EMBEDDING_SIZE, 128),
-        #     nn.ReLU(),
-        #     nn.Dropout(0.5),
-        #     nn.Linear(128, 64),
-        #     nn.ReLU(),
-        #     nn.Linear(64, self.num_classes),
-        # )
-        # freeze the model
-     
         
         if local_checkpoint:
             state_dict = torch.load(local_checkpoint)["state_dict"]
@@ -143,13 +132,6 @@ class EATModel(BirdSetModel):
             torch.Tensor: The output of the classifier.
         """
         embeddings = self.get_embeddings(input_values)
-
-        #if self.train_classifier:
-            #flattend_embeddings = embeddings.reshape(embeddings.size(0), -1)
-            # Pass embeddings through the classifier to get the final output
-            #output = self.classifier(flattend_embeddings)
-        #else:
-            #output = embeddings
 
         return self.classifier(embeddings)
 
