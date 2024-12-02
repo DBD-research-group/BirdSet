@@ -2,4 +2,4 @@
 #package global is neccessary!
 defaults:
   - biofoundation/birdset/linearprobing/linearprobing_config.yaml 
-  - override /module/network: eat.yaml 
+  - override /module/network: eat_ssl.yaml 
