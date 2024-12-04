@@ -378,20 +378,22 @@ dataset = load_dataset(
     "HSN", 
     cache_dir="the directory you used", 
     num_proc=1, 
-    #revision="629b54c06874b6d2fa886e1c0d73146c975612d0" <-- if your cache directory is correct and a new download is starting, you can use this revision (we added some metadata ~2 days ago which forces a redownload). if not, ignore this
+    #revision="629b54c06874b6d2fa886e1c0d73146c975612d0" <-- if your cache directory is correct and a new download is starting,
+    #you can use this revision (we added some metadata ~2 days ago which forces a redownload). if not, ignore this
 )
 
 dataset["train"].features["ebird_code"]
 ```
 This should be the output: 
 ```
-ClassLabel(names=['gcrfin', 'whcspa', 'amepip', 'sposan', 'rocwre', 'brebla', 'daejun', 'foxspa', 'clanut', 'moublu', 'casfin', 'mallar3', 'herthr', 'amerob', 'yerwar', 'yelwar', 'dusfly', 'mouchi', 'orcwar', 'warvir', 'norfli'], id=None)
+ClassLabel(names=['gcrfin', 'whcspa', 'amepip', 'sposan', 'rocwre', 'brebla', 'daejun', 'foxspa', ...], id=None)
 ```
 These ebird codes should correspond to the respective columns in the label matrix. 
 You could also `ds.features["label"].int2str(0)`
 
 [Issue](https://github.com/DBD-research-group/BirdSet/issues/280)
 
+-------
 #### **How to access the label names of the pre-trained models?**
 The class list of pre-trained models corresponds to the datasets they were trained on (same indices). To get the class list, you can visit this [link on HF](https://huggingface.co/datasets/DBD-research-group/BirdSet/blob/main/classes.py) or use the following code example:
 
@@ -405,6 +407,7 @@ dataset_meta.info.features["ebird_code"]
 
 We are currently working on adding the class information to the models on HF and to Git. 
 
+-------
 #### **Why are the datasets larger than expected?**
 
 Currently, our HF builder script extracts all zipped files to ensure clear file paths while retaining the original zipped files. This results in increased storage requirements. Although resolving this issue is complex, we are actively working on a solution and aim to provide updates soon.
