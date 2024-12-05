@@ -52,6 +52,7 @@ datamodule:
     classlimit: 600
     eventlimit: 5
   transforms:
+    max_length: ${module.network.length}
     preprocessing:
         normalize_waveform: null
         normalize_spectrogram: null

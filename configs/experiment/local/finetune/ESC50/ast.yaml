@@ -1,0 +1,22 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - local/finetune/ESC50/finetune_config.yaml 
+  - override /module/embedding_model: ../../module/network/ast.yaml  
+
+tags: ["ESC50", "finetune", "ast", "multiclass"]
+seed: 2
+
+
+trainer:
+  devices: [1]
+  min_epochs: 1
+  max_epochs: 5
+  precision: 32
+
+
+module:
+  embedding_model:  
+    model:
+        train_classifier: False
+

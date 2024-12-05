@@ -105,6 +105,7 @@ class EmbeddingDataModule(BaseDataModuleHF):
             dataset = self._compute_embeddings(dataset)
 
         dataset = self._preprocess_data(dataset)
+        dataset = self._create_splits(dataset)
 
         # set the length of the training set to be accessed by the model
         self.len_trainset = len(dataset["train"])
