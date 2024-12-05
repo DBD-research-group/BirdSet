@@ -407,7 +407,7 @@ dataset_meta = datasets.load_dataset_builder("dbd-research-group/BirdSet", "XCL"
 dataset_meta.info.features["ebird_code"]
 ```
 
-We have also added class information to the models on HF. You can find them in the config of the respective models. To acces the model config you can refer to the following code snippet:
+We have also added class information to the models on HF. You can find them in the config of the respective models. To access the model config you can refer to the following code snippet:
 
 ```python
 
