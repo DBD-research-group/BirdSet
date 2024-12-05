@@ -135,10 +135,11 @@ Results on HSN:
 | AudioMAE| 0.34 | 0.83 |  [audio_mae_HSN#1_2024-11-29_162609](https://wandb.ai/deepbirddetect/BioFoundation/runs/audiomae_finetuning_BirdSet_HSN_1_2024-11-29_162609) |
 | ConvNext_BS| **0.51** | **0.88** | [convnext_bs_HSN#1_2024-11-29_154136](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_bs_finetune_BirdSet_HSN_1_2024-11-29_154136) |
 | HUBERT| 0.32 | 0.80 | [hubert_HSN#1_2024-11-29_142052](https://wandb.ai/deepbirddetect/BioFoundation/runs/hubert_finetune_BirdSet_HSN_1_2024-11-29_142052) |
+| SSAST| 0.19 | 0.68 | [ssast_HSN#1_2024-12-03_181308](https://wandb.ai/deepbirddetect/BioFoundation/runs/ssast_finetune_BirdSet_HSN_1_2024-12-03_181308) |
 | EAT_SSL| 0.10 | 0.61 | [eat_ssl_HSN#1_2024-12-01_181129](https://wandb.ai/deepbirddetect/BioFoundation/runs/eat_ssl_finetune_BirdSet_HSN_1_2024-12-01_181129) |
-| SSAST| ? | ? | ? |
 | Wav2Vec2| ? | ? | ? |
 | BirdNET| ? | ? | ? |
+
 ### Running Linear Probing Experiments on BirdSet
 
 ```bash
@@ -159,8 +160,8 @@ Results on HSN:
 | AudioMAE| ? | ? | ? |
 | ConvNext_BS| 0.07 | 0.61 | [convnext_bs_HSN#1_2024-11-29_174232](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_bs_linearprobing_BirdSet_HSN_1_2024-11-29_174232) |
 | HUBERT| 0.07 | 0.57 | [hubert_HSN#1_2024-11-29_142350]( https://wandb.ai/deepbirddetect/BioFoundation/runs/hubert_linearprobing_BirdSet_HSN_1_2024-11-29_142350) |
+| SSAST| 0.03 | 0.45 | [ssast_HSN#1_2024-12-01_171656](https://wandb.ai/deepbirddetect/BioFoundation/runs/ssast_linearprobing_BirdSet_HSN_1_2024-12-01_171656) |
 | EAT_SSL| 0.21 | 0.79 | [eat_ssl_HSN#1_2024-12-01_181122](https://wandb.ai/deepbirddetect/BioFoundation/runs/eat_ssl_linearprobing_BirdSet_HSN_1_2024-12-01_181122) |
-| SSAST| ? | ? | ? |
 | Wav2Vec2| 0.03 | 0.45 | [wav2vec2_HSN#1_2024-11-29_171616](https://wandb.ai/deepbirddetect/BioFoundation/runs/wav2vec2_linearprobing_BirdSet_HSN_1_2024-11-29_171616)  |
 | BirdNET| ? | ? | ? |
 
@@ -185,8 +186,8 @@ Results on HSN with 32 samples per class:
 | AudioMAE| 0.03 | 0.47 |[audio_mae_HSN#1_2024-11-29_152352](https://wandb.ai/deepbirddetect/BioFoundation/runs/audiomae_fewshot_BirdSet_HSN_1_2024-11-29_1523) |
 | ConvNext_BS| 0.04 | 0.50 | [convnext_HSN#1_2024-11-29_130609](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_fewshot_BirdSet_HSN_1_2024-11-29_130609) |
 | HUBERT| 0.05 | 0.53 | [hubert_HSN#1_2024-11-29_141537](https://wandb.ai/deepbirddetect/BioFoundation/runs/hubert_fewshot_BirdSet_HSN_1_2024-11-29_141537) |
+| SSAST| 0.032 | 0.46 | [ssast_HSN#1_2024-12-01_174950](https://wandb.ai/deepbirddetect/BioFoundation/runs/ssast_fewshot_BirdSet_HSN_1_2024-12-01_174950) |
 | EAT_SSL| 0.02 | 0.30 | [eat_ssl_HSN#1_2024-12-01_180844](https://wandb.ai/deepbirddetect/BioFoundation/runs/eat_ssl_fewshot_BirdSet_HSN_1_2024-12-01_180844) |
-| SSAST| ? | ? | ? |
 | Wav2Vec2| 0.03 | 0.47 | [wav2vec2_HSN#1_2024-11-29_172107](https://wandb.ai/deepbirddetect/BioFoundation/runs/wav2vec2_fewshot_BirdSet_HSN_1_2024-11-29_172107) |
 | BirdNET| ? | ? | ? |
 
