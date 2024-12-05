@@ -81,11 +81,6 @@ poetry shell
 ```
 -->
 
-## Ebird-Code to ID Maps
-
-You can find JSON files containing `id2label` and `label2id` dictionaries for each dataset under the [resources/ebird_codes](https://github.com/DBD-research-group/BirdSet/tree/main/resources/ebird_codes) directory int he git repository.
-Additionally the pretrained models (e.g. the pretrained [ConvNeXT](https://huggingface.co/DBD-research-group/ConvNeXT-Base-BirdSet-XCL) model) include such dictionaries for the dataset they're trained on in their configs.
-
 ## Examples 🐤
 
 We offer an in-depth [tutorial notebook](https://github.com/DBD-research-group/BirdSet/blob/main/notebooks/tutorials/birdset-pipeline_tutorial.ipynb) on how to use this repository. In the following, we provide simple code snippets:
@@ -396,6 +391,8 @@ ClassLabel(names=['gcrfin', 'whcspa', 'amepip', 'sposan', 'rocwre', 'brebla', 'd
 These ebird codes should correspond to the respective columns in the label matrix. 
 You could also `ds.features["label"].int2str(0)`
 
+Additionally you can find JSON files containing `id2label` and `label2id` dictionaries for each dataset under the [resources/ebird_codes](https://github.com/DBD-research-group/BirdSet/tree/main/resources/ebird_codes) directory in the git repository.
+
 [Issue](https://github.com/DBD-research-group/BirdSet/issues/280)
 
 -------
@@ -410,7 +407,7 @@ dataset_meta = datasets.load_dataset_builder("dbd-research-group/BirdSet", "XCL"
 dataset_meta.info.features["ebird_code"]
 ```
 
-We are currently working on adding the class information to the models on HF and to Git. 
+We have also added class information to the models on HF. You can find them in the config of the respective models.
 
 -------
 #### **Why are the datasets larger than expected?**
