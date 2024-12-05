@@ -3,3 +3,8 @@
 defaults:
   - biofoundation/birdset/finetuning/finetuning_config.yaml 
   - override /module/network: beats.yaml  
+
+#module:
+  #network:
+    #model:
+      #local_checkpoint: /workspace/logs/train/runs/HSN/BEATs/2024-12-05_133224/callback_checkpoints/BEATs_HSN_04.ckpt 
