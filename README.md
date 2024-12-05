@@ -46,6 +46,17 @@ Deep learning (DL) has greatly advanced audio classification, yet the field is l
 
 </div>
 
+## Update (2024.11.27) 
+- Additional bird taxonomy metadata, including "Genus," "Species Group," and "Order," is provided using the 2021 eBird taxonomy, consistent with the taxonomy used for the 'ebird_code' data. These metadata fields follow the same format and encoding as 'ebird_code' and 'ebird_code_multilabel'. Further explanation can be found on our Hugging Face [BirdSet repository](https://huggingface.co/datasets/DBD-research-group/BirdSet).
+
+- If you don't require the additional taxonomy at the moment and prefer to **avoid re-downloading all files**, you can specify the previous revision directly in load_dataset as follows:
+
+```python
+from datasets import load_dataset
+ds = load_dataset("DBD-research-group/BirdSet", "HSN", trust_remote_code=True, revision="629b54c06874b6d2fa886e1c0d73146c975612d0")
+```
+
+
 ## User Installation 🐣
 
 The simplest way to install $\texttt{BirdSet}$ is to clone this repository and install it as an editable package using [conda](https://docs.conda.io/en/latest/) and [pip](https://pip.pypa.io/en/stable/):
