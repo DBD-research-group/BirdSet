@@ -38,21 +38,28 @@ class ASTSequenceClassifier(BirdSetModel):
         self.classifier = classifier
 
 
-        if (
-            local_checkpoint
-        ):  # TODO only loads a pretrained model from a local checkpoint else a randomly init model???
+        if local_checkpoint:  # TODO only loads a pretrained model from a local checkpoint else a randomly init model???
             log.info(f">> Loading state dict from local checkpoint: {local_checkpoint}")
+
             state_dict = torch.load(local_checkpoint)["state_dict"]
-            state_dict = {
+            model_state_dict = {
                 key.replace("model.model.", ""): weight
-                for key, weight in state_dict.items()
+                for key, weight in state_dict.items() if key.startswith("model.model")
             }
+
+            # Process the keys for the classifier
+            if self.classifier:
+                classifier_state_dict = {
+                    key.replace("model.classifier.", ""): weight
+                    for key, weight in state_dict.items() if key.startswith("model.classifier.")
+                }
+                self.classifier.load_state_dict(classifier_state_dict)
 
             self.model = ASTForAudioClassification.from_pretrained(
                 self.checkpoint,
                 num_labels=self.num_classes,
                 cache_dir=self.cache_dir,
-                state_dict=state_dict,
+                state_dict=model_state_dict,
                 ignore_mismatched_sizes=True,
             )
         else:
@@ -104,20 +111,15 @@ class ASTSequenceClassifier(BirdSetModel):
         last_hidden_state = outputs["hidden_states"][-1] #(batch, sequence, dim)
         cls_state = last_hidden_state[:,0,:] #(batch, dim)
 
-        if return_hidden_state:
-        
-            embeddings = (logits, cls_state)
+        if self.classifier is None:
+            if return_hidden_state:
+                output = (logits, cls_state)
 
+            else:
+                output = logits
         else:
-            embeddings = logits
-
-        if self.train_classifier:
-            output = self.classifier(embeddings)
-        else: 
-            output = embeddings
-
-        
-        
+            output = self.classifier(cls_state)
+            
         return output
     
     def get_embeddings(self, input_tensor: torch.Tensor, attention_mask=None, return_hidden_state=False):
