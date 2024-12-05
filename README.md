@@ -132,10 +132,10 @@ Results on HSN:
 | EAT| ? | ? | ? |
 | AVES| 0.19 | 0.68 | [aves_HSN#1_2024-11-28_123701](https://wandb.ai/deepbirddetect/BioFoundation/runs/aves_finetune_BirdSet_HSN_1_2024-11-28_123701) (ES: Only 7 epochs)|
 | AST| 0.21 | 0.70 | [ast_HSN#1_2024-11-28_163020](https://wandb.ai/deepbirddetect/BioFoundation/runs/ast_finetune_BirdSet_HSN_1_2024-11-28_163020) |
-| AudioMAE| 0.34132 | 0.83382 |  [audio_mae_HSN#1_2024-11-29_162609] (https://wandb.ai/deepbirddetect/BioFoundation/runs/audiomae_finetuning_BirdSet_HSN_1_2024-11-29_162609) |
+| AudioMAE| 0.34132 | 0.83382 |  [audio_mae_HSN#1_2024-11-29_162609](https://wandb.ai/deepbirddetect/BioFoundation/runs/audiomae_finetuning_BirdSet_HSN_1_2024-11-29_162609) |
 | ConvNext_BS| ? | ? | ? |
 | HUBERT| 0.32 | 0.80 | [hubert_HSN#1_2024-11-29_142052](https://wandb.ai/deepbirddetect/BioFoundation/runs/hubert_finetune_BirdSet_HSN_1_2024-11-29_142052) |
-| SSAST| ? | ? | ? |
+| SSAST| 0.19 | 0.68 | [ssast_HSN#1_2024-12-03_181308](https://wandb.ai/deepbirddetect/BioFoundation/runs/ssast_finetune_BirdSet_HSN_1_2024-12-03_181308) |
 | Wav2Vec2| ? | ? | ? |
 | BirdNET| ? | ? | ? |
 ### Running Linear Probing Experiments on BirdSet
