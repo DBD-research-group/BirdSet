@@ -369,6 +369,64 @@ Replace `EXPERIMENT_PATH` with the path to the experiment YAML config originatin
 python birdset/train.py experiment="local/HSN/efficientnet.yaml"
 ```
 
+
+## Q&A
+
+#### **How to access the label names in the datasets?**
+The class names are available in the Hugging Face datasets (with the [ClassLabel Feature](https://huggingface.co/docs/datasets/v3.1.0/en/package_reference/main_classes#datasets.ClassLabel))
+
+```python
+from datasets import load_dataset
+
+dataset = load_dataset(
+    "DBD-research-group/BirdSet", 
+    "HSN", 
+    cache_dir="the directory you used", 
+    num_proc=1, 
+    #revision="629b54c06874b6d2fa886e1c0d73146c975612d0" <-- if your cache directory is correct and a new download is starting,
+    #you can use this revision (we added some metadata ~2 days ago which forces a redownload). if not, ignore this
+)
+
+dataset["train"].features["ebird_code"]
+```
+This should be the output: 
+```
+ClassLabel(names=['gcrfin', 'whcspa', 'amepip', 'sposan', 'rocwre', 'brebla', 'daejun', 'foxspa', ...], id=None)
+```
+These ebird codes should correspond to the respective columns in the label matrix. 
+You could also `ds.features["label"].int2str(0)`
+
+[Issue](https://github.com/DBD-research-group/BirdSet/issues/280)
+
+-------
+#### **How to access the label names of the pre-trained models?**
+The class list of pre-trained models corresponds to the datasets they were trained on (same indices). To get the class list, you can visit this [link on HF](https://huggingface.co/datasets/DBD-research-group/BirdSet/blob/main/classes.py) or use the following code example:
+
+```python
+
+import datasets 
+
+dataset_meta = datasets.load_dataset_builder("dbd-research-group/BirdSet", "XCL")
+dataset_meta.info.features["ebird_code"]
+```
+
+We are currently working on adding the class information to the models on HF and to Git. 
+
+-------
+#### **Why are the datasets larger than expected?**
+
+Currently, our HF builder script extracts all zipped files to ensure clear file paths while retaining the original zipped files. This results in increased storage requirements. Although resolving this issue is complex, we are actively working on a solution and aim to provide updates soon.
+
+_Example_:  
+For the largest dataset, `XCL`, the zipped files are approximately 480GB. However, due to the extraction process, you’ll need around 990GB of available disk space. After the extraction, the zipped files will account for roughly 510GB.  
+
+*Quick Workaround*:  
+After extraction, you can delete unnecessary files by running in `XCL/downloads/`
+```bash
+find . -mindepth 1 -maxdepth 1 ! -name 'extracted' -exec rm -rfv {} +
+```
+While we could omit the unzipping process entirely, this would prevent us from maintaining accurate file paths and relying on soundfile to read directly from the zipped files.
+
 ## Citation
 
 ```
