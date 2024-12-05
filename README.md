@@ -431,6 +431,8 @@ model.config.id2label[0]
 
 In the case of XCL this should output `ostric2`.
 
+**Please note:** Changing the last layer in any way (e.g. changing the output layer to 21 classes to fine-tune on HSN) will remove or invalidate that label information from the configs. In that case you will need to get that information differently. In case of BirdSet datasets you can look under [resources/ebird_codes](https://github.com/DBD-research-group/BirdSet/tree/main/resources/ebird_codes). The json files in that directory contain `label2id` and `id2label` dicts for every dataset.
+
 -------
 #### **Why are the datasets larger than expected?**
 
