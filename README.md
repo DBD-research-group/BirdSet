@@ -25,7 +25,7 @@ Deep learning (DL) has greatly advanced audio classification, yet the field is l
 > - This accompanying **code** provides comprehensive support tool for data preparation, model training, and evaluation. 
 > - Participate in our Hugging Face [leaderboard](https://huggingface.co/spaces/DBD-research-group/BirdSet-Leaderboard) by submitting new results and comparing performance across models.
 > - Access our pre-trained [model checkpoints](https://huggingface.co/collections/DBD-research-group/birdset-dataset-and-models-665ef710a28cbe70dfaa028a) on Hugging Face, ready to fine-tune or evaluate for various tasks.
-
+> - A Q&A section is included at the end of this README. If you have further questions or encounter any issues, please raise an issue. 
 <br>
 
 <div align="center">
@@ -45,17 +45,6 @@ Deep learning (DL) has greatly advanced audio classification, yet the field is l
 |                            | [SNE](https://zenodo.org/records/7050014)    |  Sierre Nevada soundscape test dataset and class-dedicated focal training subset of XCL.               | 19,390    | 23,756       | 0.70  | 56       |
 
 </div>
-
-## Update (2024.11.27) 
-- Additional bird taxonomy metadata, including "Genus," "Species Group," and "Order," is provided using the 2021 eBird taxonomy, consistent with the taxonomy used for the 'ebird_code' data. These metadata fields follow the same format and encoding as 'ebird_code' and 'ebird_code_multilabel'. Further explanation can be found on our Hugging Face [BirdSet repository](https://huggingface.co/datasets/DBD-research-group/BirdSet).
-
-- If you don't require the additional taxonomy at the moment and prefer to **avoid re-downloading all files**, you can specify the previous revision directly in load_dataset as follows:
-
-```python
-from datasets import load_dataset
-ds = load_dataset("DBD-research-group/BirdSet", "HSN", trust_remote_code=True, revision="629b54c06874b6d2fa886e1c0d73146c975612d0")
-```
-
 
 ## User Installation 🐣
 
@@ -447,6 +436,20 @@ After extraction, you can delete unnecessary files by running in `XCL/downloads/
 find . -mindepth 1 -maxdepth 1 ! -name 'extracted' -exec rm -rfv {} +
 ```
 While we could omit the unzipping process entirely, this would prevent us from maintaining accurate file paths and relying on soundfile to read directly from the zipped files.
+
+------
+#### **Hugging Face downloads the dataset again even though I already downloaded it**
+We made a small update to the metadata on **27-11-2024**: 
+
+- Additional bird taxonomy metadata, including "Genus," "Species Group," and "Order," is provided using the 2021 eBird taxonomy, consistent with the taxonomy used for the 'ebird_code' data. These metadata fields follow the same format and encoding as 'ebird_code' and 'ebird_code_multilabel'. Further explanation can be found on our Hugging Face [BirdSet repository](https://huggingface.co/datasets/DBD-research-group/BirdSet).
+
+- If you don't require the additional taxonomy and prefer to **avoid re-downloading all files**, you can specify the previous revision directly in load_dataset as follows:
+
+```python
+from datasets import load_dataset
+ds = load_dataset("DBD-research-group/BirdSet", "HSN", trust_remote_code=True, revision="629b54c06874b6d2fa886e1c0d73146c975612d0")
+```
+
 
 ## Citation
 
