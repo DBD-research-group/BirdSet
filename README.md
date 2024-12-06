@@ -35,14 +35,14 @@ Deep learning (DL) has greatly advanced audio classification, yet the field is l
 | **Large Train**                  | [XCL](https://xeno-canto.org/)               | Complete Xeno-Canto snapshot with focals for large (pre-) training.                | 528,434   | -            | -     | 9,734    |
 |                            | [XCM](https://xeno-canto.org/)               | Smaller subset of XCL only containing focals of bird species available in test datasets.                 | 89,798    | -            | -     | 409      |
 | **Auxiliary**              | [POW](https://zenodo.org/records/4656848)    | Powdermill Nature soundscape validation dataset and class-dedicated focal training subset of XCL.     | 14,911    | 4,560        | 0.66  | 48       |
-|                            | [VOX](https://zenodo.org/records/1208080)    | BirdVox-DCASE soundscape background dataset without bird vocalizations for augmentations.              | 20,331    | -            | -     | -        |
-| **Test & Dedicated Train** | [PER](https://zenodo.org/records/7079124) | Amazon Basin soundscape test dataset and class-dedicated focal training subset of XCL.                 | 16,802    | 15,120       | 0.78  | 132      |
-|                            | [NES](https://zenodo.org/records/7525349)    |  Columbia Costa Rica soundscape test dataset and class-dedicated focal training subset of XCL.               | 16,117    | 24,480       | 0.76  | 89       |
-|                            | [UHH](https://zenodo.org/records/7078499)    |  Hawaiian Islands soundscape test dataset and class-dedicated focal training subset of XCL.               | 3,626     | 36,637       | 0.64  | 25       |
-|                            | [HSN](https://zenodo.org/records/7525805)    |  High Sierras Nevada soundscape test dataset and class-dedicated focal training subset of XCL.               | 5,460     | 12,000       | 0.54  | 21       |
-|                            | [NBP](https://link-to-birddb)                |  NIPS4BPlus test dataset and class-dedicated focal training subset of XCL.               | 24,327    | 563          | 0.92  | 51       |
-|                            | [SSW](https://zenodo.org/records/7018484)    |  Sapsucker Woods soundscape test dataset and class-dedicated focal training subset of XCL.               | 28,403    | 205,200      | 0.77  | 81       |
-|                            | [SNE](https://zenodo.org/records/7050014)    |  Sierre Nevada soundscape test dataset and class-dedicated focal training subset of XCL.               | 19,390    | 23,756       | 0.70  | 56       |
+|                            | [VOX](https://zenodo.org/records/1208080)    | BirdVox-DCASE soundscape background dataset without bird vocalizations.              | 20,331    | -            | -     | -        |
+| **Test & Dedicated Train** | [PER](https://zenodo.org/records/7079124) | Amazon Basin soundscape test dataset and class-dedicated focal training subset.                 | 16,802    | 15,120       | 0.78  | 132      |
+|        Train Subsets XCL!                    | [NES](https://zenodo.org/records/7525349)    |  Columbia Costa Rica soundscape test dataset and class-dedicated focal training subset.               | 16,117    | 24,480       | 0.76  | 89       |
+|                            | [UHH](https://zenodo.org/records/7078499)    |  Hawaiian Islands soundscape test dataset and class-dedicated focal training subset.               | 3,626     | 36,637       | 0.64  | 25       |
+|                            | [HSN](https://zenodo.org/records/7525805)    |  High Sierras Nevada soundscape test dataset and class-dedicated focal training subset.               | 5,460     | 12,000       | 0.54  | 21       |
+|                            | [NBP](https://link-to-birddb)                |  NIPS4BPlus test dataset and class-dedicated focal training subset.               | 24,327    | 563          | 0.92  | 51       |
+|                            | [SSW](https://zenodo.org/records/7018484)    |  Sapsucker Woods soundscape test dataset and class-dedicated focal training.               | 28,403    | 205,200      | 0.77  | 81       |
+|                            | [SNE](https://zenodo.org/records/7050014)    |  Sierre Nevada soundscape test dataset and class-dedicated focal training subset.               | 19,390    | 23,756       | 0.70  | 56       |
 
 </div>
 
