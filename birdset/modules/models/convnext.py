@@ -60,8 +60,7 @@ class ConvNextClassifier(nn.Module):
         self._initialize_model()
 
     def _initialize_model(self):
-        """Initializes the ConvNext model based on specified attributes.
-        """
+        """Initializes the ConvNext model based on specified attributes."""
 
         adjusted_state_dict = None
 

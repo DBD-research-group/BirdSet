@@ -1,9 +1,10 @@
-import torch 
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+
 class MultiLabelFocalLoss(nn.Module):
-    def __init__(self, alpha=1, gamma=2.0, reduction='mean'):
+    def __init__(self, alpha=1, gamma=2.0, reduction="mean"):
         super(MultiLabelFocalLoss, self).__init__()
         self.alpha = alpha
         self.gamma = gamma
@@ -20,24 +21,25 @@ class MultiLabelFocalLoss(nn.Module):
 
         # Compute the focal loss components
         focal_weight = (1 - pt) ** self.gamma
-        bce_loss = F.binary_cross_entropy_with_logits(inputs, targets, reduction='none')
+        bce_loss = F.binary_cross_entropy_with_logits(inputs, targets, reduction="none")
 
         if isinstance(self.alpha, torch.Tensor) and focal_weight.is_cuda:
-            self.alpha=self.alpha.to("cuda")
+            self.alpha = self.alpha.to("cuda")
 
         # Combine components
-        focal_loss = self.alpha * focal_weight * bce_loss 
+        focal_loss = self.alpha * focal_weight * bce_loss
 
         # Apply reduction
-        if self.reduction == 'mean':
+        if self.reduction == "mean":
             return focal_loss.mean()
-        elif self.reduction == 'sum':
+        elif self.reduction == "sum":
             return focal_loss.sum()
         else:
             return focal_loss
 
+
 class FocalLoss(nn.Module):
-    def __init__(self, alpha=1, gamma=2, reduction='mean'):
+    def __init__(self, alpha=1, gamma=2, reduction="mean"):
         super(FocalLoss, self).__init__()
         self.alpha = alpha
         self.gamma = gamma
@@ -54,16 +56,14 @@ class FocalLoss(nn.Module):
         bce_loss = torch.log(pt)
 
         if isinstance(self.alpha, torch.Tensor) and focal_weight.is_cuda:
-            self.alpha=self.alpha.to("cuda")
+            self.alpha = self.alpha.to("cuda")
 
         # Compute the focal loss
         focal_loss = -self.alpha * focal_weight * bce_loss
 
-        if self.reduction == 'mean':
+        if self.reduction == "mean":
             return focal_loss.mean()
-        elif self.reduction == 'sum':
+        elif self.reduction == "sum":
             return focal_loss.sum()
         else:
             return focal_loss
-        
-

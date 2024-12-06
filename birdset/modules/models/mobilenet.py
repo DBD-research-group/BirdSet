@@ -6,6 +6,7 @@ from transformers import AutoConfig, MobileNetV2ForImageClassification
 
 from birdset.configs import PretrainInfoConfig
 
+
 class MobileNetClassifier(nn.Module):
     """
     MobileNet model for audio classification.
