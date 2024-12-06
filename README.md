@@ -407,7 +407,31 @@ dataset_meta = datasets.load_dataset_builder("dbd-research-group/BirdSet", "XCL"
 dataset_meta.info.features["ebird_code"]
 ```
 
-We have also added class information to the models on HF. You can find them in the config of the respective models.
+We have also added class information to the models on HF. You can find them in the config of the respective models. To access the model config you can refer to the following code snippet:
+
+```python
+
+from transformers import ConvNextForImageClassification
+
+# load model
+model = ConvNextForImageClassification.from_pretrained("DBD-research-group/ConvNeXT-Base-BirdSet-XCL")
+
+# access label dicts
+model.config.id2label # or model.config.label2id depending on what you need
+
+```
+
+`id2label` and `label2id` are dictionaries so to access a specific element you can do this:
+
+```python
+
+model.config.id2label[0]
+
+```
+
+In the case of XCL this should output `ostric2`.
+
+**Please note:** Changing the last layer in any way (e.g. changing the output layer to 21 classes to fine-tune on HSN) will remove or invalidate that label information from the configs. In that case you will need to get that information differently. In case of BirdSet datasets you can look under [resources/ebird_codes](https://github.com/DBD-research-group/BirdSet/tree/main/resources/ebird_codes). The json files in that directory contain `label2id` and `id2label` dicts for every dataset.
 
 -------
 #### **Why are the datasets larger than expected?**
