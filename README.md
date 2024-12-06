@@ -423,9 +423,9 @@ In the case of XCL this should output `ostric2`.
 **Please note:** Changing the last layer in any way (e.g. changing the output layer to 21 classes to fine-tune on HSN) will remove or invalidate that label information from the configs. In that case you will need to get that information differently. In case of BirdSet datasets you can look under [resources/ebird_codes](https://github.com/DBD-research-group/BirdSet/tree/main/resources/ebird_codes). The json files in that directory contain `label2id` and `id2label` dicts for every dataset.
 
 -------
-#### **Why are the datasets larger than expected?**
+#### **Why are the datasets larger than expected? (should only apply to downloads before 05-12-2024! fixed)**
 
-Currently, our HF builder script extracts all zipped files to ensure clear file paths while retaining the original zipped files. This results in increased storage requirements. Although resolving this issue is complex, we are actively working on a solution and aim to provide updates soon.
+Currently, our HF builder script extracts all zipped files to ensure clear file paths while retaining the original zipped files. This results in increased storage requirements.
 
 _Example_:  
 For the largest dataset, `XCL`, the zipped files are approximately 480GB. However, due to the extraction process, you’ll need around 990GB of available disk space. After the extraction, the zipped files will account for roughly 510GB.  
@@ -435,7 +435,7 @@ After extraction, you can delete unnecessary files by running in `XCL/downloads/
 ```bash
 find . -mindepth 1 -maxdepth 1 ! -name 'extracted' -exec rm -rfv {} +
 ```
-While we could omit the unzipping process entirely, this would prevent us from maintaining accurate file paths and relying on soundfile to read directly from the zipped files.
+More information: see Q below. 
 
 ------
 #### **Hugging Face downloads the dataset again even though I already downloaded it**
