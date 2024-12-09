@@ -4,9 +4,10 @@ import numpy as np
 from transformers import BatchFeature
 from transformers import SequenceFeatureExtractor
 from transformers.utils import logging, PaddingStrategy
-import torch 
+import torch
 
 logger = logging.get_logger(__name__)
+
 
 class DefaultFeatureExtractor(SequenceFeatureExtractor):
     """
@@ -25,6 +26,7 @@ class DefaultFeatureExtractor(SequenceFeatureExtractor):
     return_attention_mask : bool
         Indicates whether an attention mask should be returned along with the processed features.
     """
+
     model_input_names = ["input_values", "attention_mask"]
 
     def __init__(
@@ -49,8 +51,9 @@ class DefaultFeatureExtractor(SequenceFeatureExtractor):
         padding: Union[bool, str, PaddingStrategy] = False,
         max_length: int = None,
         truncation: bool = False,
-        return_attention_mask: bool = False):
-        #return_tensors: str = "pt"):
+        return_attention_mask: bool = False,
+    ):
+        # return_tensors: str = "pt"):
 
         waveform_encoded = BatchFeature({"input_values": waveform})
 
@@ -59,15 +62,13 @@ class DefaultFeatureExtractor(SequenceFeatureExtractor):
             padding=padding,
             max_length=max_length,
             truncation=truncation,
-            return_attention_mask=return_attention_mask
+            return_attention_mask=return_attention_mask,
         )
 
-        padded_inputs["input_values"] = torch.tensor(
-            padded_inputs["input_values"])
+        padded_inputs["input_values"] = torch.tensor(padded_inputs["input_values"])
         attention_mask = padded_inputs.get("attention_mask")
 
         if attention_mask is not None:
             padded_inputs["attention_mask"] = attention_mask
 
-
-        return padded_inputs 
+        return padded_inputs

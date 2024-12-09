@@ -14,6 +14,7 @@ from birdset.utils import pylogger
 
 log = pylogger.get_pylogger(__name__)
 
+
 @rank_zero_only
 def print_config_tree(
     cfg: DictConfig,
@@ -47,8 +48,12 @@ def print_config_tree(
 
     # add fields from `print_order` to queue
     for field in print_order:
-        queue.append(field) if field in cfg else log.warning(
-            f"Field '{field}' not found in config. Skipping '{field}' config printing..."
+        (
+            queue.append(field)
+            if field in cfg
+            else log.warning(
+                f"Field '{field}' not found in config. Skipping '{field}' config printing..."
+            )
         )
 
     # add all the other fields to queue (not specified in `print_order`)
@@ -75,5 +80,3 @@ def print_config_tree(
     if save_to_file:
         with open(Path(cfg.paths.output_dir, "config_tree.log"), "w") as file:
             rich.print(tree, file=file)
-
-

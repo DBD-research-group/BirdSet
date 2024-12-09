@@ -312,7 +312,7 @@ class MultilabelMix(BaseWaveformTransform):
         elif mix_target == "union":
             self._mix_target = lambda target, background_target, snr: torch.maximum(
                 target, background_target
-            )           
+            )
         else:
             raise ValueError("mix_target must be one of 'original' or 'union'.")
 
@@ -327,7 +327,7 @@ class MultilabelMix(BaseWaveformTransform):
     ):
 
         batch_size, num_channels, num_samples = samples.shape
-        
+
         snr_distribution = torch.distributions.Uniform(
             low=torch.tensor(
                 self.min_snr_in_db,
@@ -340,7 +340,7 @@ class MultilabelMix(BaseWaveformTransform):
                 device=samples.device,
             ),
             validate_args=True,
-        ) # sample uniformly from this distribution (low and high values)
+        )  # sample uniformly from this distribution (low and high values)
 
         # randomize SNRs
         self.transform_parameters["snr_in_db"] = snr_distribution.sample(
@@ -370,12 +370,20 @@ class MultilabelMix(BaseWaveformTransform):
         for i in range(batch_size):
             possible_indices = list(range(batch_size))
 
-            if len(possible_indices) > 1:# avoid error if only one sample is chosen
-                possible_indices.remove(i)  # Remove the current index to avoid self-mixing
-                sample_indices[i] = torch.tensor([possible_indices[torch.randint(0, len(possible_indices), (1,)).item()]])
+            if len(possible_indices) > 1:  # avoid error if only one sample is chosen
+                possible_indices.remove(
+                    i
+                )  # Remove the current index to avoid self-mixing
+                sample_indices[i] = torch.tensor(
+                    [
+                        possible_indices[
+                            torch.randint(0, len(possible_indices), (1,)).item()
+                        ]
+                    ]
+                )
             else:
                 # If there's only one sample, we can set the index to a default value or skip
-                sample_indices[i] = torch.tensor([0]) 
+                sample_indices[i] = torch.tensor([0])
         self.transform_parameters["sample_indices"] = sample_indices
 
     def apply_transform(
@@ -396,17 +404,25 @@ class MultilabelMix(BaseWaveformTransform):
             mixed_targets = targets.clone()
         else:
             mixed_targets = None
-        
-        batch_size,_, waveform_length = mixed_samples.shape
+
+        batch_size, _, waveform_length = mixed_samples.shape
 
         for i in range(num_mixes):
             current_indices = sample_indices[:, i]
             background_samples = Audio.rms_normalize(samples[current_indices])
 
-            idx = torch.randint(0, waveform_length, (batch_size,), device=background_samples.device)
-            arange = torch.arange(waveform_length, device=background_samples.device).unsqueeze(0).expand(batch_size, -1)
+            idx = torch.randint(
+                0, waveform_length, (batch_size,), device=background_samples.device
+            )
+            arange = (
+                torch.arange(waveform_length, device=background_samples.device)
+                .unsqueeze(0)
+                .expand(batch_size, -1)
+            )
             rolled_indices = (arange + idx.unsqueeze(1)) % waveform_length
-            background_samples = background_samples.squeeze(1)[torch.arange(batch_size).unsqueeze(1), rolled_indices].unsqueeze(1)
+            background_samples = background_samples.squeeze(1)[
+                torch.arange(batch_size).unsqueeze(1), rolled_indices
+            ].unsqueeze(1)
             background_rms = calculate_rms(mixed_samples) / (
                 10 ** (snr.unsqueeze(dim=-1) / 20)
             )
@@ -423,6 +439,7 @@ class MultilabelMix(BaseWaveformTransform):
             targets=mixed_targets,
             target_rate=target_rate,
         )
+
 
 class NoCallMixer:
     """

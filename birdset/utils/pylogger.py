@@ -15,10 +15,10 @@ def get_pylogger(name=__name__):
         "error",
         "exception",
         "fatal",
-        "critical"
+        "critical",
     )
 
-    for level in logging_levels: 
+    for level in logging_levels:
         setattr(logger, level, rank_zero_only(getattr(logger, level)))
 
     return logger
@@ -26,10 +26,12 @@ def get_pylogger(name=__name__):
 
 class TBLogger(loggers.TensorBoardLogger):
     @rank_zero_only
-    def log_hyperparams(self, params: Dict[str, any], metrics : Dict[str, any] | None = None):
+    def log_hyperparams(
+        self, params: Dict[str, any], metrics: Dict[str, any] | None = None
+    ):
         if isinstance(params, dict):
             try:
-                network = params.pop("network") # network is of class NetworkConfig
+                network = params.pop("network")  # network is of class NetworkConfig
                 params["model_name"] = network.model_name
                 params["model_type"] = network.model_type
                 params["torch_compile"] = network.torch_compile

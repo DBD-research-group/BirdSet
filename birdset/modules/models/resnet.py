@@ -6,6 +6,7 @@ import torchvision
 
 ResNetVersion = Literal["resnet18", "resnet34", "resnet50", "resnet101", "resnet152"]
 
+
 class ResNetClassifier(nn.Module):
     """
     A ResNet classifier for image classification tasks.
@@ -28,12 +29,13 @@ class ResNetClassifier(nn.Module):
     """
 
     def __init__(
-            self,
-            baseline_architecture: ResNetVersion,
-            num_classes: int,
-            num_channels: int = 1,
-            pretrained: bool = False,
-            **kwargs):
+        self,
+        baseline_architecture: ResNetVersion,
+        num_classes: int,
+        num_channels: int = 1,
+        pretrained: bool = False,
+        **kwargs
+    ):
         """
         Constructs all the necessary attributes for the ResNetClassifier object.
 
@@ -90,6 +92,7 @@ class ResNetClassifier(nn.Module):
         resnet_model.bn1 = nn.BatchNorm2d(64)
 
         self.model = resnet_model
+
     def forward(self, input_values: torch.Tensor, **kwargs):
         """
         Performs a forward pass through the network.
@@ -119,4 +122,3 @@ class ResNetClassifier(nn.Module):
     @torch.inference_mode()
     def get_representations(self, dataloader, device):
         pass
-    
