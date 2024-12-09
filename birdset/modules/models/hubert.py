@@ -54,11 +54,11 @@ class HubertSequenceClassifier(BirdSetModel):
         self.cache_dir = cache_dir
 
         state_dict = None
+        model_state_dict = None
         if local_checkpoint:
             state_dict = torch.load(local_checkpoint)['state_dict']
-            print(state_dict.keys())
             model_state_dict = {
-                key.replace("model.model", ""): weight
+                key.replace("model.model.hubert.", ""): weight
                 for key, weight in state_dict.items() if key.startswith("model.model.")
             }
 
