@@ -4,3 +4,19 @@ defaults:
   - biofoundation/birdset/linearprobing/linearprobing_config.yaml 
   - override /module/network: perch_logreg.yaml  
 tags: ["biofoundation", "perch", "linearprobing", "augs_birdset"]
+
+trainer:
+  devices: [0]
+
+user: Mats
+run_vers: 1.0
+date: 09-12
+
+logger:
+  wandb:
+    name: ${module.network.model_name}_${datamodule.dataset.dataset_name}_${user}-${run_vers}-${date}#${seed}_${start_time}
+
+# Versions:
+#    
+# 1.0: Initial version (no changes)
+#
