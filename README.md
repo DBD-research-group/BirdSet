@@ -435,7 +435,7 @@ After extraction, you can delete unnecessary files by running in `XCL/downloads/
 ```bash
 find . -mindepth 1 -maxdepth 1 ! -name 'extracted' -exec rm -rfv {} +
 ```
-More information: see Q below. 
+**This issue is fixed, more information: see Q below.**
 
 ------
 #### **Hugging Face downloads the dataset again even though I already downloaded it**
