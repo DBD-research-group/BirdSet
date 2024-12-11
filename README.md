@@ -117,7 +117,7 @@ On the BirdSet benchmark we run three different experiments:
 ### Running Fine-tuning Experiments on BirdSet
 
 ```bash
-python birdset/train.py experiment=biofoundation/birdset/finetuning/{model_name}
+./projects/biofoundation/train.sh experiment=birdset/finetuning/{model_name}
 ```
 
 #### Results
@@ -143,7 +143,7 @@ Results on HSN:
 ### Running Linear Probing Experiments on BirdSet
 
 ```bash
-python birdset/train.py experiment=biofoundation/birdset/linearprobing/{model_name}
+./projects/biofoundation/train.sh experiment=birdset/linearprobing/{model_name}
 ```
 
 Results on HSN:
@@ -168,7 +168,7 @@ Results on HSN:
 ### Running FewShot Experiments on BirdSet
 
 ```bash
-python birdset/train.py experiment=biofoundation/birdset/fewshot/{model_name}
+./projects/biofoundation/train.sh experiment=birdset/fewshot/{model_name}
 ```
 
 Results on HSN with 32 samples per class:
