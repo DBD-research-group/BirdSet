@@ -440,6 +440,7 @@ find . -mindepth 1 -maxdepth 1 ! -name 'extracted' -exec rm -rfv {} +
 ------
 #### **Hugging Face downloads the dataset again even though I already downloaded it**
 We made a samll update fixing [Issue 267: Data download size descrepancy](https://github.com/DBD-research-group/BirdSet/issues/267) on **05-12-2024**:
+- **This only works for datasets<3.0.0!**
 - TL;DR: During the extraction process, unnecessary archives are now removed immediately. This reduces the required disk space by *half*, now aligning it with the table below.
 - If you downloaded the data between this and last update and don't want to redownload yet, you can use the following `revision=b0c14a03571a7d73d56b12c4b1db81952c4f7e64`:
 ```python
