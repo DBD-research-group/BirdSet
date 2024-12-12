@@ -6,7 +6,7 @@ defaults:
 tags: ["biofoundation", "perch", "linearprobing", "augs_birdset"]
 
 trainer:
-  devices: [0]
+  devices: 1
 
 user: Mats
 run_vers: 1.0
@@ -15,6 +15,11 @@ date: 09-12
 logger:
   wandb:
     name: ${module.network.model_name}_${datamodule.dataset.dataset_name}_${user}-${run_vers}-${date}#${seed}_${start_time}
+
+module:
+  network:
+    model:
+      gpu_to_use: null # For automatically using the first available GPU (Sweep compatible)
 
 # Versions:
 #    

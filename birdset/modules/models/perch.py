@@ -107,12 +107,20 @@ class PerchModel(BirdSetModel):
         # with tf.device('/CPU:0'):
         # self.model = hub.load(model_url)
         physical_devices = tf.config.list_physical_devices("GPU")
-        tf.config.experimental.set_visible_devices(
-            physical_devices[self.gpu_to_use], "GPU"
-        )
-        tf.config.experimental.set_memory_growth(
-            physical_devices[self.gpu_to_use], True
-        )
+        if self.gpu_to_use is not None: # If no gpu is specified just choose the first one that is available (Implemented for sweeps)
+            tf.config.experimental.set_visible_devices(
+                physical_devices[self.gpu_to_use], "GPU"
+            )
+            tf.config.experimental.set_memory_growth(
+                physical_devices[self.gpu_to_use], True
+            )
+        else:
+            tf.config.experimental.set_visible_devices(
+                physical_devices[0], "GPU"
+            )
+            tf.config.experimental.set_memory_growth(
+                physical_devices[0], True
+            )
 
         tf.config.optimizer.set_jit(True)
         self.model = hub.load(model_url)

@@ -9,8 +9,8 @@ metric:
 parameters:
   experiment:
     values: [biofoundation/birdset/linearprobing/perch] # The hydra experiment
-  #trainer.devices:
-    #values: [1]
+  trainer.devices:
+    values: [1]
   module.optimizer.lr:
     min: 0.0001 
     max: 0.01  
@@ -18,7 +18,7 @@ parameters:
     min: 0.000001
     max: 0.01  
   datamodule.loaders.train.batch_size:
-    values: [16, 32, 64] 
+    values: [16, 32, 64, 128] 
 
 command:
   - ${env}
