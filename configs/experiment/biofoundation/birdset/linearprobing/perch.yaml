@@ -20,6 +20,16 @@ module:
   network:
     model:
       gpu_to_use: null # For automatically using the first available GPU (Sweep compatible)
+      classifier:
+        _target_: birdset.modules.models.linear_classifier.LinearClassifier
+        in_features: 1280
+        num_classes: null
+
+callbacks:
+  timer:
+    _target_: lightning.pytorch.callbacks.Timer
+    interval: "step"
+    duration: "00:00:40:00"  
 
 # Versions:
 #    
