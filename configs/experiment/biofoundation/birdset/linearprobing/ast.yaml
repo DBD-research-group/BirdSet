@@ -16,5 +16,5 @@ module:
       preprocess_in_model: False
       classifier:
         _target_: birdset.modules.models.linear_classifier.LinearClassifier
-        num_classes: ${datamodule.dataset.num_classes}
+        num_classes: ${module.network.model.num_classes}
         in_features: ${module.network.embedding_size}
