@@ -1,5 +1,5 @@
 model:
-  _target_: birdset.modules.models.hubert.HubertSequenceClassifier
+  _target_: biofoundation.modules.models.hubert.HubertSequenceClassifier
   num_classes: null
   checkpoint: facebook/hubert-base-ls960
   local_checkpoint: null

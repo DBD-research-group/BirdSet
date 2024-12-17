@@ -3,15 +3,10 @@ import torch.nn as nn
 from transformers import (
     AutoModelForAudioClassification,
     AutoConfig,
-    HubertModel,
-    Wav2Vec2FeatureExtractor,
-    HubertModel,
-    HubertConfig,
 )
-import datasets
-from typing import Tuple
+
 from birdset.configs import PretrainInfoConfig
-from birdset.modules.models.birdset_model import BirdSetModel
+from biofoundation.modules.models.birdset_model import BirdSetModel
 
 
 class HubertSequenceClassifier(BirdSetModel):

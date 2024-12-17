@@ -1,6 +1,6 @@
 model_name: "eat"
 model:
-  _target_: birdset.modules.models.eat_soundnet.EAT
+  _target_: biofoundation.modules.models.eat_soundnet.EAT
   nf: 32
   seq_len: 110250
   embedding_size: 256

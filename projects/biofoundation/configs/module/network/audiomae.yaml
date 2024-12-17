@@ -1,5 +1,5 @@
 model: 
-  _target_: birdset.modules.models.audiomae.AudioMAEModel
+  _target_: biofoundation.modules.models.audiomae.AudioMAEModel
   num_classes: null
   
 

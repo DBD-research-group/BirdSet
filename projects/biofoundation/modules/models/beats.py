@@ -1,11 +1,11 @@
 from typing import Optional
+import torch
+from torch import nn
 
 
 from birdset.configs.model_configs import PretrainInfoConfig
-from birdset.modules.models.BEATs import BEATs, BEATsConfig
-from birdset.modules.models.birdset_model import BirdSetModel
-import torch
-from torch import nn
+from biofoundation.modules.models.BEATs import BEATs, BEATsConfig
+from biofoundation.modules.models.birdset_model import BirdSetModel
 
 
 class BEATsModel(BirdSetModel):

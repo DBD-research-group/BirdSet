@@ -1,5 +1,5 @@
 model:
-  _target_: birdset.modules.models.ssast.ASTModel
+  _target_: biofoundation.modules.models.ssast.ASTModel
   num_classes: null
   load_pretrained_mdl_path: ${paths.root_dir}/models/ssast/SSAST-Base-Patch-400.pth
   model_size: base

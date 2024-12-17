@@ -4,8 +4,8 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 from torchaudio.compliance import kaldi
-from birdset.modules.models.birdset_model import BirdSetModel
-from birdset.configs import PretrainInfoConfig
+
+from biofoundation.modules.models.birdset_model import BirdSetModel
 
 
 class AudioMAEModel(BirdSetModel):

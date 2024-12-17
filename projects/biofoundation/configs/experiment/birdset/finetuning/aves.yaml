@@ -1,5 +1,5 @@
 # @package _global_
 #package global is neccessary!
 defaults:
-  - biofoundation/birdset/finetuning/finetuning_config.yaml 
+  - birdset/finetuning/finetuning_config.yaml 
   - override /module/network: aves.yaml  

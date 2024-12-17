@@ -2,16 +2,14 @@ import torch.nn as nn
 import torch
 from timm.models.layers import trunc_normal_
 import timm
-import numpy as np
 from timm.models.layers import to_2tuple
-from random import randrange
-import random
-from typing import Tuple
+
 from torchaudio.compliance import kaldi
 import torch.nn.functional as F
 from typing import Optional
 from birdset.utils import pylogger
-from birdset.modules.models.birdset_model import BirdSetModel
+
+from biofoundation.modules.models.birdset_model import BirdSetModel
 
 log = pylogger.get_pylogger(__name__)
 

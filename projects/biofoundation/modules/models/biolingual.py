@@ -2,12 +2,11 @@ import torch
 import torch.nn as nn
 from transformers import ClapModel, ClapProcessor
 
-# from transformers import pipeline
-import datasets
 from typing import Tuple
 from birdset.configs import PretrainInfoConfig
 from typing import Optional
-from birdset.modules.models.birdset_model import BirdSetModel
+
+from biofoundation.modules.models.birdset_model import BirdSetModel
 
 
 class BioLingualClassifier(BirdSetModel):

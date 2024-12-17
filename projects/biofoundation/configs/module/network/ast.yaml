@@ -1,5 +1,5 @@
 model:
-  _target_: birdset.modules.models.ast.ASTSequenceClassifier
+  _target_: biofoundation.modules.models.ast.ASTSequenceClassifier
   num_classes: null
   checkpoint: MIT/ast-finetuned-audioset-10-10-0.4593
   local_checkpoint: null

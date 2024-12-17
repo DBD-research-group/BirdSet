@@ -9,7 +9,8 @@ from birdset.configs import PretrainInfoConfig
 from typing import Tuple
 from torchaudio.compliance import kaldi
 import torch.nn.functional as F
-from birdset.modules.models.birdset_model import BirdSetModel
+
+from biofoundation.modules.models.birdset_model import BirdSetModel
 
 
 class ConvNextClassifier(BirdSetModel):

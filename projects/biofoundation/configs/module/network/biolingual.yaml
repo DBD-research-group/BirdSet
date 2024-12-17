@@ -1,5 +1,5 @@
 model:
-  _target_: birdset.modules.models.biolingual.BioLingualClassifier
+  _target_: biofoundation.modules.models.biolingual.BioLingualClassifier
   num_classes: null
   checkpoint: laion/clap-htsat-unfused
   local_checkpoint: null

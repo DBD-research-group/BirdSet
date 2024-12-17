@@ -1,17 +1,14 @@
 import copy
-from typing import List, Literal, Optional
+from typing import List, Optional
 from birdset.configs.model_configs import PretrainInfoConfig
 from birdset.utils import pylogger
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import lightning as L
-from dataclasses import dataclass, field
-import warnings
-import datasets
-from typing import Tuple
-from birdset.modules.models.birdset_model import BirdSetModel
+
+
+from biofoundation.modules.models.birdset_model import BirdSetModel
 
 log = pylogger.get_pylogger(__name__)
 

@@ -1,5 +1,5 @@
 model:
-  _target_: birdset.modules.models.wav2vec2.Wav2vec2SequenceClassifier
+  _target_: biofoundation.modules.models.wav2vec2.Wav2vec2SequenceClassifier
   checkpoint: facebook/wav2vec2-base
   local_checkpoint: null
   num_classes: null

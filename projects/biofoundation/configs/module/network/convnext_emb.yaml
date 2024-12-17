@@ -1,5 +1,5 @@
 model:
-  _target_: birdset.modules.models.convnext.ConvNextEmbedding
+  _target_: biofoundation.modules.models.convnext.ConvNextEmbedding
   num_classes: null
   num_channels: 1
   checkpoint: facebook/convnext-base-224-22k

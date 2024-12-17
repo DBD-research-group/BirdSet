@@ -1,5 +1,5 @@
 model: 
-  _target_: birdset.modules.models.eat_ssl.EATSSL
+  _target_: biofoundation.modules.models.eat_ssl.EATSSL
   checkpoint: ${paths.root_dir}/models/eat_ssl/EAT-base_epoch30_ft.pt
   local_checkpoint: null
   modality:

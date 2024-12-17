@@ -1,7 +1,7 @@
 # @package _global_
 #package global is neccessary!
 defaults:
-  - biofoundation/birdset/fewshot/fewshot_config.yaml 
+  - birdset/fewshot/fewshot_config.yaml 
   - override /module/network: hubert.yaml  
 
 module:
@@ -9,6 +9,6 @@ module:
     model:
       preprocess_in_model: False
       classifier:
-        _target_: projects.biofoundation.src.modules.models.linear_classifier.LinearClassifier
+        _target_: biofoundation.modules.models.linear_classifier.LinearClassifier
         num_classes: ${datamodule.dataset.num_classes}
         in_features: ${module.network.embedding_size}        

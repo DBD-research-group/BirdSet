@@ -6,7 +6,7 @@ defaults:
 
 network:
   model:
-    _target_: projects.biofoundation.src.modules.models.linear_classifier.LinearClassifier
+    _target_: biofoundation.modules.models.linear_classifier.LinearClassifier
     in_features: ${module.embedding_model.embedding_size}
 
   model_name: ${module.embedding_model.model_name}_finetune # Most values are just taken from embedding model as it is the first part

@@ -1,5 +1,5 @@
 model: 
-  _target_: birdset.modules.models.perch.PerchModel
+  _target_: biofoundation.modules.models.perch.PerchModel
   num_classes: null
   tfhub_version: 4
   restrict_logits: False
@@ -11,7 +11,7 @@ model:
     hf_pretrain_name: null
     valid_test_only: False
   classifier:
-    _target_: projects.biofoundation.src.modules.models.linear_classifier.LinearClassifier
+    _target_: biofoundation.modules.models.linear_classifier.LinearClassifier
     in_features: 1280
     num_classes: null
 

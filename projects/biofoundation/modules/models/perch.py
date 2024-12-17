@@ -9,7 +9,8 @@ import torch
 from torch import nn
 
 from birdset.configs import PretrainInfoConfig
-from birdset.modules.models.birdset_model import BirdSetModel
+
+from biofoundation.modules.models.birdset_model import BirdSetModel
 
 
 class PerchModel(BirdSetModel):

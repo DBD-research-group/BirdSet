@@ -3,8 +3,9 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 from torchaudio.compliance import kaldi
-from birdset.modules.models.EAT.data2vecmultimodel import Data2VecMultiModel
-from birdset.modules.models.birdset_model import BirdSetModel
+
+from biofoundation.modules.models.EAT.data2vecmultimodel import Data2VecMultiModel
+from biofoundation.modules.models.birdset_model import BirdSetModel
 
 
 class EATSSL(BirdSetModel):

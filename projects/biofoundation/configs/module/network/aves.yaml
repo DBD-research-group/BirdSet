@@ -1,5 +1,5 @@
 model:
-  _target_: birdset.modules.models.aves.AvesClassifier
+  _target_: biofoundation.modules.models.aves.AvesClassifier
   num_classes: null
   local_checkpoint: null
   pretrain_info:

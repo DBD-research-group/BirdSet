@@ -1,5 +1,5 @@
 model: 
-  _target_: birdset.modules.models.perch.PerchModel
+  _target_: biofoundation.modules.models.perch.PerchModel
   num_classes: null
   tfhub_version: 4
   train_classifier: False

@@ -1,11 +1,10 @@
 import torch
 import torch.nn as nn
-import datasets
 from transformers import ASTConfig, ASTForAudioClassification
-from birdset.modules.models.birdset_model import BirdSetModel
 from birdset.utils import pylogger
 from birdset.configs import PretrainInfoConfig
-from typing import Optional, Tuple
+
+from biofoundation.modules.models.birdset_model import BirdSetModel
 
 log = pylogger.get_pylogger(__name__)
 
