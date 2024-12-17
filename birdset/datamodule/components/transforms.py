@@ -505,4 +505,3 @@ class EmbeddingTransforms(BaseTransforms):
             labels = torch.tensor(batch["labels"], dtype=torch.float32)
 
         return {"input_values": embeddings, "labels": labels}
->>>>>>> origin/main
