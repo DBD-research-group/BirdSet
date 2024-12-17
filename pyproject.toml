@@ -5,7 +5,8 @@ description = "BirdSet: A Large-Scale Dataset for Audio Classification in Avian 
 authors = ["Lukas Rauch <lukas.rauch@uni-kassel.de>", "Raphael Schwinger <rsc@informatik.uni-kiel.de>", "Moritz Wirth <moritz.wirt@uni-kassel.de>", "Rene  Heinrich <rene.heinrich@iee.fraunhofer.de>", "Jonas Lange <jla@informatik.uni-kiel.de>"]
 readme = "README.md"
 packages = [
-    { include = "biofoundation", from = "projects/" }
+    { include = "biofoundation", from = "projects/" },
+    { include = "birdset", from = "./" }
 ]
 
 [tool.poetry.dependencies]
