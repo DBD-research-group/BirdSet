@@ -2,41 +2,49 @@ import torch
 import torch.nn as nn
 import datasets
 from transformers import ASTConfig, ASTForAudioClassification
-from birdset.modules.models.birdset_model import BirdSetModel
 from birdset.utils import pylogger
 from birdset.configs import PretrainInfoConfig
-from typing import Optional, Tuple
 
 log = pylogger.get_pylogger(__name__)
 
 
-class ASTSequenceClassifier(BirdSetModel):
-    EMBEDDING_SIZE = 768
-
+class ASTSequenceClassifier(nn.Module):
     def __init__(
         self,
+        checkpoint: str,
         num_classes: int = None,
-        embedding_size: int = EMBEDDING_SIZE,
-        checkpoint: str = "MIT/ast-finetuned-audioset-10-10-0.4593",
         local_checkpoint: str = None,
-        freeze_backbone: bool = False,
-        preprocess_in_model: bool = False,  # This isn't implemented for this model (yet?!)
-        classifier: nn.Module | None = None,
         cache_dir: str = None,
         pretrain_info: PretrainInfoConfig = None,
     ):
+        """
+        Note: Either num_classes or pretrain_info must be given
+        Args:
+            checkpoint: huggingface checkpoint path of any model of correct type
+            num_classes: number of classification heads to be used in the model
+            local_checkpoint: local path to checkpoint file
+            cache_dir: specified cache dir to save model files at
+            pretrain_info: hf_path and hf_name of info will be used to infer if num_classes is None
+        """
+        super(ASTSequenceClassifier, self).__init__()
 
-        super().__init__(
-            num_classes=num_classes,
-            embedding_size=embedding_size,
-            local_checkpoint=local_checkpoint,
-            freeze_backbone=freeze_backbone,
-            preprocess_in_model=preprocess_in_model,
-            pretrain_info=pretrain_info,
-        )
         self.checkpoint = checkpoint
+        if pretrain_info:  # either num_classes if provided or pretrain info
+            self.hf_path = pretrain_info.hf_path
+            self.hf_name = (
+                pretrain_info.hf_name
+                if not pretrain_info.hf_pretrain_name
+                else pretrain_info.hf_pretrain_name
+            )
+            self.num_classes = len(
+                datasets.load_dataset_builder(self.hf_path, self.hf_name)
+                .info.features["ebird_code"]
+                .names
+            )
+        else:
+            self.num_classes = num_classes
+
         self.cache_dir = cache_dir
-        self.classifier = classifier
 
         if (
             local_checkpoint
@@ -64,10 +72,6 @@ class ASTSequenceClassifier(BirdSetModel):
                 ignore_mismatched_sizes=True,
             )
 
-        if freeze_backbone:
-            for param in self.model.parameters():
-                param.requires_grad = False
-
     def forward(
         self, input_values, attention_mask=None, labels=None, return_hidden_state=False
     ):
@@ -87,11 +91,13 @@ class ASTSequenceClassifier(BirdSetModel):
           model. Defaults to False.
         """
 
+        # Squeeze the channel dimension so that the tensor has shape (height, width)
         input_values = input_values.squeeze(1)
 
         # Swap the height and width dimensions so that the tensor has shape (width, height)
         # 6,1,128,1024
         input_values = input_values.transpose(1, 2)
+
         outputs = self.model(
             input_values,
             attention_mask,
@@ -100,64 +106,17 @@ class ASTSequenceClassifier(BirdSetModel):
             return_dict=True,
             labels=None,
         )
+
         logits = outputs["logits"]
+
         last_hidden_state = outputs["hidden_states"][-1]  # (batch, sequence, dim)
         cls_state = last_hidden_state[:, 0, :]  # (batch, dim)
 
         if return_hidden_state:
-
-            embeddings = (logits, cls_state)
+            output = (logits, cls_state)
 
         else:
-            embeddings = logits
-
-        if self.train_classifier:
-            output = self.classifier(embeddings)
-        else:
-            output = embeddings
-
-        return output
-
-    def get_embeddings(
-        self, input_tensor: torch.Tensor, attention_mask=None, return_hidden_state=False
-    ):
-        """
-        Get the embeddings and logits from the model.
-
-        Args:
-            input_tensor (torch.Tensor): The input tensor for the model.
-
-        Returns:
-            torch.Tensor: The embeddings from the model.
-        """
-        # Ensure input tensor has the correct dimensions
-        print("shaaaaaaaap", input_tensor.shape)
-
-        input_tensor = input_tensor.squeeze(1)
-        print("shaaaaaaaap", input_tensor.shape)
-        input_values = input_tensor.transpose(1, 2)  # Swap sequence and feature dims
-
-        outputs = self.model(
-            input_values,
-            attention_mask,
-            output_attentions=False,
-            output_hidden_states=True,
-            return_dict=True,
-            labels=None,
-        )
-        logits = outputs["logits"]
-
-        last_hidden_state = outputs["hidden_states"][-1]  # (batch, sequence, dim)
-        cls_state = last_hidden_state[:, 0, :]  # (batch, dim)
-
-        if self.classifier is None:
-            if return_hidden_state:
-                output = (logits, cls_state)
-
-            else:
-                output = logits
-        else:
-            output = self.classifier(cls_state)
+            output = logits
 
         return output
 

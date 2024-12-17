@@ -1,27 +1,19 @@
 import torch
 import torch.nn as nn
-from typing import Optional, Tuple
 from transformers import AutoModelForAudioClassification, AutoConfig
 import datasets
 
 from birdset.utils import pylogger
 from birdset.configs import PretrainInfoConfig
-from birdset.modules.models.birdset_model import BirdSetModel
 
 log = pylogger.get_pylogger(__name__)
 
 
-class Wav2vec2SequenceClassifier(BirdSetModel):
-    EMBEDDING_SIZE = 768
-
+class Wav2vec2SequenceClassifier(nn.Module):
     def __init__(
         self,
+        checkpoint: str,
         num_classes: int = None,
-        embedding_size: int = EMBEDDING_SIZE,
-        checkpoint: str = None,
-        freeze_backbone: bool = False,
-        preprocess_in_model: bool = False,
-        classifier: nn.Module = None,
         local_checkpoint: str = None,
         cache_dir: str = None,
         pretrain_info: PretrainInfoConfig = None,
@@ -35,17 +27,24 @@ class Wav2vec2SequenceClassifier(BirdSetModel):
             cache_dir: specified cache dir to save model files at
             pretrain_info: hf_path and hf_name of info will be used to infer if num_classes is None
         """
-        super().__init__(
-            num_classes=num_classes,
-            embedding_size=embedding_size,
-            classifier=classifier,
-            local_checkpoint=local_checkpoint,
-            freeze_backbone=freeze_backbone,
-            preprocess_in_model=preprocess_in_model,
-            pretrain_info=pretrain_info,
-        )
+        super(Wav2vec2SequenceClassifier, self).__init__()
+
         self.checkpoint = checkpoint
 
+        if pretrain_info:  # either num_classes if provided or pretrain info
+            self.hf_path = pretrain_info.hf_path
+            self.hf_name = (
+                pretrain_info.hf_name
+                if not pretrain_info.hf_pretrain_name
+                else pretrain_info.hf_pretrain_name
+            )
+            self.num_classes = len(
+                datasets.load_dataset_builder(self.hf_path, self.hf_name)
+                .info.features["ebird_code"]
+                .names
+            )
+        else:
+            self.num_classes = num_classes
         self.cache_dir = cache_dir
 
         state_dict = None
@@ -65,46 +64,44 @@ class Wav2vec2SequenceClassifier(BirdSetModel):
             ignore_mismatched_sizes=True,
         )
 
-        if freeze_backbone:
-            for param in self.model.parameters():
-                param.requires_grad = False
-
     def forward(
-        self, input_values: torch.Tensor, labels: Optional[torch.Tensor] = None
-    ) -> torch.Tensor:
+        self, input_values, attention_mask=None, labels=None, return_hidden_state=False
+    ):
+        """
+        This method processes the input tensor, primarily by adjusting its dimensions to match the expected
+        format of the model. It first squeezes out the channel dimension, assuming it's of size one. The processed tensor is then passed through the model to
+        generate outputs.
+        Parameters:
+        - input_values (Tensor): The main input tensor of shape (channel, height, width).
+        - attention_mask (Tensor, optional): An optional mask applied to the input, used in models that
+          focus on specific parts of the input like transformers. Defaults to None.
+        - labels (Tensor, optional): Labels used for supervised learning, typically for computing loss.
+          Defaults to None.
+        - return_hidden_state (bool, optional): A flag to determine whether to return hidden states of the
+          model. Defaults to False.
+        """
 
-        if self.classifier is None:
-            # Squeeze the channel dimension so that the tensor has shape (batch size, wavelength)
-            input_values = input_values.squeeze(1)
-
-            outputs = self.model(
-                input_values,
-                attention_mask=None,
-                output_attentions=False,
-                output_hidden_states=False,
-                return_dict=True,
-            )
-
-            return outputs["logits"]
-
-        else:
-            embeddings = self.get_embeddings(input_values)
-            return self.classifier(embeddings)
-
-    def get_embeddings(self, input_tensor) -> torch.Tensor:
-        input_tensor = input_tensor.squeeze(1)
+        # Squeeze the channel dimension so that the tensor has shape (batch size, wavelength)
+        input_values = input_values.squeeze(1)
 
         outputs = self.model(
-            input_tensor,
+            input_values,
+            attention_mask,
             output_attentions=False,
-            output_hidden_states=True,
+            output_hidden_states=return_hidden_state,
             return_dict=True,
-            # labels=None
         )
-        last_hidden_state = outputs["hidden_states"][-1]  # (batch, sequence, dim)
-        cls_state = last_hidden_state[:, 0, :]
 
-        return cls_state
+        logits = outputs["logits"]
+
+        if return_hidden_state:
+            last_hidden_state = outputs["hidden_states"][-1]  # (batch, sequence, dim)
+            cls_state = last_hidden_state[:, 0, :]  # (batch, dim)
+            output = (logits, cls_state)
+        else:
+            output = logits
+
+        return output
 
     @torch.inference_mode()
     def get_logits(self, dataloader, device):
