@@ -7,7 +7,7 @@ defaults:
 
 network:
   model:
-    _target_: birdset.modules.models.linear_classifier.LinearClassifier
+    _target_: projects.biofoundation.src.modules.models.linear_classifier.LinearClassifier
     in_features: ${datamodule.embedding_model.embedding_size}
 
   model_name: ${datamodule.embedding_model.model_name}_embedding # Most values are just taken from embedding model as it is the first part

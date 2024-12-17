@@ -10,7 +10,7 @@ module:
       preprocess_in_model: False
       checkpoint: DBD-research-group/ConvNeXT-Base-BirdSet-XCL
       classifier:
-        _target_: birdset.modules.models.linear_classifier.LinearClassifier
+        _target_: projects.biofoundation.src.modules.models.linear_classifier.LinearClassifier
         num_classes: ${datamodule.dataset.num_classes}
         in_features: ${module.network.embedding_size}
     model_name: convnext_bs

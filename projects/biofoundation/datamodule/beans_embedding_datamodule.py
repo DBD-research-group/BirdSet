@@ -1,9 +1,9 @@
 from birdset.datamodule.components.transforms import BirdSetTransformsWrapper
-from birdset.datamodule.embedding_datamodule import (
+from biofoundation.datamodule.embedding_datamodule import (
     EmbeddingDataModule,
     EmbeddingModuleConfig,
 )
-from birdset.datamodule.beans_datamodule import BEANSDataModule
+from biofoundation.datamodule.beans_datamodule import BEANSDataModule
 from birdset.configs import DatasetConfig, LoadersConfig
 from birdset.utils import pylogger
 

@@ -9,6 +9,6 @@ module:
     model:
       local_checkpoint: /workspace/models/eat/eat-XCL-2024-05-19_105101-checkpoint-26.ckpt
       classifier:
-        _target_: birdset.modules.models.linear_classifier.LinearClassifier
+        _target_: projects.biofoundation.src.modules.models.linear_classifier.LinearClassifier
         num_classes: ${datamodule.dataset.num_classes}
         in_features: ${module.network.embedding_size}

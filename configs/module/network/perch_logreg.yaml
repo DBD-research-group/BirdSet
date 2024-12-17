@@ -11,7 +11,7 @@ model:
     hf_pretrain_name: null
     valid_test_only: False
   classifier:
-    _target_: birdset.modules.models.linear_classifier.LinearClassifier
+    _target_: projects.biofoundation.src.modules.models.linear_classifier.LinearClassifier
     in_features: 1280
     num_classes: null
 
