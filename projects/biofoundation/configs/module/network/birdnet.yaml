@@ -1,0 +1,16 @@
+# Should have the correct values from BirdNET Paper
+model: 
+  _target_: birdset.modules.models.birdnet.BirdNetModel
+  num_classes: null
+  train_classifier: True
+  model_path: ${paths.root_dir}/models/birdnet/BirdNET_GLOBAL_6K_V2.4_Model
+  #gpu_to_use: ${trainer.devices[0]}
+
+model_name: birdnet
+model_type: waveform
+torch_compile: False
+sampling_rate: 48_000
+normalize_spectrogram: False
+normalize_waveform: False
+embedding_size: 1024
+length: 3 # 6 seconds but multiple windows (no), ghani says 3
