@@ -38,7 +38,7 @@ trainer:
 
 callbacks:
   model_checkpoint:
-    filename: ${module.network.model_name}_${datamodule.dataset.dataset_name}_{epoch:02d}_{step:06d}
+    filename: ${module.network.model_name}_${datamodule.dataset.hf_name}_{epoch:02d}_{step:06d}
     save_last: False
     monitor: null
     save_top_k: -1

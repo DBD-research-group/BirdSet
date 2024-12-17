@@ -1,10 +1,6 @@
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-
 # https://openaccess.thecvf.com/content/ICCV2021/papers/Ridnik_Asymmetric_Loss_for_Multi-Label_Classification_ICCV_2021_paper.pdf
 import torch
-import torch.nn as nn
+from torch import nn
 
 
 # https://github.com/huggingface/pytorch-image-models/blob/bbe798317fb26f063c18279827c038058e376479/timm/loss/asymmetric_loss.py#L6
@@ -16,17 +12,19 @@ class AsymmetricLossMultiLabel(nn.Module):
         clip=0.05,
         eps=1e-8,
         disable_torch_grad_focal_loss=False,
+        reduction="mean",
     ):
-        super(AsymmetricLossMultiLabel, self).__init__()
+        super().__init__()
 
         self.gamma_neg = gamma_neg
         self.gamma_pos = gamma_pos
         self.clip = clip
         self.disable_torch_grad_focal_loss = disable_torch_grad_focal_loss
         self.eps = eps
+        self.reduction = reduction
 
     def forward(self, x, y):
-        """ "
+        """
         Parameters
         ----------
         x: input logits
@@ -60,12 +58,17 @@ class AsymmetricLossMultiLabel(nn.Module):
                 torch._C.set_grad_enabled(True)
             loss *= one_sided_w
 
-        return -loss.sum()
+        if self.reduction == "mean":
+            return -loss.mean()
+        if self.reduction == "sum":
+            return -loss.sum()
+
+        return -loss
 
 
 class AsymmetricLossSingleLabel(nn.Module):
     def __init__(self, gamma_pos=1, gamma_neg=4, eps: float = 0.1, reduction="mean"):
-        super(AsymmetricLossSingleLabel, self).__init__()
+        super().__init__()
 
         self.eps = eps
         self.logsoftmax = nn.LogSoftmax(dim=-1)
@@ -74,8 +77,8 @@ class AsymmetricLossSingleLabel(nn.Module):
         self.gamma_neg = gamma_neg
         self.reduction = reduction
 
-    def forward(self, inputs, target, reduction=None):
-        """ "
+    def forward(self, inputs, target):
+        """
         Parameters
         ----------
         x: input logits

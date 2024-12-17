@@ -6,6 +6,7 @@ import os
 from collections import Counter, defaultdict
 import lightning as L
 import pandas as pd
+import datasets
 from datasets import (
     load_dataset,
     load_from_disk,
@@ -17,6 +18,7 @@ from datasets import (
 )
 from torch.utils.data import DataLoader
 from copy import deepcopy
+from tqdm import tqdm
 
 from tqdm import tqdm
 
@@ -153,10 +155,10 @@ class BaseDataModuleHF(L.LightningDataModule):
             fingerprint = dataset._fingerprint
         else:
             raise ValueError("dataset must be a Dataset or DatasetDict")
-
+            
         self.disk_save_path = os.path.join(
             self.dataset_config.data_dir,
-            f"{self.dataset_config.dataset_name}_processed_{self.dataset_config.seed}_{fingerprint}",
+            f"{self.dataset_config.hf_name}_processed_{self.dataset_config.seed}_{fingerprint}",
         )
 
         if os.path.exists(self.disk_save_path):
@@ -199,21 +201,28 @@ class BaseDataModuleHF(L.LightningDataModule):
             DatasetDict: The dataset with train, validation, and test splits. The keys are the names of the splits and the values are the datasets for each split.
         """
         if isinstance(dataset, Dataset):
-            split_1 = dataset.train_test_split(
-                self.dataset_config.val_split,
+            # Split the dataset into train and remaining (validation + test) first
+            train_split = dataset.train_test_split(
+                test_size=self.dataset_config.val_split
+                + self.dataset_config.test_split,
                 shuffle=True,
                 seed=self.dataset_config.seed,
             )
-            split_2 = split_1["test"].train_test_split(
-                0.2, shuffle=False, seed=self.dataset_config.seed
+            # Split the remaining into validation and test
+            valid_test_split = train_split["test"].train_test_split(
+                test_size=self.dataset_config.test_split
+                / (self.dataset_config.val_split + self.dataset_config.test_split),
+                shuffle=True,
+                seed=self.dataset_config.seed,
             )
             return DatasetDict(
                 {
-                    "train": split_1["train"],
-                    "valid": split_2["train"],
-                    "test": split_2["test"],
+                    "train": train_split["train"],
+                    "valid": valid_test_split["train"],
+                    "test": valid_test_split["test"],
                 }
             )
+
         elif isinstance(dataset, DatasetDict):
             # check if dataset has train, valid, test splits
             if "train" in dataset.keys() and "valid" in dataset.keys():
@@ -225,15 +234,17 @@ class BaseDataModuleHF(L.LightningDataModule):
             ):
                 return dataset
             if "train" in dataset.keys() and "test" in dataset.keys():
-                split = dataset["train"].train_test_split(
+                if self.dataset_config.val_split == 0:
+                    raise ValueError("A small validation split is required. Please set val_split > 0.")
+                train_valid_split = dataset["train"].train_test_split(
                     self.dataset_config.val_split,
                     shuffle=True,
                     seed=self.dataset_config.seed,
                 )
                 return DatasetDict(
                     {
-                        "train": split["train"],
-                        "valid": split["test"],
+                        "train": train_valid_split["train"],
+                        "valid": train_valid_split["test"],
                         "test": dataset["test"],
                     }
                 )
@@ -248,12 +259,17 @@ class BaseDataModuleHF(L.LightningDataModule):
         """
         log.info("> Loading data set.")
 
-        dataset = load_dataset(
-            name=self.dataset_config.hf_name,
-            path=self.dataset_config.hf_path,
-            cache_dir=self.dataset_config.data_dir,
-            num_proc=3,
-        )
+        dataset_args = {
+            "path": self.dataset_config.hf_path,
+            "cache_dir": self.dataset_config.data_dir,
+            "num_proc": 3,
+        }
+
+        if self.dataset_config.hf_name != "esc50": # special esc50 case due to naming
+            dataset_args["name"] = self.dataset_config.hf_name
+
+        dataset = load_dataset(**dataset_args)
+
         if isinstance(dataset, IterableDataset | IterableDatasetDict):
             log.error("Iterable datasets not supported yet.")
             return
@@ -302,10 +318,9 @@ class BaseDataModuleHF(L.LightningDataModule):
         transforms = deepcopy(self.transforms)
         transforms.set_mode(split)
 
-        if (
-            split == "train"
-        ):  # we need this for sampler, cannot be done later because set_transform
-            self.train_label_list = dataset["labels"]
+        if split == "train":  # we need this for sampler, cannot be done later because set_transform
+            if self.dataset_config.class_weights_sampler:
+                self.train_label_list = dataset["labels"]
 
         # add run-time transforms to dataset
         dataset.set_transform(transforms, output_all_columns=False)
@@ -389,14 +404,14 @@ class BaseDataModuleHF(L.LightningDataModule):
 
         class_limit = class_limit if class_limit else -float("inf")
         dataset = dataset.map(
-            lambda x: _unique_identifier(x, label_name), desc="smart-sampling-1"
+            lambda x: _unique_identifier(x, label_name), desc="sampling: unique-identifier"
         )
         df = pd.DataFrame(dataset)
         path_label_count = df.groupby(["id", label_name], as_index=False).size()
         path_label_count = path_label_count.set_index("id")
         class_sizes = df.groupby(label_name).size()
 
-        for label in class_sizes.index:
+        for label in tqdm(class_sizes.index, desc="sampling"):
             current = path_label_count[path_label_count[label_name] == label]
             total = current["size"].sum()
             most = current["size"].max()

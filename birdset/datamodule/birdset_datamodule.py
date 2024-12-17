@@ -115,7 +115,7 @@ class BirdSetDataModule(BaseDataModuleHF):
                 batch_size=300,
                 load_from_cache_file=True,
                 num_proc=self.dataset_config.n_workers,
-                desc="Event Mapping",
+                desc="Train event mapping",
             )
 
             if (
@@ -158,7 +158,7 @@ class BirdSetDataModule(BaseDataModuleHF):
                 batched=True,
                 batch_size=300,
                 num_proc=self.dataset_config.n_workers,
-                desc="Event Mapping",
+                desc="Train event mapping",
             )
 
             dataset = dataset.rename_column("ebird_code_multilabel", "labels")
@@ -173,14 +173,15 @@ class BirdSetDataModule(BaseDataModuleHF):
                 )
 
             log.info(">> One-hot-encode classes")
-            dataset = dataset.map(
-                self._classes_one_hot,
-                batched=True,
-                batch_size=500,
-                load_from_cache_file=True,
-                num_proc=self.dataset_config.n_workers,
-                desc="One-hot-encoding",
-            )
+            for split in ["train", "test_5s"]:
+                dataset[split] = dataset[split].map(
+                    self._classes_one_hot,
+                    batched=True,
+                    batch_size=300,
+                    load_from_cache_file=True,
+                    num_proc=self.dataset_config.n_workers,
+                    desc=f"One-hot-encoding {split} labels.",
+                )
 
             if (
                 self.dataset_config.class_weights_loss
@@ -190,16 +191,14 @@ class BirdSetDataModule(BaseDataModuleHF):
                     (dataset["train"]["ebird_code"])
                 )
 
-            dataset["test"] = dataset["test_5s"]
+            dataset_test = dataset.pop("test_5s")
+            dataset["test"] = dataset_test
         else:
             raise f"{self.dataset_config.task=} is not supported, choose (multilabel, multiclass)"
-        dataset["train"] = dataset["train"].select_columns(
-            ["filepath", "labels", "detected_events", "start_time", "end_time"]
-        )
-        # maybe has to be added to test data to avoid two selections
-        dataset["test"] = dataset["test"].select_columns(
-            ["filepath", "labels", "detected_events", "start_time", "end_time"]
-        )
-        if self.dataset_config.get("fewshot") is not None:
-            dataset = self._fewshot_preprocess(dataset)
+
+        for split in ["train", "test"]:
+            dataset[split] = dataset[split].select_columns(
+                ["filepath", "labels", "detected_events", "start_time", "end_time"]
+            )
+
         return dataset
