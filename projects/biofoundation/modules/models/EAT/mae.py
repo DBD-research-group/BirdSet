@@ -27,9 +27,7 @@ except:
     FusedLayerNorm = nn.LayerNorm
 
 
-
 logger = logging.getLogger(__name__)
-
 
 
 def modify_relative_position_bias(orig_bias, bsz, mask):
@@ -101,6 +99,7 @@ class AltBlock(nn.Module):
         else:
             if alt_attention:
                 from .modules import AltAttention as AltAttention2
+
                 self.attn = AltAttention2(
                     dim,
                     num_heads=num_heads,
@@ -178,7 +177,7 @@ class AltAttention(nn.Module):
         if attn_head_dim is not None:
             head_dim = attn_head_dim
         all_head_dim = head_dim * self.num_heads
-        self.scale = qk_scale or head_dim ** -0.5
+        self.scale = qk_scale or head_dim**-0.5
 
         self.qkv = nn.Linear(dim, all_head_dim * 3, bias=False)
         if qkv_bias:
@@ -328,23 +327,28 @@ class RelativePositionBias(nn.Module):
 
 
 class PatchEmbed_new(nn.Module):
-    """ Flexible Image to Patch Embedding
-    """
-    def __init__(self, img_size=224, patch_size=16, in_chans=3, embed_dim=768, stride=16):
+    """Flexible Image to Patch Embedding"""
+
+    def __init__(
+        self, img_size=224, patch_size=16, in_chans=3, embed_dim=768, stride=16
+    ):
         super().__init__()
         img_size = to_2tuple(img_size)
         patch_size = to_2tuple(patch_size)
         stride = to_2tuple(stride)
-        
+
         self.img_size = img_size
         self.patch_size = patch_size
 
-        self.proj = nn.Conv2d(in_chans, embed_dim, kernel_size=patch_size, stride=stride) # with overlapped patches
+        self.proj = nn.Conv2d(
+            in_chans, embed_dim, kernel_size=patch_size, stride=stride
+        )  # with overlapped patches
 
     def forward(self, x):
         x = self.proj(x)
         x = x.flatten(2).transpose(1, 2)
         return x
+
 
 def get_2d_sincos_pos_embed(embed_dim, grid_size, cls_token=False):
     """
@@ -362,6 +366,7 @@ def get_2d_sincos_pos_embed(embed_dim, grid_size, cls_token=False):
     if cls_token:
         pos_embed = np.concatenate([np.zeros([1, embed_dim]), pos_embed], axis=0)
     return pos_embed
+
 
 def get_2d_sincos_pos_embed_flexible(embed_dim, grid_size, cls_token=False):
     """
@@ -401,7 +406,7 @@ def get_1d_sincos_pos_embed_from_grid(embed_dim, pos):
     assert embed_dim % 2 == 0
     omega = np.arange(embed_dim // 2, dtype=np.float32)
     omega /= embed_dim / 2.0
-    omega = 1.0 / 10000 ** omega  # (D/2,)
+    omega = 1.0 / 10000**omega  # (D/2,)
 
     pos = pos.reshape(-1)  # (M,)
     out = np.einsum("m,d->md", pos, omega)  # (M, D/2), outer product
@@ -422,7 +427,7 @@ def interpolate_pos_embed(model, checkpoint_model):
         # height (== width) for the checkpoint position embedding
         orig_size = int((pos_embed_checkpoint.shape[-2] - num_extra_tokens) ** 0.5)
         # height (== width) for the new position embedding
-        new_size = int(num_patches ** 0.5)
+        new_size = int(num_patches**0.5)
         # class_token and dist_token are kept unchanged
         if orig_size != new_size:
             print(
@@ -460,9 +465,12 @@ class MaeModel(L.LightningModule):
         )
         num_patches = self.patch_embed.num_patches
 
-        self.cls_token = nn.Parameter(torch.zeros(1, 1, cfg.embed_dim)) if not cfg.no_cls else None
+        self.cls_token = (
+            nn.Parameter(torch.zeros(1, 1, cfg.embed_dim)) if not cfg.no_cls else None
+        )
         self.pos_embed = nn.Parameter(
-            torch.zeros(1, num_patches + int(not cfg.no_cls), cfg.embed_dim), requires_grad=False
+            torch.zeros(1, num_patches + int(not cfg.no_cls), cfg.embed_dim),
+            requires_grad=False,
         )  # fixed sin-cos embedding
 
         norm_layer = partial(nn.LayerNorm, eps=cfg.norm_eps)
@@ -503,13 +511,19 @@ class MaeModel(L.LightningModule):
                     layer_norm_first=cfg.layer_norm_first,
                     ffn_targets=not cfg.end_of_block_targets,
                     use_rel_pos_bias=cfg.use_rel_pos_bias,
-                    window_size=window_size
-                    if (self.cfg.use_rel_pos_bias and not self.cfg.shared_rel_pos_bias)
-                    else None,
+                    window_size=(
+                        window_size
+                        if (
+                            self.cfg.use_rel_pos_bias
+                            and not self.cfg.shared_rel_pos_bias
+                        )
+                        else None
+                    ),
                     alt_attention=cfg.alt_attention,
                 )
             elif cfg.alt_block2:
                 from .modules import AltBlock as AltBlock2
+
                 return AltBlock2(
                     cfg.embed_dim,
                     cfg.num_heads,
@@ -549,9 +563,11 @@ class MaeModel(L.LightningModule):
                 torch.zeros(
                     1,
                     1,
-                    cfg.decoder_embed_dim
-                    if not cfg.no_decoder_embed
-                    else cfg.embed_dim,
+                    (
+                        cfg.decoder_embed_dim
+                        if not cfg.no_decoder_embed
+                        else cfg.embed_dim
+                    ),
                 )
             )
             if cfg.mask_noise_std <= 0
@@ -563,9 +579,11 @@ class MaeModel(L.LightningModule):
                 torch.zeros(
                     1,
                     num_patches + 1,
-                    cfg.decoder_embed_dim
-                    if not cfg.no_decoder_embed
-                    else cfg.embed_dim,
+                    (
+                        cfg.decoder_embed_dim
+                        if not cfg.no_decoder_embed
+                        else cfg.embed_dim
+                    ),
                 ),
                 requires_grad=False,
             )
@@ -589,7 +607,7 @@ class MaeModel(L.LightningModule):
 
         self.decoder_norm = norm_layer(cfg.decoder_embed_dim)
         self.decoder_pred = nn.Linear(
-            cfg.decoder_embed_dim, cfg.patch_size ** 2 * cfg.in_chans, bias=True
+            cfg.decoder_embed_dim, cfg.patch_size**2 * cfg.in_chans, bias=True
         )  # decoder to patch
         # --------------------------------------------------------------------------
 
@@ -608,7 +626,7 @@ class MaeModel(L.LightningModule):
         # initialize (and freeze) pos_embed by sin-cos embedding
         pos_embed = get_2d_sincos_pos_embed(
             self.pos_embed.shape[-1],
-            int(self.patch_embed.num_patches ** 0.5),
+            int(self.patch_embed.num_patches**0.5),
             cls_token=not self.cfg.no_cls,
         )
         self.pos_embed.data.copy_(torch.from_numpy(pos_embed).float().unsqueeze(0))
@@ -616,7 +634,7 @@ class MaeModel(L.LightningModule):
         if self.decoder_pos_embed is not None:
             decoder_pos_embed = get_2d_sincos_pos_embed(
                 self.decoder_pos_embed.shape[-1],
-                int(self.patch_embed.num_patches ** 0.5),
+                int(self.patch_embed.num_patches**0.5),
                 cls_token=not self.cfg.no_cls,
             )
             self.decoder_pos_embed.data.copy_(
@@ -658,7 +676,7 @@ class MaeModel(L.LightningModule):
         h = w = imgs.shape[2] // p
         x = imgs.reshape(shape=(imgs.shape[0], 3, h, p, w, p))
         x = torch.einsum("nchpwq->nhwpqc", x)
-        x = x.reshape(shape=(imgs.shape[0], h * w, p ** 2 * 3))
+        x = x.reshape(shape=(imgs.shape[0], h * w, p**2 * 3))
         return x
 
     def unpatchify(self, x):

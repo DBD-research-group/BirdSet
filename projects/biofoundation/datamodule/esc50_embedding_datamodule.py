@@ -1,10 +1,21 @@
 from datasets import Audio
 
 from birdset.datamodule.components.transforms import BirdSetTransformsWrapper
-from birdset.datamodule.embedding_datamodule import EmbeddingDataModule, EmbeddingModuleConfig
+from birdset.datamodule.embedding_datamodule import (
+    EmbeddingDataModule,
+    EmbeddingModuleConfig,
+)
 from birdset.datamodule.esc50_datamodule import ESC50DataModule
 from birdset.configs import DatasetConfig, LoadersConfig
-from datasets import load_dataset, IterableDataset, IterableDatasetDict, DatasetDict, Audio, Dataset, load_from_disk
+from datasets import (
+    load_dataset,
+    IterableDataset,
+    IterableDatasetDict,
+    DatasetDict,
+    Audio,
+    Dataset,
+    load_from_disk,
+)
 from birdset.utils import pylogger
 import os
 
@@ -13,24 +24,20 @@ log = pylogger.get_pylogger(__name__)
 
 class ESC50EmbeddingDataModule(EmbeddingDataModule, ESC50DataModule):
     def __init__(
-            self,
-            dataset: DatasetConfig = DatasetConfig(),
-            loaders: LoadersConfig = LoadersConfig(),
-            transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
-            k_samples: int = 0,
-            val_batches: int = None, # Should val set be created
-            test_ratio: float = 0.5, # Ratio of test set if val set is also created
-            low_train: bool = False, # If low train set is used
-            embedding_model: EmbeddingModuleConfig = EmbeddingModuleConfig(),
-            average: bool = True,
-            gpu_to_use: int = 0,
-            cross_valid: bool = False,
-            fold : int = 1,
-            
-            
+        self,
+        dataset: DatasetConfig = DatasetConfig(),
+        loaders: LoadersConfig = LoadersConfig(),
+        transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
+        k_samples: int = 0,
+        val_batches: int = None,  # Should val set be created
+        test_ratio: float = 0.5,  # Ratio of test set if val set is also created
+        low_train: bool = False,  # If low train set is used
+        embedding_model: EmbeddingModuleConfig = EmbeddingModuleConfig(),
+        average: bool = True,
+        gpu_to_use: int = 0,
+        cross_valid: bool = False,
+        fold: int = 1,
     ):
-           
-        
         """
         DataModule for using BEANS and extracting embeddings.
 
@@ -53,26 +60,22 @@ class ESC50EmbeddingDataModule(EmbeddingDataModule, ESC50DataModule):
             dataset=dataset,
             loaders=loaders,
             transforms=transforms,
-            cross_valid= cross_valid,
-            fold= fold
-            
-            
+            cross_valid=cross_valid,
+            fold=fold,
         )
-        
 
         EmbeddingDataModule.__init__(
             self,
             dataset=dataset,
             loaders=loaders,
             transforms=transforms,
-            k_samples = k_samples,
-            val_batches = val_batches,
-            test_ratio = test_ratio,
-            low_train = low_train,
-            embedding_model = embedding_model,
-            average = average,
-            gpu_to_use = gpu_to_use
-            
+            k_samples=k_samples,
+            val_batches=val_batches,
+            test_ratio=test_ratio,
+            low_train=low_train,
+            embedding_model=embedding_model,
+            average=average,
+            gpu_to_use=gpu_to_use,
         )
 
         self.cross_valid = cross_valid
@@ -87,17 +90,17 @@ class ESC50EmbeddingDataModule(EmbeddingDataModule, ESC50DataModule):
         if self._prepare_done:
             log.info("Skip preparing.")
             return
-                 # Check if the embeddings for the dataset have already been computed
+            # Check if the embeddings for the dataset have already been computed
         if os.path.exists(self.embeddings_save_path):
-            log.info(f"Embeddings found in {self.embeddings_save_path}, loading from disk")
+            log.info(
+                f"Embeddings found in {self.embeddings_save_path}, loading from disk"
+            )
             dataset = load_from_disk(self.embeddings_save_path)
         else:
             log.info("Prepare Data")
             dataset = self._load_data()
             dataset = self._compute_embeddings(dataset)
 
-
-            
         print("dataset type:", type(dataset))
         dataset = self._preprocess_data(dataset)
         dataset = self._create_splits(dataset)
@@ -108,18 +111,16 @@ class ESC50EmbeddingDataModule(EmbeddingDataModule, ESC50DataModule):
 
         # set to done so that lightning does not call it again
         self._prepare_done = True
-        
-    def _preprocess_data(self, dataset: Dataset|DatasetDict):
-    
+
+    def _preprocess_data(self, dataset: Dataset | DatasetDict):
+
         dataset = dataset.rename_column("target", "labels")
-        dataset = dataset.select_columns(["embedding", "labels","fold"])
+        dataset = dataset.select_columns(["embedding", "labels", "fold"])
 
         dataset = EmbeddingDataModule._preprocess_data(self, dataset)
-        
-            
+
         return dataset
-    
-    
+
     def _save_dataset_to_disk(self, dataset: Dataset | DatasetDict):
         """
         Saves the dataset to disk.
@@ -134,12 +135,20 @@ class ESC50EmbeddingDataModule(EmbeddingDataModule, ESC50DataModule):
             None
         """
         dataset.set_format("np")
-        
+
         if self.cross_valid:
-            fingerprint = f"{dataset[next(iter(dataset))]._fingerprint}_{self.fold}" if isinstance(dataset, DatasetDict) else f"{dataset._fingerprint}_{self.fold}"  # changed to next_iter to be more robust
+            fingerprint = (
+                f"{dataset[next(iter(dataset))]._fingerprint}_{self.fold}"
+                if isinstance(dataset, DatasetDict)
+                else f"{dataset._fingerprint}_{self.fold}"
+            )  # changed to next_iter to be more robust
             log.info("fingerprint updates")
         else:
-            fingerprint = dataset[next(iter(dataset))]._fingerprint if isinstance(dataset, DatasetDict) else dataset._fingerprint  # changed to next_iter to be more robust
+            fingerprint = (
+                dataset[next(iter(dataset))]._fingerprint
+                if isinstance(dataset, DatasetDict)
+                else dataset._fingerprint
+            )  # changed to next_iter to be more robust
 
         self.disk_save_path = os.path.join(
             self.dataset_config.data_dir,
@@ -147,13 +156,9 @@ class ESC50EmbeddingDataModule(EmbeddingDataModule, ESC50DataModule):
         )
 
         if os.path.exists(self.disk_save_path):
-            log.info(f"Train fingerprint found in {self.disk_save_path}, saving to disk is skipped")
+            log.info(
+                f"Train fingerprint found in {self.disk_save_path}, saving to disk is skipped"
+            )
         else:
             log.info(f"Saving to disk: {self.disk_save_path}")
             dataset.save_to_disk(self.disk_save_path)
-        
-        
-        
-        
-          
-       

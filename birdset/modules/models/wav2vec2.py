@@ -69,7 +69,9 @@ class Wav2vec2SequenceClassifier(BirdSetModel):
             for param in self.model.parameters():
                 param.requires_grad = False
 
-    def forward(self, input_values: torch.Tensor, labels: Optional[torch.Tensor] = None) -> torch.Tensor:
+    def forward(
+        self, input_values: torch.Tensor, labels: Optional[torch.Tensor] = None
+    ) -> torch.Tensor:
 
         if self.classifier is None:
             # Squeeze the channel dimension so that the tensor has shape (batch size, wavelength)
@@ -84,11 +86,10 @@ class Wav2vec2SequenceClassifier(BirdSetModel):
             )
 
             return outputs["logits"]
-        
+
         else:
             embeddings = self.get_embeddings(input_values)
             return self.classifier(embeddings)
-
 
     def get_embeddings(self, input_tensor) -> torch.Tensor:
         input_tensor = input_tensor.squeeze(1)

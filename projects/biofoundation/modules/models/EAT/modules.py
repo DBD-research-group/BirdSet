@@ -17,7 +17,7 @@ class FixedPositionalEncoder(nn.Module):
         super().__init__()
         self.positions = pos_embed
 
-    def forward(self, x, padding_mask): 
+    def forward(self, x, padding_mask):
         return self.positions
 
 
@@ -281,7 +281,7 @@ class AltAttention(nn.Module):
         super().__init__()
         self.num_heads = num_heads
         head_dim = dim // num_heads
-        self.scale = qk_scale or head_dim ** -0.5
+        self.scale = qk_scale or head_dim**-0.5
 
         self.qkv = nn.Linear(dim, dim * 3, bias=qkv_bias)
         self.attn_drop = nn.Dropout(attn_drop)
@@ -351,7 +351,7 @@ class EncDecAttention(nn.Module):
         super().__init__()
         self.num_heads = num_heads
         head_dim = q_dim // num_heads
-        self.scale = qk_scale or head_dim ** -0.5
+        self.scale = qk_scale or head_dim**-0.5
 
         self.q_proj = nn.Linear(q_dim, q_dim, bias=qkv_bias)
         self.kv_proj = nn.Linear(kv_dim, 2 * q_dim, bias=qkv_bias)
@@ -465,9 +465,7 @@ class EncDecBlock(nn.Module):
     def forward(self, q, kv, padding_mask=None):
         r = q if self.first_residual else 0
         if self.layer_norm_first:
-            x = r + self.drop_path(
-                self.attn(self.norm1(q), kv, padding_mask)
-            )
+            x = r + self.drop_path(self.attn(self.norm1(q), kv, padding_mask))
             r = x = self.mlp(self.norm2(x))
             x = r + self.drop_path(self.post_mlp_dropout(x))
         else:

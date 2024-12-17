@@ -20,7 +20,7 @@ from .fairseq.ema import EMAModule
 
 from .base import (
     MaskSeed,
-    ModalitySpecificEncoder, 
+    ModalitySpecificEncoder,
     get_annealed_rate,
 )
 
@@ -29,9 +29,7 @@ from .modules import (
     Decoder1d,
 )
 
-from .images import (
-    ImageEncoder
-)
+from .images import ImageEncoder
 
 logger = logging.getLogger(__name__)
 
@@ -43,17 +41,11 @@ class Data2VecMultiModel(nn.Module):
         embed_dim: int,
         make_block: Callable[[float], nn.ModuleList],
         norm_layer: Callable[[int], nn.LayerNorm],
-        layer_norm_first: bool
+        layer_norm_first: bool,
     ) -> ModalitySpecificEncoder:
         enc_cls = ImageEncoder
 
-        return enc_cls(
-            cfg,
-            embed_dim,
-            make_block,
-            norm_layer,
-            layer_norm_first
-        )
+        return enc_cls(cfg, embed_dim, make_block, norm_layer, layer_norm_first)
 
     def __init__(self, multimodel, modality, skip_ema=False, task=None):
         super().__init__()
@@ -81,14 +73,14 @@ class Data2VecMultiModel(nn.Module):
                 layer_norm_first=cfg.layer_norm_first,
                 ffn_targets=not cfg.end_of_block_targets,
             )
-        
+
         # extract CNN encoder and CNN decoder from modified data2vec image modality (see image.py)
         self.modality_encoder = self.make_modality_encoder(
             self.modality,
             cfg.embed_dim,
             make_block,
             make_layer_norm,
-            cfg.layer_norm_first
+            cfg.layer_norm_first,
         )
 
         self.ema = None
@@ -122,8 +114,7 @@ class Data2VecMultiModel(nn.Module):
 
             self.recon_proj = None
             if cfg.recon_loss > 0:
-                self.recon_proj = nn.Linear(cfg.embed_dim, cfg.embed_dim//3)
-                
+                self.recon_proj = nn.Linear(cfg.embed_dim, cfg.embed_dim // 3)
 
         for pn, p in self.named_parameters():
             if len(p.shape) == 1 or pn.endswith(".bias"):
@@ -154,10 +145,10 @@ class Data2VecMultiModel(nn.Module):
 
     @torch.no_grad()
     def make_ema_teacher(self, ema_decay, ema_config):
-        ema_config.ema_decay=ema_decay
-        ema_config.ema_fp32=True
-        ema_config.log_norms=self.cfg.log_norms
-        ema_config.add_missing_params=False
+        ema_config.ema_decay = ema_decay
+        ema_config.ema_fp32 = True
+        ema_config.log_norms = self.cfg.log_norms
+        ema_config.add_missing_params = False
 
         model_copy = self.make_target_model()
 
@@ -288,10 +279,7 @@ class Data2VecMultiModel(nn.Module):
                 or self.cfg.layerdrop == 0
                 or (np.random.random() > self.cfg.layerdrop)
             ):
-                x, lr = blk(
-                    x,
-                    padding_mask=masked_padding_mask
-                )
+                x, lr = blk(x, padding_mask=masked_padding_mask)
                 if features_only:
                     layer_results.append(lr)
 
@@ -393,15 +381,12 @@ class Data2VecMultiModel(nn.Module):
             y = []
             ema_x = []
             extra_tokens = self.modality_encoder.modality_cfg.num_extra_tokens
-            for i, blk in enumerate(ema_blocks):  
-                ema_input, lr = blk(
-                    ema_input,
-                    padding_mask=ema_padding_mask
-                )
+            for i, blk in enumerate(ema_blocks):
+                ema_input, lr = blk(ema_input, padding_mask=ema_padding_mask)
                 y.append(lr[:, extra_tokens:])
                 ema_x.append(ema_input[:, extra_tokens:])
 
-        # EAT utilize total 12 Transformer block layer output average as target  
+        # EAT utilize total 12 Transformer block layer output average as target
         y = self.make_targets(y, self.average_top_k_layers)
         orig_targets = y
 
@@ -412,13 +397,12 @@ class Data2VecMultiModel(nn.Module):
         # extract values in masked position to make prediction
         masked = encoder_mask.mask.unsqueeze(-1)
         masked_b = encoder_mask.mask.bool()
-        y = y[masked_b]     
+        y = y[masked_b]
 
         if dx.size(1) == masked_b.size(1):
             dx = dx[masked_b]
         else:
             dx = dx.reshape(-1, dx.size(-1))
-            
 
         sample_size = masked.sum().long()
 
@@ -427,7 +411,7 @@ class Data2VecMultiModel(nn.Module):
             "sample_size": sample_size,
         }
 
-        sample_size = result["sample_size"] #TODO: Isnt that doubled?
+        sample_size = result["sample_size"]  # TODO: Isnt that doubled?
 
         # EAT employ utterance-level loss by using mean pooling in patch dimension
         if self.cfg.cls_loss > 0:
@@ -436,21 +420,23 @@ class Data2VecMultiModel(nn.Module):
             if self.cfg.clone_batch > 1:
                 cls_target = cls_target.repeat_interleave(self.cfg.clone_batch, 0)
             cls_pred = x[:, extra_tokens - 1]
-            
+
             result["losses"]["cls"] = self.d2v_loss(cls_pred, cls_target) * (
                 self.cfg.cls_loss * sample_size
             )
-            
+
         if self.cfg.recon_loss > 0:
 
             with torch.no_grad():
-                target = self.modality_encoder.patchify(source)  #(btz,1,512,16*16)
+                target = self.modality_encoder.patchify(source)  # (btz,1,512,16*16)
                 mean = target.mean(dim=-1, keepdim=True)
                 var = target.var(dim=-1, keepdim=True)
-                target = (target - mean) / (var + 1.0e-6) ** 0.5   #(btz,1,512,1)
+                target = (target - mean) / (var + 1.0e-6) ** 0.5  # (btz,1,512,1)
 
                 if self.cfg.clone_batch > 1:
-                    target = target.repeat_interleave(self.cfg.clone_batch, 0)  #(btz*clone_btz,1,512,1)
+                    target = target.repeat_interleave(
+                        self.cfg.clone_batch, 0
+                    )  # (btz*clone_btz,1,512,1)
 
                 if masked_b is not None:
                     target = target[masked_b]
@@ -469,7 +455,6 @@ class Data2VecMultiModel(nn.Module):
 
         return result
 
-
     def forward_decoder(
         self,
         x,
@@ -481,7 +466,6 @@ class Data2VecMultiModel(nn.Module):
         x = decoder(*x)
 
         return x
-
 
     # That is the loss function for both utterance and Frame Loss
     def d2v_loss(self, x, y):
@@ -502,7 +486,6 @@ class Data2VecMultiModel(nn.Module):
 
         return reg_loss
 
-    
     # Average top-k layers output from teacher model to provide a target for the student
     def make_targets(self, y, num_layers):
 
@@ -548,7 +531,7 @@ class Data2VecMultiModel(nn.Module):
             y = F.instance_norm(y.transpose(1, 2)).transpose(1, 2)
 
         return y
-    
+
     def remove_pretrain_components(self):
         self.ema = None
         self.shared_decoder = None

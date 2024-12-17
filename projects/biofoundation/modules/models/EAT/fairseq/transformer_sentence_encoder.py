@@ -16,8 +16,6 @@ from .transformer_sentence_encoder_layer import TransformerSentenceEncoderLayer
 from .guant_noise import quant_noise as apply_quant_noise_
 
 
-
-
 def init_bert_params(module):
     """
     Initialize the weights specific to the BERT Model.

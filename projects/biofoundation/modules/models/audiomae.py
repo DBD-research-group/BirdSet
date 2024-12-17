@@ -7,6 +7,7 @@ from torchaudio.compliance import kaldi
 from birdset.modules.models.birdset_model import BirdSetModel
 from birdset.configs import PretrainInfoConfig
 
+
 class AudioMAEModel(BirdSetModel):
     """
     Pretrained model for audio classification using the AUDIOMAE model.
@@ -39,11 +40,12 @@ class AudioMAEModel(BirdSetModel):
         self.model = None  # Placeholder for the loaded model
         self.load_model()
         self.num_classes = num_classes
-        
-        
+
         if classifier is None:
-                        
-            self.classifier = nn.Linear(in_features=self.EMBEDDING_SIZE, out_features=num_classes)
+
+            self.classifier = nn.Linear(
+                in_features=self.EMBEDDING_SIZE, out_features=num_classes
+            )
         else:
             self.classifier = classifier
         if local_checkpoint:
@@ -69,7 +71,7 @@ class AudioMAEModel(BirdSetModel):
         self.model.eval()
 
     def preprocess(self, input_values: torch.Tensor) -> torch.Tensor:
-        
+
         device = input_values.device
         melspecs = []
         for waveform in input_values:
@@ -85,7 +87,6 @@ class AudioMAEModel(BirdSetModel):
         melspecs = melspecs.unsqueeze(1)  # shape (batch_size, 1, 128, 1024)
         melspecs = (melspecs - self.MEAN) / (self.STD * 2)
         return melspecs
-        
 
     def forward(
         self, input_values: torch.Tensor, labels: Optional[torch.Tensor] = None
@@ -100,7 +101,7 @@ class AudioMAEModel(BirdSetModel):
         Returns:
             torch.Tensor: The output of the classifier.
         """
-        
+
         embeddings = self.get_embeddings(input_values)
 
         return self.classifier(embeddings)
@@ -118,5 +119,5 @@ class AudioMAEModel(BirdSetModel):
         if self.preprocess_in_model:
             input_values = self.preprocess(input_tensor)
         embeddings = self.model(input_values)
-        
+
         return embeddings

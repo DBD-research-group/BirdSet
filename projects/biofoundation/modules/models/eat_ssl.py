@@ -6,13 +6,14 @@ from torchaudio.compliance import kaldi
 from birdset.modules.models.EAT.data2vecmultimodel import Data2VecMultiModel
 from birdset.modules.models.birdset_model import BirdSetModel
 
+
 class EATSSL(BirdSetModel):
     """
     Pretrained model for audio classification using the Efficient Audio Transformer (EAT) model.
-    
+
     This file and the EAT folder includes code that is based on EAT by Wenxi Chen, licensed under the MIT License
     Copyright (c) 2024 Wenxi Chen
-    Github-Repository: https://github.com/cwx-worst-one/EAT 
+    Github-Repository: https://github.com/cwx-worst-one/EAT
     Paper: https://arxiv.org/abs/2401.03497
 
     We use a modified version of the EAT implementation that only relies on small local fairseq files and is compatible with Pytorch Lightning.
@@ -25,19 +26,18 @@ class EATSSL(BirdSetModel):
     multimodel: The settings for the Data2vec multimodel to be used in the model. This should best be defined in a hydra yaml.
     modality: The settings for the Image Encoder to be used in the model. This should best be defined in a hydra yaml.
     num_classes: Number of classification heads to be used in the model.
-    train_classifier: If True, the model will output the embeddings and freeze the feature extractor. Default is False. 
+    train_classifier: If True, the model will output the embeddings and freeze the feature extractor. Default is False.
     """
+
     EMBEDDING_SIZE = 768
     MEAN = torch.tensor(-4.268)
     STD = torch.tensor(4.569)
-
-
 
     def __init__(
         self,
         checkpoint,
         multimodel,
-        modality, 
+        modality,
         num_classes: int | None,
         embedding_size: int = EMBEDDING_SIZE,
         local_checkpoint: str = None,
@@ -57,13 +57,13 @@ class EATSSL(BirdSetModel):
         self.modality = modality
         self.model = None  # Placeholder for the loaded model
         self.load_model()
-        
-         # Define a linear classifier to use on top of the embeddings
+
+        # Define a linear classifier to use on top of the embeddings
         if classifier is None:
             self.classifier = nn.Linear(embedding_size, num_classes)
         else:
             self.classifier = classifier
-        
+
         if local_checkpoint:
             state_dict = torch.load(local_checkpoint)["state_dict"]
             state_dict = {
@@ -76,24 +76,29 @@ class EATSSL(BirdSetModel):
             for param in self.model.parameters():
                 param.requires_grad = False
 
-
     def load_model(self) -> None:
         """
         Load the model by using the Data2VecMultiModel and loading a local checkpoint. The decoder is not needed to extract features so we remove it and ignore its weights from the checkpoint.
         """
-        backbone = Data2VecMultiModel(multimodel=self.multimodel, modality=self.modality, skip_ema=True)
+        backbone = Data2VecMultiModel(
+            multimodel=self.multimodel, modality=self.modality, skip_ema=True
+        )
 
-        checkpoint = torch.load(self.checkpoint)['model']
-        checkpoint = {k.replace('model.', ''): v for k, v in checkpoint.items()}
-        checkpoint = {k.replace('modality_encoders.IMAGE', 'modality_encoder'): v for k, v in checkpoint.items()}
+        checkpoint = torch.load(self.checkpoint)["model"]
+        checkpoint = {k.replace("model.", ""): v for k, v in checkpoint.items()}
+        checkpoint = {
+            k.replace("modality_encoders.IMAGE", "modality_encoder"): v
+            for k, v in checkpoint.items()
+        }
 
-        missing_keys, unexpected_keys = backbone.load_state_dict(checkpoint, strict=False)
+        missing_keys, unexpected_keys = backbone.load_state_dict(
+            checkpoint, strict=False
+        )
         print(f"Missing keys: {missing_keys}")
         print(f"Unexpected keys: {unexpected_keys}")
         # We don't need the decoder so it is fine that the keys are missing
         backbone.remove_pretrain_components()
-        self.model = backbone 
-
+        self.model = backbone
 
     def preprocess(self, input_values: torch.Tensor) -> torch.Tensor:
         """
@@ -106,7 +111,9 @@ class EATSSL(BirdSetModel):
         device = input_values.device
         melspecs = []
         for waveform in input_values:
-            melspec = kaldi.fbank(waveform, htk_compat=True, window_type="hanning", num_mel_bins=128)  # shape (n_frames, 128)
+            melspec = kaldi.fbank(
+                waveform, htk_compat=True, window_type="hanning", num_mel_bins=128
+            )  # shape (n_frames, 128)
             if melspec.shape[0] < 1024:
                 melspec = F.pad(melspec, (0, 0, 0, 1024 - melspec.shape[0]))
             else:
@@ -117,7 +124,6 @@ class EATSSL(BirdSetModel):
         melspecs = (melspecs - self.MEAN) / (self.STD * 2)
         return melspecs
 
-    
     def forward(
         self, input_values: torch.Tensor, labels: Optional[torch.Tensor] = None
     ) -> torch.Tensor:
@@ -135,9 +141,7 @@ class EATSSL(BirdSetModel):
 
         return self.classifier(embeddings)
 
-
-    def get_embeddings(
-        self, input_tensor: torch.Tensor) -> torch.Tensor:
+    def get_embeddings(self, input_tensor: torch.Tensor) -> torch.Tensor:
         """
         Get the embeddings and logits from the AUDIOMAE model.
 
@@ -151,8 +155,13 @@ class EATSSL(BirdSetModel):
             input_values = self.preprocess(input_tensor)
 
         # Utterance level here
-        result = self.model(input_values, features_only=True, padding_mask=None,mask=False, remove_extra_tokens=False)
-        embeddings = result['x']
-        cls_state = embeddings[:, 0,:]
+        result = self.model(
+            input_values,
+            features_only=True,
+            padding_mask=None,
+            mask=False,
+            remove_extra_tokens=False,
+        )
+        embeddings = result["x"]
+        cls_state = embeddings[:, 0, :]
         return cls_state
-

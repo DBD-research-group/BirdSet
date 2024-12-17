@@ -45,7 +45,7 @@ class PatchEmbed(nn.Module):
 
 class ASTModel(BirdSetModel):
     EMBEDDING_SIZE = 768
-    
+
     def __init__(
         self,
         num_classes,
@@ -116,7 +116,7 @@ class ASTModel(BirdSetModel):
             freeze_backbone=freeze_backbone,
             preprocess_in_model=preprocess_in_model,
         )
-        
+
         if classifier is None:
             self.classifier = nn.Linear(embedding_size, num_classes)
         else:
@@ -258,10 +258,10 @@ class ASTModel(BirdSetModel):
             self.cls_token_num = audio_model.module.cls_token_num
 
             # Classifier head for fine-tuning
-            #self.mlp_head = nn.Sequential(
-                #nn.LayerNorm(self.original_embedding_dim),
-                #nn.Linear(self.original_embedding_dim, num_classes),
-            #)
+            # self.mlp_head = nn.Sequential(
+            # nn.LayerNorm(self.original_embedding_dim),
+            # nn.Linear(self.original_embedding_dim, num_classes),
+            # )
 
             f_dim, t_dim = self.get_shape(
                 fstride, tstride, input_fdim, input_tdim, fshape, tshape

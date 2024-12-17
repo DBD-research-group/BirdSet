@@ -15,9 +15,9 @@ from birdset.modules.models.birdset_model import BirdSetModel
 
 
 class HubertSequenceClassifier(BirdSetModel):
-    
+
     EMBEDDING_SIZE = 768
-    
+
     def __init__(
         self,
         num_classes: int = None,
@@ -28,7 +28,7 @@ class HubertSequenceClassifier(BirdSetModel):
         preprocess_in_model: bool = False,
         classifier: nn.Module | None = None,
         cache_dir: str = None,
-        pretrain_info: PretrainInfoConfig = None
+        pretrain_info: PretrainInfoConfig = None,
     ):
         """
         Note: Either num_classes or pretrain_info must be given
@@ -68,7 +68,7 @@ class HubertSequenceClassifier(BirdSetModel):
             state_dict=state_dict,
             ignore_mismatched_sizes=True,
         )
-        
+
         if freeze_backbone:
             for param in self.model.parameters():
                 param.requires_grad = False
@@ -103,7 +103,7 @@ class HubertSequenceClassifier(BirdSetModel):
 
         last_hidden_state = outputs["hidden_states"][-1]  # (batch, sequence, dim)
         cls_state = last_hidden_state[:, 0, :]  # (batch, dim)
-        
+
         if self.classifier is None:
             if return_hidden_state:
                 output = (logits, cls_state)
@@ -112,7 +112,7 @@ class HubertSequenceClassifier(BirdSetModel):
                 output = logits
         else:
             output = self.classifier(cls_state)
-            
+
         return output
 
     def get_embeddings(self, input_tensor) -> torch.Tensor:

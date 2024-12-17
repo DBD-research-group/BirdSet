@@ -10,7 +10,6 @@ from torch import Tensor
 from .utils import softmax, log_softmax
 
 
-
 class FairseqDecoder(nn.Module):
     """Base class for decoders."""
 

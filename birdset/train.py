@@ -69,7 +69,7 @@ def train(cfg):
     except ConfigAttributeError:
         log.info("pretrain_info does not exist using None instead")
 
-    # Setup model 
+    # Setup model
     log.info(f"Instantiate model <{cfg.module.network.model._target_}>")
     with open_dict(cfg):
         cfg.module.metrics["num_labels"] = datamodule.num_classes
@@ -84,7 +84,7 @@ def train(cfg):
         num_epochs=cfg.trainer.max_epochs,
         len_trainset=datamodule.len_trainset,
         batch_size=datamodule.loaders_config.train.batch_size,
-        pretrain_info=pretrain_info
+        pretrain_info=pretrain_info,
     )
 
     object_dict = {

@@ -1,26 +1,37 @@
 from datasets import Audio
 
 from birdset.datamodule.components.transforms import BirdSetTransformsWrapper
-#from . import BaseDataModuleHF
+
+# from . import BaseDataModuleHF
 from birdset.datamodule.base_datamodule import BaseDataModuleHF
 from birdset.configs import DatasetConfig, LoadersConfig
-from datasets import load_dataset, load_from_disk, Audio, DatasetDict, Dataset, IterableDataset, IterableDatasetDict
+from datasets import (
+    load_dataset,
+    load_from_disk,
+    Audio,
+    DatasetDict,
+    Dataset,
+    IterableDataset,
+    IterableDatasetDict,
+)
 from birdset.utils import pylogger
 from datasets import Dataset, DatasetDict, concatenate_datasets
 import os
+
 log = pylogger.get_pylogger(__name__)
+
 
 class ESC50DataModule(BaseDataModuleHF):
     def __init__(
-            self,
-            dataset: DatasetConfig = DatasetConfig(),
-            loaders: LoadersConfig = LoadersConfig(),
-            transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
-            cross_valid: bool = False,
-            fold: int = 1
+        self,
+        dataset: DatasetConfig = DatasetConfig(),
+        loaders: LoadersConfig = LoadersConfig(),
+        transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
+        cross_valid: bool = False,
+        fold: int = 1,
     ):
         """
-        Args: 
+        Args:
         cross_valid (bool, optional): If a cross_valid set should be used or not. Defaults to False which means that the normal split of dataset is used.
         """
         super().__init__(
@@ -30,7 +41,6 @@ class ESC50DataModule(BaseDataModuleHF):
         )
         self.cross_valid = cross_valid
         self.fold = fold
-    
 
     def prepare_data(self):
         """
@@ -83,7 +93,7 @@ class ESC50DataModule(BaseDataModuleHF):
     @property
     def num_classes(self):
         return 50
-    
+
     def _preprocess_data(self, dataset):
         dataset = dataset.cast_column(
             column="audio",
@@ -94,12 +104,12 @@ class ESC50DataModule(BaseDataModuleHF):
             ),
         )
         dataset = dataset.rename_column("target", "labels")
-        dataset = dataset.select_columns(["audio", "labels","fold"])
+        dataset = dataset.select_columns(["audio", "labels", "fold"])
         return dataset
-    
+
     def _cross_validation(self, dataset, fold):
         # Define fold configurations for cross-validation
-        
+
         fold_combinations = [
             {"test": [1], "train": [2, 3, 4], "validation": [5]},
             {"test": [2], "train": [3, 4, 5], "validation": [1]},
@@ -112,9 +122,24 @@ class ESC50DataModule(BaseDataModuleHF):
         selected_fold = fold_combinations[fold - 1]
 
         # Filter the datasets for each split (train, validation, test)
-        train_splits = [dataset[split_name].filter(lambda example: example["fold"] in selected_fold["train"]) for split_name in dataset]
-        val_splits = [dataset[split_name].filter(lambda example: example["fold"] in selected_fold["validation"]) for split_name in dataset]
-        test_splits = [dataset[split_name].filter(lambda example: example["fold"] in selected_fold["test"]) for split_name in dataset]
+        train_splits = [
+            dataset[split_name].filter(
+                lambda example: example["fold"] in selected_fold["train"]
+            )
+            for split_name in dataset
+        ]
+        val_splits = [
+            dataset[split_name].filter(
+                lambda example: example["fold"] in selected_fold["validation"]
+            )
+            for split_name in dataset
+        ]
+        test_splits = [
+            dataset[split_name].filter(
+                lambda example: example["fold"] in selected_fold["test"]
+            )
+            for split_name in dataset
+        ]
 
         # Concatenate all filtered datasets into a single Dataset for each split
         train_set = concatenate_datasets(train_splits)
@@ -122,11 +147,9 @@ class ESC50DataModule(BaseDataModuleHF):
         test_set = concatenate_datasets(test_splits)
 
         # Create a new DatasetDict with the final splits
-        cv_dataset = DatasetDict({
-            "train": train_set,
-            "valid": val_set,
-            "test": test_set
-        })
+        cv_dataset = DatasetDict(
+            {"train": train_set, "valid": val_set, "test": test_set}
+        )
 
         # Optionally, set the format for each split (e.g., to numpy arrays)
         cv_dataset["train"].set_format("np")
@@ -151,9 +174,17 @@ class ESC50DataModule(BaseDataModuleHF):
         """
         dataset.set_format("np")
         if self.cross_valid:
-            fingerprint = f"{dataset[next(iter(dataset))]._fingerprint}_{self.fold}" if isinstance(dataset, DatasetDict) else f"{dataset._fingerprint}_{self.fold}"  # changed to next_iter to be more robust
+            fingerprint = (
+                f"{dataset[next(iter(dataset))]._fingerprint}_{self.fold}"
+                if isinstance(dataset, DatasetDict)
+                else f"{dataset._fingerprint}_{self.fold}"
+            )  # changed to next_iter to be more robust
         else:
-            fingerprint = dataset[next(iter(dataset))]._fingerprint if isinstance(dataset, DatasetDict) else dataset._fingerprint  # changed to next_iter to be more robust
+            fingerprint = (
+                dataset[next(iter(dataset))]._fingerprint
+                if isinstance(dataset, DatasetDict)
+                else dataset._fingerprint
+            )  # changed to next_iter to be more robust
 
         self.disk_save_path = os.path.join(
             self.dataset_config.data_dir,
@@ -161,7 +192,9 @@ class ESC50DataModule(BaseDataModuleHF):
         )
 
         if os.path.exists(self.disk_save_path):
-            log.info(f"Train fingerprint found in {self.disk_save_path}, saving to disk is skipped")
+            log.info(
+                f"Train fingerprint found in {self.disk_save_path}, saving to disk is skipped"
+            )
         else:
             log.info(f"Saving to disk: {self.disk_save_path}")
             dataset.save_to_disk(self.disk_save_path)
@@ -186,27 +219,46 @@ class ESC50DataModule(BaseDataModuleHF):
                 dataset = self._cross_validation(dataset, self.fold)
                 # `dataset` is already a DatasetDict at this point, so no need to wrap it
                 return dataset
-   
+
         else:
             if isinstance(dataset, Dataset):
                 split_1 = dataset.train_test_split(
-                    self.dataset_config.val_split, shuffle=True, seed=self.dataset_config.seed
+                    self.dataset_config.val_split,
+                    shuffle=True,
+                    seed=self.dataset_config.seed,
                 )
                 split_2 = split_1["test"].train_test_split(
-                    0.2, shuffle=False, seed=self.dataset_config.seed)
-                return DatasetDict({"train": split_1["train"], "valid": split_2["train"], "test": split_2["test"]})
+                    0.2, shuffle=False, seed=self.dataset_config.seed
+                )
+                return DatasetDict(
+                    {
+                        "train": split_1["train"],
+                        "valid": split_2["train"],
+                        "test": split_2["test"],
+                    }
+                )
             elif isinstance(dataset, DatasetDict):
                 # check if dataset has train, valid, test splits
                 if "train" in dataset.keys() and "valid" in dataset.keys():
                     return dataset
-                if "train" in dataset.keys() and "valid" in dataset.keys() and "test" in dataset.keys():
+                if (
+                    "train" in dataset.keys()
+                    and "valid" in dataset.keys()
+                    and "test" in dataset.keys()
+                ):
                     return dataset
                 if "train" in dataset.keys() and "test" in dataset.keys():
                     split = dataset["train"].train_test_split(
-                        self.dataset_config.val_split, shuffle=True, seed=self.dataset_config.seed
+                        self.dataset_config.val_split,
+                        shuffle=True,
+                        seed=self.dataset_config.seed,
                     )
-                    return DatasetDict({"train": split["train"], "valid": split["test"], "test": dataset["test"]})
+                    return DatasetDict(
+                        {
+                            "train": split["train"],
+                            "valid": split["test"],
+                            "test": dataset["test"],
+                        }
+                    )
                 else:
                     return self._create_splits(dataset[list(dataset.keys())[0]])
-    
-   

@@ -1,5 +1,6 @@
 import torch
 
+
 def is_xla_tensor(tensor):
     return torch.is_tensor(tensor) and tensor.device.type == "xla"
 
@@ -15,6 +16,7 @@ def index_put(tensor, indices, value):
         tensor[indices] = value
     return tensor
 
+
 def make_positions(tensor, padding_idx: int, onnx_trace: bool = False):
     """Replace non-padding symbols with their position numbers.
 
@@ -26,7 +28,6 @@ def make_positions(tensor, padding_idx: int, onnx_trace: bool = False):
     # how to handle the dtype kwarg in cumsum.
     mask = tensor.ne(padding_idx).int()
     return (torch.cumsum(mask, dim=1).type_as(mask) * mask).long() + padding_idx
-
 
 
 import math
@@ -45,6 +46,7 @@ def gelu_accurate(x):
 
 def gelu(x: torch.Tensor) -> torch.Tensor:
     return torch.nn.functional.gelu(x.float()).type_as(x)
+
 
 def eval_str_dict(x, type=dict):
     if x is None:
@@ -72,7 +74,7 @@ def get_activation_fn(activation: str):
     """Returns the activation function corresponding to `activation`"""
     if activation == "relu":
         return F.relu
-    #elif activation == "relu_squared":
+    # elif activation == "relu_squared":
     #    return relu_squared
     elif activation == "gelu":
         return gelu

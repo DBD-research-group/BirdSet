@@ -6,12 +6,13 @@ from birdset.modules.models.birdset_model import BirdSetModel
 from birdset.utils import pylogger
 from birdset.configs import PretrainInfoConfig
 from typing import Optional, Tuple
+
 log = pylogger.get_pylogger(__name__)
 
 
 class ASTSequenceClassifier(BirdSetModel):
     EMBEDDING_SIZE = 768
-    
+
     def __init__(
         self,
         num_classes: int = None,
@@ -19,7 +20,7 @@ class ASTSequenceClassifier(BirdSetModel):
         checkpoint: str = "MIT/ast-finetuned-audioset-10-10-0.4593",
         local_checkpoint: str = None,
         freeze_backbone: bool = False,
-        preprocess_in_model: bool = False, # This isn't implemented for this model (yet?!)
+        preprocess_in_model: bool = False,  # This isn't implemented for this model (yet?!)
         classifier: nn.Module | None = None,
         cache_dir: str = None,
         pretrain_info: PretrainInfoConfig = None,
@@ -36,7 +37,6 @@ class ASTSequenceClassifier(BirdSetModel):
         self.checkpoint = checkpoint
         self.cache_dir = cache_dir
         self.classifier = classifier
-
 
         if (
             local_checkpoint
@@ -63,10 +63,10 @@ class ASTSequenceClassifier(BirdSetModel):
                 cache_dir=self.cache_dir,
                 ignore_mismatched_sizes=True,
             )
-            
+
         if freeze_backbone:
             for param in self.model.parameters():
-                param.requires_grad = False    
+                param.requires_grad = False
 
     def forward(
         self, input_values, attention_mask=None, labels=None, return_hidden_state=False
@@ -93,19 +93,19 @@ class ASTSequenceClassifier(BirdSetModel):
         # 6,1,128,1024
         input_values = input_values.transpose(1, 2)
         outputs = self.model(
-            input_values, 
+            input_values,
             attention_mask,
             output_attentions=False,
             output_hidden_states=True,
             return_dict=True,
-            labels=None
+            labels=None,
         )
         logits = outputs["logits"]
-        last_hidden_state = outputs["hidden_states"][-1] #(batch, sequence, dim)
-        cls_state = last_hidden_state[:,0,:] #(batch, dim)
+        last_hidden_state = outputs["hidden_states"][-1]  # (batch, sequence, dim)
+        cls_state = last_hidden_state[:, 0, :]  # (batch, dim)
 
         if return_hidden_state:
-        
+
             embeddings = (logits, cls_state)
 
         else:
@@ -113,14 +113,14 @@ class ASTSequenceClassifier(BirdSetModel):
 
         if self.train_classifier:
             output = self.classifier(embeddings)
-        else: 
+        else:
             output = embeddings
 
-        
-        
         return output
-    
-    def get_embeddings(self, input_tensor: torch.Tensor, attention_mask=None, return_hidden_state=False):
+
+    def get_embeddings(
+        self, input_tensor: torch.Tensor, attention_mask=None, return_hidden_state=False
+    ):
         """
         Get the embeddings and logits from the model.
 
@@ -131,12 +131,11 @@ class ASTSequenceClassifier(BirdSetModel):
             torch.Tensor: The embeddings from the model.
         """
         # Ensure input tensor has the correct dimensions
-        print("shaaaaaaaap",input_tensor.shape)
-        
-        input_tensor = input_tensor.squeeze(1) 
-        print("shaaaaaaaap",input_tensor.shape)
+        print("shaaaaaaaap", input_tensor.shape)
+
+        input_tensor = input_tensor.squeeze(1)
+        print("shaaaaaaaap", input_tensor.shape)
         input_values = input_tensor.transpose(1, 2)  # Swap sequence and feature dims
-        
 
         outputs = self.model(
             input_values,
@@ -157,9 +156,9 @@ class ASTSequenceClassifier(BirdSetModel):
 
             else:
                 output = logits
-        else: 
+        else:
             output = self.classifier(cls_state)
-            
+
         return output
 
     @torch.inference_mode()

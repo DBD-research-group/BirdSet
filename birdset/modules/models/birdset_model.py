@@ -3,6 +3,7 @@ from torch import nn
 import torch
 from birdset.configs import PretrainInfoConfig
 
+
 class BirdSetModel(nn.Module):
     def __init__(
         self,
@@ -13,7 +14,6 @@ class BirdSetModel(nn.Module):
         freeze_backbone: bool = False,
         preprocess_in_model: bool = False,
         pretrain_info: PretrainInfoConfig = None,
-
     ) -> None:
         super().__init__()
         self.num_classes = num_classes
@@ -42,7 +42,6 @@ class BirdSetModel(nn.Module):
             self.hf_path = None
             self.hf_name = None
             self.num_classes = num_classes
-
 
     def _preprocess(self, input_values: torch.Tensor) -> torch.Tensor:
         return input_values

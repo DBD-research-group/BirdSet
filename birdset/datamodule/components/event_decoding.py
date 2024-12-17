@@ -20,13 +20,16 @@ class EventDecoding:
     extracted_interval : float
         Denotes the fixed duration (in seconds) of the audio segment that is randomly extracted from the extended audio event.
     """
-    def __init__(self,
-                 min_len: float = 1,
-                 max_len: float = 5,
-                 sampling_rate: int = 32_000,
-                 extension_time: float = 6,
-                 extracted_interval: float = 5):
-        self.min_len = min_len # in seconds
+
+    def __init__(
+        self,
+        min_len: float = 1,
+        max_len: float = 5,
+        sampling_rate: int = 32_000,
+        extension_time: float = 6,
+        extracted_interval: float = 5,
+    ):
+        self.min_len = min_len  # in seconds
         self.max_len = max_len
         self.sampling_rate = sampling_rate
         self.extension_time = extension_time

@@ -29,9 +29,13 @@ class SinusoidalPositionalEmbedding(nn.Module):
         super().__init__()
         self.embedding_dim = embedding_dim
         self.padding_idx = padding_idx if padding_idx is not None else 0
-        self.register_buffer("weights", SinusoidalPositionalEmbedding.get_embedding(
-            init_size, embedding_dim, padding_idx
-        ), persistent=False)
+        self.register_buffer(
+            "weights",
+            SinusoidalPositionalEmbedding.get_embedding(
+                init_size, embedding_dim, padding_idx
+            ),
+            persistent=False,
+        )
         self.max_positions = int(1e5)
         self.onnx_trace = False
 
@@ -99,9 +103,7 @@ class SinusoidalPositionalEmbedding(nn.Module):
                 )
             return self.weights[self.padding_idx + pos, :].expand(bsz, 1, -1)
 
-        positions = make_positions(
-            input, self.padding_idx, onnx_trace=self.onnx_trace
-        )
+        positions = make_positions(input, self.padding_idx, onnx_trace=self.onnx_trace)
         if self.onnx_trace:
             flat_embeddings = self.weights.detach().index_select(0, positions.view(-1))
             embedding_shape = torch.cat(

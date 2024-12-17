@@ -34,7 +34,7 @@ class ModalitySpecificEncoder(nn.Module):
         fixed_positional_encoder: Optional[nn.Module],
         relative_positional_encoder: Optional[nn.Module],
         context_encoder: nn.Module,
-        decoder: nn.Module
+        decoder: nn.Module,
     ):
         super().__init__()
 
@@ -133,7 +133,7 @@ class ModalitySpecificEncoder(nn.Module):
 
         x_pos = None
         if self.fixed_positional_encoder is not None:
-            x = x + self.fixed_positional_encoder(x, padding_mask)[:,:x.size(1),:]
+            x = x + self.fixed_positional_encoder(x, padding_mask)[:, : x.size(1), :]
 
         if mask:
             if clone_batch > 1:
@@ -182,7 +182,6 @@ class ModalitySpecificEncoder(nn.Module):
         elif x_pos is not None:
             x = x + x_pos
 
-        
         if self.extra_tokens is not None:
             num = self.extra_tokens.size(1)
             x = torch.cat([self.extra_tokens.expand(x.size(0), -1, -1), x], dim=1)
@@ -190,10 +189,7 @@ class ModalitySpecificEncoder(nn.Module):
                 # B x T
                 masked_padding_mask = F.pad(masked_padding_mask, (num, 0))
 
-        x = self.context_encoder(
-            x,
-            masked_padding_mask
-        )
+        x = self.context_encoder(x, masked_padding_mask)
 
         return {
             "x": x,
@@ -283,7 +279,6 @@ class ModalitySpecificEncoder(nn.Module):
 
         return x, mask_info
 
-
     def make_maskinfo(self, x, mask, shape=None):
         if shape is None:
             B, T, D = x.shape
@@ -335,11 +330,7 @@ class ModalitySpecificEncoder(nn.Module):
                 cfg.mask_channel_prob,
                 cfg.mask_channel_length,
             )
-            mask_channel = (
-                torch.from_numpy(mask_channel)
-                .unsqueeze(1)
-                .expand(-1, T, -1)
-            )
+            mask_channel = torch.from_numpy(mask_channel).unsqueeze(1).expand(-1, T, -1)
             x = index_put(x, mask_channel, 0)
         return x
 

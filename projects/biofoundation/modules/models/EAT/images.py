@@ -25,7 +25,6 @@ from .modules import (
 )
 
 
-
 class ImageEncoder(ModalitySpecificEncoder):
     def __init__(
         self,
@@ -33,15 +32,15 @@ class ImageEncoder(ModalitySpecificEncoder):
         embed_dim: int,
         make_block: Callable[[float, Optional[int], Optional[int]], nn.ModuleList],
         norm_layer: Callable[[int], nn.LayerNorm],
-        layer_norm_first: bool
+        layer_norm_first: bool,
     ):
-        
-        img_size = (modality_cfg.target_length,modality_cfg.target_height)
+
+        img_size = (modality_cfg.target_length, modality_cfg.target_height)
         patch_size = to_2tuple(modality_cfg.patch_size)
         num_patches = (img_size[1] // patch_size[1]) * (img_size[0] // patch_size[0])
         self.H = img_size[0] // patch_size[0]
         self.W = img_size[1] // patch_size[1]
-        self.hw = (self.H,self.W)
+        self.hw = (self.H, self.W)
 
         local_encoder = PatchEmbed_new(
             img_size,
@@ -65,18 +64,20 @@ class ImageEncoder(ModalitySpecificEncoder):
         # note: max_length control the maximum time length of audio -> "64" for 10s, here we define it as 2min, you can change it yourself
         max_length = modality_cfg.max_length
         pos_embed = nn.Parameter(
-            torch.zeros(1, max_length*self.W, embed_dim), requires_grad=False
+            torch.zeros(1, max_length * self.W, embed_dim), requires_grad=False
         )
 
         # side_n = int(num_patches ** 0.5)
-        # note: we fix the variable length sequence problem here -> support up to 2min audio 
+        # note: we fix the variable length sequence problem here -> support up to 2min audio
         emb = get_2d_sincos_pos_embed_flexible(
             pos_embed.shape[-1],
-            (max_length,self.W),  
+            (max_length, self.W),
             cls_token=False,
         )
-        
-        pos_embed.data.copy_(torch.from_numpy(emb[:max_length*self.W,:]).float().unsqueeze(0)) 
+
+        pos_embed.data.copy_(
+            torch.from_numpy(emb[: max_length * self.W, :]).float().unsqueeze(0)
+        )
         fixed_positional_encoder = (
             FixedPositionalEncoder(pos_embed) if modality_cfg.fixed_positions else None
         )
@@ -95,9 +96,7 @@ class ImageEncoder(ModalitySpecificEncoder):
             modality_cfg.prenet_dropout,
         )
 
-        decoder = (
-            Decoder2d(modality_cfg.decoder, embed_dim, self.H, self.W)
-        )
+        decoder = Decoder2d(modality_cfg.decoder, embed_dim, self.H, self.W)
 
         super().__init__(
             modality_cfg=modality_cfg,
@@ -107,7 +106,7 @@ class ImageEncoder(ModalitySpecificEncoder):
             fixed_positional_encoder=fixed_positional_encoder,
             relative_positional_encoder=None,
             context_encoder=context_encoder,
-            decoder=decoder
+            decoder=decoder,
         )
 
     def reset_parameters(self):
@@ -125,17 +124,17 @@ class ImageEncoder(ModalitySpecificEncoder):
             p = self.modality_cfg.patch_size
             h = imgs.shape[2] // p
             w = imgs.shape[3] // p
-            #h,w = self.patch_embed.patch_hw
+            # h,w = self.patch_embed.patch_hw
             x = imgs.reshape(shape=(imgs.shape[0], 1, h, p, w, p))
-            x = torch.einsum('nchpwq->nhwpqc', x)
+            x = torch.einsum("nchpwq->nhwpqc", x)
             x = x.reshape(shape=(imgs.shape[0], h * w, p**2 * 1))
-            
+
         else:
             p = self.modality_cfg.patch_size
             h = w = imgs.shape[2] // p
             x = imgs.reshape(shape=(imgs.shape[0], 3, h, p, w, p))
             x = torch.einsum("nchpwq->nhwpqc", x)
-            x = x.reshape(shape=(imgs.shape[0], h * w, p ** 2 * 3))
+            x = x.reshape(shape=(imgs.shape[0], h * w, p**2 * 3))
 
         return x
 
@@ -186,13 +185,12 @@ class ImageEncoder(ModalitySpecificEncoder):
                 mask_prob_adjust=self.modality_cfg.mask_prob_adjust,
                 inverse_mask=self.modality_cfg.inverse_mask,
                 require_same_masks=True,
-                mask_dropout=self.modality_cfg.mask_dropout
+                mask_dropout=self.modality_cfg.mask_dropout,
             )
 
-            #TODO: Put mask on same device as x if not already
+            # TODO: Put mask on same device as x if not already
             if mask.device != x.device:
                 mask = mask.to(x.device)
-            
 
         mask_info = self.make_maskinfo(x, mask, shape)
         if apply:

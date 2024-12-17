@@ -29,12 +29,13 @@ class ResNetClassifier(nn.Module):
     """
 
     def __init__(
-            self,
-            baseline_architecture: ResNetVersion,
-            num_classes: int,
-            num_channels: int = 1,
-            pretrained: bool = False,
-            **kwargs):
+        self,
+        baseline_architecture: ResNetVersion,
+        num_classes: int,
+        num_channels: int = 1,
+        pretrained: bool = False,
+        **kwargs
+    ):
         """
         Constructs all the necessary attributes for the ResNetClassifier object.
 

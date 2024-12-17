@@ -18,7 +18,6 @@ class BEATsModel(BirdSetModel):
     MEAN = torch.tensor(-4.268)
     STD = torch.tensor(4.569)
 
-
     def __init__(
         self,
         num_classes: int | None,

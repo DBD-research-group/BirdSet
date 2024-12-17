@@ -196,7 +196,6 @@ def compute_mask_indices(
     return mask
 
 
-
 def compute_block_mask_2d(
     shape: Tuple[int, int],
     mask_prob: float,
@@ -241,7 +240,7 @@ def compute_block_mask_2d(
         mask = torch.zeros((B, d, d))
         mask_inds = torch.randint(
             0,
-            d**2, #TODO: replaced L with d**2 as d is rounded down and not equal to L
+            d**2,  # TODO: replaced L with d**2 as d is rounded down and not equal to L
             size=(
                 B,
                 int(
@@ -329,9 +328,9 @@ def compute_block_mask_2d(
     if inverse_mask:
         mask = 1 - mask
 
-    #TODO: This is a current workaround for the unfitting shapes of mask and batch
+    # TODO: This is a current workaround for the unfitting shapes of mask and batch
     if d**2 < L:
-        expansion = torch.zeros(size=(B, L-d**2))
+        expansion = torch.zeros(size=(B, L - d**2))
         mask = torch.cat((mask, expansion), dim=-1)
 
     return mask

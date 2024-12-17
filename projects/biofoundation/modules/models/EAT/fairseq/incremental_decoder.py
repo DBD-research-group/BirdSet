@@ -65,7 +65,6 @@ def with_incremental_state(cls):
     return cls
 
 
-
 @with_incremental_state
 class FairseqIncrementalDecoder(FairseqDecoder):
     """Base class for incremental decoders.

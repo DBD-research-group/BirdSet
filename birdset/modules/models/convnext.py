@@ -16,6 +16,7 @@ class ConvNextClassifier(BirdSetModel):
     """
     ConvNext model for audio classification.
     """
+
     EMBEDDING_SIZE = 768
 
     def __init__(
@@ -75,14 +76,13 @@ class ConvNextClassifier(BirdSetModel):
         self.local_checkpoint = local_checkpoint
         self.cache_dir = cache_dir
 
-        self.model = self._initialize_model() 
+        self.model = self._initialize_model()
 
         self._initialize_model()
-        
+
         if freeze_backbone:
             for param in self.model.parameters():
                 param.requires_grad = False
-        
 
     def _initialize_model(self) -> ConvNextForImageClassification | ConvNextModel:
         """Initializes the ConvNext model based on specified attributes."""
@@ -136,7 +136,6 @@ class ConvNextClassifier(BirdSetModel):
                     num_channels=self.num_channels,
                 )
                 return ConvNextModel(config)
-
 
     def _preprocess(
         self, input_values: torch.Tensor, input_tdim=500, sampling_rate=32000

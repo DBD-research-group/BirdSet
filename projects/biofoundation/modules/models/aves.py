@@ -64,9 +64,13 @@ class AvesClassifier(BirdSetModel):
         """
         Load the model from shared storage.
         """
-        self.config = self.load_config("/workspace/models/aves/aves-base-bio.torchaudio.model_config.json")
+        self.config = self.load_config(
+            "/workspace/models/aves/aves-base-bio.torchaudio.model_config.json"
+        )
         self.model = wav2vec2_model(**self.config, aux_num_out=None)
-        self.model.load_state_dict(torch.load("/workspace//models/aves/aves-base-bio.torchaudio.pt"))
+        self.model.load_state_dict(
+            torch.load("/workspace//models/aves/aves-base-bio.torchaudio.pt")
+        )
         self.model.feature_extractor.requires_grad_(True)
 
     def load_config(self, config_path):
@@ -103,7 +107,7 @@ class AvesClassifier(BirdSetModel):
         """
         if self.preprocess_in_model:
             input_values = self._preprocess(input_values)
-        
+
         input_values = input_values.squeeze(1)
         embeddings = self.model.extract_features(input_values)[0][-1]
         cls_state = embeddings[:, 0, :]

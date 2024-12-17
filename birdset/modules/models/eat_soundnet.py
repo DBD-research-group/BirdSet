@@ -331,7 +331,7 @@ class EAT(BirdSetModel):
         preprocess_in_model: bool = True,
         classifier: nn.Module | None = None,
         pretrain_info: Optional[PretrainInfoConfig] = None,
-        device: str| int = "cuda:0",
+        device: str | int = "cuda:0",
         nf: int = 32,
         seq_len: int = 90112,
         n_layers: int = 4,
@@ -372,6 +372,6 @@ class EAT(BirdSetModel):
             logits = self.classifier(embedding)
             return logits
         return self.model(input_values)
-    
+
     def get_embeddings(self, x: torch.Tensor) -> torch.Tensor:
         return self.model.get_embeddings(x)
