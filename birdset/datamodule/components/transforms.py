@@ -276,7 +276,6 @@ class BirdSetTransformsWrapper(BaseTransforms):
         input_values = waveform_batch["input_values"]
         input_values = input_values.unsqueeze(1)
         labels = torch.tensor(batch["labels"])
-<<<<<<< HEAD
         if self.wave_aug:
             input_values, labels = self._waveform_augmentation(input_values, labels)
 
