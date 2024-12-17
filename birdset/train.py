@@ -1,6 +1,6 @@
-import os 
+import os
 import hydra
-import lightning as L 
+import lightning as L
 from omegaconf import OmegaConf, open_dict
 from omegaconf.errors import ConfigAttributeError
 import json
@@ -18,15 +18,16 @@ root = pyrootutils.setup_root(
 )
 
 _HYDRA_PARAMS = {
-    "version_base":None,
+    "version_base": None,
     "config_path": str(root / "configs"),
-    "config_name": "train.yaml"
+    "config_name": "train.yaml",
 }
+
 
 # @utils.register_custom_resolvers(**_HYDRA_PARAMS)
 @hydra.main(**_HYDRA_PARAMS)
 def train(cfg):
-    log.info('Using config: \n%s', OmegaConf.to_yaml(cfg))
+    log.info("Using config: \n%s", OmegaConf.to_yaml(cfg))
 
     log.info(f"Dataset path: <{os.path.abspath(cfg.paths.dataset_path)}>")
     os.makedirs(cfg.paths.dataset_path, exist_ok=True)
@@ -41,12 +42,12 @@ def train(cfg):
 
     log.info(f"Seed everything with <{cfg.seed}>")
     L.seed_everything(cfg.seed)
-    #log.info(f"Instantiate logger {[loggers for loggers in cfg['logger']]}")
+    # log.info(f"Instantiate logger {[loggers for loggers in cfg['logger']]}")
 
     # Setup data
     log.info(f"Instantiate datamodule <{cfg.datamodule._target_}>")
     datamodule = hydra.utils.instantiate(cfg.datamodule)
-    datamodule.prepare_data() # has to be called before model for len_traindataset!
+    datamodule.prepare_data()  # has to be called before model for len_traindataset!
 
     # Setup logger
     log.info(f"Instantiate logger")
@@ -60,9 +61,7 @@ def train(cfg):
 
     # Training
     log.info(f"Instantiate trainer <{cfg.trainer._target_}>")
-    trainer = hydra.utils.instantiate(
-        cfg.trainer, callbacks=callbacks, logger=logger
-    )
+    trainer = hydra.utils.instantiate(cfg.trainer, callbacks=callbacks, logger=logger)
 
     pretrain_info = None
     try:
@@ -70,27 +69,29 @@ def train(cfg):
     except ConfigAttributeError:
         log.info("pretrain_info does not exist using None instead")
 
-    # Setup model 
+    # Setup model
     log.info(f"Instantiate model <{cfg.module.network.model._target_}>")
     with open_dict(cfg):
         cfg.module.metrics["num_labels"] = datamodule.num_classes
-        cfg.module.network.model["num_classes"] = datamodule.num_classes # TODO not the correct classes when masking in valid/test only
+        cfg.module.network.model["num_classes"] = (
+            datamodule.num_classes
+        )  # TODO not the correct classes when masking in valid/test only
 
     model = hydra.utils.instantiate(
         cfg.module,
         num_epochs=cfg.trainer.max_epochs,
         len_trainset=datamodule.len_trainset,
         batch_size=datamodule.loaders_config.train.batch_size,
-        pretrain_info=pretrain_info
+        pretrain_info=pretrain_info,
     )
 
     object_dict = {
-        "cfg": cfg, 
+        "cfg": cfg,
         "datamodule": datamodule,
         "model": model,
         "callbacks": callbacks,
         "logger": logger,
-        "trainer": trainer
+        "trainer": trainer,
     }
 
     log.info("Logging Hyperparams")
@@ -103,52 +104,51 @@ def train(cfg):
             log.info(f"Resume training from checkpoint {ckpt}")
         else:
             log.info("No checkpoint found. Training from scratch!")
-                     
-        trainer.fit(
-            model=model, 
-            datamodule=datamodule,
-            ckpt_path=cfg.get("ckpt_path"))
-    
+
+        trainer.fit(model=model, datamodule=datamodule, ckpt_path=cfg.get("ckpt_path"))
+
     train_metrics = trainer.callback_metrics
 
     if cfg.get("test"):
         log.info(f"Starting testing")
         ckpt_path = trainer.checkpoint_callback.best_model_path
         if ckpt_path == "":
-            log.warning(
-                "No ckpt saved or found. Using current weights for testing"
-            )
+            log.warning("No ckpt saved or found. Using current weights for testing")
             ckpt_path = None
         else:
             log.info(
                 f"The best checkpoint for {cfg.callbacks.model_checkpoint.monitor}"
                 f" is {trainer.checkpoint_callback.best_model_score}"
-                f" and saved in {ckpt_path}"   
+                f" and saved in {ckpt_path}"
             )
         trainer.test(model=model, datamodule=datamodule, ckpt_path=ckpt_path)
 
-    test_metrics = trainer.callback_metrics 
+    test_metrics = trainer.callback_metrics
 
     if cfg.get("save_state_dict"):
         log.info(f"Saving state dicts")
         utils.save_state_dicts(
             trainer=trainer,
-            model=model, 
+            model=model,
             dirname=cfg.paths.output_dir,
-            **cfg.extras.state_dict_saving_params  
+            **cfg.extras.state_dict_saving_params,
         )
 
     if cfg.get("dump_metrics"):
         log.info(f"Dumping final metrics locally to {cfg.paths.output_dir}")
         metric_dict = {**train_metrics, **test_metrics}
 
-        metric_dict = [{'name': k, 'value': v.item() if hasattr(v, 'item') else v} for k, v in metric_dict.items()]
+        metric_dict = [
+            {"name": k, "value": v.item() if hasattr(v, "item") else v}
+            for k, v in metric_dict.items()
+        ]
 
         file_path = os.path.join(cfg.paths.output_dir, "finalmetrics.json")
-        with open(file_path, 'w') as json_file:
+        with open(file_path, "w") as json_file:
             json.dump(metric_dict, json_file)
-    
+
     utils.close_loggers()
 
-if __name__ == "__main__":    
+
+if __name__ == "__main__":
     train()

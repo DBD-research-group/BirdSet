@@ -1,5 +1,6 @@
 from typing import Dict
-import json 
+import json
+
 
 def get_label_to_class_mapping_from_metadata(
     file_path: str, task: str

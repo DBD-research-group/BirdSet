@@ -158,7 +158,7 @@ class BaseDataModuleHF(L.LightningDataModule):
             fingerprint = dataset._fingerprint
         else:
             raise ValueError("dataset must be a Dataset or DatasetDict")
-            
+
         self.disk_save_path = os.path.join(
             self.dataset_config.data_dir,
             f"{self.dataset_config.hf_name}_processed_{self.dataset_config.seed}_{fingerprint}",
@@ -238,7 +238,9 @@ class BaseDataModuleHF(L.LightningDataModule):
                 return dataset
             if "train" in dataset.keys() and "test" in dataset.keys():
                 if self.dataset_config.val_split == 0:
-                    raise ValueError("A small validation split is required. Please set val_split > 0.")
+                    raise ValueError(
+                        "A small validation split is required. Please set val_split > 0."
+                    )
                 train_valid_split = dataset["train"].train_test_split(
                     self.dataset_config.val_split,
                     shuffle=True,
@@ -268,7 +270,7 @@ class BaseDataModuleHF(L.LightningDataModule):
             "num_proc": 3,
         }
 
-        if self.dataset_config.hf_name != "esc50": # special esc50 case due to naming
+        if self.dataset_config.hf_name != "esc50":  # special esc50 case due to naming
             dataset_args["name"] = self.dataset_config.hf_name
 
         dataset = load_dataset(**dataset_args)
@@ -321,7 +323,9 @@ class BaseDataModuleHF(L.LightningDataModule):
         transforms = deepcopy(self.transforms)
         transforms.set_mode(split)
 
-        if split == "train":  # we need this for sampler, cannot be done later because set_transform
+        if (
+            split == "train"
+        ):  # we need this for sampler, cannot be done later because set_transform
             if self.dataset_config.class_weights_sampler:
                 self.train_label_list = dataset["labels"]
 
@@ -407,7 +411,8 @@ class BaseDataModuleHF(L.LightningDataModule):
 
         class_limit = class_limit if class_limit else -float("inf")
         dataset = dataset.map(
-            lambda x: _unique_identifier(x, label_name), desc="sampling: unique-identifier"
+            lambda x: _unique_identifier(x, label_name),
+            desc="sampling: unique-identifier",
         )
         df = pd.DataFrame(dataset)
         path_label_count = df.groupby(["id", label_name], as_index=False).size()
