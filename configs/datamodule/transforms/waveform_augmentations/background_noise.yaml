@@ -4,8 +4,8 @@ background_noise:
   p: 0.5
   min_snr_in_db: 3
   max_snr_in_db: 30
-  sample_rate: ${module.network.sampling_rate}
-  target_rate: ${module.network.sampling_rate}
+  sample_rate: ${module.network.sample_rate}
+  target_rate: ${module.network.sample_rate}
   background_paths: ${paths.background_path}
 
 
