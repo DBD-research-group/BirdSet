@@ -17,6 +17,7 @@ from datasets import (
 )
 from torch.utils.data import DataLoader
 from copy import deepcopy
+from tqdm import tqdm
 
 from birdset.datamodule.components.transforms import BirdSetTransformsWrapper
 from birdset.utils import pylogger
@@ -150,11 +151,13 @@ class BaseDataModuleHF(L.LightningDataModule):
         """
         dataset.set_format("np")
 
-        fingerprint = (
-            dataset[next(iter(dataset))]._fingerprint
-            if isinstance(dataset, DatasetDict)
-            else dataset._fingerprint
-        )  # changed to next_iter to be more robust
+        if isinstance(dataset, DatasetDict):
+            fingerprints = [dataset[split]._fingerprint for split in dataset]
+            fingerprint = "_".join(fingerprints)
+        elif isinstance(dataset, Dataset):
+            fingerprint = dataset._fingerprint
+        else:
+            raise ValueError("dataset must be a Dataset or DatasetDict")
 
         self.disk_save_path = os.path.join(
             self.dataset_config.data_dir,
@@ -235,7 +238,9 @@ class BaseDataModuleHF(L.LightningDataModule):
                 return dataset
             if "train" in dataset.keys() and "test" in dataset.keys():
                 if self.dataset_config.val_split == 0:
-                    raise ValueError("A small validation split is required. Please set val_split > 0.")
+                    raise ValueError(
+                        "A small validation split is required. Please set val_split > 0."
+                    )
                 train_valid_split = dataset["train"].train_test_split(
                     self.dataset_config.val_split,
                     shuffle=True,
@@ -265,7 +270,7 @@ class BaseDataModuleHF(L.LightningDataModule):
             "num_proc": 3,
         }
 
-        if self.dataset_config.hf_name != "esc50": # special esc50 case due to naming
+        if self.dataset_config.hf_name != "esc50":  # special esc50 case due to naming
             dataset_args["name"] = self.dataset_config.hf_name
 
         dataset = load_dataset(**dataset_args)
@@ -321,7 +326,8 @@ class BaseDataModuleHF(L.LightningDataModule):
         if (
             split == "train"
         ):  # we need this for sampler, cannot be done later because set_transform
-            self.train_label_list = dataset["labels"]
+            if self.dataset_config.class_weights_sampler:
+                self.train_label_list = dataset["labels"]
 
         # add run-time transforms to dataset
         dataset.set_transform(transforms, output_all_columns=False)
@@ -405,14 +411,15 @@ class BaseDataModuleHF(L.LightningDataModule):
 
         class_limit = class_limit if class_limit else -float("inf")
         dataset = dataset.map(
-            lambda x: _unique_identifier(x, label_name), desc="smart-sampling-1"
+            lambda x: _unique_identifier(x, label_name),
+            desc="sampling: unique-identifier",
         )
         df = pd.DataFrame(dataset)
         path_label_count = df.groupby(["id", label_name], as_index=False).size()
         path_label_count = path_label_count.set_index("id")
         class_sizes = df.groupby(label_name).size()
 
-        for label in class_sizes.index:
+        for label in tqdm(class_sizes.index, desc="sampling"):
             current = path_label_count[path_label_count[label_name] == label]
             total = current["size"].sum()
             most = current["size"].max()

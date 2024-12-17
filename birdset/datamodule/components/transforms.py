@@ -276,6 +276,10 @@ class BirdSetTransformsWrapper(BaseTransforms):
         input_values = waveform_batch["input_values"]
         input_values = input_values.unsqueeze(1)
         labels = torch.tensor(batch["labels"])
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/main
         if self.wave_aug:
             input_values, labels = self._waveform_augmentation(input_values, labels)
 
@@ -480,6 +484,7 @@ class BirdSetTransformsWrapper(BaseTransforms):
         return
 
 
+<<<<<<< HEAD
 class EmbeddingTransforms(BirdSetTransformsWrapper):
     def __init__(
         self,
@@ -548,3 +553,30 @@ class EmbeddingTransforms(BirdSetTransformsWrapper):
             return_attention_mask=True,
         )
         return waveform_batch
+=======
+class EmbeddingTransforms(BaseTransforms):
+    def __init__(
+        self,
+        task: Literal["multiclass", "multilabel"] = "multiclass",
+        sampling_rate: int = 3200,
+        max_length: int = 5,
+        decoding: EventDecoding | None = None,
+        feature_extractor: DefaultFeatureExtractor | None = None,
+    ) -> None:
+        super().__init__(task, sampling_rate, max_length, decoding, feature_extractor)
+
+    def _transform(self, batch):
+        embeddings = [embedding for embedding in batch["embeddings"]]
+
+        embeddings = torch.tensor(embeddings)
+
+        if self.task == "multiclass":
+            labels = batch["labels"]
+
+        else:
+            # self.task == "multilabel"
+            # datatype of labels must be float32 to support BCEWithLogitsLoss
+            labels = torch.tensor(batch["labels"], dtype=torch.float32)
+
+        return {"input_values": embeddings, "labels": labels}
+>>>>>>> origin/main

@@ -25,7 +25,7 @@ Deep learning (DL) has greatly advanced audio classification, yet the field is l
 > - This accompanying **code** provides comprehensive support tool for data preparation, model training, and evaluation. 
 > - Participate in our Hugging Face [leaderboard](https://huggingface.co/spaces/DBD-research-group/BirdSet-Leaderboard) by submitting new results and comparing performance across models.
 > - Access our pre-trained [model checkpoints](https://huggingface.co/collections/DBD-research-group/birdset-dataset-and-models-665ef710a28cbe70dfaa028a) on Hugging Face, ready to fine-tune or evaluate for various tasks.
-
+> - A Q&A section is included at the end of this README. If you have further questions or encounter any issues, please raise an issue. 
 <br>
 
 <div align="center">
@@ -35,14 +35,14 @@ Deep learning (DL) has greatly advanced audio classification, yet the field is l
 | **Large Train**                  | [XCL](https://xeno-canto.org/)               | Complete Xeno-Canto snapshot with focals for large (pre-) training.                | 528,434   | -            | -     | 9,734    |
 |                            | [XCM](https://xeno-canto.org/)               | Smaller subset of XCL only containing focals of bird species available in test datasets.                 | 89,798    | -            | -     | 409      |
 | **Auxiliary**              | [POW](https://zenodo.org/records/4656848)    | Powdermill Nature soundscape validation dataset and class-dedicated focal training subset of XCL.     | 14,911    | 4,560        | 0.66  | 48       |
-|                            | [VOX](https://zenodo.org/records/1208080)    | BirdVox-DCASE soundscape background dataset without bird vocalizations for augmentations.              | 20,331    | -            | -     | -        |
-| **Test & Dedicated Train** | [PER](https://zenodo.org/records/7079124) | Amazon Basin soundscape test dataset and class-dedicated focal training subset of XCL.                 | 16,802    | 15,120       | 0.78  | 132      |
-|                            | [NES](https://zenodo.org/records/7525349)    |  Columbia Costa Rica soundscape test dataset and class-dedicated focal training subset of XCL.               | 16,117    | 24,480       | 0.76  | 89       |
-|                            | [UHH](https://zenodo.org/records/7078499)    |  Hawaiian Islands soundscape test dataset and class-dedicated focal training subset of XCL.               | 3,626     | 36,637       | 0.64  | 25       |
-|                            | [HSN](https://zenodo.org/records/7525805)    |  High Sierras Nevada soundscape test dataset and class-dedicated focal training subset of XCL.               | 5,460     | 12,000       | 0.54  | 21       |
-|                            | [NBP](https://link-to-birddb)                |  NIPS4BPlus test dataset and class-dedicated focal training subset of XCL.               | 24,327    | 563          | 0.92  | 51       |
-|                            | [SSW](https://zenodo.org/records/7018484)    |  Sapsucker Woods soundscape test dataset and class-dedicated focal training subset of XCL.               | 28,403    | 205,200      | 0.77  | 81       |
-|                            | [SNE](https://zenodo.org/records/7050014)    |  Sierre Nevada soundscape test dataset and class-dedicated focal training subset of XCL.               | 19,390    | 23,756       | 0.70  | 56       |
+|                            | [VOX](https://zenodo.org/records/1208080)    | BirdVox-DCASE soundscape background dataset without bird vocalizations.              | 20,331    | -            | -     | -        |
+| **Test & Dedicated Train** | [PER](https://zenodo.org/records/7079124) | Amazon Basin soundscape test dataset and class-dedicated focal training subset.                 | 16,802    | 15,120       | 0.78  | 132      |
+|        Train Subsets XCL!                    | [NES](https://zenodo.org/records/7525349)    |  Columbia Costa Rica soundscape test dataset and class-dedicated focal training subset.               | 16,117    | 24,480       | 0.76  | 89       |
+|                            | [UHH](https://zenodo.org/records/7078499)    |  Hawaiian Islands soundscape test dataset and class-dedicated focal training subset.               | 3,626     | 36,637       | 0.64  | 25       |
+|                            | [HSN](https://zenodo.org/records/7525805)    |  High Sierras Nevada soundscape test dataset and class-dedicated focal training subset.               | 5,460     | 12,000       | 0.54  | 21       |
+|                            | [NBP](https://link-to-birddb)                |  NIPS4BPlus test dataset and class-dedicated focal training subset.               | 24,327    | 563          | 0.92  | 51       |
+|                            | [SSW](https://zenodo.org/records/7018484)    |  Sapsucker Woods soundscape test dataset and class-dedicated focal training.               | 28,403    | 205,200      | 0.77  | 81       |
+|                            | [SNE](https://zenodo.org/records/7050014)    |  Sierre Nevada soundscape test dataset and class-dedicated focal training subset.               | 19,390    | 23,756       | 0.70  | 56       |
 
 </div>
 
@@ -297,6 +297,48 @@ Logs will be written to [Weights&Biases](https://wandb.ai/) by default.
 ## Background noise
 To enhance model performance we mix in additional background noise from downloaded from the [DCASE18](https://dcase.community/challenge2018/index). To download the files and convert them to the correct format, run the notebook 'download_background_noise.ipynb' in the 'notebooks' folder.
 
+
+## Reproduce Baselines
+
+First, you have to download the background noise files for augmentations
+
+``` bash
+python resources/utils/download_background_noise.py
+```
+
+We provide all experiment YAML files used to generate our results in the path `birdset/configs/experiment/birdset_neurips24`. For each dataset, we specify the parameters for all training scenario: `DT`, `MT`, and `LT`
+
+### Dedicated Training (DT)
+
+The experiments for `DT` with the dedicated subset can be easily run with a single line: 
+
+``` bash
+python birdset/train.py experiment="birdset_neurips24/DT/$Model"
+```
+
+### Medium Training (MT) and Large Training (LT)
+Experiments for training scenarios `MT` and `LT` are harder to reproduce since they require more extensive training times. 
+Additionally, the datasets are quite large (90GB for XCM and 480GB for XCL). Therefore, we provide the best model checkpoints via Hugging Face in the experiment files to avoid the need for retraining.
+These checkpoints can be executed by running the evaluation script, which will automatically download the model and perform inference on the test datasets:
+
+``` bash
+python birdset/eval.py experiment="birdset_neurips24/$EXPERIMENT_PATH"
+```
+
+If you want to start the large-scale trainings and download the big training datasets, you can also employ the `XCM` and `XCL` trainings via the experiment YAML files. 
+
+``` bash
+python birdset/train.py experiment="birdset_neurips24/$EXPERIMENT_PATH"
+```
+After training, the best model checkpoint is saved based on the validation loss and can then be used for inference:
+
+``` bash
+python birdset/eval.py experiment="birdset_neurips24/$EXPERIMENT_PATH" module.model.network.local_checkpoint="$CHECKPOINT_PATH"
+```
+
+
+
+
 ## Run experiments
 
 Our experiments are defined in the `configs/experiment` folder. To run an experiment, use the following command in the directory of the repository:
@@ -310,6 +352,113 @@ Replace `EXPERIMENT_PATH` with the path to the experiment YAML config originatin
 ``` bash
 python birdset/train.py experiment="local/HSN/efficientnet.yaml"
 ```
+
+
+## Q&A
+
+#### **How to access the label names in the datasets?**
+The class names are available in the Hugging Face datasets (with the [ClassLabel Feature](https://huggingface.co/docs/datasets/v3.1.0/en/package_reference/main_classes#datasets.ClassLabel))
+
+```python
+from datasets import load_dataset
+
+dataset = load_dataset(
+    "DBD-research-group/BirdSet", 
+    "HSN", 
+    cache_dir="the directory you used", 
+    num_proc=1, 
+    #revision="629b54c06874b6d2fa886e1c0d73146c975612d0" <-- if your cache directory is correct and a new download is starting,
+    #you can use this revision (we added some metadata ~2 days ago which forces a redownload). if not, ignore this
+)
+
+dataset["train"].features["ebird_code"]
+```
+This should be the output: 
+```
+ClassLabel(names=['gcrfin', 'whcspa', 'amepip', 'sposan', 'rocwre', 'brebla', 'daejun', 'foxspa', ...], id=None)
+```
+These ebird codes should correspond to the respective columns in the label matrix. 
+You could also `ds.features["label"].int2str(0)`
+
+Additionally you can find JSON files containing `id2label` and `label2id` dictionaries for each dataset under the [resources/ebird_codes](https://github.com/DBD-research-group/BirdSet/tree/main/resources/ebird_codes) directory in the git repository.
+
+[Issue](https://github.com/DBD-research-group/BirdSet/issues/280)
+
+-------
+#### **How to access the label names of the pre-trained models?**
+The class list of pre-trained models corresponds to the datasets they were trained on (same indices). To get the class list, you can visit this [link on HF](https://huggingface.co/datasets/DBD-research-group/BirdSet/blob/main/classes.py) or use the following code example:
+
+```python
+
+import datasets 
+
+dataset_meta = datasets.load_dataset_builder("dbd-research-group/BirdSet", "XCL")
+dataset_meta.info.features["ebird_code"]
+```
+
+We have also added class information to the models on HF. You can find them in the config of the respective models. To access the model config you can refer to the following code snippet:
+
+```python
+
+from transformers import ConvNextForImageClassification
+
+# load model
+model = ConvNextForImageClassification.from_pretrained("DBD-research-group/ConvNeXT-Base-BirdSet-XCL")
+
+# access label dicts
+model.config.id2label # or model.config.label2id depending on what you need
+
+```
+
+`id2label` and `label2id` are dictionaries so to access a specific element you can do this:
+
+```python
+
+model.config.id2label[0]
+
+```
+
+In the case of XCL this should output `ostric2`.
+
+**Please note:** Changing the last layer in any way (e.g. changing the output layer to 21 classes to fine-tune on HSN) will remove or invalidate that label information from the configs. In that case you will need to get that information differently. In case of BirdSet datasets you can look under [resources/ebird_codes](https://github.com/DBD-research-group/BirdSet/tree/main/resources/ebird_codes). The json files in that directory contain `label2id` and `id2label` dicts for every dataset.
+
+-------
+#### **Why are the datasets larger than expected? (should only apply to downloads before 05-12-2024! fixed)**
+
+Currently, our HF builder script extracts all zipped files to ensure clear file paths while retaining the original zipped files. This results in increased storage requirements.
+
+_Example_:  
+For the largest dataset, `XCL`, the zipped files are approximately 480GB. However, due to the extraction process, you’ll need around 990GB of available disk space. After the extraction, the zipped files will account for roughly 510GB.  
+
+*Quick Workaround*:  
+After extraction, you can delete unnecessary files by running in `XCL/downloads/`
+```bash
+find . -mindepth 1 -maxdepth 1 ! -name 'extracted' -exec rm -rfv {} +
+```
+**This issue is fixed, more information: see Q below.**
+
+------
+#### **Hugging Face downloads the dataset again even though I already downloaded it**
+We made a samll update fixing [Issue 267: Data download size descrepancy](https://github.com/DBD-research-group/BirdSet/issues/267) on **05-12-2024**:
+- **This only works for datasets<3.0.0!**
+- TL;DR: During the extraction process, unnecessary archives are now removed immediately. This reduces the required disk space by *half*, now aligning it with the table below.
+- If you downloaded the data between this and last update and don't want to redownload yet, you can use the following `revision=b0c14a03571a7d73d56b12c4b1db81952c4f7e64`:
+```python
+from datasets import load_dataset
+ds = load_dataset("DBD-research-group/BirdSet", "HSN", trust_remote_code=True, revision="b0c14a03571a7d73d56b12c4b1db81952c4f7e64")
+```
+
+We made a small update to the metadata on **27-11-2024**: 
+
+- Additional bird taxonomy metadata, including "Genus," "Species Group," and "Order," is provided using the 2021 eBird taxonomy, consistent with the taxonomy used for the 'ebird_code' data. These metadata fields follow the same format and encoding as 'ebird_code' and 'ebird_code_multilabel'. Further explanation can be found on our Hugging Face [BirdSet repository](https://huggingface.co/datasets/DBD-research-group/BirdSet).
+
+- If you don't require the additional taxonomy and prefer to **avoid re-downloading all files**, you can specify the previous revision directly in load_dataset as follows:
+
+```python
+from datasets import load_dataset
+ds = load_dataset("DBD-research-group/BirdSet", "HSN", trust_remote_code=True, revision="629b54c06874b6d2fa886e1c0d73146c975612d0")
+```
+
 
 ## Citation
 

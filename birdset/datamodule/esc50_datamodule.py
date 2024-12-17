@@ -7,10 +7,10 @@ from birdset.configs import DatasetConfig, LoadersConfig
 
 class ESC50DataModule(BaseDataModuleHF):
     def __init__(
-            self,
-            dataset: DatasetConfig = DatasetConfig(),
-            loaders: LoadersConfig = LoadersConfig(),
-            transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
+        self,
+        dataset: DatasetConfig = DatasetConfig(),
+        loaders: LoadersConfig = LoadersConfig(),
+        transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
     ):
         super().__init__(
             dataset=dataset,
@@ -21,7 +21,7 @@ class ESC50DataModule(BaseDataModuleHF):
     @property
     def num_classes(self):
         return 50
-    
+
     def _preprocess_data(self, dataset):
         dataset = dataset.cast_column(
             column="audio",
@@ -34,4 +34,3 @@ class ESC50DataModule(BaseDataModuleHF):
         dataset = dataset.rename_column("target", "labels")
         dataset = dataset.select_columns(["audio", "labels"])
         return dataset
-
