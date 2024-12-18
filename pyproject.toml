@@ -6,7 +6,7 @@ authors = ["Lukas Rauch <lukas.rauch@uni-kassel.de>", "Raphael Schwinger <rsc@in
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.10,<3.13"
+python = ">=3.10,<3.11"
 scipy = "^1.11.3"
 ffprobe = "^0.5"
 # --------- pytorch --------- #
