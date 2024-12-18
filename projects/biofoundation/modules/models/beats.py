@@ -3,7 +3,6 @@ import torch
 from torch import nn
 
 
-from birdset.configs.model_configs import PretrainInfoConfig
 from biofoundation.modules.models.BEATs import BEATs, BEATsConfig
 from biofoundation.modules.models.birdset_model import BirdSetModel
 
@@ -26,7 +25,7 @@ class BEATsModel(BirdSetModel):
         freeze_backbone: bool = False,
         preprocess_in_model: bool = True,
         classifier: nn.Module | None = None,
-        pretrain_info: Optional[PretrainInfoConfig] = None,
+        pretrain_info = None,
     ) -> None:
         super().__init__(
             num_classes=num_classes,

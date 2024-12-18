@@ -13,7 +13,7 @@ import torch.nn as nn
 from torch.nn import LayerNorm
 import torchaudio.compliance.kaldi as ta_kaldi
 
-from birdset.modules.models.BEATs.backbone import (
+from biofoundation.modules.models.BEATs.backbone import (
     TransformerEncoder,
 )
 
