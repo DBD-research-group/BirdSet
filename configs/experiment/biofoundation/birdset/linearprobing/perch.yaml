@@ -23,7 +23,7 @@ module:
       classifier:
         _target_: birdset.modules.models.linear_classifier.LinearClassifier
         in_features: 1280
-        num_classes: null
+        num_classes: ${module.network.model.num_classes}
 
 callbacks:
   timer:
