@@ -19,6 +19,7 @@ logger:
   wandb:
     tags: ${tags}
     group: "biofoundation_${module.network.model_name}_linearprobing_BirdSet__${datamodule.dataset.dataset_name}"
+    name: ${module.network.model_name}_linearprobing_BirdSetCheckpoints_${datamodule.dataset.dataset_name}_${seed}_${start_time}
     mode: online
     version: ${module.network.model_name}_linearprobing_BirdSet_${datamodule.dataset.dataset_name}_${seed}_${start_time} #to resume train run # needs to be tested
  
