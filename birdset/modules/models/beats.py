@@ -45,20 +45,7 @@ class BEATsModel(BirdSetModel):
             self.classifier = classifier
 
         if local_checkpoint:
-            state_dict = torch.load(local_checkpoint)["state_dict"]
-            model_state_dict = {
-                key.replace("model.model.", ""): weight
-                for key, weight in state_dict.items() if key.startswith("model.model")
-            }
-            self.model.load_state_dict(model_state_dict)
-
-            # Process the keys for the classifier
-            if self.classifier:
-                classifier_state_dict = {
-                    key.replace("model.classifier.", ""): weight
-                    for key, weight in state_dict.items() if key.startswith("model.classifier.")
-                }
-                self.classifier.load_state_dict(classifier_state_dict)
+            self._load_local_checkpoint()
 
         if freeze_backbone:
             for param in self.model.parameters():

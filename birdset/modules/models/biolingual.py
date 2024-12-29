@@ -59,14 +59,6 @@ class BioLingualClassifier(BirdSetModel):
         self.checkpoint = checkpoint
         self.device = device
 
-        state_dict = None
-        if local_checkpoint:
-            state_dict = torch.load(local_checkpoint)["state_dict"]
-            state_dict = {
-                key.replace("model.model.", ""): weight
-                for key, weight in state_dict.items()
-            }
-
         self.model = ClapModel.from_pretrained(checkpoint).to(self.device)
 
         if classifier is None:
@@ -75,6 +67,9 @@ class BioLingualClassifier(BirdSetModel):
             self.classifier = classifier
 
         self.processor = ClapProcessor.from_pretrained(checkpoint)
+
+        if local_checkpoint:
+            self._load_local_checkpoint()
 
         if freeze_backbone:
             for param in self.model.parameters():
