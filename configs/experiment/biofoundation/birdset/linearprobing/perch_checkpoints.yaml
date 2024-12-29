@@ -38,7 +38,9 @@ module:
         _target_: birdset.modules.models.linear_classifier.LinearClassifier
         in_features: 1280
         num_classes: ${module.network.model.num_classes}
- 
+
+#ckpt_path: /workspace/logs/train/runs/HSN/perch/2024-12-27_132547/callback_checkpoints/perch_HSN_05.ckpt 
+
 trainer:
   min_epochs: 1
   max_epochs: 50
@@ -85,5 +87,6 @@ callbacks:
     save_last: False
     every_n_epochs: 3 # Save every 3 epochs
     every_n_train_steps: null
+    save_top_k: -1 # Added this to save more than 3 checkpoints
 
 # Removed early stopping
