@@ -241,17 +241,22 @@ class SoundNet(nn.Module):
     def load_state_dict_from_file(self, file_path, model_name="model"):
         state_dict = torch.load(file_path, map_location=self.device)["state_dict"]
         # select only models where the key starts with `model.` + model_name + `.`
+        prefix = ""
+        for name in state_dict.keys():
+            if name.startswith("model.model."):
+                prefix = "model."
+                break
         # TODO: Only do this if classifier varies
         state_dict = {
-            k: v for k, v in state_dict.items() if not k.startswith("model.tf.fc")
+            k: v for k, v in state_dict.items() if not k.startswith(prefix+"model.tf.fc")
         }
         state_dict = {
             key: weight
             for key, weight in state_dict.items()
-            if key.startswith("model." + model_name + ".")
+            if key.startswith(prefix+"model." + model_name + ".")
         }
         state_dict = {
-            key.replace("model." + model_name + ".", ""): weight
+            key.replace(prefix+"model." + model_name + ".", ""): weight
             for key, weight in state_dict.items()
         }
 
@@ -361,6 +366,15 @@ class EAT(BirdSetModel):
             dim_feedforward=dim_feedforward,
             local_checkpoint=local_checkpoint,
         )
+
+        if local_checkpoint and classifier is not None:
+            state_dict = torch.load(self.local_checkpoint)["state_dict"]
+            classifier_state_dict = {
+                key.replace("model.classifier.", ""): weight
+                for key, weight in state_dict.items() if key.startswith("model.classifier.")
+            }
+            self.classifier.load_state_dict(classifier_state_dict, strict=False) # Strict to false in case BirdSet checkpoint is used without classifier weights
+
         if self.freeze_backbone:
             self.classifier = copy.deepcopy(classifier)
             for param in self.model.parameters():
