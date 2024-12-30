@@ -1,5 +1,6 @@
 import torch
 
+
 class AudioPreprocessor:
     def __init__(self, feature_extractor, n_classes, window_length):
         self.feature_extractor = feature_extractor

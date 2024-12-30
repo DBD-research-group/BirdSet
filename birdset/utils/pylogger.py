@@ -32,11 +32,13 @@ class TBLogger(loggers.TensorBoardLogger):
     ):
         if isinstance(params, dict):
             try:
-                network : NetworkConfig = params.pop("network")
+                network: NetworkConfig = params.pop("network")
                 params["model_name"] = network.model_name
                 params["model_type"] = network.model_type
                 params["torch_compile"] = network.torch_compile
-                params["sample_rate"] = network.sample_rate # refactor note: maybe it should be 'sampling_rate' as key in params
+                params["sample_rate"] = (
+                    network.sample_rate
+                )  # refactor note: maybe it should be 'sampling_rate' as key in params
                 params["normalize_waverform"] = network.normalize_waveform
                 params["normalize_spectrogram"] = network.normalize_spectrogram
             except KeyError:
