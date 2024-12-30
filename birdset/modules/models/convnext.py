@@ -72,13 +72,15 @@ class ConvNextClassifier(BirdSetModel):
 
         self.num_channels = num_channels
         self.checkpoint = checkpoint
-        self.local_checkpoint = local_checkpoint
         self.cache_dir = cache_dir
 
         self.model = self._initialize_model() 
 
         self._initialize_model()
         
+        if local_checkpoint:
+            self._load_local_checkpoint()
+
         if freeze_backbone:
             for param in self.model.parameters():
                 param.requires_grad = False
