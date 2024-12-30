@@ -56,6 +56,14 @@ class Wav2vec2SequenceClassifier(BirdSetModel):
                 key.replace("model.model.", ""): weight
                 for key, weight in state_dict.items()
             }
+            
+            # Process the keys for the classifier
+            if self.classifier:
+                classifier_state_dict = {
+                    key.replace("model.classifier.", ""): weight
+                    for key, weight in state_dict.items() if key.startswith("model.classifier.")
+                }
+                self.classifier.load_state_dict(classifier_state_dict)
 
         self.model = AutoModelForAudioClassification.from_pretrained(
             self.checkpoint,
