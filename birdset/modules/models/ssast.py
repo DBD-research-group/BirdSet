@@ -143,25 +143,25 @@ class ASTModel(BirdSetModel):
 
             # There are different model sizes
             if model_size == "tiny":
-                self.v = timm.create_model(
+                self.model = timm.create_model(
                     "vit_deit_tiny_distilled_patch16_224", pretrained=False
                 )
                 self.heads, self.depth = 3, 12
                 self.cls_token_num = 2
             elif model_size == "small":
-                self.v = timm.create_model(
+                self.model = timm.create_model(
                     "vit_deit_small_distilled_patch16_224", pretrained=False
                 )
                 self.heads, self.depth = 6, 12
                 self.cls_token_num = 2
             elif model_size == "base":
-                self.v = timm.create_model(
+                self.model = timm.create_model(
                     "vit_deit_base_distilled_patch16_384", pretrained=False
                 )
                 self.heads, self.depth = 12, 12
                 self.cls_token_num = 2
             elif model_size == "base_nokd":
-                self.v = timm.create_model(
+                self.model = timm.create_model(
                     "vit_deit_base_patch16_384", pretrained=False
                 )
                 self.heads, self.depth = 12, 12
@@ -171,7 +171,7 @@ class ASTModel(BirdSetModel):
                     "Model size must be one of tiny, small, base, base_nokd"
                 )
 
-            self.original_embedding_dim = self.v.pos_embed.shape[2]
+            self.original_embedding_dim = self.model.pos_embed.shape[2]
 
             # SSL Pretraining params
             self.fshape, self.tshape = fshape, tshape
@@ -188,7 +188,7 @@ class ASTModel(BirdSetModel):
             )
             num_patches = self.p_f_dim * self.p_t_dim
             self.num_patches = num_patches
-            self.v.patch_embed.num_patches = num_patches
+            self.model.patch_embed.num_patches = num_patches
 
             # the linear patch projection layer, use 1 channel for spectrogram rather than the original 3 channels for RGB images.
             new_proj = torch.nn.Conv2d(
@@ -197,18 +197,18 @@ class ASTModel(BirdSetModel):
                 kernel_size=(fshape, tshape),
                 stride=(fstride, tstride),
             )
-            self.v.patch_embed.proj = new_proj
+            self.model.patch_embed.proj = new_proj
 
             # use trainable positional embedding
             new_pos_embed = nn.Parameter(
                 torch.zeros(
                     1,
-                    self.v.patch_embed.num_patches + self.cls_token_num,
+                    self.model.patch_embed.num_patches + self.cls_token_num,
                     self.original_embedding_dim,
                 )
             )
-            self.v.pos_embed = new_pos_embed
-            trunc_normal_(self.v.pos_embed, std=0.02)
+            self.model.pos_embed = new_pos_embed
+            trunc_normal_(self.model.pos_embed, std=0.02)
 
         # Use a pretrained models for finetuning
         elif pretrain_stage == False:
@@ -253,8 +253,8 @@ class ASTModel(BirdSetModel):
             audio_model = torch.nn.DataParallel(audio_model)
             audio_model.load_state_dict(sd, strict=False)
 
-            self.v = audio_model.module.v
-            self.original_embedding_dim = self.v.pos_embed.shape[2]
+            self.model = audio_model.module.model
+            self.original_embedding_dim = self.model.pos_embed.shape[2]
             self.cls_token_num = audio_model.module.cls_token_num
 
             # Classifier head for fine-tuning
@@ -271,7 +271,7 @@ class ASTModel(BirdSetModel):
             p_f_dim, p_t_dim = audio_model.module.p_f_dim, audio_model.module.p_t_dim
             num_patches = f_dim * t_dim
             p_num_patches = p_f_dim * p_t_dim
-            self.v.patch_embed.num_patches = num_patches
+            self.model.patch_embed.num_patches = num_patches
             log.info(
                 "Fine-tuning patch split stride: frequncey={:d}, time={:d}".format(
                     fstride, tstride
@@ -299,13 +299,13 @@ class ASTModel(BirdSetModel):
                 )
                 # but the weights of patch embedding layer is still got from the pretrained models
                 new_proj.weight = torch.nn.Parameter(
-                    torch.sum(self.v.patch_embed.proj.weight, dim=1).unsqueeze(1)
+                    torch.sum(self.model.patch_embed.proj.weight, dim=1).unsqueeze(1)
                 )
-                new_proj.bias = self.v.patch_embed.proj.bias
-                self.v.patch_embed.proj = new_proj
+                new_proj.bias = self.model.patch_embed.proj.bias
+                self.model.patch_embed.proj = new_proj
 
             new_pos_embed = (
-                self.v.pos_embed[:, self.cls_token_num :, :]
+                self.model.pos_embed[:, self.cls_token_num :, :]
                 .detach()
                 .reshape(1, p_num_patches, self.original_embedding_dim)
                 .transpose(1, 2)
@@ -344,18 +344,21 @@ class ASTModel(BirdSetModel):
             new_pos_embed = new_pos_embed.reshape(
                 1, self.original_embedding_dim, num_patches
             ).transpose(1, 2)
-            self.v.pos_embed = nn.Parameter(
+            self.model.pos_embed = nn.Parameter(
                 torch.cat(
                     [
-                        self.v.pos_embed[:, : self.cls_token_num, :].detach(),
+                        self.model.pos_embed[:, : self.cls_token_num, :].detach(),
                         new_pos_embed,
                     ],
                     dim=1,
                 )
             )
 
+            if local_checkpoint:
+                self._load_local_checkpoint()
+
             if freeze_backbone:
-                for param in self.v.parameters():
+                for param in self.model.parameters():
                     param.requires_grad = False
 
     # Get the shape of intermediate representation.
@@ -421,23 +424,23 @@ class ASTModel(BirdSetModel):
         # expect input x = (batch_size, time_frame_num, frequency_bins), e.g., (12, 1024, 128)
         input_tensor = input_tensor.transpose(2, 3)
         B = input_tensor.shape[0]
-        x = self.v.patch_embed(input_tensor)
+        x = self.model.patch_embed(input_tensor)
 
         if self.cls_token_num == 2:
-            cls_tokens = self.v.cls_token.expand(B, -1, -1)
-            dist_token = self.v.dist_token.expand(B, -1, -1)
+            cls_tokens = self.model.cls_token.expand(B, -1, -1)
+            dist_token = self.model.dist_token.expand(B, -1, -1)
             x = torch.cat((cls_tokens, dist_token, x), dim=1)
         else:
-            cls_tokens = self.v.cls_token.expand(B, -1, -1)
+            cls_tokens = self.model.cls_token.expand(B, -1, -1)
             x = torch.cat((cls_tokens, x), dim=1)
 
-        x = x + self.v.pos_embed
-        x = self.v.pos_drop(x)
+        x = x + self.model.pos_embed
+        x = self.model.pos_drop(x)
 
-        for blk_id, blk in enumerate(self.v.blocks):
+        for blk_id, blk in enumerate(self.model.blocks):
             x = blk(x)
 
-        x = self.v.norm(x)
+        x = self.model.norm(x)
         # average output of all tokens except cls token(s)
         x = torch.mean(x[:, self.cls_token_num :, :], dim=1)
 
