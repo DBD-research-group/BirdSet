@@ -1,0 +1,89 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - override /datamodule: beans.yaml
+  - override /module: multiclass.yaml
+  - override /module/network: beats.yaml
+  - override /callbacks: default.yaml
+  - override /trainer: single_gpu.yaml
+  - override /datamodule/transforms: bird_default_multiclass.yaml
+  - override /paths: default.yaml
+  - override /hydra: default.yaml
+tags: ["biofoundation", "${module.network.model_name}", "finetune", "BEANS"]
+seed: 1
+train: True
+test: True
+ 
+logger:
+  wandb:
+    tags: ${tags}
+    group: "biofoundation_${module.network.model_name}_finetune_BEANS__${datamodule.dataset.dataset_name}"
+    mode: online
+    version: ${module.network.model_name}_finetune_BEANS_${datamodule.dataset.dataset_name}_${seed}_${start_time} #to resume train run # needs to be tested
+ 
+module:
+  optimizer:
+    lr: 3e-4
+    weight_decay: 1e-5
+  loss:
+    _target_: torch.nn.CrossEntropyLoss
+  network:
+    torch_compile: False
+    model:
+      preprocess_in_model: True
+
+  metrics: 
+    _target_: biofoundation.modules.metrics.multiclass.EmbeddingMetricsConfig # Use these embedding to compare to ghani?!
+    num_labels: ${datamodule.dataset.n_classes}  
+ 
+trainer:
+  min_epochs: 1
+  max_epochs: 50
+  devices: [2]
+ 
+datamodule:
+  dataset:
+    dataset_name: beans_watkins
+    hf_path: DBD-research-group/beans_watkins
+    hf_name: default
+    n_classes: 31
+  transforms:
+    max_length: ${module.network.length}
+    preprocessing:
+        normalize_waveform: null
+        normalize_spectrogram: null
+ 
+ 
+  loaders:
+    train:
+      batch_size: 32
+      shuffle: True
+      num_workers: 16
+      drop_last: True
+      prefetch_factor: 2
+ 
+    valid:
+      batch_size: 32
+      num_workers: 16
+      shuffle: False
+   
+    test:
+      batch_size: 16
+      num_workers: 16
+      shuffle: False
+ 
+callbacks:
+  model_checkpoint:
+    monitor: "val/CrossEntropyLoss" #"val/MulticlassAccuracy"
+    mode: "min"
+    save_last: True
+    every_n_epochs: null
+    every_n_train_steps: null
+  early_stopping:
+    _target_: lightning.pytorch.callbacks.EarlyStopping
+    monitor: "val/CrossEntropyLoss_epoch"
+    patience: 3 #5
+    mode: 'min'
+    min_delta: 5e-3 #1e-3
+    verbose: False
+    check_finite: True
