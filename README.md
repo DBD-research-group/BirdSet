@@ -239,7 +239,7 @@ Results on Watkins:
 
 | Model | T1 | AUROC | Wandb |
 |-------| -------| ---- | ---- |
-| BEATs| ? | ? | ? |
+| BEATs| 0.91 | 0.99 | [BEATs_finetune_BEANS_beans_watkins_1_2025-01-02_142041](https://wandb.ai/deepbirddetect/BioFoundation/runs/BEATs_finetune_BEANS_beans_watkins_1_2025-01-02_142041) |
 | BioLingual|? | ? | ? |
 | Perch | ? | ? | ? |
 | ConvNext| ? | ? | ? |
@@ -263,7 +263,7 @@ Results on HSN:
 
 | Model | T1 | AUROC | Wandb |
 |-------| -------| ---- | ---- |
-| BEATs| ? | ? | ? |
+| BEATs| 0.86 | 0.99 | [BEATs_default#1_2025-01-02_144748](https://wandb.ai/deepbirddetect/BioFoundation/runs/BEATs_linearprobing_BEANS_beans_watkins_1_2025-01-02_144748) |
 | BioLingual|? | ? | ? |
 | ConvNext| ? | ? | ? |
 | EAT| ? | ? | ? |

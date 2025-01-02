@@ -19,8 +19,9 @@ logger:
     tags: ${tags}
     group: "biofoundation_${module.network.model_name}_linearprobing_BEANS__${datamodule.dataset.dataset_name}"
     mode: online
-    version: ${module.network.model_name}_linearprobing_BEANS_${datamodule.dataset.dataset_name}_${seed}_${start_time} #to resume train run # needs to be tested
- 
+    version: ${module.network.model_name}_linearprobing_${datamodule.dataset.dataset_name}_${seed}_${start_time} #to resume train run # needs to be tested
+    name: ${module.network.model_name}_linearprobing_${datamodule.dataset.dataset_name}_${seed}_${start_time}
+    
 module:
   optimizer:
     lr: 1e-2
@@ -85,9 +86,9 @@ callbacks:
     every_n_train_steps: null
   early_stopping:
     _target_: lightning.pytorch.callbacks.EarlyStopping
-    monitor: "val/CrossEntropyLoss_epoch"
+    monitor: "val/MulticlassAccuracy"
     patience: 5
-    mode: 'min'
-    min_delta: 1e-3
+    mode: 'max'
+    min_delta: 1e-3 
     verbose: False
     check_finite: True
