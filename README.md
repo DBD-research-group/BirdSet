@@ -223,6 +223,85 @@ Results on HSN with 32 samples per class:
 | Wav2Vec2| 0.03 | 0.47 | [wav2vec2_HSN#1_2024-11-29_172107](https://wandb.ai/deepbirddetect/BioFoundation/runs/wav2vec2_fewshot_BirdSet_HSN_1_2024-11-29_172107) |
 | BirdNET| ? | ? | ? |
 
+## BEANS
+
+On the BEANS benchmark we also run the three different experiments but in a multiclass scenario:
+
+### Running Fine-tuning Experiments on BEANS
+
+```bash
+./projects/biofoundation/train.sh experiment=beans/finetuning/{model_name}
+```
+
+#### Results
+
+Results on Watkins:
+
+| Model | T1 | AUROC | Wandb |
+|-------| -------| ---- | ---- |
+| BEATs| ? | ? | ? |
+| BioLingual|? | ? | ? |
+| Perch | ? | ? | ? |
+| ConvNext| ? | ? | ? |
+| EAT| ? | ? | ? |
+| AVES| ? | ? | ? |
+| AST|? | ? | ? |
+| AudioMAE| ? | ? | ? |
+| ConvNext_BS| ? | ? | ? |
+| HUBERT| ? | ? | ? |
+| SSAST| ? | ? | ? |
+| EAT_SSL| ? | ? | ? |
+| Wav2Vec2| ? | ? | ? |
+
+### Running Linear Probing Experiments on BEANS
+
+```bash
+./projects/biofoundation/train.sh experiment=beans/linearprobing/{model_name}
+```
+
+Results on HSN:
+
+| Model | T1 | AUROC | Wandb |
+|-------| -------| ---- | ---- |
+| BEATs| ? | ? | ? |
+| BioLingual|? | ? | ? |
+| ConvNext| ? | ? | ? |
+| EAT| ? | ? | ? |
+| AVES| ? | ? | ? |
+| AST|? | ? | ? |
+| AudioMAE| ? | ? | ? |
+| ConvNext_BS| ? | ? | ? |
+| HUBERT| ? | ? | ? |
+| SSAST| ? | ? | ? |
+| EAT_SSL| ? | ? | ? |
+| Wav2Vec2| ? | ? | ? |
+| BirdNET| ? | ? | ? |
+
+### Running FewShot Experiments on BEANS
+
+```bash
+./projects/biofoundation/train.sh experiment=beans/fewshot/{model_name}
+```
+
+Results on HSN with 32 samples per class:
+
+
+| Model | T1 | AUROC | Wandb |
+|-------| -------| ---- | ---- |
+| BEATs| ? | ? | ? |
+| BioLingual|? | ? | ? |
+| ConvNext| ? | ? | ? |
+| EAT| ? | ? | ? |
+| AVES| ? | ? | ? |
+| AST|? | ? | ? |
+| AudioMAE| ? | ? | ? |
+| ConvNext_BS| ? | ? | ? |
+| HUBERT| ? | ? | ? |
+| SSAST| ? | ? | ? |
+| EAT_SSL| ? | ? | ? |
+| Wav2Vec2| ? | ? | ? |
+| BirdNET| ? | ? | ? |
+
 ## Example
 
 <!-- ## Log in to Huggingface

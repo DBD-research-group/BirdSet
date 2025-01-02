@@ -75,16 +75,16 @@ datamodule:
  
 callbacks:
   model_checkpoint:
-    monitor: "val/CrossEntropyLoss" #"val/MulticlassAccuracy"
-    mode: "min"
-    save_last: True
+    monitor: "val/MulticlassAccuracy"
+    mode: "max"
+    save_last: False
     every_n_epochs: null
     every_n_train_steps: null
   early_stopping:
     _target_: lightning.pytorch.callbacks.EarlyStopping
-    monitor: "val/CrossEntropyLoss_epoch"
-    patience: 3 #5
-    mode: 'min'
-    min_delta: 5e-3 #1e-3
+    monitor: "val/MulticlassAccuracy"
+    patience: 3
+    mode: 'max'
+    min_delta: 1e-3 
     verbose: False
     check_finite: True
