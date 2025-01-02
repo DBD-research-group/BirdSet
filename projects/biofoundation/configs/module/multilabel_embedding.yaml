@@ -31,7 +31,7 @@ loss:
   _target_: torch.nn.BCEWithLogitsLoss
 
 metrics: 
-  _target_: birdset.modules.metrics.multiclass.EmbeddingMetricsConfig # Temporary solution 
+  _target_: biofoundation.modules.metrics.multiclass.GhaniMetricsConfig # Temporary solution 
   num_labels: ${datamodule.dataset.n_classes}
 
 output_activation: 

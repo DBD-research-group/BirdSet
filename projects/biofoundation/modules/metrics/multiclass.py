@@ -46,15 +46,10 @@ class MulticlassMetricsConfig:
             )
         )
 
-class EmbeddingMetricsConfig(MulticlassMetricsConfig):
+class GhaniMetricsConfig(MulticlassMetricsConfig):
     """
-    A class for embedding metrics used during model training and evaluation.
-
-    Attributes:
-        main_metric (Metric): The main metric used for model training.
-        val_metric_best (Metric): The metric used for model validation.
-        add_metrics (MetricCollection): A collection of additional metrics used during model training.
-        eval_complete (MetricCollection): A collection of metrics used during model evaluation.
+    A class for metrics from the Ghani et al. paper (Global birdsong embeddings enable superior transfer learning  for bioacoustic classification) used during model training and evaluation.
+    It supports multiclass classification. 
     """
 
     def __init__(self, num_labels: int = 21):
@@ -71,27 +66,22 @@ class EmbeddingMetricsConfig(MulticlassMetricsConfig):
 
         self.add_metrics: torchmetrics.MetricCollection = torchmetrics.MetricCollection(
             {
-                "T1Accuracy": torchmetrics.Accuracy(
+                "AUROC": torchmetrics.AUROC(
                     task="multiclass",
                     num_classes=num_labels,
-                    # average='macro',
-                    top_k=1,
+                    average="macro",
                 ),
                 "T3Accuracy": torchmetrics.Accuracy(
                     task="multiclass",
                     num_classes=num_labels,
                     # average='macro',
                     top_k=3,
-                ),
-                "AUROC": torchmetrics.AUROC(
-                    task="multiclass",
-                    num_classes=num_labels,
-                    average="macro",
-                ),
-                "F1": torchmetrics.F1Score(
-                    task="multiclass",
-                    num_classes=num_labels,
-                ),
+                )
+                # F1 is same as T1 in multiclass?
+                #"F1": torchmetrics.F1Score(
+                #    task="multiclass",
+                #    num_classes=num_labels,
+                #),
             }
         )
         self.eval_complete: torchmetrics.MetricCollection = (

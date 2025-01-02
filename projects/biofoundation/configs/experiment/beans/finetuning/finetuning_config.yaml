@@ -20,6 +20,7 @@ logger:
     group: "biofoundation_${module.network.model_name}_finetune_BEANS__${datamodule.dataset.dataset_name}"
     mode: online
     version: ${module.network.model_name}_finetune_BEANS_${datamodule.dataset.dataset_name}_${seed}_${start_time} #to resume train run # needs to be tested
+    name: ${module.network.model_name}_finetune_BEANS_${datamodule.dataset.dataset_name}_${seed}_${start_time}
  
 module:
   optimizer:
@@ -33,7 +34,7 @@ module:
       preprocess_in_model: True
 
   metrics: 
-    _target_: biofoundation.modules.metrics.multiclass.EmbeddingMetricsConfig # Use these embedding to compare to ghani?!
+    _target_: biofoundation.modules.metrics.multiclass.GhaniMetricsConfig
     num_labels: ${datamodule.dataset.n_classes}  
  
 trainer:

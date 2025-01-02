@@ -31,7 +31,7 @@ loss:
   _target_: torch.nn.CrossEntropyLoss
 
 metrics: 
-  _target_: birdset.modules.metrics.multiclass.EmbeddingMetricsConfig
+  _target_: biofoundation.modules.metrics.multiclass.GhaniMetricsConfig
   num_labels: ${datamodule.dataset.n_classes}
 
 output_activation: 
