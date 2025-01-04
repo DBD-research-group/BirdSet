@@ -240,7 +240,7 @@ Results on Watkins:
 | Model | T1 | AUROC | Wandb |
 |-------| -------| ---- | ---- |
 | BEATs| 0.91 | 0.99 | [BEATs_finetune_BEANS_beans_watkins_1_2025-01-02_142041](https://wandb.ai/deepbirddetect/BioFoundation/runs/BEATs_finetune_BEANS_beans_watkins_1_2025-01-02_142041) |
-| BioLingual|? | ? | ? |
+| BioLingual|0.88 | 0.98 | [biolingual_finetune_beans_watkins_1_2025-01-04_164323](https://wandb.ai/deepbirddetect/BioFoundation/runs/biolingual_finetune_beans_watkins_1_2025-01-04_164323) |
 | Perch | ? | ? | ? |
 | ConvNext| ? | ? | ? |
 | EAT| ? | ? | ? |
@@ -250,7 +250,7 @@ Results on Watkins:
 | ConvNext_BS| ? | ? | ? |
 | HUBERT| ? | ? | ? |
 | SSAST| ? | ? | ? |
-| EAT_SSL| ? | ? | ? |
+| EAT_SSL| 0.84 | 0.99 | [eat_ssl_finetune_beans_watkins_1_2025-01-04_161731](https://wandb.ai/deepbirddetect/BioFoundation/runs/eat_ssl_finetune_beans_watkins_1_2025-01-04_161731) |
 | Wav2Vec2| ? | ? | ? |
 
 ### Running Linear Probing Experiments on BEANS
