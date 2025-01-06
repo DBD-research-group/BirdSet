@@ -108,9 +108,9 @@ class ASTSequenceClassifier(BirdSetModel):
             embeddings = (logits, cls_state)
 
         else:
-            embeddings = logits
+            embeddings = cls_state
 
-        if self.train_classifier:
+        if self.classifier is not None:
             output = self.classifier(embeddings)
         else:
             output = embeddings
