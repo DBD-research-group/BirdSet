@@ -241,13 +241,12 @@ Results on Watkins:
 |-------| -------| ---- | ---- |
 | BEATs| 0.91 | 0.99 | [BEATs_finetune_BEANS_beans_watkins_1_2025-01-02_142041](https://wandb.ai/deepbirddetect/BioFoundation/runs/BEATs_finetune_BEANS_beans_watkins_1_2025-01-02_142041) |
 | BioLingual|0.88 | 0.98 | [biolingual_finetune_beans_watkins_1_2025-01-04_164323](https://wandb.ai/deepbirddetect/BioFoundation/runs/biolingual_finetune_beans_watkins_1_2025-01-04_164323) |
-| Perch | ? | ? | ? |
-| ConvNext| ? | ? | ? |
-| EAT| ? | ? | ? |
+| ConvNext| 0.89 | 0.99 | [convnext_finetune_beans_watkins_1_2025-01-04_173811](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_finetune_beans_watkins_1_2025-01-04_173811) |
+| EAT| 0.76 | 0.98 | [eat_finetune_beans_watkins_1_2025-01-06_122645](https://wandb.ai/deepbirddetect/BioFoundation/runs/eat_finetune_beans_watkins_1_2025-01-06_122645) |
 | AVES| ? | ? | ? |
 | AST|? | ? | ? |
 | AudioMAE| ? | ? | ? |
-| ConvNext_BS| ? | ? | ? |
+| ConvNext_BS| 0.89 | 0.99 | [convnext_bs_finetune_beans_watkins_1_2025-01-06_120053](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_bs_finetune_beans_watkins_1_2025-01-06_120053) |
 | HUBERT| ? | ? | ? |
 | SSAST| ? | ? | ? |
 | EAT_SSL| 0.84 | 0.99 | [eat_ssl_finetune_beans_watkins_1_2025-01-04_161731](https://wandb.ai/deepbirddetect/BioFoundation/runs/eat_ssl_finetune_beans_watkins_1_2025-01-04_161731) |
@@ -265,6 +264,7 @@ Results on HSN:
 |-------| -------| ---- | ---- |
 | BEATs| 0.86 | 0.99 | [BEATs_default#1_2025-01-02_144748](https://wandb.ai/deepbirddetect/BioFoundation/runs/BEATs_linearprobing_BEANS_beans_watkins_1_2025-01-02_144748) |
 | BioLingual|? | ? | ? |
+| Perch | ? | ? | ? |
 | ConvNext| ? | ? | ? |
 | EAT| ? | ? | ? |
 | AVES| ? | ? | ? |
@@ -290,6 +290,7 @@ Results on HSN with 32 samples per class:
 |-------| -------| ---- | ---- |
 | BEATs| ? | ? | ? |
 | BioLingual|? | ? | ? |
+| Perch | ? | ? | ? |
 | ConvNext| ? | ? | ? |
 | EAT| ? | ? | ? |
 | AVES| ? | ? | ? |
