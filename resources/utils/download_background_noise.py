@@ -2,7 +2,7 @@ from huggingface_hub import hf_hub_download
 import tarfile
 import os
 import pyrootutils
-from tqdm import tqdm 
+from tqdm import tqdm
 
 root = pyrootutils.setup_root(
     search_from=__file__,
@@ -11,11 +11,14 @@ root = pyrootutils.setup_root(
     dotenv=True,
 )
 
+
 def main():
 
     repo_id = "DBD-research-group/BirdSet"  # Replace with the repository ID
-    filenames = ["dcase18_shard_0001.tar.gz",
-                 "dcase18_shard_0002.tar.gz"]  # Replace with the path to the file in the repository
+    filenames = [
+        "dcase18_shard_0001.tar.gz",
+        "dcase18_shard_0002.tar.gz",
+    ]  # Replace with the path to the file in the repository
     subfolder = "dcase18"
     revision = "data"
     local_dir = f"{root}/data_birdset/"  # Replace with the local directory where the file will be downloaded
@@ -30,7 +33,8 @@ def main():
             revision=revision,
             repo_type=repo_type,
             local_dir_use_symlinks=False,
-            force_download=True)
+            force_download=True,
+        )
 
     os.chdir(f"{root}/data_birdset/dcase18")
 

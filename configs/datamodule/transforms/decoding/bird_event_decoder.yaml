@@ -1,6 +1,6 @@
 _target_: birdset.datamodule.components.EventDecoding
 min_len: 1.0
 max_len: 5.0
-sampling_rate: ${module.network.sampling_rate}
+sample_rate: ${module.network.sample_rate}
 extension_time: 8
 extracted_interval: 5

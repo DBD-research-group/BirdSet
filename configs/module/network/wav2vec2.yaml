@@ -14,7 +14,7 @@ model:
 model_name: wav2vec2
 model_type: waveform
 torch_compile: False
-sampling_rate: 16_000
+sample_rate: 16_000
 normalize_spectrogram: False
 normalize_waveform: instance_normalization
 

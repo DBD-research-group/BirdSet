@@ -10,7 +10,13 @@ root = pyrootutils.setup_root(
 
 
 def main():
-    subprocess.run("python " + str(root / "birdset/train.py") + " experiment=\"local/DT_example.yaml\"", shell=True)    
+    subprocess.run(
+        "python "
+        + str(root / "birdset/train.py")
+        + ' experiment="local/DT_example.yaml"',
+        shell=True,
+    )
+
 
 if __name__ == "__main__":
     main()

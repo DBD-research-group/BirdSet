@@ -9,9 +9,13 @@ from transformers import (
 
 # TODO fill out
 hf_write_access_token: str = ""  # a hf write access token
-cache_dir: str | None = None  # cache dir from paths.yaml, else model will be downloaded into hf default cache dir
+cache_dir: str | None = (
+    None  # cache dir from paths.yaml, else model will be downloaded into hf default cache dir
+)
 state_dict_path: str = "path/to/checkpoint.ckpt"
-hf_repo_name: str = "{model name and version}-Birdset-{hf_name}"  # format: "{model name and version}-Birdset-{hf_name}"
+hf_repo_name: str = (
+    "{model name and version}-Birdset-{hf_name}"  # format: "{model name and version}-Birdset-{hf_name}"
+)
 hf_base_model: str = "facebook/wav2vec2-base"
 # num_classes: int = 9736  # XCL
 num_classes = 411  # XCM
