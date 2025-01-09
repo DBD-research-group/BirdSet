@@ -2,29 +2,30 @@ program: birdset/train.py
 name: base # Name of the sweep
 entity: deepbirddetect
 project: BioFoundation
-method: random  # random, grid, or bayesian
+method: grid  # random, grid, or bayes
 metric:
   name: val/cmAP  # Metric to optimize
   goal: maximize
 parameters:
   experiment:
-    values: [biofoundation/birdset/linearprobing/perch] # The hydra experiment
+    values: [biofoundation/birdset/finetuning/beats] # The hydra experiment
   trainer.devices:
     values: [1]
   module.optimizer.lr:
-    min: 0.0001 
-    max: 0.01  
+    values: [0.0001, 0.0005, 0.001, 0.01]  # Grid of learning rates
   module.optimizer.weight_decay:
-    min: 0.000001
-    max: 0.01  
+    values: [0.000001, 0.00001, 0.0001, 0.001, 0.01]  
   datamodule.loaders.train.batch_size:
-    values: [16, 32, 64, 128] 
-
+    values: [16, 32, 64] 
+early_terminate:
+  type: hyperband
+  min_iter: 3
+  
 command:
   - ${env}
   - python
   - ${program}
   - ${args_no_hyphens}
 
-
+#run_cap: 50
 
