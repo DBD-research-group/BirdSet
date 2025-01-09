@@ -250,7 +250,7 @@ Results on Watkins:
 | HUBERT| 0.85 | 0.99 | [hubert_finetune_beans_watkins_1_2025-01-09_140320](https://wandb.ai/deepbirddetect/BioFoundation/runs/hubert_finetune_beans_watkins_1_2025-01-09_140320) |
 | SSAST| 0.79 | 0.98 | [ssast_finetune_beans_watkins_1_2025-01-09_142902](https://wandb.ai/deepbirddetect/BioFoundation/runs/ssast_finetune_beans_watkins_1_2025-01-09_142902) |
 | EAT_SSL| 0.84 | 0.99 | [eat_ssl_finetune_beans_watkins_1_2025-01-04_161731](https://wandb.ai/deepbirddetect/BioFoundation/runs/eat_ssl_finetune_beans_watkins_1_2025-01-04_161731) |
-| Wav2Vec2| 0.81 | 0.98 | [wav2vec2_finetune_beans_watkins_1_2025-01-09_145847](https://wandb.ai/deepbirddetect/BioFoundation/runs/wav2vec2_finetune_beans_watkins_1_2025-01-09_145847) |
+| Wav2Vec2| 0.81 | 0.98 | [wav2vec2_finetune_beans_watkins_1_2025-01-09_145847](https://wandb.ai/deepbirddetect/BioFoundation/runs/wav2vec2_finetune_beans_watkins_1_2025-01-09_145847) [Weird run](https://wandb.ai/deepbirddetect/BioFoundation/runs/wav2vec2_finetune_beans_watkins_1_2025-01-09_152442)|
 
 ### Running Linear Probing Experiments on BEANS
 
@@ -273,7 +273,7 @@ Results on HSN:
 | ConvNext_BS| ? | ? | ? |
 | HUBERT| ? | ? | ? |
 | SSAST| ? | ? | ? |
-| EAT_SSL| ? | ? | ? |
+| EAT_SSL| 0.70 | 0.97 | [eat_ssl_linearprobing_beans_watkins_1_2025-01-09_173305](https://wandb.ai/deepbirddetect/BioFoundation/runs/eat_ssl_linearprobing_beans_watkins_1_2025-01-09_173305) |
 | Wav2Vec2| ? | ? | ? |
 | BirdNET| ? | ? | ? |
 
