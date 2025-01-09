@@ -244,13 +244,13 @@ Results on Watkins:
 | ConvNext| 0.89 | 0.99 | [convnext_finetune_beans_watkins_1_2025-01-04_173811](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_finetune_beans_watkins_1_2025-01-04_173811) |
 | EAT| 0.76 | 0.98 | [eat_finetune_beans_watkins_1_2025-01-06_122645](https://wandb.ai/deepbirddetect/BioFoundation/runs/eat_finetune_beans_watkins_1_2025-01-06_122645) |
 | AVES| 0.76 | 0.98 | [aves_finetune_beans_watkins_1_2025-01-06_123523](https://wandb.ai/deepbirddetect/BioFoundation/runs/aves_finetune_beans_watkins_1_2025-01-06_123523) |
-| AST|? | ? | ? |
+| AST|0.73 | 0.98 | [ast_finetune_beans_watkins_1_2025-01-09_122523](https://wandb.ai/deepbirddetect/BioFoundation/runs/ast_finetune_beans_watkins_1_2025-01-09_122523) |
 | AudioMAE| 0.73 | 0.98 | [audio_mae_finetune_beans_watkins_1_2025-01-06_135838](https://wandb.ai/deepbirddetect/BioFoundation/runs/audio_mae_finetune_beans_watkins_1_2025-01-06_135838) |
 | ConvNext_BS| 0.89 | 0.99 | [convnext_bs_finetune_beans_watkins_1_2025-01-06_120053](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_bs_finetune_beans_watkins_1_2025-01-06_120053) |
-| HUBERT| ? | ? | ? |
-| SSAST| ? | ? | ? |
+| HUBERT| 0.85 | 0.99 | [hubert_finetune_beans_watkins_1_2025-01-09_140320](https://wandb.ai/deepbirddetect/BioFoundation/runs/hubert_finetune_beans_watkins_1_2025-01-09_140320) |
+| SSAST| 0.79 | 0.98 | [ssast_finetune_beans_watkins_1_2025-01-09_142902](https://wandb.ai/deepbirddetect/BioFoundation/runs/ssast_finetune_beans_watkins_1_2025-01-09_142902) |
 | EAT_SSL| 0.84 | 0.99 | [eat_ssl_finetune_beans_watkins_1_2025-01-04_161731](https://wandb.ai/deepbirddetect/BioFoundation/runs/eat_ssl_finetune_beans_watkins_1_2025-01-04_161731) |
-| Wav2Vec2| ? | ? | ? |
+| Wav2Vec2| 0.81 | 0.98 | [wav2vec2_finetune_beans_watkins_1_2025-01-09_145847](https://wandb.ai/deepbirddetect/BioFoundation/runs/wav2vec2_finetune_beans_watkins_1_2025-01-09_145847) |
 
 ### Running Linear Probing Experiments on BEANS
 
