@@ -1,5 +1,5 @@
 # @package _global_
 #package global is neccessary!
 defaults:
-  - biofoundation/birdset/linearprobing/linearprobing_config.yaml 
+  - birdset/linearprobing/linearprobing_config.yaml 
   - override /module/network: ssast.yaml  
