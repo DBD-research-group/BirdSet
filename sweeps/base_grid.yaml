@@ -17,9 +17,9 @@ parameters:
     values: [0.000001, 0.00001, 0.0001, 0.001, 0.01]  
   datamodule.loaders.train.batch_size:
     values: [16, 32, 64] 
-early_terminate:
-  type: hyperband
-  min_iter: 3
+#early_terminate:
+#  type: hyperband
+#  min_iter: 3
   
 command:
   - ${env}
