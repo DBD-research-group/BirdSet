@@ -264,8 +264,8 @@ Results on HSN:
 |-------| -------| ---- | ---- |
 | BEATs| 0.86 | 0.99 | [BEATs_default#1_2025-01-02_144748](https://wandb.ai/deepbirddetect/BioFoundation/runs/BEATs_linearprobing_BEANS_beans_watkins_1_2025-01-02_144748) |
 | BioLingual|? | ? | ? |
-| Perch | ? | ? | ? |
-| ConvNext| ? | ? | ? |
+| Perch |0.81 | 0.99 | [perch_linearprobing_beans_watkins_5_2025-01-10_164918](https://wandb.ai/deepbirddetect/BioFoundation/runs/perch_linearprobing_beans_watkins_5_2025-01-10_164918) |
+| ConvNext| 0.68 | 0.97 | [convnext_linearprobing_beans_watkins_1_2025-01-10_170347](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_linearprobing_beans_watkins_1_2025-01-10_170347) |
 | EAT| ? | ? | ? |
 | AVES| ? | ? | ? |
 | AST|? | ? | ? |
