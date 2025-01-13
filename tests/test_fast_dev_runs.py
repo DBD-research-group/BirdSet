@@ -3,7 +3,6 @@ import pytest
 from datetime import datetime
 import os
 
-
 def test_train_script():
     """
     Tests the training script for multiple experiments using the fast_dev_run option.
