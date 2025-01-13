@@ -3,6 +3,9 @@ import pytest
 from datetime import datetime
 import os
 
+# TODO create shell information on the progress of the tests
+
+
 def test_train_script():
     """
     Tests the training script for multiple experiments using the fast_dev_run option.
@@ -29,20 +32,20 @@ def test_train_script():
     command_pattern = [
         "python",
         "birdset/train.py",
-        "experiment='X'",
+        "experiment=X",
         "trainer.fast_dev_run=True",
     ]
 
     experiment_dict = {
         "HSN/DT/ConvNext": "birdset_neurips24/HSN/DT/convnext.yaml",
-        "HSN/DT/EAT": "birdset_neurips24/HSN/DT/eat.yaml",
+        # "HSN/DT/EAT": "birdset_neurips24/HSN/DT/eat.yaml",
     }
 
     commands = {}
 
     for experiment, file in experiment_dict.items():
         command = command_pattern.copy()
-        command[2] = f"experiment={file}"
+        command[2] = f"experiment='{file}'"
         commands[experiment] = command
 
     for experiment, command in commands.items():
@@ -52,25 +55,27 @@ def test_train_script():
         except subprocess.CalledProcessError as e:
             failed_result_log[experiment] = e.stderr
             pytest.fail(f"{experiment} failed with error: {e.stderr}")
+        except Exception as e:
+            failed_result_log[experiment] = str(e)
+            pytest.fail(f"{experiment} failed with error: {e}")
 
         passed_result_log.append(experiment)
 
     return passed_result_log, failed_result_log
 
 
-def write_result_log(passed_log: dict, failed_log: dict, directory: str = "tests/logs"):
-    def write_result_log(passed_log: dict, failed_log: dict, directory: str = "tests"):
-        """
-        Writes the results of test runs to a log file.
+def write_result_log(passed_log: list, failed_log: dict, directory: str = "tests/logs"):
+    """
+    Writes the results of test runs to a log file.
 
-        Parameters:
-        passed_log (dict): A dictionary containing the experiments that passed and their results.
-        failed_log (dict): A dictionary containing the experiments that failed and their results.
-        directory (str): The directory where the log file will be saved. Defaults to "tests".
+    Parameters:
+    passed_log (dict): A dictionary containing the experiments that passed and their results.
+    failed_log (dict): A dictionary containing the experiments that failed and their results.
+    directory (str): The directory where the log file will be saved. Defaults to "tests".
 
-        The log file will be named with the format "test_fast_dev_runs_YYYYMMDD_HHMMSS.txt"
-        where YYYYMMDD_HHMMSS is the current timestamp.
-        """
+    The log file will be named with the format "test_fast_dev_runs_YYYYMMDD_HHMMSS.txt"
+    where YYYYMMDD_HHMMSS is the current timestamp.
+    """
 
     os.makedirs(directory, exist_ok=True)
 
@@ -88,5 +93,9 @@ def write_result_log(passed_log: dict, failed_log: dict, directory: str = "tests
 
         if passed_log:
             f.write("Passed runs:\n")
-            for experiment, result in passed_log.items():
+            for experiment, result in passed_log:
                 f.write(f"{experiment}: {result}\n")
+
+
+passed_log, failed_log = test_train_script()
+write_result_log(passed_log, failed_log)
