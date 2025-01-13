@@ -3,6 +3,7 @@ import pytest
 
 result_log = []
 
+
 def test_train_script():
     """
     Tests the training script for multiple experiments using the fast_dev_run option.
@@ -22,7 +23,7 @@ def test_train_script():
     Raises:
         pytest.fail: If any of the commands return a non-zero exit code, indicating a failure in the training script.
     """
-    
+
     passed_result_log = {}
     failed_result_log = {}
     all_passed = True
@@ -30,14 +31,13 @@ def test_train_script():
     command_pattern = [
         "python",
         "birdset/train.py",
-        "experiment=X"
-        "trainer.fast_dev_run=True",
+        "experiment=X" "trainer.fast_dev_run=True",
     ]
 
     experiment_dict = {
-        "HSN/DT/ConvNext" : "birdset_neurips24/HSN/DT/eat.yaml",
-        "HSN/DT/EAT" : "birdset_neurips24/HSN/DT/eat.yaml",
-    } 
+        "HSN/DT/ConvNext": "birdset_neurips24/HSN/DT/eat.yaml",
+        "HSN/DT/EAT": "birdset_neurips24/HSN/DT/eat.yaml",
+    }
 
     commands = {}
 
@@ -46,7 +46,6 @@ def test_train_script():
         command[2] = f"experiment={file}"
         commands[experiment] = command
 
-
     for experiment, command in commands.items():
         try:
             result = subprocess.run(command, check=True, capture_output=True, text=True)
@@ -54,8 +53,7 @@ def test_train_script():
         except subprocess.CalledProcessError as e:
             failed_result_log[experiment] = e.stderr
             pytest.fail(f"{experiment} failed with error: {e.stderr}")
-            
+
         passed_result_log[experiment] = result.stdout
 
     return passed_result_log, failed_result_log
-    
