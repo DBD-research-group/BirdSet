@@ -1,6 +1,7 @@
 import subprocess
 import pytest
 from datetime import datetime
+import os
 
 
 def test_train_script():
@@ -58,7 +59,7 @@ def test_train_script():
     return passed_result_log, failed_result_log
 
 
-def write_result_log(passed_log: dict, failed_log: dict, directory: str = "tests"):
+def write_result_log(passed_log: dict, failed_log: dict, directory: str = "tests/logs"):
     def write_result_log(passed_log: dict, failed_log: dict, directory: str = "tests"):
         """
         Writes the results of test runs to a log file.
@@ -71,6 +72,8 @@ def write_result_log(passed_log: dict, failed_log: dict, directory: str = "tests
         The log file will be named with the format "test_fast_dev_runs_YYYYMMDD_HHMMSS.txt"
         where YYYYMMDD_HHMMSS is the current timestamp.
         """
+
+    os.makedirs(directory, exist_ok=True)
 
     current_time = datetime.now()
     timestamp = current_time.strftime("%Y%m%d_%H%M%S")
