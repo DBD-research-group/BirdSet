@@ -1,4 +1,4 @@
-_target_: birdset.datamodule.birdset_embedding_datamodule.BirdSetEmbeddingDataModule
+_target_: biofoundation.datamodule.birdset_embedding_datamodule.BirdSetEmbeddingDataModule
 
 defaults: 
   - _self_

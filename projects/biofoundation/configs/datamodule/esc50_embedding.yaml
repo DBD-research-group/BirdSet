@@ -1,5 +1,5 @@
 #ESC50
-_target_: birdset.datamodule.esc50_embedding_datamodule.ESC50EmbeddingDataModule
+_target_: biofoundation.datamodule.esc50_embedding_datamodule.ESC50EmbeddingDataModule
 
 defaults:
   - _self_

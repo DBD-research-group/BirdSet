@@ -1,5 +1,5 @@
 #BEANS watkins
-_target_: birdset.datamodule.beans_embedding_datamodule.BEANSEmbeddingDataModule
+_target_: biofoundation.datamodule.beans_embedding_datamodule.BEANSEmbeddingDataModule
 
 defaults: 
   - _self_

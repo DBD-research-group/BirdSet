@@ -122,9 +122,7 @@ class HubertSequenceClassifier(BirdSetModel):
         )
         logits = outputs["logits"]
         # There are 13 layers
-        last_hidden_state = outputs["hidden_states"][
-            -self.n_last_hidden_layer
-        ]  # (batch, sequence, dim)
+        last_hidden_state = outputs["hidden_states"][-1]  # (batch, sequence, dim)
         cls_state = last_hidden_state[:, 0, :]
 
         return cls_state
