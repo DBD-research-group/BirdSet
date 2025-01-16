@@ -267,8 +267,8 @@ Results on HSN:
 | Perch |0.81 | 0.99 | [perch_linearprobing_beans_watkins_5_2025-01-10_164918](https://wandb.ai/deepbirddetect/BioFoundation/runs/perch_linearprobing_beans_watkins_5_2025-01-10_164918) |
 | ConvNext| 0.68 | 0.97 | [convnext_linearprobing_beans_watkins_1_2025-01-10_170347](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_linearprobing_beans_watkins_1_2025-01-10_170347) |
 | EAT| 0.67 | 0.97 | [eat_linearprobing_beans_watkins_1_2025-01-10_174439](https://wandb.ai/deepbirddetect/BioFoundation/runs/eat_linearprobing_beans_watkins_1_2025-01-10_174439) |
-| AVES| ? | ? | ? |
-| AST|? | ? | ? |
+| AVES| 0.61 | 0.96 | [aves_linearprobing_beans_watkins_1_2025-01-16_115408](https://wandb.ai/deepbirddetect/BioFoundation/runs/aves_linearprobing_beans_watkins_1_2025-01-16_115408) |
+| AST|0.50 | 0.94 | [ast_linearprobing_beans_watkins_1_2025-01-16_121501](https://wandb.ai/deepbirddetect/BioFoundation/runs/ast_linearprobing_beans_watkins_1_2025-01-16_121501) |
 | AudioMAE| ? | ? | ? |
 | ConvNext_BS| ? | ? | ? |
 | HUBERT| ? | ? | ? |
