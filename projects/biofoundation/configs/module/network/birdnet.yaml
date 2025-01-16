@@ -1,6 +1,6 @@
 # Should have the correct values from BirdNET Paper
 model: 
-  _target_: biofoundation.modules.models.birdnet.BirdNetModel
+  _target_: birdset.modules.models.birdnet.BirdNetModel
   num_classes: null
   train_classifier: True
   model_path: ${paths.root_dir}/models/birdnet/BirdNET_GLOBAL_6K_V2.4_Model

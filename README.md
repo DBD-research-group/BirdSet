@@ -258,7 +258,7 @@ Results on Watkins:
 ./projects/biofoundation/train.sh experiment=beans/linearprobing/{model_name}
 ```
 
-Results on HSN:
+Results on Watkins:
 
 | Model | T1 | AUROC | Wandb |
 |-------| -------| ---- | ---- |
@@ -269,13 +269,13 @@ Results on HSN:
 | EAT| 0.67 | 0.97 | [eat_linearprobing_beans_watkins_1_2025-01-10_174439](https://wandb.ai/deepbirddetect/BioFoundation/runs/eat_linearprobing_beans_watkins_1_2025-01-10_174439) |
 | AVES| 0.61 | 0.96 | [aves_linearprobing_beans_watkins_1_2025-01-16_115408](https://wandb.ai/deepbirddetect/BioFoundation/runs/aves_linearprobing_beans_watkins_1_2025-01-16_115408) |
 | AST|0.50 | 0.94 | [ast_linearprobing_beans_watkins_1_2025-01-16_121501](https://wandb.ai/deepbirddetect/BioFoundation/runs/ast_linearprobing_beans_watkins_1_2025-01-16_121501) |
-| AudioMAE| ? | ? | ? |
-| ConvNext_BS| ? | ? | ? |
-| HUBERT| ? | ? | ? |
-| SSAST| ? | ? | ? |
+| AudioMAE| 0.14 | 0.76 | [audio_mae_linearprobing_beans_watkins_1_2025-01-16_123844](https://wandb.ai/deepbirddetect/BioFoundation/runs/audio_mae_linearprobing_beans_watkins_1_2025-01-16_123844) |
+| ConvNext_BS| 0.70 | 0.98 | [convnext_bs_linearprobing_beans_watkins_1_2025-01-16_124814](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_bs_linearprobing_beans_watkins_1_2025-01-16_124814) |
+| HUBERT| 0.60 | 0.96 | [hubert_linearprobing_beans_watkins_1_2025-01-16_130349](https://wandb.ai/deepbirddetect/BioFoundation/runs/hubert_linearprobing_beans_watkins_1_2025-01-16_130349) |
+| SSAST| 0.40 | 0.92 | [ssast_linearprobing_beans_watkins_1_2025-01-16_134535](https://wandb.ai/deepbirddetect/BioFoundation/runs/ssast_linearprobing_beans_watkins_1_2025-01-16_134535) |
 | EAT_SSL| 0.70 | 0.97 | [eat_ssl_linearprobing_beans_watkins_1_2025-01-09_173305](https://wandb.ai/deepbirddetect/BioFoundation/runs/eat_ssl_linearprobing_beans_watkins_1_2025-01-09_173305) |
-| Wav2Vec2| ? | ? | ? |
-| BirdNET| ? | ? | ? |
+| Wav2Vec2| 0.52 | 0.93 | [wav2vec2_linearprobing_beans_watkins_1_2025-01-16_132404](https://wandb.ai/deepbirddetect/BioFoundation/runs/wav2vec2_linearprobing_beans_watkins_1_2025-01-16_132404) |
+| BirdNET| ? | ? | We didn't test Birdset on this but could easily be added |
 
 ### Running FewShot Experiments on BEANS
 
