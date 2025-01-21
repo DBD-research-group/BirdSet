@@ -1,6 +1,6 @@
 # Build and run this Dockerfile: (NOT TESTED YET)
-# docker build -f tests/Dockerfile -t my-repo-tests .
-# docker run --rm -v $(pwd)/reports:/app/reports my-repo-tests
+# docker build -f tests/Dockerfile -t network-tests .
+# docker run --rm -v $(pwd)/reports:/app/reports network-tests
 
 FROM python:3.11-slim
 
@@ -16,4 +16,4 @@ COPY ../ ./
 
 RUN poetry install --no-root
 
-CMD ["poetry", "run", "pytest", ""--junitxml=report.xml""]
+CMD ["poetry", "run", "pytest", "--junitxml=report.xml"]
