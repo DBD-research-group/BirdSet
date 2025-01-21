@@ -1,6 +1,4 @@
-import copy
-from typing import List, Literal, Optional
-from birdset.configs.model_configs import PretrainInfoConfig
+from typing import List, Literal
 from birdset.utils import pylogger
 import numpy as np
 import torch
@@ -10,8 +8,6 @@ import lightning as L
 from dataclasses import dataclass, field
 import warnings
 import datasets
-from typing import Tuple
-from birdset.modules.models.birdset_model import BirdSetModel
 
 log = pylogger.get_pylogger(__name__)
 
@@ -48,34 +44,30 @@ class TAggregate(nn.Module):
     def __init__(
         self,
         clip_length=None,
-        embedding_size=64,
+        embed_dim=64,
         n_layers=6,
         nhead=6,
         n_classes=None,
         dim_feedforward=512,
-        classifier: nn.Module | None = None,
     ):
         super(TAggregate, self).__init__()
-        if classifier is None:
-            classifier = nn.Linear(embedding_size, n_classes)
-        self.fc = classifier
-
         self.num_tokens = 2  # TODO: changed this from 1 to 2
         drop_rate = 0.1
         enc_layer = nn.TransformerEncoderLayer(
-            d_model=embedding_size,
+            d_model=embed_dim,
             nhead=nhead,
             activation="gelu",
             dim_feedforward=dim_feedforward,
             dropout=drop_rate,
         )
         self.transformer_enc = nn.TransformerEncoder(
-            enc_layer, num_layers=n_layers, norm=nn.LayerNorm(embedding_size)
+            enc_layer, num_layers=n_layers, norm=nn.LayerNorm(embed_dim)
         )
-        self.cls_token = nn.Parameter(torch.zeros(1, 1, embedding_size))
+        self.cls_token = nn.Parameter(torch.zeros(1, 1, embed_dim))
         self.pos_embed = nn.Parameter(
-            torch.zeros(1, clip_length + self.num_tokens, embedding_size)
+            torch.zeros(1, clip_length + self.num_tokens, embed_dim)
         )
+        self.fc = nn.Linear(embed_dim, n_classes)
         self.apply(self._init_weights)
 
     def _init_weights(self, m):
@@ -100,7 +92,7 @@ class TAggregate(nn.Module):
         x.transpose_(1, 0)
         o = self.transformer_enc(x)
         pred = self.fc(o[0])
-        return pred, o[0]
+        return pred
 
 
 class AADownsample(nn.Module):
@@ -151,16 +143,16 @@ class SoundNet(nn.Module):
     """
     NeuralNetwork for sound classification
     expected input shape: (batch_size, clip_length)
-    output shape: (batch_size, num_classes)
+    output shape: (batch_size, n_classes)
 
     Parameters:
     nf (int): Number of filters in the convolutional layers. Default is 32.
     clip_length (Optional[int]): Length of the audio clips. Default is None.
-    embedding_size (int): Dimension of the embeddings. Default is 128.
+    embed_dim (int): Dimension of the embeddings. Default is 128.
     n_layers (int): Number of transformer layers. Default is 4.
     nhead (int): Number of heads in the multihead attention models. Default is 8.
     factors (List[int]): List of factors for the convolutional layers. Default is [4, 4, 4, 4].
-    num_classes (Optional[int]): Number of classes for classification. Default is None.
+    n_classes (Optional[int]): Number of classes for classification. Default is None.
     dim_feedforward (int): Dimension of the feedforward network model. Default is 512.
     """
 
@@ -168,18 +160,33 @@ class SoundNet(nn.Module):
         self,
         nf: int = 32,
         seq_len: int = 90112,
-        embedding_size: int = 128,
-        classifier: nn.Module | None = None,
+        embed_dim: int = 128,
         n_layers: int = 4,
         nhead: int = 8,
         factors: List[int] = [4, 4, 4, 4],
+        n_classes: int | None = None,
         dim_feedforward: int = 512,
         local_checkpoint: str | None = None,
+        pretrain_info=None,
         device: str = "cuda:0",
-        num_classes: int | None = None,
     ):
         super().__init__()
         self.device = device
+
+        if pretrain_info is not None:
+            self.hf_path = pretrain_info.hf_path
+            self.hf_name = (
+                pretrain_info.hf_name
+                if not pretrain_info.hf_pretrain_name
+                else pretrain_info.hf_pretrain_name
+            )
+            self.num_classes = len(
+                datasets.load_dataset_builder(self.hf_path, self.hf_name)
+                .info.features["ebird_code"]
+                .names
+            )
+        else:
+            self.num_classes = n_classes
 
         ds_fac = np.prod(np.array(factors)) * 4
         clip_length = seq_len // ds_fac
@@ -207,16 +214,15 @@ class SoundNet(nn.Module):
             model += [Down(channels=nf, d=f, k=f * 2 + 1)]
             nf *= 2
         self.down2 = nn.Sequential(*model)
-        self.project = nn.Conv1d(nf, embedding_size, 1)
+        self.project = nn.Conv1d(nf, embed_dim, 1)
         self.clip_length = clip_length
         self.tf = TAggregate(
-            embedding_size=embedding_size,
+            embed_dim=embed_dim,
             clip_length=clip_length,
             n_layers=n_layers,
             nhead=nhead,
-            n_classes=num_classes,
+            n_classes=self.num_classes,
             dim_feedforward=dim_feedforward,
-            classifier=classifier,
         )
         self.apply(self._init_weights)
         if local_checkpoint:
@@ -234,17 +240,12 @@ class SoundNet(nn.Module):
                 self.load_state_dict_from_file(local_checkpoint, model_name="project")
             )
             self.tf.load_state_dict(
-                self.load_state_dict_from_file(local_checkpoint, model_name="tf"),
-                strict=False,
+                self.load_state_dict_from_file(local_checkpoint, model_name="tf")
             )
 
     def load_state_dict_from_file(self, file_path, model_name="model"):
         state_dict = torch.load(file_path, map_location=self.device)["state_dict"]
         # select only models where the key starts with `model.` + model_name + `.`
-        # TODO: Only do this if classifier varies
-        state_dict = {
-            k: v for k, v in state_dict.items() if not k.startswith("model.tf.fc")
-        }
         state_dict = {
             key: weight
             for key, weight in state_dict.items()
@@ -277,101 +278,5 @@ class SoundNet(nn.Module):
         x = self.down(x)
         x = self.down2(x)
         x = self.project(x)
-        pred, _ = self.tf(x)
+        pred = self.tf(x)
         return pred
-
-    # def get_embeddings(
-    #     self, input_tensor: torch.Tensor
-    # ) -> Tuple[torch.Tensor, torch.Tensor]:
-    #     if len(input_tensor.shape) < 3:
-    #         input_tensor = input_tensor.unsqueeze(1)
-
-    #     # Pass through the initial layers
-    #     x = self.start(input_tensor)
-    #     x = self.down(x)
-    #     x = self.down2(x)
-
-    #     # Get the projected embeddings
-    #     embeddings = self.project(x)
-
-    #     # Create embeddings from transformer
-    #     cls_tokens = self.tf.cls_token.expand(embeddings.shape[0], -1, -1)
-    #     embeddings_with_pos = torch.cat(
-    #         (cls_tokens, embeddings.permute(0, 2, 1).contiguous()), dim=1
-    #     )
-    #     embeddings_with_pos += self.tf.pos_embed
-    #     embeddings_with_pos.transpose_(1, 0)
-    #     transformer_output = self.tf.transformer_enc(embeddings_with_pos)
-
-    #     # cls_embeddings are the transformer embeddings corresponding to the class token
-    #     cls_embeddings = transformer_output[0]
-
-    #     return cls_embeddings, None
-
-    def get_embeddings(self, x: torch.Tensor) -> torch.Tensor:
-        if len(x.shape) < 3:
-            x.unsqueeze_(1)
-        x = self.start(x)
-        x = self.down(x)
-        x = self.down2(x)
-        x = self.project(x)
-        _, embeddings = self.tf(x)
-        return embeddings
-
-
-class EAT(BirdSetModel):
-    EMBEDDING_SIZE = 128
-
-    def __init__(
-        self,
-        num_classes: int | None,
-        embedding_size: int = EMBEDDING_SIZE,
-        local_checkpoint: str = None,
-        freeze_backbone: bool = False,
-        preprocess_in_model: bool = True,
-        classifier: nn.Module | None = None,
-        pretrain_info: Optional[PretrainInfoConfig] = None,
-        device: str| int = "cuda:0",
-        nf: int = 32,
-        seq_len: int = 90112,
-        n_layers: int = 4,
-        nhead: int = 8,
-        factors: List[int] = [4, 4, 4, 4],
-        dim_feedforward: int = 512,
-    ):
-        super().__init__(
-            num_classes=num_classes,
-            embedding_size=embedding_size,
-            local_checkpoint=local_checkpoint,
-            freeze_backbone=freeze_backbone,
-            preprocess_in_model=preprocess_in_model,
-            pretrain_info=pretrain_info,
-            classifier=classifier,
-        )
-        self.model = SoundNet(
-            embedding_size=embedding_size,
-            num_classes=self.num_classes,
-            device=device,
-            classifier=classifier,
-            nf=nf,
-            seq_len=seq_len,
-            n_layers=n_layers,
-            nhead=nhead,
-            factors=factors,
-            dim_feedforward=dim_feedforward,
-            local_checkpoint=local_checkpoint,
-        )
-        if self.freeze_backbone:
-            self.classifier = copy.deepcopy(classifier)
-            for param in self.model.parameters():
-                param.requires_grad = False
-
-    def forward(self, input_values: torch.Tensor, **kwargs) -> torch.Tensor:
-        if self.freeze_backbone:
-            embedding = self.model.get_embeddings(input_values)
-            logits = self.classifier(embedding)
-            return logits
-        return self.model(input_values)
-    
-    def get_embeddings(self, x: torch.Tensor) -> torch.Tensor:
-        return self.model.get_embeddings(x)

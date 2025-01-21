@@ -18,7 +18,7 @@ root = pyrootutils.setup_root(
 _HYDRA_PARAMS = {
     "version_base": None,
     "config_path": str(root / "configs"),
-    "config_name": "train.yaml",
+    "config_name": "eval.yaml",
 }
 
 log = utils.get_pylogger(__name__)

@@ -1,0 +1,14 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - birdset/fewshot/fewshot_config.yaml 
+  - override /module/network: beats.yaml  
+
+tags: ["biofoundation", "beats", "fewshot", "k32"]
+
+logger:
+  wandb:
+    tags: ${tags}
+    group: "biofoundation_beats_fewshot_BirdSet__${datamodule.dataset.dataset_name}"
+    mode: online
+    version: beats_fewshot_BirdSet_${datamodule.dataset.dataset_name}_${seed}_${start_time} #to resume train run # needs to be tested

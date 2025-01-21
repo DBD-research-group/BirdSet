@@ -1,7 +1,7 @@
 mlflow:
   _target_: pytorch_lightning.loggers.MLFlowLogger
   #experiment_name: birdset
-  run_name: ${module.network.model_name}_${datamodule.dataset.dataset_name}_${module.task}#${seed}_${start_time}
+  run_name: ${module.network.model_name}_${datamodule.dataset.hf_name}_${module.task}#${seed}_${start_time}
   tracking_uri: ${paths.log_dir}/mlflow/mlruns # run `mlflow ui` command inside the `logs/mlflow/` dir to open the UI
   tags: null
   # save_dir: "./mlruns"

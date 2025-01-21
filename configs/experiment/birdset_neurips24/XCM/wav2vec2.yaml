@@ -39,7 +39,7 @@ callbacks:
   model_checkpoint:
     monitor: val/BCEWithLogitsLoss
     dirpath: /mnt/work/bird2vec/logs_mw/checkpoints/${datamodule.dataset.hf_name}/${module.network.model_name}
-    filename: ${module.network.model_name}_${datamodule.dataset.dataset_name}_{epoch:02d}
+    filename: ${module.network.model_name}_${datamodule.dataset.hf_name}_{epoch:02d}
     save_last: True
     save_top_k: 3
     mode: "min"

@@ -1,0 +1,20 @@
+model_name: "eat"
+model:
+  _target_: biofoundation.modules.models.eat_soundnet.EAT
+  nf: 16
+  seq_len: 110250
+  embedding_size: 128
+  n_layers: 4
+  nhead: 8
+  factors: [4, 4, 4, 4]
+  num_classes: null
+  dim_feedforward: 512
+  pretrain_info: null
+  
+torch_compile: False
+model_type: waveform
+sampling_rate: 22050
+normalize_spectrogram: False
+normalize_waveform: instance_min_max
+embedding_size: 128
+length: 5

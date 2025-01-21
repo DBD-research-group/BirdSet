@@ -5,7 +5,7 @@
 job:
   chdir: True
 run:
-  dir: ${paths.log_dir}/${task_name}/runs/${datamodule.dataset.dataset_name}/${module.network.model_name}/${seed}${now:%Y-%m-%d_%H%M%S}
+  dir: ${paths.log_dir}/${task_name}/runs/${datamodule.dataset.hf_name}/${module.network.model_name}/${seed}${now:%Y-%m-%d_%H%M%S}
   
   
   
