@@ -175,7 +175,6 @@ class SoundNet(nn.Module):
         factors: List[int] = [4, 4, 4, 4],
         dim_feedforward: int = 512,
         local_checkpoint: str | None = None,
-        load_classifier_checkpoint: bool = True,
         device: str = "cuda:0",
         num_classes: int | None = None,
     ):
@@ -333,6 +332,7 @@ class EAT(BirdSetModel):
         num_classes: int | None,
         embedding_size: int = EMBEDDING_SIZE,
         local_checkpoint: str = None,
+        load_classifier_checkpoint: bool = True,
         freeze_backbone: bool = False,
         preprocess_in_model: bool = True,
         classifier: nn.Module | None = None,
@@ -349,6 +349,7 @@ class EAT(BirdSetModel):
             num_classes=num_classes,
             embedding_size=embedding_size,
             local_checkpoint=local_checkpoint,
+            load_classifier_checkpoint=load_classifier_checkpoint,
             freeze_backbone=freeze_backbone,
             preprocess_in_model=preprocess_in_model,
             pretrain_info=pretrain_info,
@@ -379,7 +380,7 @@ class EAT(BirdSetModel):
                     self.classifier.load_state_dict(classifier_state_dict, strict=False) # Strict to false in case BirdSet checkpoint is used without classifier weights
                 except Exception as e:
                     log.error(f"Could not load classifier state dict from local checkpoint: {e}")  
-                    
+
         if self.freeze_backbone:
             self.classifier = copy.deepcopy(classifier)
             for param in self.model.parameters():
