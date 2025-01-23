@@ -12,6 +12,7 @@ class BirdSetModel(nn.Module):
         embedding_size: int,
         classifier: nn.Module | None = None,
         local_checkpoint: str = None,
+        load_classifier_checkpoint: bool = True,
         freeze_backbone: bool = False,
         preprocess_in_model: bool = False,
         pretrain_info: PretrainInfoConfig = None,
@@ -24,6 +25,7 @@ class BirdSetModel(nn.Module):
         self.preprocess_in_model = preprocess_in_model
         self.classifier = classifier
         self.embedding_size = embedding_size
+        self.load_classifier_checkpoint = load_classifier_checkpoint
 
         if pretrain_info:
             self.hf_path = pretrain_info.hf_path
@@ -61,9 +63,13 @@ class BirdSetModel(nn.Module):
 
         # Process the keys for the classifier
         if self.classifier:
-            classifier_state_dict = {
-                key.replace("model.classifier.", ""): weight
-                for key, weight in state_dict.items() if key.startswith("model.classifier.")
-            }
-            self.classifier.load_state_dict(classifier_state_dict)
-            log.info(f">> Also loaded classifier state dict from local checkpoint: {self.local_checkpoint}")
+            if self.load_classifier_checkpoint:
+                try:
+                    classifier_state_dict = {
+                        key.replace("model.classifier.", ""): weight
+                        for key, weight in state_dict.items() if key.startswith("model.classifier.")
+                    }
+                    self.classifier.load_state_dict(classifier_state_dict)
+                    log.info(f">> Also loaded classifier state dict from local checkpoint: {self.local_checkpoint}")
+                except Exception as e:
+                    log.error(f"Could not load classifier state dict from local checkpoint: {e}")  

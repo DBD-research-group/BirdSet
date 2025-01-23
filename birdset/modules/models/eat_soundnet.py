@@ -175,6 +175,7 @@ class SoundNet(nn.Module):
         factors: List[int] = [4, 4, 4, 4],
         dim_feedforward: int = 512,
         local_checkpoint: str | None = None,
+        load_classifier_checkpoint: bool = True,
         device: str = "cuda:0",
         num_classes: int | None = None,
     ):
@@ -368,13 +369,17 @@ class EAT(BirdSetModel):
         )
 
         if local_checkpoint and classifier is not None:
-            state_dict = torch.load(self.local_checkpoint)["state_dict"]
-            classifier_state_dict = {
-                key.replace("model.classifier.", ""): weight
-                for key, weight in state_dict.items() if key.startswith("model.classifier.")
-            }
-            self.classifier.load_state_dict(classifier_state_dict, strict=False) # Strict to false in case BirdSet checkpoint is used without classifier weights
-
+            if self.load_classifier_checkpoint:
+                try:
+                    state_dict = torch.load(self.local_checkpoint)["state_dict"]
+                    classifier_state_dict = {
+                        key.replace("model.classifier.", ""): weight
+                        for key, weight in state_dict.items() if key.startswith("model.classifier.")
+                    }
+                    self.classifier.load_state_dict(classifier_state_dict, strict=False) # Strict to false in case BirdSet checkpoint is used without classifier weights
+                except Exception as e:
+                    log.error(f"Could not load classifier state dict from local checkpoint: {e}")  
+                    
         if self.freeze_backbone:
             self.classifier = copy.deepcopy(classifier)
             for param in self.model.parameters():
