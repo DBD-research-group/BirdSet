@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from datasets import DatasetDict
 
+
 def get_unique_multilabel_labels(multilabel_labels: list) -> list:
     """
     Generates a list of unique labels in the given label list
@@ -38,7 +39,7 @@ def get_multilabel_stats(multilabel_labels: list) -> tuple[list, dict]:
     return unique_labels, label_occurences
 
 
-def show_multilabel_stats(dataset_dict: DatasetDict, figwidth: int=10):
+def show_multilabel_stats(dataset_dict: DatasetDict, figwidth: int = 10):
     """
     Plot unique labels and their occurences as absolute values.
     Plots both the train and test set of the given dataset dict.
@@ -46,8 +47,12 @@ def show_multilabel_stats(dataset_dict: DatasetDict, figwidth: int=10):
     train_set = dataset_dict["train"]
     test_set = dataset_dict["test"]
 
-    unique_train_labels, train_label_occurences = get_multilabel_stats(train_set["ebird_code_multilabel"])
-    unique_test_labels, test_label_occurences = get_multilabel_stats(test_set["ebird_code_multilabel"])
+    unique_train_labels, train_label_occurences = get_multilabel_stats(
+        train_set["ebird_code_multilabel"]
+    )
+    unique_test_labels, test_label_occurences = get_multilabel_stats(
+        test_set["ebird_code_multilabel"]
+    )
 
     unique_labels_in_dataset = set(unique_train_labels).union(set(unique_test_labels))
 
@@ -57,7 +62,9 @@ def show_multilabel_stats(dataset_dict: DatasetDict, figwidth: int=10):
         test_label_occurences[label] = test_label_occurences.get(label, 0)
 
     print(f"Unique labels in dataset: {len(unique_labels_in_dataset)}")
-    print(f"Unique labels in train set vs. test set:  {len(unique_train_labels)} vs. {len(unique_test_labels)}")
+    print(
+        f"Unique labels in train set vs. test set:  {len(unique_train_labels)} vs. {len(unique_test_labels)}"
+    )
 
     label_occurences = sorted(train_label_occurences.items())
     labels, train_label_counts = zip(*label_occurences)
@@ -71,14 +78,20 @@ def show_multilabel_stats(dataset_dict: DatasetDict, figwidth: int=10):
     ax.set_xticks(labels, labels=labels)
 
     ax.bar(labels, train_label_counts, label="train_set", width=width)
-    ax.bar(labels, test_label_counts, label="test_set",width=width, bottom=train_label_counts)
+    ax.bar(
+        labels,
+        test_label_counts,
+        label="test_set",
+        width=width,
+        bottom=train_label_counts,
+    )
     ax.set_xlabel("Bird Code")
     ax.set_ylabel("Occurence count")
     ax.legend()
     plt.show()
 
 
-def show_multilabel_percentages(dataset_dict: DatasetDict, figwidth: int=10):
+def show_multilabel_percentages(dataset_dict: DatasetDict, figwidth: int = 10):
     """
     Plot unique labels and their occurences as percentage based values.
     Plots both the train and test set of the given dataset dict.
@@ -86,8 +99,12 @@ def show_multilabel_percentages(dataset_dict: DatasetDict, figwidth: int=10):
     train_set = dataset_dict["train"]
     test_set = dataset_dict["test"]
 
-    unique_train_labels, train_label_occurences = get_multilabel_stats(train_set["ebird_code_multilabel"])
-    unique_test_labels, test_label_occurences = get_multilabel_stats(test_set["ebird_code_multilabel"])
+    unique_train_labels, train_label_occurences = get_multilabel_stats(
+        train_set["ebird_code_multilabel"]
+    )
+    unique_test_labels, test_label_occurences = get_multilabel_stats(
+        test_set["ebird_code_multilabel"]
+    )
 
     unique_labels_in_dataset = set(unique_train_labels).union(set(unique_test_labels))
 
@@ -97,9 +114,15 @@ def show_multilabel_percentages(dataset_dict: DatasetDict, figwidth: int=10):
         test_label_occurences[label] = test_label_occurences.get(label, 0)
 
     for label in unique_labels_in_dataset:
-        occurence_count_sum = train_label_occurences[label] + test_label_occurences[label]
-        train_label_occurences[label] = train_label_occurences[label] / occurence_count_sum
-        test_label_occurences[label] = test_label_occurences[label] / occurence_count_sum
+        occurence_count_sum = (
+            train_label_occurences[label] + test_label_occurences[label]
+        )
+        train_label_occurences[label] = (
+            train_label_occurences[label] / occurence_count_sum
+        )
+        test_label_occurences[label] = (
+            test_label_occurences[label] / occurence_count_sum
+        )
 
     label_occurences = sorted(train_label_occurences.items())
     labels, train_label_counts = zip(*label_occurences)
@@ -113,7 +136,13 @@ def show_multilabel_percentages(dataset_dict: DatasetDict, figwidth: int=10):
     ax.set_xticks(labels, labels=labels)
 
     ax.bar(labels, train_label_counts, label="train_set", width=width)
-    ax.bar(labels, test_label_counts, label="test_set",width=width, bottom=train_label_counts)
+    ax.bar(
+        labels,
+        test_label_counts,
+        label="test_set",
+        width=width,
+        bottom=train_label_counts,
+    )
     ax.set_xlabel("Bird Code")
     ax.set_ylabel("Percentage per set")
     ax.legend()
