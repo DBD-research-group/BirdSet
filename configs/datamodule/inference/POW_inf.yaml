@@ -9,7 +9,6 @@ defaults:
 
 dataset:
   data_dir: ${paths.dataset_path}
-  dataset_name: POW
   hf_path: DBD-research-group/BirdSet
   hf_name: POW
   seed: ${seed}

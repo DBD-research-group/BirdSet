@@ -14,7 +14,7 @@ cache_dir: str | None = (
 )
 state_dict_path: str = "path/to/checkpoint.ckpt"
 hf_repo_name: str = (
-    "{model name and version}-Birdset-{dataset_name}"  # format: "{model name and version}-Birdset-{dataset_name}"
+    "{model name and version}-Birdset-{hf_name}"  # format: "{model name and version}-Birdset-{hf_name}"
 )
 hf_base_model: str = "facebook/wav2vec2-base"
 # num_classes: int = 9736  # XCL

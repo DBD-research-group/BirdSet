@@ -1,0 +1,8 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - beans/finetuning/finetuning_config.yaml 
+  - override /module/network: beats.yaml  
+  #- override /datamodule/transforms/waveform_augmentations: none.yaml
+  #- override /datamodule/transforms/spectrogram_augmentations: none.yaml
+  # Augmentations don't seem to have a big impact for BEANS

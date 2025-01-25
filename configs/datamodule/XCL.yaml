@@ -9,7 +9,6 @@ defaults:
 
 dataset:
   data_dir: ${paths.dataset_path}
-  dataset_name: XCL
   hf_path: DBD-research-group/BirdSet
   hf_name: XCL
   seed: ${seed}

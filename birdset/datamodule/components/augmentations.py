@@ -3,17 +3,15 @@ import math
 import random
 import warnings
 from pathlib import Path
-from typing import List, Text, TypedDict, Union
-import torch.nn as nn
+from typing import List, Text, Union
+from torch import nn
 
 # Related third-party imports
-import audiomentations
 import librosa
 import numpy as np
 import soundfile as sf
 import torch.nn.functional as F
 import torchaudio
-import torchvision
 from torchaudio import transforms
 import torch_audiomentations
 from torch_audiomentations.core.transforms_interface import EmptyPathException
@@ -26,7 +24,6 @@ from torch import Tensor
 from torch_audiomentations.core.transforms_interface import BaseWaveformTransform
 from torch_audiomentations.utils.dsp import calculate_rms
 from torch_audiomentations.utils.object_dict import ObjectDict
-from torch_audiomentations.utils.io import Audio
 
 
 def pad_spectrogram_width(
@@ -139,356 +136,6 @@ class RandomTimeStretch:
         return f"{self.__class__.__name__}(p={self.prob})"
 
 
-class SpecAugmentations(TypedDict):
-    """A class representing the configuration for spectrogram augmentations.
-
-    Attributes:
-        time_masking (dict): Time masking parameters.
-        frequency_masking (dict): Frequency masking parameters.
-        time_stretch (dict): Time stretching parameters.
-    """
-
-    time_masking: dict
-    frequency_masking: dict
-    time_stretch: dict
-
-
-class WaveAugmentations(TypedDict):
-    """
-    A class representing the configuration for waveform augmentations.
-
-    Attributes:
-        colored_noise (dict): Colored noise augmentation parameters.
-        background_noise (dict): Background noise augmentation parameters.
-        pitch_shift (dict): Pitch shifting parameters.
-        time_mask (dict): Time masking parameters.
-        time_stretch (dict): Time stretching parameters.
-    """
-
-    colored_noise: dict
-    background_noise: dict
-    pitch_shift: dict
-    time_mask: dict
-    time_stretch: dict
-
-
-class AudioAugmentor:
-    def __init__(
-        self,
-        sample_rate: int = 16000,
-        use_spectrogram: bool = False,
-        waveform_augmentations: Optional[WaveAugmentations] = None,
-        spectrogram_augmentations: Optional[SpecAugmentations] = None,
-        n_fft: Optional[int] = 2048,
-        hop_length: Optional[int] = 1024,
-        n_mels: Optional[int] = None,
-        db_scale: bool = False,
-    ):
-        """
-        Initialize the AudioAugmentor, which is used for data augmentation of waveforms and spectrograms.
-
-        Args:
-            sample_rate (int): Sample rate of the audio signal.
-            use_spectrogram (bool): Flag indicating whether to convert waveforms to spectrograms.
-            waveform_augmentations (Optional[WaveAugmentations]): Configuration for waveform augmentations.
-            spectrogram_augmentations (Optional[SpecAugmentations]): Configuration for spectrogram augmentations.
-            n_fft (Optional[int]): Size of the FFT, only required if use_spectrogram=True.
-            hop_length (Optional[int]): Length of hop between STFT windows, only required if use_spectrogram=True.
-            n_mels (Optional[int]): Number of Mel filter banks. If not specified, the spectrogram will not be converted
-             to a Mel spectrogram. Only required if use_spectrogram=True.
-            db_scale (bool): Flag indicating whether to convert spectrograms to decibel (dB) units. Only required if
-            use_spectrogram=True.
-        """
-        self.sample_rate = sample_rate
-        self.use_spectrogram = use_spectrogram
-        self.waveform_augmentations = waveform_augmentations
-        self.spectrogram_augmentations = spectrogram_augmentations
-        self.n_fft = n_fft
-        self.hop_length = hop_length
-        self.n_mels = n_mels
-        self.db_scale = db_scale
-
-    def augment_waveform(self, waveform: torch.Tensor) -> torch.Tensor:
-        """
-        Apply waveform augmentations if specified in the configuration.
-
-        Args:
-            waveform (torch.Tensor): Input waveform.
-
-        Returns:
-            torch.Tensor: Augmented waveform if waveform_augmentations are specified; else, the original waveform.
-        """
-        if self.waveform_augmentations:
-            augmentations_torch_audiomentations = []
-            augmentations_audiomentations = []
-
-            # audiomentations expects 1d numpy arrays, with shape [num_samples,],
-            waveform = np.array(waveform)
-
-            # Make a randomly chosen part of the audio silent.
-            if "time_mask" in self.waveform_augmentations:
-                min_band_part = self.waveform_augmentations["time_mask"][
-                    "min_band_part"
-                ]
-                max_band_part = self.waveform_augmentations["time_mask"][
-                    "max_band_part"
-                ]
-                prob = self.waveform_augmentations["time_mask"]["prob"]
-                time_mask = audiomentations.TimeMask(
-                    min_band_part=min_band_part, max_band_part=max_band_part, p=prob
-                )
-                augmentations_audiomentations.append(time_mask)
-
-            # Change the speed or duration of the signal without changing the pitch.
-            if "time_stretch" in self.waveform_augmentations:
-                min_rate = self.waveform_augmentations["time_stretch"]["min_rate"]
-                max_rate = self.waveform_augmentations["time_stretch"]["max_rate"]
-                prob = self.waveform_augmentations["time_stretch"]["prob"]
-                time_stretch = audiomentations.TimeStretch(
-                    min_rate=min_rate, max_rate=max_rate, p=prob
-                )
-                augmentations_audiomentations.append(time_stretch)
-
-            waveform_transforms_audiomentations = audiomentations.Compose(
-                transforms=augmentations_audiomentations
-            )
-
-            waveform_augmented = waveform_transforms_audiomentations(
-                samples=waveform, sample_rate=self.sample_rate
-            )
-
-            # torch-audiomentations expects 3d PyTorch tensors, with shape [batch_size, num_channels, num_samples],
-            # so we expand the first two dimensions
-            waveform_augmented = torch.Tensor(waveform_augmented)
-            waveform_augmented = waveform_augmented.unsqueeze(0).unsqueeze(0)
-
-            # Add colored noises to the input audio.
-            if "colored_noise" in self.waveform_augmentations:
-                prob = self.waveform_augmentations["colored_noise"]["prob"]
-                min_snr_in_db = self.waveform_augmentations["colored_noise"][
-                    "min_snr_in_db"
-                ]
-                max_snr_in_db = self.waveform_augmentations["colored_noise"][
-                    "max_snr_in_db"
-                ]
-                min_f_decay = self.waveform_augmentations["colored_noise"][
-                    "min_f_decay"
-                ]
-                max_f_decay = self.waveform_augmentations["colored_noise"][
-                    "max_f_decay"
-                ]
-                colored_noise = torch_audiomentations.AddColoredNoise(
-                    p=prob,
-                    min_snr_in_db=min_snr_in_db,
-                    max_snr_in_db=max_snr_in_db,
-                    min_f_decay=min_f_decay,
-                    max_f_decay=max_f_decay,
-                )
-                augmentations_torch_audiomentations.append(colored_noise)
-
-            # Add background noise to the input audio.
-            if "background_noise" in self.waveform_augmentations:
-                prob = self.waveform_augmentations["background_noise"]["prob"]
-                min_snr_in_db = self.waveform_augmentations["background_noise"][
-                    "min_snr_in_db"
-                ]
-                max_snr_in_db = self.waveform_augmentations["background_noise"][
-                    "max_snr_in_db"
-                ]
-                background_paths = self.waveform_augmentations["background_noise"][
-                    "background_paths"
-                ]
-                background_noise = torch_audiomentations.AddBackgroundNoise(
-                    background_paths=background_paths,
-                    p=prob,
-                    min_snr_in_db=min_snr_in_db,
-                    max_snr_in_db=max_snr_in_db,
-                )
-                augmentations_torch_audiomentations.append(background_noise)
-
-            # Pitch-shift sounds up or down without changing the tempo.
-            if "pitch_shift" in self.waveform_augmentations:
-                prob = self.waveform_augmentations["pitch_shift"]["prob"]
-                min_transpose_semitones = self.waveform_augmentations["pitch_shift"][
-                    "min_transpose_semitones"
-                ]
-                max_transpose_semitones = self.waveform_augmentations["pitch_shift"][
-                    "max_transpose_semitones"
-                ]
-                pitch_shift = torch_audiomentations.PitchShift(
-                    p=prob,
-                    sample_rate=self.sample_rate,
-                    min_transpose_semitones=min_transpose_semitones,
-                    max_transpose_semitones=max_transpose_semitones,
-                )
-                augmentations_torch_audiomentations.append(pitch_shift)
-
-            waveform_transforms_torch_audiomentations = torch_audiomentations.Compose(
-                transforms=augmentations_torch_audiomentations
-            )
-
-            waveform_augmented = waveform_transforms_torch_audiomentations(
-                waveform_augmented, sample_rate=self.sample_rate
-            )
-
-            # Squeeze the first dimension so that we get a tensor with the shape [num_channels, num_samples]
-            waveform_augmented = waveform_augmented.squeeze(0)
-
-            return waveform_augmented
-
-        # Expand the first dimension so that we get a PyTorch tensor, with shape [num_channels, num_samples]
-        waveform = torch.Tensor(waveform)
-        waveform = waveform.unsqueeze(0)
-
-        return waveform
-
-    def augment_spectrogram(self, spectrogram: torch.Tensor) -> torch.Tensor:
-        """
-        Apply spectrogram augmentations if specified in the configuration.
-
-        Args:
-            spectrogram (torch.Tensor): Input spectrogram.
-
-        Returns:
-            torch.Tensor: Augmented spectrogram if spectrogram_augmentations are specified; else, the original
-            spectrogram.
-        """
-        if self.spectrogram_augmentations:
-            all_augmentations = []
-
-            # Stretch stft in time without modifying pitch for a given rate.
-            # Note: Time stretching must be the first augmentation technique applied because it takes a complex-valued
-            # STFT and returns a power spectrogram, while all other augmentation techniques take power spectrograms.
-            if "time_stretch" in self.spectrogram_augmentations:
-                n_freq = self.n_fft // 2 + 1
-                hop_length = self.hop_length
-
-                min_rate = self.spectrogram_augmentations["time_stretch"]["min_rate"]
-                max_rate = self.spectrogram_augmentations["time_stretch"]["max_rate"]
-                prob = self.spectrogram_augmentations["time_stretch"]["prob"]
-
-                time_stretch = RandomTimeStretch(
-                    prob=prob,
-                    n_freq=n_freq,
-                    min_rate=min_rate,
-                    max_rate=max_rate,
-                    hop_length=hop_length,
-                )
-                all_augmentations.append(time_stretch)
-
-            # Apply masking to a spectrogram in the time domain.
-            if "time_masking" in self.spectrogram_augmentations:
-                time_mask_param = self.spectrogram_augmentations["time_masking"][
-                    "time_mask_param"
-                ]
-                prob = self.spectrogram_augmentations["time_masking"]["prob"]
-                time_masking = torchvision.transforms.RandomApply(
-                    [transforms.TimeMasking(time_mask_param=time_mask_param)], p=prob
-                )
-                all_augmentations.append(time_masking)
-
-            # Apply masking to a spectrogram in the frequency domain.
-            if "frequency_masking" in self.spectrogram_augmentations:
-                freq_mask_param = self.spectrogram_augmentations["frequency_masking"][
-                    "freq_mask_param"
-                ]
-                prob = self.spectrogram_augmentations["frequency_masking"]["prob"]
-                frequency_masking = torchvision.transforms.RandomApply(
-                    [transforms.FrequencyMasking(freq_mask_param=freq_mask_param)],
-                    p=prob,
-                )
-                all_augmentations.append(frequency_masking)
-
-            spectrogram_transforms = torchvision.transforms.Compose(all_augmentations)
-
-            spectrogram_augmented = spectrogram_transforms(spectrogram)
-
-            return spectrogram_augmented
-
-        return spectrogram
-
-    def transform_to_spectrogram(
-        self, waveform: torch.Tensor, power: Optional[float] = 2.0
-    ) -> torch.Tensor:
-        """
-        Transform waveform to spectrogram.
-
-        Args:
-            waveform (torch.Tensor): Input waveform.
-            power (Optional[float]): Exponent for the magnitude spectrogram, (must be > 0) e.g., 1 for magnitude, 2 for
-             power, etc. If None, then the complex spectrum is returned instead.
-
-        Returns:
-            torch.Tensor: Spectrogram representation of the input waveform.
-        """
-        transform = transforms.Spectrogram(
-            n_fft=self.n_fft, hop_length=self.hop_length, power=power
-        )
-        spectrogram = transform(waveform)
-        return spectrogram
-
-    def transform_to_mel_scale(self, spectrogram: torch.Tensor) -> torch.Tensor:
-        """
-        Transform spectrogram to mel scale.
-
-        Args:
-            spectrogram (torch.Tensor): Input spectrogram.
-
-        Returns:
-            torch.Tensor: Mel spectrogram representation of the input spectrogram.
-        """
-        transform = transforms.MelScale(
-            n_mels=self.n_mels, sample_rate=self.sample_rate, n_stft=self.n_fft // 2 + 1
-        )
-        mel_spectrogram = transform(spectrogram)
-        return mel_spectrogram
-
-    def combined_augmentations(self, waveform: torch.Tensor) -> torch.Tensor:
-        """
-        Apply combined augmentations to the input waveform.
-
-        Args:
-            waveform (torch.Tensor): Input waveform.
-
-        Returns:
-            torch.Tensor: Augmented waveform (or spectrogram if use_spectrogram=True).
-        """
-
-        waveform_augmented = self.augment_waveform(waveform)
-
-        if self.use_spectrogram:
-            if (self.spectrogram_augmentations is not None) and (
-                "time_stretch" in self.spectrogram_augmentations
-            ):
-                # Time stretching requires a complex-valued STFT, but returns a power spectrogram.
-                spectrogram = self.transform_to_spectrogram(
-                    waveform_augmented, power=None
-                )
-            else:
-                # When time stretching is not used, we work directly with power spectrograms.
-                spectrogram = self.transform_to_spectrogram(
-                    waveform_augmented, power=2.0
-                )
-
-            spectrogram_augmented = self.augment_spectrogram(spectrogram)
-
-            # Transform spectrogram to mel scale
-            if self.n_mels:
-                spectrogram_augmented = self.transform_to_mel_scale(
-                    spectrogram_augmented
-                )
-
-            if self.db_scale:
-                # Convert spectrogram to decibel (dB) units.
-                spectrogram_augmented = spectrogram_augmented.numpy()
-                spectrogram_augmented = librosa.power_to_db(spectrogram_augmented)
-                spectrogram_augmented = torch.from_numpy(spectrogram_augmented)
-
-            return spectrogram_augmented
-
-        return waveform_augmented
-
-
 class AddBackgroundNoiseHf(torch_audiomentations.AddBackgroundNoise):
     def __init__(
         self,
@@ -537,8 +184,8 @@ class Compose:
         self.transforms = transforms
 
     def __call__(self, inputs, *args, **kwargs):
-        for transforms in self.transforms:
-            inputs = transforms(inputs, *args, **kwargs)
+        for transform in self.transforms:
+            inputs = transform(inputs, *args, **kwargs)
         return inputs
 
 
@@ -552,8 +199,8 @@ class AudioTransforms:
     ):
         if np.random.rand() < self.p:
             return self.apply(inputs)
-        else:
-            return inputs
+
+        return inputs
 
 
 class BackgroundNoise(AudioTransforms):
@@ -624,7 +271,6 @@ class BackgroundNoise(AudioTransforms):
 
 # Mix not officially released yet
 class MultilabelMix(BaseWaveformTransform):
-
     supported_modes = {"per_example", "per_channel"}
 
     supports_multichannel = True
@@ -638,6 +284,7 @@ class MultilabelMix(BaseWaveformTransform):
         min_snr_in_db: float = 0.0,
         max_snr_in_db: float = 5.0,
         mix_target: str = "union",
+        max_samples: int = 1,
         mode: str = "per_example",
         p: float = 0.5,
         p_mode: str = None,
@@ -666,9 +313,10 @@ class MultilabelMix(BaseWaveformTransform):
             self._mix_target = lambda target, background_target, snr: torch.maximum(
                 target, background_target
             )
-
         else:
             raise ValueError("mix_target must be one of 'original' or 'union'.")
+
+        self.max_samples = max_samples
 
     def randomize_parameters(
         self,
@@ -679,6 +327,7 @@ class MultilabelMix(BaseWaveformTransform):
     ):
 
         batch_size, num_channels, num_samples = samples.shape
+
         snr_distribution = torch.distributions.Uniform(
             low=torch.tensor(
                 self.min_snr_in_db,
@@ -691,20 +340,51 @@ class MultilabelMix(BaseWaveformTransform):
                 device=samples.device,
             ),
             validate_args=True,
-        )
+        )  # sample uniformly from this distribution (low and high values)
 
         # randomize SNRs
         self.transform_parameters["snr_in_db"] = snr_distribution.sample(
             sample_shape=(batch_size,)
         )
 
-        # randomize index of second sample
-        self.transform_parameters["sample_idx"] = torch.randint(
-            0,
-            batch_size,
-            (batch_size,),
-            device=samples.device,
-        )
+        # randomize number of samples to mix for the entire batch
+        num_mixes = torch.randint(
+            1, self.max_samples + 1, (1,), device=samples.device
+        ).item()
+
+        self.transform_parameters["num_mixes"] = num_mixes
+
+        # Ensure the number of mixes is smaller than the batch size
+        # if num_mixes >= batch_size:
+        #     raise ValueError("The number of mixes must be smaller than the batch size.")
+        # randomize indices of samples to mix
+        # self.transform_parameters["sample_indices"] = torch.randint(
+        #     0,
+        #     batch_size,
+        #     (batch_size, num_mixes),
+        #     device=samples.device,
+        # )
+        # Generate random indices with the constraint
+        sample_indices = torch.empty((batch_size, num_mixes), dtype=torch.long)
+
+        for i in range(batch_size):
+            possible_indices = list(range(batch_size))
+
+            if len(possible_indices) > 1:  # avoid error if only one sample is chosen
+                possible_indices.remove(
+                    i
+                )  # Remove the current index to avoid self-mixing
+                sample_indices[i] = torch.tensor(
+                    [
+                        possible_indices[
+                            torch.randint(0, len(possible_indices), (1,)).item()
+                        ]
+                    ]
+                )
+            else:
+                # If there's only one sample, we can set the index to a default value or skip
+                sample_indices[i] = torch.tensor([0])
+        self.transform_parameters["sample_indices"] = sample_indices
 
     def apply_transform(
         self,
@@ -715,19 +395,43 @@ class MultilabelMix(BaseWaveformTransform):
     ) -> ObjectDict:
 
         snr = self.transform_parameters["snr_in_db"]
-        idx = self.transform_parameters["sample_idx"]
+        # idx = self.transform_parameters["sample_idx"]
+        num_mixes = self.transform_parameters["num_mixes"]
+        sample_indices = self.transform_parameters["sample_indices"]
 
-        background_samples = Audio.rms_normalize(samples[idx])
-        background_rms = calculate_rms(samples) / (10 ** (snr.unsqueeze(dim=-1) / 20))
-
-        mixed_samples = samples + background_rms.unsqueeze(-1) * background_samples
-
-        if targets is None:
+        mixed_samples = samples.clone()
+        if targets is not None:
+            mixed_targets = targets.clone()
+        else:
             mixed_targets = None
 
-        else:
-            background_targets = targets[idx]
-            mixed_targets = self._mix_target(targets, background_targets, snr)
+        batch_size, _, waveform_length = mixed_samples.shape
+
+        for i in range(num_mixes):
+            current_indices = sample_indices[:, i]
+            background_samples = Audio.rms_normalize(samples[current_indices])
+
+            idx = torch.randint(
+                0, waveform_length, (batch_size,), device=background_samples.device
+            )
+            arange = (
+                torch.arange(waveform_length, device=background_samples.device)
+                .unsqueeze(0)
+                .expand(batch_size, -1)
+            )
+            rolled_indices = (arange + idx.unsqueeze(1)) % waveform_length
+            background_samples = background_samples.squeeze(1)[
+                torch.arange(batch_size).unsqueeze(1), rolled_indices
+            ].unsqueeze(1)
+            background_rms = calculate_rms(mixed_samples) / (
+                10 ** (snr.unsqueeze(dim=-1) / 20)
+            )
+
+            mixed_samples += background_rms.unsqueeze(-1) * background_samples
+
+            if mixed_targets is not None:
+                background_targets = targets[current_indices]
+                mixed_targets = self._mix_target(mixed_targets, background_targets, snr)
 
         return ObjectDict(
             samples=mixed_samples,

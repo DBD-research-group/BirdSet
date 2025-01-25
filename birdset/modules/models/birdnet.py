@@ -20,7 +20,6 @@ class BirdNetModel(nn.Module):
         restrict_logits: bool = False,
         label_path: Optional[str] = None,
         pretrain_info: Optional[Dict] = None,
-        gpu_to_use: int = 0,
     ) -> None:
         """
         Initialize the BirdNetModel.
@@ -40,7 +39,6 @@ class BirdNetModel(nn.Module):
         self.train_classifier = train_classifier
         self.restrict_logits = restrict_logits
         self.label_path = label_path
-        self.gpu_to_use = gpu_to_use
 
         if pretrain_info:
             self.hf_path = pretrain_info["hf_path"]
@@ -53,15 +51,14 @@ class BirdNetModel(nn.Module):
         # self.classifier = nn.Linear(
         #     in_features=self.EMBEDDING_SIZE, out_features=num_classes
         # )
-        if self.train_classifier:
-            self.classifier = nn.Sequential(
-                nn.Linear(self.EMBEDDING_SIZE, 128),
-                nn.ReLU(),
-                nn.Dropout(0.5),
-                nn.Linear(128, 64),
-                nn.ReLU(),
-                nn.Linear(64, self.num_classes),
-            )
+        self.classifier = nn.Sequential(
+            nn.Linear(self.EMBEDDING_SIZE, 128),
+            nn.ReLU(),
+            nn.Dropout(0.5),
+            nn.Linear(128, 64),
+            nn.ReLU(),
+            nn.Linear(64, self.num_classes),
+        )
 
         self.load_model()
 
@@ -70,13 +67,7 @@ class BirdNetModel(nn.Module):
         Load the model from TensorFlow Hub.
         """
         physical_devices = tf.config.list_physical_devices("GPU")
-        tf.config.experimental.set_visible_devices(
-            physical_devices[self.gpu_to_use], "GPU"
-        )
-        tf.config.experimental.set_memory_growth(
-            physical_devices[self.gpu_to_use], True
-        )
-
+        tf.config.experimental.set_memory_growth(physical_devices[0], True)
         tf.config.optimizer.set_jit(True)
         self.model = tf.saved_model.load(self.model_path)  # Load the BirdNet model
 
@@ -179,21 +170,43 @@ class BirdNetModel(nn.Module):
         Returns:
             Tuple[torch.Tensor, torch.Tensor]: A tuple of two tensors (embeddings, logits).
         """
-        device = input_tensor.device  # Get the device of the input tensor
-        input_tensor = (
-            input_tensor.cpu().numpy()
-        )  # Move the tensor to the CPU and convert it to a NumPy array.
-        input_tensor = input_tensor.reshape([-1, input_tensor.shape[-1]])
 
-        # Process the single input_tensor as usual
-        # Run the model and get the outputs using the optimized TensorFlow function
-        outputs = self.run_tf_model(input_tensor=input_tensor)
+        max_length = 144000  # 3 seconds at 48kHz
+        overlap_length = 48000  # 1 second overlap
 
-        # Extract embeddings and logits, convert them to PyTorch tensors
-        embeddings = torch.from_numpy(outputs["embeddings"].numpy())
-        logits = torch.from_numpy(outputs["logits"].numpy())
-        embeddings = embeddings.to(device)  # Move back to previous device
-        logits = logits.to(device)
+        # Check if input_tensor is longer than 3 seconds
+        # TODO: Must be able to handle different audio lengths flexibly, currently only 5 second audios are supported!
+        if input_tensor.shape[1] > max_length:
+            # Calculate start indices for each segment
+            start_indices = [0, max_length - overlap_length]
+            outputs = []
+
+            # Process each segment
+            for start in start_indices:
+                end = start + max_length
+                segment = input_tensor[:, start:end]
+                output = self.run_tf_model(input_tensor=segment)
+                outputs.append(output)
+
+            # Combine logits from both segments by taking the maximum
+            logits_list = [
+                torch.from_numpy(output["logits"].numpy()) for output in outputs
+            ]
+            logits = torch.max(logits_list[0], logits_list[1])
+
+            # Combine embeddings from both segments by averaging
+            embeddings_list = [
+                torch.from_numpy(output["embeddings"].numpy()) for output in outputs
+            ]
+            embeddings = torch.mean(torch.stack(embeddings_list), dim=0)
+        else:
+            # Process the single input_tensor as usual
+            # Run the model and get the outputs using the optimized TensorFlow function
+            outputs = self.run_tf_model(input_tensor=input_tensor)
+
+            # Extract embeddings and logits, convert them to PyTorch tensors
+            embeddings = torch.from_numpy(outputs["embeddings"].numpy())
+            logits = torch.from_numpy(outputs["logits"].numpy())
 
         if self.class_mask:
             # Initialize full_logits to a large negative value for penalizing non-present classes

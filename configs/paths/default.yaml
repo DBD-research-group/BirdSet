@@ -7,7 +7,7 @@ output_dir: ${hydra:runtime.output_dir}
 
 # data directory
 #dataset_path: ${paths.root_dir}/data_birdset
-dataset_path: ${paths.root_dir}/data_birdset/${datamodule.dataset.dataset_name}
+dataset_path: ${paths.root_dir}/data_birdset/${datamodule.dataset.hf_name}
 model_path: ${paths.root_dir}/data_birdset/models/
 background_path: ${paths.root_dir}/data_birdset/background_noise/
 
