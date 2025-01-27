@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="2" time="70.622" timestamp="2025-01-27T14:11:22.253390+00:00" hostname="56803411d3ee"><testcase classname="tests.test_fast_dev_runs" name="test_experiment_command[HSN/DT/convnext.yaml]" time="50.761" /><testcase classname="tests.test_fast_dev_runs" name="test_experiment_command[HSN/DT/eat.yaml]" time="19.744"><failure message="Failed: birdset_neurips24/HSN/DT/eat.yaml failed with error: Seed set to 1&#10;/root/.cache/pypoetry/virtualenvs/birdset-MXnuhEyn-py3.10/lib/python3.10/site-packages/torch_audiomentations/utils/io.py:27: UserWarning: torchaudio._backend.set_audio_backend has been deprecated. With dispatcher enabled, this function is no-op. You can remove the function call.&#10;  torchaudio.set_audio_backend(&quot;soundfile&quot;)&#10;Using the latest cached version of the module from /root/.cache/huggingface/modules/datasets_modules/datasets/DBD-research-group--BirdSet/c6d7d1c30e4d8f29c4fb5e358bc605ccb896681b869398c54db64721f45ac91e (last modified on Mon Jan 27 13:56:59 2025) since it couldn't be found locally at DBD-research-group/BirdSet, or remotely on the Hugging Face Hub.&#10;&#10;sampling:   0%|          | 0/21 [00:00&lt;?, ?it/s]&#10;sampling:  10%|▉         | 2/21 [00:00&lt;00:01, 16.72it/s]&#10;sampling:  52%|█████▏    | 11/21 [00:00&lt;00:00, 50.65it/s]&#10;sampling:  81%|████████  | 17/21 [00:01&lt;00:00, 12.42it/s]&#10;sampling: 100%|██████████| 21/21 [00:01&lt;00:00, 10.33it/s]&#10;sampling: 100%|██████████| 21/21 [00:01&lt;00:00, 12.32it/s]&#10;Using 16bit Automatic Mixed Precision (AMP)&#10;Trainer already configured with model summary callbacks: [&lt;class 'lightning.pytorch.callbacks.rich_model_summary.RichModelSummary'&gt;]. Skipping setting a default `ModelSummary` callback.&#10;GPU available: True (cuda), used: True&#10;TPU available: False, using: 0 TPU cores&#10;IPU available: False, using: 0 IPUs&#10;HPU available: False, using: 0 HPUs&#10;Running in `fast_dev_run` mode: will run the requested loop using 1 batch(es). Logging and checkpointing is suppressed.&#10;Using the latest cached version of the module from /root/.cache/huggingface/modules/datasets_modules/datasets/DBD-research-group--BirdSet/c6d7d1c30e4d8f29c4fb5e358bc605ccb896681b869398c54db64721f45ac91e (last modified on Mon Jan 27 13:56:59 2025) since it couldn't be found locally at DBD-research-group/BirdSet, or remotely on the Hugging Face Hub.&#10;Using the latest cached version of the module from /root/.cache/huggingface/modules/datasets_modules/datasets/DBD-research-group--BirdSet/c6d7d1c30e4d8f29c4fb5e358bc605ccb896681b869398c54db64721f45ac91e (last modified on Mon Jan 27 13:56:59 2025) since it couldn't be found locally at DBD-research-group/BirdSet, or remotely on the Hugging Face Hub.&#10;Error executing job with overrides: ['experiment=birdset_neurips24/HSN/DT/eat.yaml', 'trainer.fast_dev_run=True']&#10;Error in call to target 'birdset.modules.models.eat_soundnet.SoundNet':&#10;TypeError(&quot;SoundNet.__init__() got an unexpected keyword argument 'num_classes'&quot;)&#10;full_key: module.network.model&#10;&#10;Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.">experiment = 'birdset_neurips24/HSN/DT/eat.yaml'
+command = ['python', 'birdset/train.py', 'experiment=birdset_neurips24/HSN/DT/eat.yaml', 'trainer.fast_dev_run=True']
+
+    @pytest.mark.parametrize(
+        "experiment,command",
+        commands.items(),
+        ids=["/".join(exp.split("/")[-3:]) for exp in commands.keys()],
+    )
+    def test_experiment_command(experiment, command):
+        """
+        Test the execution of training commands for different experiments.
+    
+        Parameters:
+        - experiment: The experiment configuration file path (used to construct the command).
+        - command: The complete command to be executed, including the experiment parameter.
+    
+        The test ensures:
+        1. The command runs successfully without errors.
+        2. The return code is zero, indicating successful execution.
+    
+        If the command fails:
+        - `pytest.fail` is called with detailed error output for debugging.
+        """
+        try:
+&gt;           result = subprocess.run(command, check=True, capture_output=True, text=True)
+
+tests/test_fast_dev_runs.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['python', 'birdset/train.py', 'experiment=birdset_neurips24/HSN/DT/eat.yaml', 'trainer.fast_dev_run=True'],)
+kwargs = {'stderr': -1, 'stdout': -1, 'text': True}
+process = &lt;Popen: returncode: 1 args: ['python', 'birdset/train.py', 'experiment=birds...&gt;
+stdout = "[\x1b[36m2025-01-27 14:12:18,992\x1b[0m][\x1b[34m__main__\x1b[0m][\x1b[32mINFO\x1b[0m] - Using config: \ntask_name: t... 2025) since it couldn't be found locally at DBD-research-group/BirdSet, or remotely on the Hugging Face Hub.\x1b[0m\n"
+stderr = 'Seed set to 1\n/root/.cache/pypoetry/virtualenvs/birdset-MXnuhEyn-py3.10/lib/python3.10/site-packages/torch_audioment...s\'")\nfull_key: module.network.model\n\nSet the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.\n'
+retcode = 1
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output &amp; stderr attributes if those streams
+        were captured.
+    
+        If timeout is given, and the process takes too long, a TimeoutExpired
+        exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+&gt;               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['python', 'birdset/train.py', 'experiment=birdset_neurips24/HSN/DT/eat.yaml', 'trainer.fast_dev_run=True']' returned non-zero exit status 1.
+
+/usr/lib/python3.10/subprocess.py:526: CalledProcessError
+
+During handling of the above exception, another exception occurred:
+
+experiment = 'birdset_neurips24/HSN/DT/eat.yaml'
+command = ['python', 'birdset/train.py', 'experiment=birdset_neurips24/HSN/DT/eat.yaml', 'trainer.fast_dev_run=True']
+
+    @pytest.mark.parametrize(
+        "experiment,command",
+        commands.items(),
+        ids=["/".join(exp.split("/")[-3:]) for exp in commands.keys()],
+    )
+    def test_experiment_command(experiment, command):
+        """
+        Test the execution of training commands for different experiments.
+    
+        Parameters:
+        - experiment: The experiment configuration file path (used to construct the command).
+        - command: The complete command to be executed, including the experiment parameter.
+    
+        The test ensures:
+        1. The command runs successfully without errors.
+        2. The return code is zero, indicating successful execution.
+    
+        If the command fails:
+        - `pytest.fail` is called with detailed error output for debugging.
+        """
+        try:
+            result = subprocess.run(command, check=True, capture_output=True, text=True)
+            assert result.returncode == 0, f"Non-zero return code for {experiment}"
+        except subprocess.CalledProcessError as e:
+&gt;           pytest.fail(f"{experiment} failed with error: {e.stderr}")
+E           Failed: birdset_neurips24/HSN/DT/eat.yaml failed with error: Seed set to 1
+E           /root/.cache/pypoetry/virtualenvs/birdset-MXnuhEyn-py3.10/lib/python3.10/site-packages/torch_audiomentations/utils/io.py:27: UserWarning: torchaudio._backend.set_audio_backend has been deprecated. With dispatcher enabled, this function is no-op. You can remove the function call.
+E             torchaudio.set_audio_backend("soundfile")
+E           Using the latest cached version of the module from /root/.cache/huggingface/modules/datasets_modules/datasets/DBD-research-group--BirdSet/c6d7d1c30e4d8f29c4fb5e358bc605ccb896681b869398c54db64721f45ac91e (last modified on Mon Jan 27 13:56:59 2025) since it couldn't be found locally at DBD-research-group/BirdSet, or remotely on the Hugging Face Hub.
+E           
+E           sampling:   0%|          | 0/21 [00:00&lt;?, ?it/s]
+E           sampling:  10%|▉         | 2/21 [00:00&lt;00:01, 16.72it/s]
+E           sampling:  52%|█████▏    | 11/21 [00:00&lt;00:00, 50.65it/s]
+E           sampling:  81%|████████  | 17/21 [00:01&lt;00:00, 12.42it/s]
+E           sampling: 100%|██████████| 21/21 [00:01&lt;00:00, 10.33it/s]
+E           sampling: 100%|██████████| 21/21 [00:01&lt;00:00, 12.32it/s]
+E           Using 16bit Automatic Mixed Precision (AMP)
+E           Trainer already configured with model summary callbacks: [&lt;class 'lightning.pytorch.callbacks.rich_model_summary.RichModelSummary'&gt;]. Skipping setting a default `ModelSummary` callback.
+E           GPU available: True (cuda), used: True
+E           TPU available: False, using: 0 TPU cores
+E           IPU available: False, using: 0 IPUs
+E           HPU available: False, using: 0 HPUs
+E           Running in `fast_dev_run` mode: will run the requested loop using 1 batch(es). Logging and checkpointing is suppressed.
+E           Using the latest cached version of the module from /root/.cache/huggingface/modules/datasets_modules/datasets/DBD-research-group--BirdSet/c6d7d1c30e4d8f29c4fb5e358bc605ccb896681b869398c54db64721f45ac91e (last modified on Mon Jan 27 13:56:59 2025) since it couldn't be found locally at DBD-research-group/BirdSet, or remotely on the Hugging Face Hub.
+E           Using the latest cached version of the module from /root/.cache/huggingface/modules/datasets_modules/datasets/DBD-research-group--BirdSet/c6d7d1c30e4d8f29c4fb5e358bc605ccb896681b869398c54db64721f45ac91e (last modified on Mon Jan 27 13:56:59 2025) since it couldn't be found locally at DBD-research-group/BirdSet, or remotely on the Hugging Face Hub.
+E           Error executing job with overrides: ['experiment=birdset_neurips24/HSN/DT/eat.yaml', 'trainer.fast_dev_run=True']
+E           Error in call to target 'birdset.modules.models.eat_soundnet.SoundNet':
+E           TypeError("SoundNet.__init__() got an unexpected keyword argument 'num_classes'")
+E           full_key: module.network.model
+E           
+E           Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.
+
+tests/test_fast_dev_runs.py:54: Failed</failure></testcase></testsuite></testsuites>
