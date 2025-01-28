@@ -14,6 +14,6 @@ module:
       checkpoint: DBD-research-group/ConvNeXT-Base-BirdSet-XCL
       classifier:
         _target_: biofoundation.modules.models.linear_classifier.LinearClassifier
-        num_classes: ${datamodule.dataset.num_classes}
+        num_classes: ${module.network.model.num_classes}
         in_features: ${module.network.embedding_size}
     model_name: convnext_bs
