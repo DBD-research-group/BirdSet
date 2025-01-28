@@ -1,0 +1,34 @@
+model:
+  _target_: biofoundation.modules.models.wav2vec2.Wav2vec2SequenceClassifier
+  checkpoint: facebook/wav2vec2-base
+  local_checkpoint: null
+  num_classes: null
+  cache_dir: ${paths.model_path}
+
+  pretrain_info:
+    hf_path: ${datamodule.dataset.hf_path}
+    hf_name: ${datamodule.dataset.hf_name}
+    hf_pretrain_name: null
+    valid_test_only: False
+
+model_name: wav2vec2
+model_type: waveform
+torch_compile: False
+sampling_rate: 16_000
+normalize_spectrogram: False
+normalize_waveform: instance_normalization
+embedding_size: 768
+length: 15
+
+
+
+
+
+
+
+
+
+
+
+
+

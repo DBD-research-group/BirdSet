@@ -1,0 +1,46 @@
+_target_: birdset.modules.multilabel_module.MultilabelModule
+
+defaults:
+  - _self_
+
+#embedding_model: perch_logreg.yaml
+
+network:
+  model:
+    _target_: biofoundation.modules.models.linear_classifier.LinearClassifier
+    in_features: ${datamodule.embedding_model.embedding_size}
+
+  model_name: ${datamodule.embedding_model.model_name}_embedding # Most values are just taken from embedding model as it is the first part
+  model_type: ${datamodule.embedding_model.model_type}
+  torch_compile: ${datamodule.embedding_model.torch_compile}
+  sampling_rate: ${datamodule.embedding_model.sampling_rate}
+  normalize_spectrogram: ${datamodule.embedding_model.normalize_spectrogram}
+  normalize_waveform: ${datamodule.embedding_model.normalize_waveform} 
+
+task: multilabel
+#class_weights_loss: ${datamodule.dataset.class_weights_loss}
+num_gpus: ${trainer.devices}
+
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 1e-2
+  _partial_: true
+  weight_decay: 5e-4
+
+loss:
+  _target_: torch.nn.BCEWithLogitsLoss
+
+metrics: 
+  _target_: biofoundation.modules.metrics.multiclass.GhaniMetricsConfig # Temporary solution 
+  num_labels: ${datamodule.dataset.n_classes}
+
+output_activation: 
+  _target_: "torch.sigmoid"
+  _partial_: true
+
+logging_params:
+  _target_: birdset.modules.base_module.LoggingParamsConfig 
+  on_step: False
+  on_epoch: True
+  sync_dist: False
+  prog_bar: True  

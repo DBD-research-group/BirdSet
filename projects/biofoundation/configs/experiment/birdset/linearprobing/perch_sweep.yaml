@@ -1,0 +1,31 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - biofoundation/birdset/linearprobing/linearprobing_config.yaml 
+  - override /module/network: perch_logreg.yaml  
+
+tags: ["biofoundation", "perch", "linearprobing", "augs_birdset"]
+
+trainer:
+  devices: 1
+
+module:
+  network:
+    model:
+      gpu_to_use: null # For automatically using the first available GPU (Sweep compatible)
+      #classifier: 
+        #_target_: "torch.nn.Sequential"
+        #_args_:
+          #- _target_: "torch.nn.Linear"
+            #in_features: ${module.network.embedding_size}
+            #out_features: 128
+          #- _target_: "torch.nn.ReLU"
+          #- _target_: "torch.nn.Dropout"
+            #p: 0.5
+          #- _target_: "torch.nn.Linear"
+            #in_features: 128
+            #out_features: 64
+          #- _target_: "torch.nn.ReLU"
+          #- _target_: "torch.nn.Linear"
+            #in_features: 64
+            #out_features: ${module.network.model.num_classes}

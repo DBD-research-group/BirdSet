@@ -1,13 +1,45 @@
 # BioFoundation
 
+# $\texttt{BirdSet}$ - A Dataset for Audio Classification in Avian Bioacoustics 🤗
 [![python](https://img.shields.io/badge/-Python_3.10-blue?logo=python&logoColor=white)](https://github.com/pre-commit/pre-commit)
+<a href="https://huggingface.co/"><img alt="Hugging Face" src="https://img.shields.io/badge/HuggingFace-ffcc00?logo=huggingface&logoColor=white"></a>
 <a href="https://pytorch.org/get-started/locally/"><img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-ee4c2c?logo=pytorch&logoColor=white"></a>
-<a href="https://pytorchlightning.ai/"><img alt="Lightning" src="https://img.shields.io/badge/-Lightning-792ee5?logo=pytorchlightning&logoColor=white"></a>
+<a href="https://www.pytorchlightning.ai/"><img alt="PyTorch Lightning" src="https://img.shields.io/badge/PyTorch_Lightning-792ee5?logo=pytorch-lightning&logoColor=white"></a>
 <a href="https://hydra.cc/"><img alt="Config: Hydra" src="https://img.shields.io/badge/Config-Hydra-89b8cd"></a>
 
 
-Deep learning models have emerged as a powerful tool in avian bioacoustics to assess environmental health. To maximize the potential of cost-effective and minimal-invasive passive acoustic monitoring (PAM), models must analyze bird vocalizations across a wide range of species and environmental conditions. However, data fragmentation challenges a evaluation of generalization performance. Therefore, we introduce the $\texttt{BirdSet}$ dataset, comprising approximately 520,000 global bird recordings for training and over 400 hours PAM recordings for testing.
-## User Installation
+  <img src="https://github.com/DBD-research-group/BirdSet/blob/main/resources/graphical_abstract.png" alt="logo", width=950>
+</div>
+
+<br>
+
+**TL;DR**
+> - Explore our **datasets** shared on Hugging Face 🤗 in the [BirdSet repository](https://huggingface.co/datasets/DBD-research-group/BirdSet).
+> - This accompanying **code** provides comprehensive support tool for data preparation, model training, and evaluation. 
+> - Participate in our Hugging Face [leaderboard](https://huggingface.co/spaces/DBD-research-group/BirdSet-Leaderboard) by submitting new results and comparing performance across models.
+> - Access our pre-trained [model checkpoints](https://huggingface.co/collections/DBD-research-group/birdset-dataset-and-models-665ef710a28cbe70dfaa028a) on Hugging Face, ready to fine-tune or evaluate for various tasks.
+> - A Q&A section is included at the end of this README. If you have further questions or encounter any issues, please raise an issue. 
+<br>
+
+<div align="center">
+  
+|                            | **Task**                                     | **Description** | **# Train Recordings** | **# Test\_5s Segments** | **Pielou’s evenness J** | **# Species**   |
+|----------------------------|----------------------------------------------|-----------------|-----------|--------------|-------|----------|
+| **Large Train**                  | [XCL](https://xeno-canto.org/)               | Complete Xeno-Canto snapshot with focals for large (pre-) training.                | 528,434   | -            | -     | 9,734    |
+|                            | [XCM](https://xeno-canto.org/)               | Smaller subset of XCL only containing focals of bird species available in test datasets.                 | 89,798    | -            | -     | 409      |
+| **Auxiliary**              | [POW](https://zenodo.org/records/4656848)    | Powdermill Nature soundscape validation dataset and class-dedicated focal training subset of XCL.     | 14,911    | 4,560        | 0.66  | 48       |
+|                            | [VOX](https://zenodo.org/records/1208080)    | BirdVox-DCASE soundscape background dataset without bird vocalizations.              | 20,331    | -            | -     | -        |
+| **Test & Dedicated Train** | [PER](https://zenodo.org/records/7079124) | Amazon Basin soundscape test dataset and class-dedicated focal training subset.                 | 16,802    | 15,120       | 0.78  | 132      |
+|        Train Subsets XCL!                    | [NES](https://zenodo.org/records/7525349)    |  Columbia Costa Rica soundscape test dataset and class-dedicated focal training subset.               | 16,117    | 24,480       | 0.76  | 89       |
+|                            | [UHH](https://zenodo.org/records/7078499)    |  Hawaiian Islands soundscape test dataset and class-dedicated focal training subset.               | 3,626     | 36,637       | 0.64  | 25       |
+|                            | [HSN](https://zenodo.org/records/7525805)    |  High Sierras Nevada soundscape test dataset and class-dedicated focal training subset.               | 5,460     | 12,000       | 0.54  | 21       |
+|                            | [NBP](https://link-to-birddb)                |  NIPS4BPlus test dataset and class-dedicated focal training subset.               | 24,327    | 563          | 0.92  | 51       |
+|                            | [SSW](https://zenodo.org/records/7018484)    |  Sapsucker Woods soundscape test dataset and class-dedicated focal training.               | 28,403    | 205,200      | 0.77  | 81       |
+|                            | [SNE](https://zenodo.org/records/7050014)    |  Sierre Nevada soundscape test dataset and class-dedicated focal training subset.               | 19,390    | 23,756       | 0.70  | 56       |
+
+</div>
+
+## User Installation 🐣
 
 ### Devcontainer
 
@@ -117,7 +149,7 @@ On the BirdSet benchmark we run three different experiments:
 ### Running Fine-tuning Experiments on BirdSet
 
 ```bash
-python birdset/train.py experiment=biofoundation/birdset/finetuning/{model_name}
+./projects/biofoundation/train.sh experiment=birdset/finetuning/{model_name}
 ```
 
 #### Results
@@ -143,7 +175,7 @@ Results on HSN:
 ### Running Linear Probing Experiments on BirdSet
 
 ```bash
-python birdset/train.py experiment=biofoundation/birdset/linearprobing/{model_name}
+./projects/biofoundation/train.sh experiment=birdset/linearprobing/{model_name}
 ```
 
 Results on HSN:
@@ -168,7 +200,7 @@ Results on HSN:
 ### Running FewShot Experiments on BirdSet
 
 ```bash
-python birdset/train.py experiment=biofoundation/birdset/fewshot/{model_name}
+./projects/biofoundation/train.sh experiment=birdset/fewshot/{model_name}
 ```
 
 Results on HSN with 32 samples per class:
@@ -189,6 +221,86 @@ Results on HSN with 32 samples per class:
 | SSAST| 0.032 | 0.46 | [ssast_HSN#1_2024-12-01_174950](https://wandb.ai/deepbirddetect/BioFoundation/runs/ssast_fewshot_BirdSet_HSN_1_2024-12-01_174950) |
 | EAT_SSL| 0.02 | 0.30 | [eat_ssl_HSN#1_2024-12-01_180844](https://wandb.ai/deepbirddetect/BioFoundation/runs/eat_ssl_fewshot_BirdSet_HSN_1_2024-12-01_180844) |
 | Wav2Vec2| 0.03 | 0.47 | [wav2vec2_HSN#1_2024-11-29_172107](https://wandb.ai/deepbirddetect/BioFoundation/runs/wav2vec2_fewshot_BirdSet_HSN_1_2024-11-29_172107) |
+| BirdNET| ? | ? | ? |
+
+## BEANS
+
+On the BEANS benchmark we also run the three different experiments but in a multiclass scenario:
+
+### Running Fine-tuning Experiments on BEANS
+
+```bash
+./projects/biofoundation/train.sh experiment=beans/finetuning/{model_name}
+```
+
+#### Results
+
+Results on Watkins:
+
+| Model | T1 | AUROC | Wandb |
+|-------| -------| ---- | ---- |
+| BEATs| 0.91 | 0.99 | [BEATs_finetune_BEANS_beans_watkins_1_2025-01-02_142041](https://wandb.ai/deepbirddetect/BioFoundation/runs/BEATs_finetune_BEANS_beans_watkins_1_2025-01-02_142041) |
+| BioLingual|0.88 | 0.98 | [biolingual_finetune_beans_watkins_1_2025-01-04_164323](https://wandb.ai/deepbirddetect/BioFoundation/runs/biolingual_finetune_beans_watkins_1_2025-01-04_164323) |
+| ConvNext| 0.89 | 0.99 | [convnext_finetune_beans_watkins_1_2025-01-04_173811](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_finetune_beans_watkins_1_2025-01-04_173811) |
+| EAT| 0.76 | 0.98 | [eat_finetune_beans_watkins_1_2025-01-06_122645](https://wandb.ai/deepbirddetect/BioFoundation/runs/eat_finetune_beans_watkins_1_2025-01-06_122645) |
+| AVES| 0.76 | 0.98 | [aves_finetune_beans_watkins_1_2025-01-06_123523](https://wandb.ai/deepbirddetect/BioFoundation/runs/aves_finetune_beans_watkins_1_2025-01-06_123523) |
+| AST|0.73 | 0.98 | [ast_finetune_beans_watkins_1_2025-01-09_122523](https://wandb.ai/deepbirddetect/BioFoundation/runs/ast_finetune_beans_watkins_1_2025-01-09_122523) |
+| AudioMAE| 0.73 | 0.98 | [audio_mae_finetune_beans_watkins_1_2025-01-06_135838](https://wandb.ai/deepbirddetect/BioFoundation/runs/audio_mae_finetune_beans_watkins_1_2025-01-06_135838) |
+| ConvNext_BS| 0.89 | 0.99 | [convnext_bs_finetune_beans_watkins_1_2025-01-06_120053](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_bs_finetune_beans_watkins_1_2025-01-06_120053) |
+| HUBERT| 0.85 | 0.99 | [hubert_finetune_beans_watkins_1_2025-01-09_140320](https://wandb.ai/deepbirddetect/BioFoundation/runs/hubert_finetune_beans_watkins_1_2025-01-09_140320) |
+| SSAST| 0.79 | 0.98 | [ssast_finetune_beans_watkins_1_2025-01-09_142902](https://wandb.ai/deepbirddetect/BioFoundation/runs/ssast_finetune_beans_watkins_1_2025-01-09_142902) |
+| EAT_SSL| 0.84 | 0.99 | [eat_ssl_finetune_beans_watkins_1_2025-01-04_161731](https://wandb.ai/deepbirddetect/BioFoundation/runs/eat_ssl_finetune_beans_watkins_1_2025-01-04_161731) |
+| Wav2Vec2| 0.81 | 0.98 | [wav2vec2_finetune_beans_watkins_1_2025-01-09_145847](https://wandb.ai/deepbirddetect/BioFoundation/runs/wav2vec2_finetune_beans_watkins_1_2025-01-09_145847) [Weird run](https://wandb.ai/deepbirddetect/BioFoundation/runs/wav2vec2_finetune_beans_watkins_1_2025-01-09_152442)|
+
+### Running Linear Probing Experiments on BEANS
+
+```bash
+./projects/biofoundation/train.sh experiment=beans/linearprobing/{model_name}
+```
+
+Results on Watkins:
+
+| Model | T1 | AUROC | Wandb |
+|-------| -------| ---- | ---- |
+| BEATs| 0.86 | 0.99 | [BEATs_default#1_2025-01-02_144748](https://wandb.ai/deepbirddetect/BioFoundation/runs/BEATs_linearprobing_BEANS_beans_watkins_1_2025-01-02_144748) |
+| BioLingual|? | ? | ? |
+| Perch |0.81 | 0.99 | [perch_linearprobing_beans_watkins_5_2025-01-10_164918](https://wandb.ai/deepbirddetect/BioFoundation/runs/perch_linearprobing_beans_watkins_5_2025-01-10_164918) |
+| ConvNext| 0.68 | 0.97 | [convnext_linearprobing_beans_watkins_1_2025-01-10_170347](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_linearprobing_beans_watkins_1_2025-01-10_170347) |
+| EAT| 0.67 | 0.97 | [eat_linearprobing_beans_watkins_1_2025-01-10_174439](https://wandb.ai/deepbirddetect/BioFoundation/runs/eat_linearprobing_beans_watkins_1_2025-01-10_174439) |
+| AVES| 0.61 | 0.96 | [aves_linearprobing_beans_watkins_1_2025-01-16_115408](https://wandb.ai/deepbirddetect/BioFoundation/runs/aves_linearprobing_beans_watkins_1_2025-01-16_115408) |
+| AST|0.50 | 0.94 | [ast_linearprobing_beans_watkins_1_2025-01-16_121501](https://wandb.ai/deepbirddetect/BioFoundation/runs/ast_linearprobing_beans_watkins_1_2025-01-16_121501) |
+| AudioMAE| 0.14 | 0.76 | [audio_mae_linearprobing_beans_watkins_1_2025-01-16_123844](https://wandb.ai/deepbirddetect/BioFoundation/runs/audio_mae_linearprobing_beans_watkins_1_2025-01-16_123844) |
+| ConvNext_BS| 0.70 | 0.98 | [convnext_bs_linearprobing_beans_watkins_1_2025-01-16_124814](https://wandb.ai/deepbirddetect/BioFoundation/runs/convnext_bs_linearprobing_beans_watkins_1_2025-01-16_124814) |
+| HUBERT| 0.60 | 0.96 | [hubert_linearprobing_beans_watkins_1_2025-01-16_130349](https://wandb.ai/deepbirddetect/BioFoundation/runs/hubert_linearprobing_beans_watkins_1_2025-01-16_130349) |
+| SSAST| 0.40 | 0.92 | [ssast_linearprobing_beans_watkins_1_2025-01-16_134535](https://wandb.ai/deepbirddetect/BioFoundation/runs/ssast_linearprobing_beans_watkins_1_2025-01-16_134535) |
+| EAT_SSL| 0.70 | 0.97 | [eat_ssl_linearprobing_beans_watkins_1_2025-01-09_173305](https://wandb.ai/deepbirddetect/BioFoundation/runs/eat_ssl_linearprobing_beans_watkins_1_2025-01-09_173305) |
+| Wav2Vec2| 0.52 | 0.93 | [wav2vec2_linearprobing_beans_watkins_1_2025-01-16_132404](https://wandb.ai/deepbirddetect/BioFoundation/runs/wav2vec2_linearprobing_beans_watkins_1_2025-01-16_132404) |
+| BirdNET| ? | ? | We didn't test Birdset on this but could easily be added |
+
+### Running FewShot Experiments on BEANS
+
+```bash
+./projects/biofoundation/train.sh experiment=beans/fewshot/{model_name}
+```
+
+Results on HSN with 32 samples per class:
+
+
+| Model | T1 | AUROC | Wandb |
+|-------| -------| ---- | ---- |
+| BEATs| ? | ? | ? |
+| BioLingual|? | ? | ? |
+| Perch | ? | ? | ? |
+| ConvNext| ? | ? | ? |
+| EAT| ? | ? | ? |
+| AVES| ? | ? | ? |
+| AST|? | ? | ? |
+| AudioMAE| ? | ? | ? |
+| ConvNext_BS| ? | ? | ? |
+| HUBERT| ? | ? | ? |
+| SSAST| ? | ? | ? |
+| EAT_SSL| ? | ? | ? |
+| Wav2Vec2| ? | ? | ? |
 | BirdNET| ? | ? | ? |
 
 ## Example
@@ -266,12 +378,54 @@ trainer.fit(model, dm)
 | <sub>Title</sub> | <sub>Notes</sub> |<sub>PER</sub> | <sub>NES</sub> | <sub>UHH</sub> | <sub>HSN</sub> | <sub>NBP</sub> | <sub>POW</sub> | <sub>SSW</sub> | <sub>SNE</sub>  | <sub>Overall</sub> | <sub>Code</sub> |
 | :----| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | <sub>**BirdSet: A Multi-Task Benchmark For Classification In Avian Bioacoustics**</sub> | | | | | | | |
-| <sub>**BIRB: A Generalization Benchmark for Information Retrieval in Bioacoustics**</sub> | | | | | | | |  | | | |-->
+| <sub>**BIRB: A Generalization Benchmark for Information Retrieval in Bioacoustics**</sub> | | | | | | | |  | | | |
 ## Logging
 Logs will be written to [Weights&Biases](https://wandb.ai/) by default.
-
+-->
 ## Background noise
 To enhance model performance we mix in additional background noise from downloaded from the [DCASE18](https://dcase.community/challenge2018/index). To download the files and convert them to the correct format, run the notebook 'download_background_noise.ipynb' in the 'notebooks' folder.
+
+
+## Reproduce Baselines
+
+First, you have to download the background noise files for augmentations
+
+``` bash
+python resources/utils/download_background_noise.py
+```
+
+We provide all experiment YAML files used to generate our results in the path `birdset/configs/experiment/birdset_neurips24`. For each dataset, we specify the parameters for all training scenario: `DT`, `MT`, and `LT`
+
+### Dedicated Training (DT)
+
+The experiments for `DT` with the dedicated subset can be easily run with a single line: 
+
+``` bash
+python birdset/train.py experiment="birdset_neurips24/DT/$Model"
+```
+
+### Medium Training (MT) and Large Training (LT)
+Experiments for training scenarios `MT` and `LT` are harder to reproduce since they require more extensive training times. 
+Additionally, the datasets are quite large (90GB for XCM and 480GB for XCL). Therefore, we provide the best model checkpoints via Hugging Face in the experiment files to avoid the need for retraining.
+These checkpoints can be executed by running the evaluation script, which will automatically download the model and perform inference on the test datasets:
+
+``` bash
+python birdset/eval.py experiment="birdset_neurips24/$EXPERIMENT_PATH"
+```
+
+If you want to start the large-scale trainings and download the big training datasets, you can also employ the `XCM` and `XCL` trainings via the experiment YAML files. 
+
+``` bash
+python birdset/train.py experiment="birdset_neurips24/$EXPERIMENT_PATH"
+```
+After training, the best model checkpoint is saved based on the validation loss and can then be used for inference:
+
+``` bash
+python birdset/eval.py experiment="birdset_neurips24/$EXPERIMENT_PATH" module.model.network.local_checkpoint="$CHECKPOINT_PATH"
+```
+
+
+
 
 ## Run experiments
 
@@ -280,16 +434,139 @@ Our experiments are defined in the `configs/experiment` folder. To run an experi
 ``` bash
 python birdset/train.py experiment="EXPERIMENT_PATH"
 ```
-Replace `EXPERIMENT_PATH` with the path to the disired experiment YAML config originating from the `experiment` directory. For example, here's a command for training an EfficientNet on HSN: 
+
+Replace `EXPERIMENT_PATH` with the path to the experiment YAML config originating from the `experiment` directory. Here's a command for training an EfficientNet on HSN: 
 
 ``` bash
-python bridset/train.py experiment="local/HSN/efficientnet.yaml"
+python birdset/train.py experiment="local/HSN/efficientnet.yaml"
 ```
 
+
+## Q&A
+
+#### **How to access the label names in the datasets?**
+The class names are available in the Hugging Face datasets (with the [ClassLabel Feature](https://huggingface.co/docs/datasets/v3.1.0/en/package_reference/main_classes#datasets.ClassLabel))
+
+```python
+from datasets import load_dataset
+
+dataset = load_dataset(
+    "DBD-research-group/BirdSet", 
+    "HSN", 
+    cache_dir="the directory you used", 
+    num_proc=1, 
+    #revision="629b54c06874b6d2fa886e1c0d73146c975612d0" <-- if your cache directory is correct and a new download is starting,
+    #you can use this revision (we added some metadata ~2 days ago which forces a redownload). if not, ignore this
+)
+
+dataset["train"].features["ebird_code"]
+```
+This should be the output: 
+```
+ClassLabel(names=['gcrfin', 'whcspa', 'amepip', 'sposan', 'rocwre', 'brebla', 'daejun', 'foxspa', ...], id=None)
+```
+These ebird codes should correspond to the respective columns in the label matrix. 
+You could also `ds.features["label"].int2str(0)`
+
+Additionally you can find JSON files containing `id2label` and `label2id` dictionaries for each dataset under the [resources/ebird_codes](https://github.com/DBD-research-group/BirdSet/tree/main/resources/ebird_codes) directory in the git repository.
+
+[Issue](https://github.com/DBD-research-group/BirdSet/issues/280)
+
+-------
+#### **How to access the label names of the pre-trained models?**
+The class list of pre-trained models corresponds to the datasets they were trained on (same indices). To get the class list, you can visit this [link on HF](https://huggingface.co/datasets/DBD-research-group/BirdSet/blob/main/classes.py) or use the following code example:
+
+```python
+
+import datasets 
+
+dataset_meta = datasets.load_dataset_builder("dbd-research-group/BirdSet", "XCL")
+dataset_meta.info.features["ebird_code"]
+```
+
+We have also added class information to the models on HF. You can find them in the config of the respective models. To access the model config you can refer to the following code snippet:
+
+```python
+
+from transformers import ConvNextForImageClassification
+
+# load model
+model = ConvNextForImageClassification.from_pretrained("DBD-research-group/ConvNeXT-Base-BirdSet-XCL")
+
+# access label dicts
+model.config.id2label # or model.config.label2id depending on what you need
+
+```
+
+`id2label` and `label2id` are dictionaries so to access a specific element you can do this:
+
+```python
+
+model.config.id2label[0]
+
+```
+
+In the case of XCL this should output `ostric2`.
+
+**Please note:** Changing the last layer in any way (e.g. changing the output layer to 21 classes to fine-tune on HSN) will remove or invalidate that label information from the configs. In that case you will need to get that information differently. In case of BirdSet datasets you can look under [resources/ebird_codes](https://github.com/DBD-research-group/BirdSet/tree/main/resources/ebird_codes). The json files in that directory contain `label2id` and `id2label` dicts for every dataset.
+
+-------
+#### **Why are the datasets larger than expected? (should only apply to downloads before 05-12-2024! fixed)**
+
+Currently, our HF builder script extracts all zipped files to ensure clear file paths while retaining the original zipped files. This results in increased storage requirements.
+
+_Example_:  
+For the largest dataset, `XCL`, the zipped files are approximately 480GB. However, due to the extraction process, you’ll need around 990GB of available disk space. After the extraction, the zipped files will account for roughly 510GB.  
+
+*Quick Workaround*:  
+After extraction, you can delete unnecessary files by running in `XCL/downloads/`
+```bash
+find . -mindepth 1 -maxdepth 1 ! -name 'extracted' -exec rm -rfv {} +
+```
+**This issue is fixed, more information: see Q below.**
+
+------
+#### **Hugging Face downloads the dataset again even though I already downloaded it**
+We made a samll update fixing [Issue 267: Data download size descrepancy](https://github.com/DBD-research-group/BirdSet/issues/267) on **05-12-2024**:
+- **This only works for datasets<3.0.0!**
+- TL;DR: During the extraction process, unnecessary archives are now removed immediately. This reduces the required disk space by *half*, now aligning it with the table below.
+- If you downloaded the data between this and last update and don't want to redownload yet, you can use the following `revision=b0c14a03571a7d73d56b12c4b1db81952c4f7e64`:
+```python
+from datasets import load_dataset
+ds = load_dataset("DBD-research-group/BirdSet", "HSN", trust_remote_code=True, revision="b0c14a03571a7d73d56b12c4b1db81952c4f7e64")
+```
+
+We made a small update to the metadata on **27-11-2024**: 
+
+- Additional bird taxonomy metadata, including "Genus," "Species Group," and "Order," is provided using the 2021 eBird taxonomy, consistent with the taxonomy used for the 'ebird_code' data. These metadata fields follow the same format and encoding as 'ebird_code' and 'ebird_code_multilabel'. Further explanation can be found on our Hugging Face [BirdSet repository](https://huggingface.co/datasets/DBD-research-group/BirdSet).
+
+- If you don't require the additional taxonomy and prefer to **avoid re-downloading all files**, you can specify the previous revision directly in load_dataset as follows:
+
+```python
+from datasets import load_dataset
+ds = load_dataset("DBD-research-group/BirdSet", "HSN", trust_remote_code=True, revision="629b54c06874b6d2fa886e1c0d73146c975612d0")
+```
+
+
+## Citation
+
+```
+@misc{rauch2024birdset,
+      title={BirdSet: A Large-Scale Dataset for Audio Classification in Avian Bioacoustics}, 
+      author={Lukas Rauch and Raphael Schwinger and Moritz Wirth and René Heinrich and Denis Huseljic and Marek Herde and Jonas Lange and Stefan Kahl and Bernhard Sick and Sven Tomforde and Christoph Scholz},
+      year={2024},
+      eprint={2403.10380},
+      archivePrefix={arXiv},
+      primaryClass={cs.SD},
+      url={https://arxiv.org/abs/2403.10380}, 
+}
+```
+
+<!-- 
 # Data pipeline
 
-Our datasets are shared via HuggingFace Datasets in our [BirdSet repository](https://huggingface.co/datasets/DBD-research-group/birdset_v1).
-First log in to HuggingFace with:
+Our datasets are shared via Hugging Face Datasets in our [BirdSet repository](https://huggingface.co/datasets/DBD-research-group/BirdSet).
+First log in to Hugging Face with:
 ```bash
 huggingface-cli login
 ```
@@ -303,7 +580,7 @@ The datamodules are defined in `birdset/datamodule` and configurations are store
 
 The following steps are performed in `prepare_data`:
 
-1. Data is downloaded from HuggingFace Datasets `_load_data`
+1. Data is downloaded from Hugging Face Datasets `_load_data`
 2. Data gets preprocessed with `_preprocess_data`
 3. Data is split into train validation and test sets with `_create_splits`
 4. Length of the dataset gets saved to access later

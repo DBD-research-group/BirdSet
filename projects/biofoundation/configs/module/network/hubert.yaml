@@ -1,0 +1,27 @@
+model:
+  _target_: biofoundation.modules.models.hubert.HubertSequenceClassifier
+  num_classes: null
+  checkpoint: facebook/hubert-base-ls960
+  local_checkpoint: null
+  cache_dir: ${paths.model_path}
+  pretrain_info:
+    hf_path: ${datamodule.dataset.hf_path}
+    hf_name: ${datamodule.dataset.hf_name}
+    hf_pretrain_name: null
+    valid_test_only: False
+  
+model_name: hubert
+model_type: waveform
+torch_compile: False
+sampling_rate: 16_000
+normalize_spectrogram: False
+normalize_waveform: False
+embedding_size: 768
+length: 15 #15 Seems to be best
+# hubert uses the w2v2 featue extractor 
+
+
+
+
+
+

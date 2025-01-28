@@ -1,0 +1,33 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - birdset/linearprobing/linearprobing_config.yaml 
+  - override /module/network: convnext.yaml
+
+module:
+  optimizer:
+    lr: 1e-3
+    weight_decay: 5e-4
+  network:
+    model:
+      preprocess_in_model: False
+      checkpoint: DBD-research-group/ConvNeXT-Base-BirdSet-XCL
+      classifier:
+        _target_: biofoundation.modules.models.linear_classifier.LinearClassifier
+        num_classes: ${module.network.model.num_classes}
+        in_features: ${module.network.embedding_size}
+    model_name: convnext_bs
+
+callbacks:
+  model_checkpoint:
+    save_last: False
+    every_n_epochs: null
+    every_n_train_steps: null
+  early_stopping:
+    _target_: lightning.pytorch.callbacks.EarlyStopping
+    monitor: "val/cmAP"
+    patience: 5
+    mode: 'max'
+    min_delta: 1e-3
+    verbose: False
+    check_finite: True

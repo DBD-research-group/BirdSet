@@ -4,8 +4,6 @@ model:
   num_channels: 1
   checkpoint: facebook/convnext-base-224-22k
   local_checkpoint: null
-  classifier: null
-  preprocess_in_model: False
   cache_dir: ${paths.dataset_path}/models/
   pretrain_info:
     hf_path: ${datamodule.dataset.hf_path}
@@ -19,8 +17,6 @@ torch_compile: False
 sampling_rate: 32_000
 normalize_waveform: null
 normalize_spectrogram: True
-embedding_size: 1024
-length: 5
 
 
 

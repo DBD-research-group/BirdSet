@@ -1,0 +1,5 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - birdset/fewshot/fewshot_config.yaml 
+  - override /module/network: ssast.yaml  

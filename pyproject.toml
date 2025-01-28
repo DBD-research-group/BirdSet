@@ -1,9 +1,13 @@
 [tool.poetry]
 name = "birdset"
-version = "0.1.1"
-description = "BirdSet: A multi-task benchmark and data pipeline for deep learning based avian bioacoustics"
+version = "0.2.0"
+description = "BirdSet: A Large-Scale Dataset for Audio Classification in Avian Bioacoustics"
 authors = ["Lukas Rauch <lukas.rauch@uni-kassel.de>", "Raphael Schwinger <rsc@informatik.uni-kiel.de>", "Moritz Wirth <moritz.wirt@uni-kassel.de>", "Rene  Heinrich <rene.heinrich@iee.fraunhofer.de>", "Jonas Lange <jla@informatik.uni-kiel.de>"]
 readme = "README.md"
+packages = [
+    { include = "biofoundation", from = "projects/" },
+    { include = "birdset", from = "./" }
+]
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.12"
@@ -22,9 +26,8 @@ tensorflow-hub = "^0.16.1"
 tensorboard = "^2.14.1"
 
 # --------- hydra --------- #
-hydra-core = "^1.3"
-hydra-colorlog = "^1.2"
-hydra-optuna-sweeper = "^1.2"
+hydra-core = "1.3.2"
+hydra-colorlog = "1.2"
 
 # --------- loggers --------- #
 # wandb
@@ -41,23 +44,21 @@ hydra-optuna-sweeper = "^1.2"
 # sh            # for running bash commands in some tests (linux/macos only)
 rootutils = "^1.0.7"
 pre-commit = "^3.5.0"
-rich = "^13.6.0"
-pytest = "^7.4.2"
-sh = "^2.0.6"
+rich = "13.7.0"
 matplotlib = "^3.8.0"
 seaborn = "^0.13.0"
 ipywidgets = "^8.1.1"
 jupyter = "^1.0.0"
-datasets = "^2.14.6"
-audiomentations = "^0.33.0"
-torch-audiomentations = "^0.11.0"
+datasets = "2.18.0"
+audiomentations = "0.34.1"
+torch-audiomentations = "0.11.0"
 wandb = "^0.16.0"
-transformers = "^4.38.0"
+transformers = "4.38.0"
 pyrootutils = "^1.0.4"
 mlflow = "^2.11.0"
 pydub = "^0.25.1"
 tabulate = "^0.9.0"
-timm = "0.4.5"
+timm = "1.0.12" #"0.4.5" for SSAST
 einops = "^0.8.0"
 tensorrt = "8.5.3.1"
 numba = "0.60.0"
