@@ -46,32 +46,21 @@ class ASTSequenceClassifier(nn.Module):
 
         self.cache_dir = cache_dir
 
-        if local_checkpoint:  # TODO only loads a pretrained model from a local checkpoint else a randomly init model???
+        if (
+            local_checkpoint
+        ):  # TODO only loads a pretrained model from a local checkpoint else a randomly init model???
             log.info(f">> Loading state dict from local checkpoint: {local_checkpoint}")
-
             state_dict = torch.load(local_checkpoint)["state_dict"]
-            model_state_dict = {
+            state_dict = {
                 key.replace("model.model.", ""): weight
-                for key, weight in state_dict.items() if key.startswith("model.model")
+                for key, weight in state_dict.items()
             }
-
-            # Process the keys for the classifier
-            if self.classifier:
-                if self.load_classifier_checkpoint:
-                    try:
-                        classifier_state_dict = {
-                            key.replace("model.classifier.", ""): weight
-                            for key, weight in state_dict.items() if key.startswith("model.classifier.")
-                        }
-                        self.classifier.load_state_dict(classifier_state_dict)
-                    except Exception as e:
-                        print(f"Could not load classifier state dict from local checkpoint: {e}") 
 
             self.model = ASTForAudioClassification.from_pretrained(
                 self.checkpoint,
                 num_labels=self.num_classes,
                 cache_dir=self.cache_dir,
-                state_dict=model_state_dict,
+                state_dict=state_dict,
                 ignore_mismatched_sizes=True,
             )
         else:

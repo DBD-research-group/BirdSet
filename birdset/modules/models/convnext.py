@@ -18,7 +18,6 @@ class ConvNextClassifier(nn.Module):
         num_classes: Optional[int] = None,
         checkpoint: Optional[str] = None,
         local_checkpoint: Optional[str] = None,
-        load_classifier_checkpoint: bool = True,
         cache_dir: Optional[str] = None,
         pretrain_info: PretrainInfoConfig = None,
     ):

@@ -249,10 +249,10 @@ class SoundNet(nn.Module):
         state_dict = {
             key: weight
             for key, weight in state_dict.items()
-            if key.startswith(prefix+"model." + model_name + ".")
+            if key.startswith("model." + model_name + ".")
         }
         state_dict = {
-            key.replace(prefix+"model." + model_name + ".", ""): weight
+            key.replace("model." + model_name + ".", ""): weight
             for key, weight in state_dict.items()
         }
 
