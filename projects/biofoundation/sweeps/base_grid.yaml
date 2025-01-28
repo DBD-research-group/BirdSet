@@ -1,4 +1,4 @@
-program: birdset/train.py  
+program: projects/biofoundation/train.sh 
 name: base # Name of the sweep
 entity: deepbirddetect
 project: BioFoundation
@@ -8,7 +8,7 @@ metric:
   goal: maximize
 parameters:
   experiment:
-    values: [biofoundation/birdset/finetuning/beats] # The hydra experiment
+    values: [birdset/finetuning/beats] # The hydra experiment
   trainer.devices:
     values: [1]
   module.optimizer.lr:
@@ -23,7 +23,6 @@ parameters:
   
 command:
   - ${env}
-  - python
   - ${program}
   - ${args_no_hyphens}
 
