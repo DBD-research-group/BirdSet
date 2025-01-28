@@ -315,3 +315,31 @@ The following steps are performed in `setup`:
 ## Transformations
 
 Data transformations are referred to data transformations that are applied to the data during training. They include e.g. augmentations. The transformations are added to the huggingface dataset with [`set_transform`](https://huggingface.co/docs/datasets/main/en/package_reference/main_classes#datasets.Dataset.set_transform).
+
+# Sweeps with WandB
+
+Weights & Biases (WandB) Sweeps is a powerful tool for hyperparameter optimization. It allows you to systematically explore various hyperparameter configurations to find the best performing model. With WandB Sweeps, you can automate the process of running multiple experiments with different hyperparameters, track their performance, and visualize the results.
+
+To set up a sweep, you need to define a sweep configuration file in YAML format. This file specifies the parameters to be optimized, their ranges, and the search strategy. The sweeps that we have used can be found in the [sweeps folder](/sweeps/):
+- The [base_grid.yaml](sweeps/base_grid.yaml) is a simple grid search that maximizes the CMAP when changing basic parameters like the learning rate. This didn't have a huge affect on linear probing Perch but a sweep can be seen [here](https://wandb.ai/deepbirddetect/BioFoundation/sweeps/xr9bagcf)
+- The [classifier.yaml](sweeps/classifier.yaml) is a bayes search that additionally experiments with different classifier heads. For linear probing Perch this also only had a limited impact as can be seen [here](https://wandb.ai/deepbirddetect/BioFoundation/sweeps/ddftblna)
+
+### Running a Sweep
+
+Once the sweep configuration is defined, you can start the sweep using the WandB CLI:
+
+```bash
+wandb sweep sweep.yaml
+```
+
+This command will create a new sweep in WandB and provide you with a sweep ID. To launch agents that will run the experiments, use the following command:
+
+```bash
+wandb agent <sweep_id>
+```
+
+You can run multiple agents in parallel to speed up the sweep process and for our setup the [sweep.sh](sweeps/sweep.sh) script can be used to run a sweep on a specific GPU.
+
+```bash
+sweeps/sweep.sh <gpu_id> <sweep_id>
+```

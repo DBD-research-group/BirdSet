@@ -2,7 +2,7 @@ program: birdset/train.py
 name: full # Name of the sweep
 entity: deepbirddetect
 project: BioFoundation
-method: random  # random, grid, or bayesian
+method: bayes  # random, grid, or bayes
 metric:
   name: val/cmAP  # Metric to optimize
   goal: maximize
