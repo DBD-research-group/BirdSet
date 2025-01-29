@@ -23,6 +23,7 @@ class Wav2vec2SequenceClassifier(BirdSetModel):
         preprocess_in_model: bool = False,
         classifier: nn.Module = None,
         local_checkpoint: str = None,
+        load_classifier_checkpoint: bool = True,
         cache_dir: str = None,
         pretrain_info: PretrainInfoConfig = None,
     ):
@@ -40,6 +41,7 @@ class Wav2vec2SequenceClassifier(BirdSetModel):
             embedding_size=embedding_size,
             classifier=classifier,
             local_checkpoint=local_checkpoint,
+            load_classifier_checkpoint=load_classifier_checkpoint,
             freeze_backbone=freeze_backbone,
             preprocess_in_model=preprocess_in_model,
             pretrain_info=pretrain_info,
@@ -56,6 +58,18 @@ class Wav2vec2SequenceClassifier(BirdSetModel):
                 key.replace("model.model.", ""): weight
                 for key, weight in state_dict.items()
             }
+
+            # Process the keys for the classifier
+            if self.classifier:
+                if self.load_classifier_checkpoint:
+                    try:
+                        classifier_state_dict = {
+                            key.replace("model.classifier.", ""): weight
+                            for key, weight in state_dict.items() if key.startswith("model.classifier.")
+                        }
+                        self.classifier.load_state_dict(classifier_state_dict)
+                    except Exception as e:
+                        log.error(f"Could not load classifier state dict from local checkpoint: {e}")      
 
         self.model = AutoModelForAudioClassification.from_pretrained(
             self.checkpoint,

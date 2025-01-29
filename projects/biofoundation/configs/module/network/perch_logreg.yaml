@@ -10,10 +10,10 @@ model:
     hf_name: ${datamodule.dataset.hf_name}
     hf_pretrain_name: null
     valid_test_only: False
-  classifier:
-    _target_: biofoundation.modules.models.linear_classifier.LinearClassifier
-    in_features: 1280
-    num_classes: null
+  #classifier:
+    #_target_: biofoundation.modules.models.linear_classifier.LinearClassifier
+    #in_features: 1280
+    #num_classes: null
 
 model_name: perch
 model_type: waveform

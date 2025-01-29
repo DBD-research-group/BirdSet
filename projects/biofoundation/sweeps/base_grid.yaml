@@ -1,0 +1,30 @@
+program: projects/biofoundation/train.sh 
+name: base # Name of the sweep
+entity: deepbirddetect
+project: BioFoundation
+method: grid  # random, grid, or bayes
+metric:
+  name: val/cmAP  # Metric to optimize
+  goal: maximize
+parameters:
+  experiment:
+    values: [birdset/finetuning/beats] # The hydra experiment
+  trainer.devices:
+    values: [1]
+  module.optimizer.lr:
+    values: [0.0001, 0.0005, 0.001, 0.01]  # Grid of learning rates
+  module.optimizer.weight_decay:
+    values: [0.000001, 0.00001, 0.0001, 0.001, 0.01]  
+  datamodule.loaders.train.batch_size:
+    values: [16, 32, 64] 
+#early_terminate:
+#  type: hyperband
+#  min_iter: 3
+  
+command:
+  - ${env}
+  - ${program}
+  - ${args_no_hyphens}
+
+#run_cap: 50
+

@@ -18,6 +18,7 @@ class ASTSequenceClassifier(BirdSetModel):
         embedding_size: int = EMBEDDING_SIZE,
         checkpoint: str = "MIT/ast-finetuned-audioset-10-10-0.4593",
         local_checkpoint: str = None,
+        load_classifier_checkpoint: bool = True,
         freeze_backbone: bool = False,
         preprocess_in_model: bool = False,  # This isn't implemented for this model (yet?!)
         classifier: nn.Module | None = None,
@@ -29,6 +30,7 @@ class ASTSequenceClassifier(BirdSetModel):
             num_classes=num_classes,
             embedding_size=embedding_size,
             local_checkpoint=local_checkpoint,
+            load_classifier_checkpoint=load_classifier_checkpoint,
             freeze_backbone=freeze_backbone,
             preprocess_in_model=preprocess_in_model,
             pretrain_info=pretrain_info,
@@ -42,16 +44,29 @@ class ASTSequenceClassifier(BirdSetModel):
         ):  # TODO only loads a pretrained model from a local checkpoint else a randomly init model???
             log.info(f">> Loading state dict from local checkpoint: {local_checkpoint}")
             state_dict = torch.load(local_checkpoint)["state_dict"]
-            state_dict = {
+            model_state_dict = {
                 key.replace("model.model.", ""): weight
-                for key, weight in state_dict.items()
+                for key, weight in state_dict.items() if key.startswith("model.model")
             }
+
+            # Process the keys for the classifier
+            if self.classifier:
+                if self.load_classifier_checkpoint:
+                    try:
+                        classifier_state_dict = {
+                            key.replace("model.classifier.", ""): weight
+                            for key, weight in state_dict.items() if key.startswith("model.classifier.")
+                        }
+                        self.classifier.load_state_dict(classifier_state_dict)
+                    except Exception as e:
+                        print(f"Could not load classifier state dict from local checkpoint: {e}") 
+
 
             self.model = ASTForAudioClassification.from_pretrained(
                 self.checkpoint,
                 num_labels=self.num_classes,
                 cache_dir=self.cache_dir,
-                state_dict=state_dict,
+                state_dict=model_state_dict,
                 ignore_mismatched_sizes=True,
             )
         else:
@@ -103,17 +118,14 @@ class ASTSequenceClassifier(BirdSetModel):
         last_hidden_state = outputs["hidden_states"][-1]  # (batch, sequence, dim)
         cls_state = last_hidden_state[:, 0, :]  # (batch, dim)
 
-        if return_hidden_state:
+        if self.classifier is None:
+            if return_hidden_state:
+                output = (logits, cls_state)
 
-            embeddings = (logits, cls_state)
-
+            else:
+                output = logits
         else:
-            embeddings = cls_state
-
-        if self.classifier is not None:
-            output = self.classifier(embeddings)
-        else:
-            output = embeddings
+            output = self.classifier(cls_state)            
 
         return output
 
@@ -130,10 +142,7 @@ class ASTSequenceClassifier(BirdSetModel):
             torch.Tensor: The embeddings from the model.
         """
         # Ensure input tensor has the correct dimensions
-        print("shaaaaaaaap", input_tensor.shape)
-
         input_tensor = input_tensor.squeeze(1)
-        print("shaaaaaaaap", input_tensor.shape)
         input_values = input_tensor.transpose(1, 2)  # Swap sequence and feature dims
 
         outputs = self.model(

@@ -19,6 +19,7 @@ class HubertSequenceClassifier(BirdSetModel):
         embedding_size: int = EMBEDDING_SIZE,
         checkpoint: str = "facebook/hubert-base-ls960",
         local_checkpoint: str = None,
+        load_classifier_checkpoint: bool = True,
         freeze_backbone: bool = False,
         preprocess_in_model: bool = False,
         classifier: nn.Module | None = None,
@@ -38,6 +39,7 @@ class HubertSequenceClassifier(BirdSetModel):
             num_classes=num_classes,
             embedding_size=embedding_size,
             local_checkpoint=local_checkpoint,
+            load_classifier_checkpoint=load_classifier_checkpoint,
             freeze_backbone=freeze_backbone,
             preprocess_in_model=preprocess_in_model,
             pretrain_info=pretrain_info,
@@ -49,18 +51,31 @@ class HubertSequenceClassifier(BirdSetModel):
         self.cache_dir = cache_dir
 
         state_dict = None
+        model_state_dict = None
         if local_checkpoint:
-            state_dict = torch.load(local_checkpoint)["state_dict"]
-            state_dict = {
-                key.replace("model.model.", ""): weight
-                for key, weight in state_dict.items()
+            state_dict = torch.load(local_checkpoint)['state_dict']
+            model_state_dict = {
+                key.replace("model.model.hubert.", ""): weight
+                for key, weight in state_dict.items() if key.startswith("model.model.")
             }
+
+            # Process the keys for the classifier
+            if self.classifier:
+                if self.load_classifier_checkpoint:
+                    try:
+                        classifier_state_dict = {
+                            key.replace("model.classifier.", ""): weight
+                            for key, weight in state_dict.items() if key.startswith("model.classifier.")
+                        }
+                        self.classifier.load_state_dict(classifier_state_dict)
+                    except Exception as e:
+                        print(f"Could not load classifier state dict from local checkpoint: {e}")  
 
         self.model = AutoModelForAudioClassification.from_pretrained(
             self.checkpoint,
             num_labels=self.num_classes,
             cache_dir=self.cache_dir,
-            state_dict=state_dict,
+            state_dict=model_state_dict,
             ignore_mismatched_sizes=True,
         )
 

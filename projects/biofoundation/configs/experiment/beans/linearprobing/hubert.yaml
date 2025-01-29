@@ -4,11 +4,14 @@ defaults:
   - beans/linearprobing/linearprobing_config.yaml 
   - override /module/network: hubert.yaml  
 
+trainer:
+  devices: 1
+
 module:
   network:
     model:
       preprocess_in_model: False
       classifier:
         _target_: biofoundation.modules.models.linear_classifier.LinearClassifier
-        num_classes: ${datamodule.dataset.num_classes}
+        num_classes: ${module.network.model.num_classes}
         in_features: ${module.network.embedding_size}
