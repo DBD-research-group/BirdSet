@@ -3,3 +3,12 @@
 defaults:
   - birdset/finetuning/finetuning_config.yaml 
   - override /module/network: beats.yaml  
+
+module:
+  optimizer:
+    lr: 1e-4
+    weight_decay: 1e-4
+  
+  loaders:
+    train:
+      batch_size: 64
