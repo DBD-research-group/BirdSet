@@ -17,4 +17,5 @@ module:
       classifier:
         _target_: biofoundation.modules.models.linear_classifier.LinearClassifier
         num_classes: ${datamodule.dataset.num_classes}
-        in_features: ${module.network.embedding_size}        
+        in_features: ${module.network.embedding_size}     
+      #local_checkpoint: /workspace/logs/train/runs/HSN/ast/2024-12-05_155038/callback_checkpoints/ast_HSN_01.ckpt  
