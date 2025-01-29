@@ -4,7 +4,7 @@ import threading
 import time
 
 # Define the timeout in seconds
-TIMEOUT = 60
+TIMEOUT = 1800 # 30 minutes
 
 # Get all arguments from the caller script (including the script name itself)
 args = sys.argv[1:]

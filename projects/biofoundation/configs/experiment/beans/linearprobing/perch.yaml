@@ -4,4 +4,10 @@ defaults:
   - beans/linearprobing/linearprobing_config.yaml 
   - override /module/network: perch_logreg.yaml  
 
-seed: 5
+module:
+  network:
+    model:
+      classifier:
+        _target_: biofoundation.modules.models.linear_classifier.LinearClassifier
+        in_features: 1280
+        num_classes: ${module.network.model.num_classes}

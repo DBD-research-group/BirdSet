@@ -12,3 +12,11 @@ logger:
     group: "biofoundation_perch_fewshot_BirdSet__${datamodule.dataset.dataset_name}"
     mode: online
     version: perch_fewshot_BirdSet_${datamodule.dataset.dataset_name}_${seed}_${start_time} #to resume train run # needs to be tested
+
+module:
+  network:
+    model:
+      classifier:
+        _target_: biofoundation.modules.models.linear_classifier.LinearClassifier
+        in_features: 1280
+        num_classes: null    
