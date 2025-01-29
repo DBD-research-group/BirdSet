@@ -30,6 +30,7 @@ class ConvNextClassifier(BirdSetModel):
         num_channels: int = 1,
         checkpoint: Optional[str] = None,
         local_checkpoint: Optional[str] = None,
+        load_classifier_checkpoint: bool = True,
         cache_dir: Optional[str] = None,
         pretrain_info: PretrainInfoConfig = None,
     ):
@@ -48,6 +49,7 @@ class ConvNextClassifier(BirdSetModel):
             embedding_size=embedding_size,
             freeze_backbone=freeze_backbone,
             local_checkpoint=local_checkpoint,
+            load_classifier_checkpoint=load_classifier_checkpoint,
             preprocess_in_model=preprocess_in_model,
         )
         self.classifier = classifier
@@ -74,12 +76,14 @@ class ConvNextClassifier(BirdSetModel):
 
         self.num_channels = num_channels
         self.checkpoint = checkpoint
-        self.local_checkpoint = local_checkpoint
         self.cache_dir = cache_dir
 
         self.model = self._initialize_model()
 
         self._initialize_model()
+
+        if local_checkpoint:
+            self._load_local_checkpoint()
 
         if freeze_backbone:
             for param in self.model.parameters():

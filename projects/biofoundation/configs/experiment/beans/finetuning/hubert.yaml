@@ -8,7 +8,7 @@ module:
   network:
     model:
       preprocess_in_model: False
-      classifier:
+      classifier:      
         _target_: biofoundation.modules.models.linear_classifier.LinearClassifier
         num_classes: ${module.network.model.num_classes}
         in_features: ${module.network.embedding_size}        
