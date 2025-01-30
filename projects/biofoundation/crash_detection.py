@@ -4,7 +4,7 @@ import threading
 import time
 
 # Define the timeout in seconds
-TIMEOUT = 1800 # 30 minutes
+TIMEOUT = 7200 # 2 hours since CBI takes a long time to run
 
 # Get all arguments from the caller script (including the script name itself)
 args = sys.argv[1:]

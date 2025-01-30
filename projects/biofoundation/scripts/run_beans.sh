@@ -31,6 +31,6 @@ for model in "${models[@]}"; do
     dname=${dnames[$i]}
     dclass=${dclasses[$i]}
     echo "Running with dataset_name=$dname and n_classes=$dclass"
-    projects/biofoundation/train.sh experiment="$config_path/$model" seed=$seeds logger.wandb.group=$group trainer.devices=[$gpu] datamodule.dataset.dataset_name=$dname datamodule.dataset.hf_path="DBD-research-group/$dname" datamodule.dataset.n_classes=$dclass
+    projects/biofoundation/train_anti_crash.sh experiment="$config_path/$model" seed=$seeds logger.wandb.group=$group trainer.devices=[$gpu] datamodule.dataset.dataset_name=$dname datamodule.dataset.hf_path="DBD-research-group/$dname" datamodule.dataset.n_classes=$dclass
   done
 done
