@@ -73,7 +73,7 @@ class XCEventMapping:
                         elif key == "detected_events":
                             new_batch[key].append(detected_events[i])
                         elif key == "event_cluster":
-                            new_batch[key].append([(detected_cluster[i])])
+                            new_batch[key].append([detected_cluster[i]])
                         # elif key == "no_call_events":
                         #     new_batch[key].append(no_call_events)
                         # elif key == "noise_events":
