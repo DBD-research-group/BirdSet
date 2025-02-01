@@ -24,6 +24,17 @@ def run_script_with_timeout(timeout):
         if proc.poll() is None:  # Ensure the process is still running
             proc.terminate()
             print(f"Process terminated due to timeout (timeout was {timeout} seconds).")
+            try:
+                stdout, stderr = proc.communicate(timeout=10)  # Timeout after 10 seconds
+
+            except subprocess.TimeoutExpired:
+                print("Process did not terminate correctly")
+                proc.kill()
+                stdout, stderr = proc.communicate()
+            
+            print(stdout.decode())
+            print(stderr.decode())
+
 
     # Create the process
     process = run_script()
@@ -41,10 +52,6 @@ def run_script_with_timeout(timeout):
     # Process completed before the timeout, cancel the timer
     timer.cancel()
 
-    # Wait for the process to clean up and finish
-    process.wait()
-
-    # Return the process return code
     return process.returncode
 
 # Main logic to retry the script with increasing timeouts
