@@ -4,7 +4,7 @@ import threading
 import time
 
 # Define the initial timeout and the increment for retries
-INITIAL_TIMEOUT = 7_200  # 2 hours
+INITIAL_TIMEOUT = 8_000  
 TIMEOUT_INCREMENT = 600  # 10 minutes
 
 # Define the maximum number of retries
@@ -73,3 +73,7 @@ for attempt in range(1, MAX_RETRIES + 1):
         else:
             print("Max retries reached. Exiting with failure.")
             sys.exit(1)
+
+# If the GPU is having problems with memory:
+# ps aux | grep python (Check for python processes)
+# ps aux | grep 'python birdset/train.py' | grep -v grep | awk '{print $2}' | xargs -r kill -9 (Kill the processes)
