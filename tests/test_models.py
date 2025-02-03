@@ -11,6 +11,7 @@ MODEL_EXPERIMENTS = [
 
 commands = generate_commands(MODEL_EXPERIMENTS)
 
+
 @pytest.mark.parametrize(
     "experiment,command",
     commands.items(),

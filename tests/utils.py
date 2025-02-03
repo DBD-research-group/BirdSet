@@ -1,6 +1,7 @@
 import subprocess
 import pytest
 
+
 def generate_commands(experiments):
     """
     Generates a dictionary of commands for running training experiments.
@@ -15,6 +16,7 @@ def generate_commands(experiments):
         exp: base_command[:2] + [f"experiment={exp}"] + base_command[2:]
         for exp in experiments
     }
+
 
 def run_experiment_test(experiment, command):
     """
