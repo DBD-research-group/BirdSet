@@ -366,7 +366,17 @@ Integration tests are executed using the `pytest` package. These tests utilize `
 
 2. **Model Tests**: Each model (DT) is tested on the HSN dataset using a `fast_dev_run`. The models tested are: AST, ConvNext, EAT, EfficientNet, Wav2Vec2.
 
+### How to Use the Tests
+#### Black Linting
+Simply push your code to the GitHub repository, and Black linting will run automatically.
 
+#### Integration Tests
+To execute all tests, run pytest in the root directory of your project.
+
+If you wish to test only the models or datasets, use the following commands:
+
+To test the models: `pytest tests/test_models.py`
+To test the datasets: `pytest tests/test_datasets.py`
 
 ## Q&A
 
