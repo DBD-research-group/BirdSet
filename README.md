@@ -360,7 +360,7 @@ python birdset/train.py experiment="local/HSN/efficientnet.yaml"
 Black linting is managed through GitHub Actions, as defined in `.github/workflows/black_linting.yml`. Ensure that you are using the most up-to-date version of `black[jupyter]` for optimal linting.
 
 #### Integration Tests
-Integration tests are executed using the `pytest` package. These tests utilize `subprocess` to run experiments via simple command-line invocations, and `pytest` checks for any errors during execution. We categorize the integration tests into two types:
+Integration tests are executed using the `pytest` package. These tests utilize `subprocess` to run experiments via simple command-line invocations, and `pytest` checks for any errors during execution. Every test is limited to 20 minutes (1.200 seconds), you can cahnge this vlaue in the `pytest.ini`. We categorize the integration tests into two types:
 
 1. **Dataset Tests**: Each dataset is tested on the ConvNext DT model using a `fast_dev_run`. The datasets tested are: HSN, NBP, NES, PER, POW, SNE, SSW, UHH, XCL, XCM.
 
@@ -377,6 +377,8 @@ If you wish to test only the models or datasets, use the following commands:
 
 To test the models: `pytest tests/test_models.py`
 To test the datasets: `pytest tests/test_datasets.py`
+
+You may add the flags `--html=report.html` or `--junitxml=report.xml` for generating test reports. Another way is using the integrated testing functionallity in VS Code: Just click at the Erlenmeyer flask / test tube icon at the side bar.
 
 ## Q&A
 
