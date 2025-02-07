@@ -378,7 +378,20 @@ If you wish to test only the models or datasets, use the following commands:
 To test the models: `pytest tests/test_models.py`
 To test the datasets: `pytest tests/test_datasets.py`
 
-You may add the flags `--html=report.html` or `--junitxml=report.xml` for generating test reports. Another way is using the integrated testing functionallity in VS Code: Just click at the Erlenmeyer flask / test tube icon at the side bar.
+You can generate test reports by adding the flags --html=report.html or --junitxml=report.xml when running pytest.
+
+Alternatively, you can use VS Code’s integrated testing functionality. Simply click the test tube (🧪) icon in the sidebar to access and run your tests interactively.
+
+To specify which GPUs the tests should run on, uncomment the following line in tests/utils.py:
+```python
+    base_command = [
+        "python",
+        "birdset/train.py",
+        "trainer.fast_dev_run=True",
+        # "trainer.devices=[1]",
+    ]
+```
+This enables the Hydra override, directing the tests to use GPU 1 in this case.
 
 ## Q&A
 

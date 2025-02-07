@@ -11,7 +11,12 @@ def generate_commands(experiments):
     Returns:
         dict: A dictionary where keys are experiment paths and values are commands.
     """
-    base_command = ["python", "birdset/train.py", "trainer.fast_dev_run=True"]
+    base_command = [
+        "python",
+        "birdset/train.py",
+        "trainer.fast_dev_run=True",
+        # "trainer.devices=[1]",
+    ]
     return {
         exp: base_command[:2] + [f"experiment={exp}"] + base_command[2:]
         for exp in experiments
