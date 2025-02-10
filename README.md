@@ -362,7 +362,7 @@ Black linting is managed through GitHub Actions, as defined in `.github/workflow
 #### Integration Tests
 Integration tests are executed using the `pytest` package. These tests utilize `subprocess` to run experiments via simple command-line invocations, and `pytest` checks for any errors during execution. Every test is limited to 20 minutes (1.200 seconds), you can cahnge this vlaue in the `pytest.ini`. We categorize the integration tests into two types:
 
-1. **Dataset Tests**: Each dataset is tested on the ConvNext DT model using a `fast_dev_run`. The datasets tested are: HSN, NBP, NES, PER, POW, SNE, SSW, UHH, XCL, XCM.
+1. **Dataset Tests**: Each dataset is tested on the ConvNext DT model using a `fast_dev_run`. The datasets tested are: HSN, NBP, NES, PER, POW, SNE, SSW, UHH (XCL and XCM are too big for everyday testing)
 
 2. **Model Tests**: Each model (DT) is tested on the HSN dataset using a `fast_dev_run`. The models tested are: AST, ConvNext, EAT, EfficientNet, Wav2Vec2.
 

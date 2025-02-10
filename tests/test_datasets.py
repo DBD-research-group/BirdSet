@@ -10,8 +10,9 @@ DATASET_EXPERIMENTS = [
     "birdset_neurips24/SNE/DT/convnext.yaml",
     "birdset_neurips24/SSW/DT/convnext.yaml",
     "birdset_neurips24/UHH/DT/convnext.yaml",
-    "birdset_neurips24/XCL/convnext.yaml",
-    "birdset_neurips24/XCM/convnext.yaml",
+    # to big for everyday testing:
+    # "birdset_neurips24/XCL/convnext.yaml",
+    # "birdset_neurips24/XCM/convnext.yaml",
 ]
 
 commands = generate_commands(DATASET_EXPERIMENTS)
