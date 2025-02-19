@@ -57,6 +57,8 @@ class DatasetConfig:
         Only works with PretrainDatamodule. Path to a saved preprocessed dataset path
     fewshot: FewShotConfig, optional
         Configuration for few-shot learning.
+    use_test_as_valid: bool, optional
+        Whether to use the test set as the validation set. Default is False. This is useful for debugging and setting hyperparameters on a specialized dataset.
     """
 
     data_dir: str = "/workspace/data_birdset"
@@ -78,6 +80,7 @@ class DatasetConfig:
     )
     fewshot: Optional[FewShotConfig] = None
     dataset_name: Optional[str] = None
+    use_test_as_valid: Optional[bool] = False
 
 
 @dataclass

@@ -5,6 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Debug BioFoundation",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "./birdset/train.py --config-path '../projects/biofoundation/configs' --config-dir 'configs' 'logger=wandb_biofoundation'",
+            "console": "integratedTerminal",
+            "args": "${command:pickArgs}",
+            "justMyCode": false
+        },
+        {
             "name": "Python Debugger: Current File with Arguments",
             "type": "debugpy",
             "request": "launch",

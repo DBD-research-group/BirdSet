@@ -66,7 +66,7 @@ class AvesClassifier(BirdSetModel):
         )
         self.model = wav2vec2_model(**self.config, aux_num_out=None)
         self.model.load_state_dict(
-            torch.load("/workspace//models/aves/aves-base-bio.torchaudio.pt")
+            torch.load("/workspace/models/aves/aves-base-bio.torchaudio.pt")
         )
         self.model.feature_extractor.requires_grad_(True)
 
