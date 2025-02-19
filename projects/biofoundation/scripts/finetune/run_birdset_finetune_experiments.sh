@@ -2,7 +2,7 @@
 
 # Initialize empty arrays for models and datasets
 models=()
-datasets=()
+datasets=("HSN" "NES" "PER" "POW" "SNE" "SSW" "UHH" "NBP")
 gpu_id="0" 
 
 
@@ -18,6 +18,7 @@ while [[ $# -gt 0 ]]; do
       ;;
     --datasets)
       shift
+      datasets=()
       while [[ $# -gt 0 && $1 != --* ]]; do  # Collect datasets until next flag
         datasets+=("$1")
         shift
@@ -44,6 +45,6 @@ echo "Using GPU: $gpu_id"
 for dataset in "${datasets[@]}"; do
   for model in "${models[@]}"; do
     echo "Processing model $model with dataset $dataset"
-    python birdset/train.py experiment="biofoundation/finetune/BirdSet/$model" seed=2 trainer.devices=[$gpu_id] datamodule.dataset.dataset_name=$dataset datamodule.dataset.hf_name=$dataset
+    bash /workspace/projects/biofoundation/train.sh experiment="birdset/finetuning/$model" seed=1 trainer.devices=[$gpu_id] datamodule.dataset.dataset_name=$dataset datamodule.dataset.hf_name=$dataset
   done
 done

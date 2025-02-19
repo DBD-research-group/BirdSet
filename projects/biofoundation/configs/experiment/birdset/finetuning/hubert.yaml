@@ -3,13 +3,31 @@
 defaults:
   - birdset/finetuning/finetuning_config.yaml 
   - override /module/network: hubert.yaml  
-train: False
 
 module:
   network:
     model:
-      preprocess_in_model: False
+      preprocess_in_model: True
       classifier:
         _target_: biofoundation.modules.models.linear_classifier.LinearClassifier
         num_classes: ${module.network.model.num_classes}
         in_features: ${module.network.embedding_size}        
+
+datamodule:
+  loaders:
+    train:
+      batch_size: 16
+      shuffle: True
+      num_workers: 16
+      drop_last: True
+      prefetch_factor: 2
+ 
+    valid:
+      batch_size: 16
+      num_workers: 16
+      shuffle: False
+   
+    test:
+      batch_size: 16
+      num_workers: 16
+      shuffle: False
