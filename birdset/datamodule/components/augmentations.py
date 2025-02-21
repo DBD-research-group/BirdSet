@@ -56,6 +56,14 @@ def pad_spectrogram_width(
     return padded_spectrogram
 
 
+def _choose_original_labels(target, background_target, snr):
+    return target
+
+
+def _make_union_labels(target, background_target, snr):
+    return torch.maximum(target, background_target)
+
+
 class RandomTimeStretch:
     def __init__(
         self,
@@ -307,12 +315,10 @@ class MultilabelMix(BaseWaveformTransform):
 
         self.mix_target = mix_target
         if mix_target == "original":
-            self._mix_target = lambda target, background_target, snr: target
+            self._mix_target = _choose_original_labels
 
         elif mix_target == "union":
-            self._mix_target = lambda target, background_target, snr: torch.maximum(
-                target, background_target
-            )
+            self._mix_target = _make_union_labels
         else:
             raise ValueError("mix_target must be one of 'original' or 'union'.")
 
