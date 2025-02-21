@@ -1,3 +1,4 @@
 [submodule ".devcontainer"]
 	path = .devcontainer
 	url = git@github.com:raphaelschwinger/cuda-python-devcontainer.git
+	branch = ins-dbd

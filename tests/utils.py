@@ -15,7 +15,7 @@ def generate_commands(experiments):
         "python",
         "birdset/train.py",
         "trainer.fast_dev_run=True",
-        # "trainer.devices=[1]",
+        "trainer.devices=[1]",
     ]
     return {
         exp: base_command[:2] + [f"experiment={exp}"] + base_command[2:]
