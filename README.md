@@ -354,23 +354,20 @@ python birdset/train.py experiment="local/HSN/efficientnet.yaml"
 ```
 
 
-## Automatic Testing
-### Available Tests
-#### Black Linting
+## Testing
+### Linting
 Black linting is managed through GitHub Actions, as defined in `.github/workflows/black_linting.yml`. Ensure that you are using the most up-to-date version of `black[jupyter]` for optimal linting.
+#### How to use it
+Simply push your code to the GitHub repository, and Black linting will run automatically.
 
-#### Integration Tests
+### Integration Tests
 Integration tests are executed using the `pytest` package. These tests utilize `subprocess` to run experiments via simple command-line invocations, and `pytest` checks for any errors during execution. Every test is limited to 20 minutes (1.200 seconds), you can cahnge this vlaue in the `pytest.ini`. We categorize the integration tests into two types:
 
 1. **Dataset Tests**: Each dataset is tested on the ConvNext DT model using a `fast_dev_run`. The datasets tested are: HSN, NBP, NES, PER, POW, SNE, SSW, UHH (XCL and XCM are too big for everyday testing)
 
 2. **Model Tests**: Each model (DT) is tested on the HSN dataset using a `fast_dev_run`. The models tested are: AST, ConvNext, EAT, EfficientNet, Wav2Vec2.
 
-### How to Use the Tests
-#### Black Linting
-Simply push your code to the GitHub repository, and Black linting will run automatically.
-
-#### Integration Tests
+#### How to use it
 To execute all tests, run pytest in the root directory of your project.
 
 If you wish to test only the models or datasets, use the following commands:
