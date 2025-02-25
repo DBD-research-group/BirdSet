@@ -2,7 +2,7 @@ import subprocess
 import pytest
 
 
-def generate_commands(experiments):
+def generate_commands(experiments, devices):
     """
     Generates a dictionary of commands for running training experiments.
     Args:
@@ -15,7 +15,7 @@ def generate_commands(experiments):
         "python",
         "birdset/train.py",
         "trainer.fast_dev_run=True",
-        # "trainer.devices=[1]",
+        f"trainer.devices=[{devices}]",
     ]
     return {
         exp: base_command[:2] + [f"experiment={exp}"] + base_command[2:]

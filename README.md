@@ -375,20 +375,11 @@ If you wish to test only the models or datasets, use the following commands:
 To test the models: `pytest tests/test_models.py`
 To test the datasets: `pytest tests/test_datasets.py`
 
-You can generate test reports by adding the flags --html=report.html or --junitxml=report.xml when running pytest.
+You can generate test reports by adding the flags `--html=report.html` or `--junitxml=report.xml` when running pytest.
+
+The default GPU is set to `0`. To specify a different GPU, use the `--device` flag, such as `--device=1,2`. This enables the Hydra override `trainer.devices=[1,2]` when running the test examples, ensuring that GPUs 1 and 2 are used in this case.
 
 Alternatively, you can use VS Code’s integrated testing functionality. Simply click the test tube (🧪) icon in the sidebar to access and run your tests interactively.
-
-To specify which GPUs the tests should run on, uncomment the following line in tests/utils.py:
-```python
-    base_command = [
-        "python",
-        "birdset/train.py",
-        "trainer.fast_dev_run=True",
-        # "trainer.devices=[1]",
-    ]
-```
-This enables the Hydra override, directing the tests to use GPU 1 in this case.
 
 ## Q&A
 

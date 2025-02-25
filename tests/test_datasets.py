@@ -1,5 +1,4 @@
-import pytest
-from tests.utils import generate_commands, run_experiment_test
+from tests.utils import run_experiment_test
 
 DATASET_EXPERIMENTS = [
     "birdset_neurips24/HSN/DT/convnext.yaml",
@@ -15,13 +14,6 @@ DATASET_EXPERIMENTS = [
     # "birdset_neurips24/XCM/convnext.yaml",
 ]
 
-commands = generate_commands(DATASET_EXPERIMENTS)
 
-
-@pytest.mark.parametrize(
-    "experiment,command",
-    commands.items(),
-    ids=["/".join(exp.split("/")[-3:]) for exp in commands.keys()],
-)
 def test_dataset_experiment(experiment, command):
     run_experiment_test(experiment, command)
