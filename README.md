@@ -356,7 +356,7 @@ python birdset/train.py experiment="local/HSN/efficientnet.yaml"
 
 ## Testing
 ### Linting
-Black linting is managed through GitHub Actions, as defined in `.github/workflows/black_linting.yml`. Ensure that you are using the most up-to-date version of `black[jupyter]` for optimal linting.
+Black linting is managed through GitHub Actions, as defined in `.github/workflows/black_linting.yml`. Ensure that you are using the same version of `black[jupyter]` as the tests for optimal linting. That currently is `black[jupyter]==25.1.0`.
 #### How to use it
 Simply push your code to the GitHub repository, and Black linting will run automatically.
 
