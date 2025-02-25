@@ -1,6 +1,6 @@
 from datasets import Dataset
 
-class ConditionTemplate:
+class BaseCondition:
 
     def __call__(self, dataset: Dataset, idx:int , **kwds) -> bool:
         return True

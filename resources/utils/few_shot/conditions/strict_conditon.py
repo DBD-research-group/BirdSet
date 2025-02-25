@@ -1,8 +1,8 @@
 from datasets import Dataset
 import soundfile as sf
-from resources.utils.few_shot.conditions.condition_template import ConditionTemplate
+from resources.utils.few_shot.conditions.base_condition import BaseCondition
 
-class StrictCondition(ConditionTemplate):
+class StrictCondition(BaseCondition):
 
     def __call__(self, dataset: Dataset, idx: int, **kwds):
         """
