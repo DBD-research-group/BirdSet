@@ -131,22 +131,5 @@ def _remove_duplicates(batch: dict[str, ]):
         for b_idx in range(num_samples):
             if b_idx not in removable_idx:
                 new_batch[key].append(batch[key][b_idx])
-                
+
     return new_batch
-
-# for testing purposes
-if __name__ == "__main__":
-    from datasets import load_dataset
-    from resources.utils.few_shot.conditions.lenient_condition import LenientCondition
-    
-    dataset = load_dataset(
-        path="DBD-research-group/BirdSet",
-        name="HSN",
-        cache_dir=f"/home/rantjuschin/data_birdset/HSN",
-        trust_remote_code=True
-    )
-    subset_one = create_few_shot_subset(dataset, data_selection_condition=StrictCondition(), fill_up=False)
-    #subset_two = create_few_shot_subset(dataset, data_selection_condition=StrictCondition(), fill_up=True)
-    print(subset_one)
-    #print(subset_two)
-
