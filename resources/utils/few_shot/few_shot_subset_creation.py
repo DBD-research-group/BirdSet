@@ -94,6 +94,7 @@ def _map_recordings_to_samples(train_split: Dataset, all_labels: set, recording_
     leftover_samples_per_label = {label: [] for label in all_labels}
     for idx in recording_indeces:
         mapped_batch = mapper({key: [value] for key, value in train_split[idx].items()})
+        mapped_batch = _remove_duplicates(mapped_batch)
         # in cases where a recording produces multiple samples, choose one as the main sample 
         # to prioritise the selection of samples from differing recordings.
         num_samples = len(mapped_batch["filepath"])
@@ -106,6 +107,33 @@ def _map_recordings_to_samples(train_split: Dataset, all_labels: set, recording_
                 leftover_samples_per_label[sample["ebird_code"]].append(sample)
     return primary_samples_per_label, leftover_samples_per_label
 
+
+def _remove_duplicates(batch: dict[str, ]):
+    """
+    This method removes basic duplicates samples from a batch. These are samples that
+    are entirely included in another sample in the same batch. It only works correctly if all 
+    samples in the batch are from the same recording.
+    """
+    removable_idx = set()
+    num_samples = len(batch["filepath"])
+    for b_idx in range(num_samples):
+        for other_sample in range(b_idx + 1, num_samples):
+            event_one = batch["detected_events"][b_idx]
+            event_two = batch["detected_events"][other_sample]
+            if event_one[0] < event_two[0] and event_one[1] > event_two[1]:
+                removable_idx.add(other_sample)
+            elif event_two[0] < event_one[0] and event_two[1] > event_one[1]:
+                removable_idx.add(b_idx)
+    
+    new_batch = {}
+    for key in batch.keys():
+        new_batch[key] = []
+        for b_idx in range(num_samples):
+            if b_idx not in removable_idx:
+                new_batch[key].append(batch[key][b_idx])
+                
+    return new_batch
+
 # for testing purposes
 if __name__ == "__main__":
     from datasets import load_dataset
@@ -117,7 +145,7 @@ if __name__ == "__main__":
         cache_dir=f"/home/rantjuschin/data_birdset/HSN",
         trust_remote_code=True
     )
-    subset_one = create_few_shot_subset(dataset, data_selection_condition=StrictCondition(), fill_up=True)
+    subset_one = create_few_shot_subset(dataset, data_selection_condition=StrictCondition(), fill_up=False)
     #subset_two = create_few_shot_subset(dataset, data_selection_condition=StrictCondition(), fill_up=True)
     print(subset_one)
     #print(subset_two)
