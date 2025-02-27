@@ -377,7 +377,8 @@ To test the datasets: `pytest tests/test_datasets.py`
 
 You can generate test reports by adding the flags `--html=report.html` or `--junitxml=report.xml` when running pytest.
 
-The default GPU is set to `0`. To specify a different GPU, use the `--device` flag, such as `--device=1,2`. This enables the Hydra override `trainer.devices=[1,2]` when running the test examples, ensuring that GPUs 1 and 2 are used in this case.
+The default GPU is set to `0`. To specify a different GPU, use the `--device` flag, such as `--device=2`. This enables the Hydra override `trainer.devices=[1,2]` when running the test examples, ensuring that GPUs 2 us used in this case.
+You can specify the number of CPU workers with the `--workers` flag, such as `--workers=4`, the default value is 1.
 
 Alternatively, you can use VS Code’s integrated testing functionality. Simply click the test tube (🧪) icon in the sidebar to access and run your tests interactively.
 
