@@ -84,6 +84,12 @@ def get_args_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _rename_resolver(item, loss, metric):
+    return item.replace("__loss__", loss.__class__.__name__).replace(
+        "__metric__", metric.__class__.__name__
+    )
+
+
 # flexible metric and loss names for callbacks
 def register_custom_resolvers(
     version_base: str, config_path: str, config_name: str
@@ -134,9 +140,7 @@ def register_custom_resolvers(
 
         OmegaConf.register_new_resolver(
             "replace",
-            lambda item: item.replace("__loss__", loss.__class__.__name__).replace(
-                "__metric__", metric.__class__.__name__
-            ),
+            _rename_resolver,
         )
 
     def decorator(function: Callable) -> Callable:
