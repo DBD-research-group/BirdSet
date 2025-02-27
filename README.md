@@ -354,6 +354,34 @@ python birdset/train.py experiment="local/HSN/efficientnet.yaml"
 ```
 
 
+## Testing
+### Linting
+Black linting is managed through GitHub Actions, as defined in `.github/workflows/black_linting.yml`. Ensure that you are using the same version of `black[jupyter]` as the tests for optimal linting. That currently is `black[jupyter]==25.1.0`.
+#### How to use it
+Simply push your code to the GitHub repository, and Black linting will run automatically.
+
+### Integration Tests
+Integration tests are executed using the `pytest` package. These tests utilize `subprocess` to run experiments via simple command-line invocations, and `pytest` checks for any errors during execution. Every test is limited to 20 minutes (1.200 seconds), you can cahnge this vlaue in the `pytest.ini`. We categorize the integration tests into two types:
+
+1. **Dataset Tests**: Each dataset is tested on the ConvNext DT model using a `fast_dev_run`. The datasets tested are: HSN, NBP, NES, PER, POW, SNE, SSW, UHH (XCL and XCM are too big for everyday testing)
+
+2. **Model Tests**: Each model (DT) is tested on the HSN dataset using a `fast_dev_run`. The models tested are: AST, ConvNext, EAT, EfficientNet, Wav2Vec2.
+
+#### How to use it
+To execute all tests, run pytest in the root directory of your project.
+
+If you wish to test only the models or datasets, use the following commands:
+
+To test the models: `pytest tests/test_models.py`
+To test the datasets: `pytest tests/test_datasets.py`
+
+You can generate test reports by adding the flags `--html=report.html` or `--junitxml=report.xml` when running pytest.
+
+The default GPU is set to `0`. To specify a different GPU, use the `--device` flag, such as `--device=2`. This enables the Hydra override `trainer.devices=[1,2]` when running the test examples, ensuring that GPUs 2 us used in this case.
+You can specify the number of CPU workers with the `--workers` flag, such as `--workers=4`, the default value is 1.
+
+Alternatively, you can use VS Code’s integrated testing functionality. Simply click the test tube (🧪) icon in the sidebar to access and run your tests interactively.
+
 ## Q&A
 
 #### **How to access the label names in the datasets?**
