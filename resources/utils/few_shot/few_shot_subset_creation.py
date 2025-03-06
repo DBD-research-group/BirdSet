@@ -1,12 +1,11 @@
-from typing import Union
+from typing import Union, Literal
 from datasets import DatasetDict, Dataset, load_from_disk
 import torch
 import random
+import soundfile as sf
 from birdset.datamodule.components.event_mapping import XCEventMapping
-from resources.utils.few_shot.conditions.base_condition import BaseCondition
-from resources.utils.few_shot.conditions.strict_conditon import StrictCondition
 
-def create_few_shot_subset(dataset: Union[DatasetDict, str], few_shot: int=5, data_selection_condition: BaseCondition=StrictCondition(), fill_up: bool=False, save_dir: str="", random_seed: int=None) -> DatasetDict:
+def create_few_shot_subset(dataset: Union[DatasetDict, str], few_shot: int=5, data_selection_condition: Literal["strict", "lenient"]="strict", fill_up: bool=False, save_dir: str="", random_seed: int=None) -> DatasetDict:
     """
     This method creates a subset of the given datasets train split with at max `few_shot` samples per label in the dataset split.
     The samples are chosen based on the given condition. If there are more than `few_shot` samples for a label `few_shot`
@@ -19,10 +18,12 @@ def create_few_shot_subset(dataset: Union[DatasetDict, str], few_shot: int=5, da
           represent a path from where the dataset can be loaded through Huggingface "datasets.load_from_disk". If of type "DatasetDict"
           the value should be the dataset.
         few_shot (int): The number of samples each label can have. Default is 5.
-        data_selection_condition (ConditionTemplate): A condition that defines which recordings should be included in the few-shot subset.
+        data_selection_condition (Literal["strict", "lenient"]): A condition that defines which recordings should be included in the
+          few-shot subset. Default is "strict".
         fill_up (bool): If True, labels for which not enough samples can be extracted with the given condition will be supplemented with
           random samples from the dataset. Default is False.
-        save_dir (str): If provided, the processed dataset will be saved to the given directory. Default is "".
+        save_dir (str): If provided, the processed dataset will be saved to the given directory. If equal to False the dataset
+          will not be saved. It will only be returned. Default is "".
         random_seed (int): The seed with which the random sampler is seeded. If None, no seeding is applied. Default is None.
     Returns:
         DatasetDict: A Huggingface `datasets.DatasetDict` object where the test split is return as it was given and the train
@@ -37,10 +38,18 @@ def create_few_shot_subset(dataset: Union[DatasetDict, str], few_shot: int=5, da
         random.seed(random_seed)
     train_split = dataset["train"]
 
+    if data_selection_condition == "strict":
+        condition = _strict_condition
+    elif data_selection_condition == "lenient":
+        condition = _lenient_condition
+    else:
+        print("The selected data selection condition does not exist. Please provide a valid condition")
+        return
+
     print("Applying condition to training data")
     satisfying_recording_indeces = []
     for i in range(len(train_split)):
-        if data_selection_condition(train_split, i):
+        if condition(train_split, i):
             satisfying_recording_indeces.append(i)
 
     print("Mapping satisfying recordings.")
@@ -104,6 +113,24 @@ def create_few_shot_subset(dataset: Union[DatasetDict, str], few_shot: int=5, da
         print("Processed dataset save to ", save_dir)
 
     return processed_dataset
+
+
+def _strict_condition(dataset: Dataset, idx: int):
+    """
+    This condition only allows files that up to 5s long so that no event detection has to occur when sampling.
+    """
+    file_info = sf.info(dataset[idx]["filepath"])
+    if file_info.duration <= 5:
+        return True
+
+
+def _lenient_condition(dataset: Dataset, idx: int):
+    """
+    This condition allows files up to 10s but only if one bird occurence is in the file.
+    """
+    file_info = sf.info(dataset[idx]["filepath"])
+    if file_info.duration <= 10 and (not dataset[idx]["ebird_code_secondary"]):
+        return True
     
 
 def _map_recordings_to_samples(train_split: Dataset, all_labels: set, recording_indeces: list):
@@ -158,6 +185,7 @@ def _remove_duplicates(batch: dict[str, ]):
 
     return new_batch
 
+
 def _one_hot_encode_batch(batch, num_classes):
     """
     Converts integer class labels in a batch to one-hot encoded tensors.
@@ -168,14 +196,3 @@ def _one_hot_encode_batch(batch, num_classes):
     for i, label in enumerate(label_list):
         one_hot[i, label] = 1
     return {"labels": one_hot}
-
-
-if __name__ == "__main__":
-    from datasets import load_dataset
-
-    
-
-    processed_dataset = create_few_shot_subset("/home/rantjuschin/data_birdset/saved_HSN", save_dir="/home/rantjuschin/data_birdset/processed_HSN")
-    print(processed_dataset)
-    print(processed_dataset["train"])
-    print(processed_dataset["test"])
