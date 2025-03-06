@@ -1,11 +1,12 @@
-from datasets import DatasetDict, Dataset
+from typing import Union
+from datasets import DatasetDict, Dataset, load_from_disk
 import torch
 import random
 from birdset.datamodule.components.event_mapping import XCEventMapping
 from resources.utils.few_shot.conditions.base_condition import BaseCondition
 from resources.utils.few_shot.conditions.strict_conditon import StrictCondition
 
-def create_few_shot_subset(dataset: DatasetDict, few_shot: int=5, data_selection_condition: BaseCondition=StrictCondition(), fill_up: bool=False, save_dir: str="", random_seed: int=None) -> DatasetDict:
+def create_few_shot_subset(dataset: Union[DatasetDict, str], few_shot: int=5, data_selection_condition: BaseCondition=StrictCondition(), fill_up: bool=False, save_dir: str="", random_seed: int=None) -> DatasetDict:
     """
     This method creates a subset of the given datasets train split with at max `few_shot` samples per label in the dataset split.
     The samples are chosen based on the given condition. If there are more than `few_shot` samples for a label `few_shot`
@@ -14,17 +15,23 @@ def create_few_shot_subset(dataset: DatasetDict, few_shot: int=5, data_selection
     with their respective samples from the given dataset split without regard for the condition. 
     
     Args:
-        dataset (DatasetDict): A Huggingface "datasets.DatasetDict" object. A few-shot subset will be created for the `train` split.
+        dataset (Union[DatasetDict, str]): The dataset for which a few-shot sujbset will be created. If of type "str", the value should
+          represent a path from where the dataset can be loaded through Huggingface "datasets.load_from_disk". If of type "DatasetDict"
+          the value should be the dataset.
         few_shot (int): The number of samples each label can have. Default is 5.
         data_selection_condition (ConditionTemplate): A condition that defines which recordings should be included in the few-shot subset.
         fill_up (bool): If True, labels for which not enough samples can be extracted with the given condition will be supplemented with
           random samples from the dataset. Default is False.
-        save_dir (str): If provided, the processed datasets will be saved to the given directory.
+        save_dir (str): If provided, the processed dataset will be saved to the given directory. Default is "".
         random_seed (int): The seed with which the random sampler is seeded. If None, no seeding is applied. Default is None.
     Returns:
         DatasetDict: A Huggingface `datasets.DatasetDict` object where the test split is return as it was given and the train
         split is replaced with the few-shot subset of the given train split.
     """
+    if isinstance(dataset, str):
+        print("Loading dataset from disk")
+        dataset = load_from_disk(dataset)
+
     if random_seed != None:
         print(f"Set random seed to {random_seed}.")
         random.seed(random_seed)
@@ -165,14 +172,10 @@ def _one_hot_encode_batch(batch, num_classes):
 
 if __name__ == "__main__":
     from datasets import load_dataset
+
     
-    dataset = load_dataset(
-        path="DBD-research-group/BirdSet",
-        name="HSN",
-        cache_dir="/home/rantjuschin/data_birdset/HSN",
-    )
-    
-    processed_dataset = create_few_shot_subset(dataset)
+
+    processed_dataset = create_few_shot_subset("/home/rantjuschin/data_birdset/saved_HSN", save_dir="/home/rantjuschin/data_birdset/processed_HSN")
     print(processed_dataset)
     print(processed_dataset["train"])
     print(processed_dataset["test"])
