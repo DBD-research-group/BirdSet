@@ -83,8 +83,12 @@ def create_few_shot_subset(dataset: DatasetDict, few_shot: int=5, data_selection
 
     processed_dataset = DatasetDict({"train": Dataset.from_list(selected_samples), "test": dataset["test_5s"]})
 
+    print("Selecting relevant columns and renaming")
+    columns_to_keep = ["filepath", "ebird_code_multilabel", "detected_events", "start_time", "end_time"]
+    for split in ["train", "test"]:
+        processed_dataset[split] = processed_dataset[split].select_columns(columns_to_keep).rename_column("ebird_code_multilabel", "labels")
+
     print("One-hot encoding labels")
-    processed_dataset = processed_dataset.rename_column("ebird_code_multilabel", "labels")
     processed_dataset = processed_dataset.map(lambda batch: _one_hot_encode_batch(batch, len(all_labels)), batched=True)
 
     if save_dir:
@@ -169,5 +173,6 @@ if __name__ == "__main__":
     )
     
     processed_dataset = create_few_shot_subset(dataset)
-    print(processed_dataset["train"]["labels"][0:10])
-    print(processed_dataset["test"]["labels"][0:10])
+    print(processed_dataset)
+    print(processed_dataset["train"])
+    print(processed_dataset["test"])
