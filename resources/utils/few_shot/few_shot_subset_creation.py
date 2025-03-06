@@ -1,10 +1,11 @@
-from datasets import DatasetDict, Dataset, concatenate_datasets, Sequence, Value
+from datasets import DatasetDict, Dataset
+import torch
 import random
 from birdset.datamodule.components.event_mapping import XCEventMapping
 from resources.utils.few_shot.conditions.base_condition import BaseCondition
 from resources.utils.few_shot.conditions.strict_conditon import StrictCondition
 
-def create_few_shot_subset(dataset: DatasetDict, few_shot: int=5, data_selection_condition: BaseCondition=StrictCondition(), fill_up: bool=False, random_seed: int=None) -> DatasetDict:
+def create_few_shot_subset(dataset: DatasetDict, few_shot: int=5, data_selection_condition: BaseCondition=StrictCondition(), fill_up: bool=False, save_dir: str="", random_seed: int=None) -> DatasetDict:
     """
     This method creates a subset of the given datasets train split with at max `few_shot` samples per label in the dataset split.
     The samples are chosen based on the given condition. If there are more than `few_shot` samples for a label `few_shot`
@@ -18,6 +19,7 @@ def create_few_shot_subset(dataset: DatasetDict, few_shot: int=5, data_selection
         data_selection_condition (ConditionTemplate): A condition that defines which recordings should be included in the few-shot subset.
         fill_up (bool): If True, labels for which not enough samples can be extracted with the given condition will be supplemented with
           random samples from the dataset. Default is False.
+        save_dir (str): If provided, the processed datasets will be saved to the given directory.
         random_seed (int): The seed with which the random sampler is seeded. If None, no seeding is applied. Default is None.
     Returns:
         DatasetDict: A Huggingface `datasets.DatasetDict` object where the test split is return as it was given and the train
@@ -28,7 +30,7 @@ def create_few_shot_subset(dataset: DatasetDict, few_shot: int=5, data_selection
         random.seed(random_seed)
     train_split = dataset["train"]
 
-    print("Applying condition to training data.")
+    print("Applying condition to training data")
     satisfying_recording_indeces = []
     for i in range(len(train_split)):
         if data_selection_condition(train_split, i):
@@ -42,7 +44,7 @@ def create_few_shot_subset(dataset: DatasetDict, few_shot: int=5, data_selection
         satisfying_recording_indeces
     )
 
-    print("Selecting samples for subset.")
+    print("Selecting samples for subset")
     selected_samples = []
     unfullfilled_labels = {}
     for label, samples in primary_samples_per_label.items():
@@ -59,7 +61,7 @@ def create_few_shot_subset(dataset: DatasetDict, few_shot: int=5, data_selection
             selected_samples.extend(random.sample(samples, few_shot))
 
     if fill_up:
-        print("Filling up labels.")
+        print("Filling up labels")
         unused_recordings = set(range(len(train_split))).difference(satisfying_recording_indeces)
         unused_primary, unused_leftover = _map_recordings_to_samples(
             train_split,
@@ -79,7 +81,18 @@ def create_few_shot_subset(dataset: DatasetDict, few_shot: int=5, data_selection
                 fill_up_samples.extend(random.sample(unused_primary[label], count))
         selected_samples.extend(fill_up_samples)
 
-    return DatasetDict({"train": Dataset.from_list(selected_samples), "test": dataset["test_5s"]})
+    processed_dataset = DatasetDict({"train": Dataset.from_list(selected_samples), "test": dataset["test_5s"]})
+
+    print("One-hot encoding labels")
+    processed_dataset = processed_dataset.rename_column("ebird_code_multilabel", "labels")
+    processed_dataset = processed_dataset.map(lambda batch: _one_hot_encode_batch(batch, len(all_labels)), batched=True)
+
+    if save_dir:
+        print("Saving processed Dataset")
+        processed_dataset.save_to_disk(save_dir)
+        print("Processed dataset save to ", save_dir)
+
+    return processed_dataset
     
 
 def _map_recordings_to_samples(train_split: Dataset, all_labels: set, recording_indeces: list):
@@ -133,3 +146,28 @@ def _remove_duplicates(batch: dict[str, ]):
                 new_batch[key].append(batch[key][b_idx])
 
     return new_batch
+
+def _one_hot_encode_batch(batch, num_classes):
+    """
+    Converts integer class labels in a batch to one-hot encoded tensors.
+    """
+    label_list = batch["labels"]
+    batch_size = len(label_list)
+    one_hot = torch.zeros((batch_size, num_classes), dtype=torch.float32)
+    for i, label in enumerate(label_list):
+        one_hot[i, label] = 1
+    return {"labels": one_hot}
+
+
+if __name__ == "__main__":
+    from datasets import load_dataset
+    
+    dataset = load_dataset(
+        path="DBD-research-group/BirdSet",
+        name="HSN",
+        cache_dir="/home/rantjuschin/data_birdset/HSN",
+    )
+    
+    processed_dataset = create_few_shot_subset(dataset)
+    print(processed_dataset["train"]["labels"][0:10])
+    print(processed_dataset["test"]["labels"][0:10])
