@@ -1,11 +1,11 @@
 from typing import Union, Literal
-from datasets import DatasetDict, Dataset, load_from_disk
+from datasets import DatasetDict, Dataset, load_dataset
 import torch
 import random
 import soundfile as sf
 from birdset.datamodule.components.event_mapping import XCEventMapping
 
-def create_few_shot_subset(dataset: Union[DatasetDict, str], few_shot: int=5, data_selection_condition: Literal["strict", "lenient"]="strict", fill_up: bool=False, save_dir: str="", random_seed: int=None) -> DatasetDict:
+def create_few_shot_subset(name: str, cache_dir: str, revision: str=None, few_shot: int=5, data_selection_condition: Literal["strict", "lenient"]="strict", fill_up: bool=False, save_dir: str="", random_seed: int=None) -> DatasetDict:
     """
     This method creates a subset of the given datasets train split with at max `few_shot` samples per label in the dataset split.
     The samples are chosen based on the given condition. If there are more than `few_shot` samples for a label `few_shot`
@@ -29,9 +29,14 @@ def create_few_shot_subset(dataset: Union[DatasetDict, str], few_shot: int=5, da
         DatasetDict: A Huggingface `datasets.DatasetDict` object where the test split is return as it was given and the train
         split is replaced with the few-shot subset of the given train split.
     """
-    if isinstance(dataset, str):
-        print("Loading dataset from disk")
-        dataset = load_from_disk(dataset)
+    print("Loading dataset")
+    dataset = load_dataset(
+        path="DBD-research-group/BirdSet",
+        name=name,
+        cache_dir=cache_dir,
+        revision=revision,
+        trust_remote_code=True
+    )
 
     if random_seed != None:
         print(f"Set random seed to {random_seed}.")
