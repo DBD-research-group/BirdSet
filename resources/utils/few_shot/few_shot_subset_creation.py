@@ -1,4 +1,4 @@
-from typing import Union, Literal
+from typing import Literal
 from datasets import DatasetDict, Dataset, load_dataset
 import torch
 import random
@@ -8,26 +8,26 @@ from birdset.datamodule.components.event_mapping import XCEventMapping
 def create_few_shot_subset(name: str, cache_dir: str, revision: str=None, few_shot: int=5, data_selection_condition: Literal["strict", "lenient"]="strict", fill_up: bool=False, save_dir: str="", random_seed: int=None) -> DatasetDict:
     """
     This method creates a subset of the given datasets train split with at max `few_shot` samples per label in the dataset split.
-    The samples are chosen based on the given condition. If there are more than `few_shot` samples for a label `few_shot`
+    The samples are chosen based on the given condition. If there are more than `few_shot` samples for a label, `few_shot`
     random samples are chosen. If exactly `few_shot` samples per label are wanted, `fill_up` should be set to `True`.
     After the samples that pass the condition are added to the subset, this will randomly fill up the unfullfilled labels
     with their respective samples from the given dataset split without regard for the condition. 
     
     Args:
-        dataset (Union[DatasetDict, str]): The dataset for which a few-shot sujbset will be created. If of type "str", the value should
-          represent a path from where the dataset can be loaded through Huggingface "datasets.load_from_disk". If of type "DatasetDict"
-          the value should be the dataset.
+        name (str): The dataset which is loaded.
+        cache_dir (str): The directory in which the dataset is to be loaded in/from.
+        revision (str): The version of the dataset that is loaded. Default is None (i.e. newest). 
         few_shot (int): The number of samples each label can have. Default is 5.
         data_selection_condition (Literal["strict", "lenient"]): A condition that defines which recordings should be included in the
           few-shot subset. Default is "strict".
         fill_up (bool): If True, labels for which not enough samples can be extracted with the given condition will be supplemented with
-          random samples from the dataset. Default is False.
+          random samples (with the same label) from the dataset. Default is False.
         save_dir (str): If provided, the processed dataset will be saved to the given directory. If equal to False the dataset
           will not be saved. It will only be returned. Default is "".
         random_seed (int): The seed with which the random sampler is seeded. If None, no seeding is applied. Default is None.
     Returns:
-        DatasetDict: A Huggingface `datasets.DatasetDict` object where the test split is return as it was given and the train
-        split is replaced with the few-shot subset of the given train split.
+        DatasetDict: A Huggingface `datasets.DatasetDict` object where train split is replaced with the few-shot subset of the
+        given train split. Additionally both the train and test splits are one-hot encoded.
     """
     print("Loading dataset")
     dataset = load_dataset(
