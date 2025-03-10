@@ -12,3 +12,14 @@ module:
         _target_: biofoundation.modules.models.linear_classifier.LinearClassifier
         num_classes: ${module.network.model.num_classes}
         in_features: ${module.network.embedding_size}        
+
+datamodule:
+  loaders:
+    train:
+      num_workers: 5
+ 
+    valid:
+      num_workers: 5
+   
+    test:
+      num_workers: 5

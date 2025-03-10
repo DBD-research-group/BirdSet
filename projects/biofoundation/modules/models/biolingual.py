@@ -55,6 +55,7 @@ class BioLingualClassifier(BirdSetModel):
             load_classifier_checkpoint=load_classifier_checkpoint,
             freeze_backbone=freeze_backbone,
             preprocess_in_model=preprocess_in_model,
+            pretrain_info=pretrain_info
         )
 
         self.checkpoint = checkpoint
