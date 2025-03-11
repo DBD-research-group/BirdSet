@@ -27,6 +27,9 @@ while [[ "$#" -gt 0 ]]; do
     --tags)
       IFS=',' read -r -a tags <<< "$2"
       shift 2;;
+    --gpu)
+      gpu=$2
+      shift 2;;
     --config)
       config_path="$2"
       shift 2;;
@@ -99,6 +102,7 @@ for model in "${models[@]}"; do
       datamodule.dataset.dataset_name=$dname \
       datamodule.dataset.hf_path="DBD-research-group/$dname" \
       datamodule.dataset.n_classes=$dclass \
+      trainer.devices=[$gpu] \
       logger.wandb.tags=[$(IFS=,; echo "${tags[*]}")] \
       $extra_args
   done
