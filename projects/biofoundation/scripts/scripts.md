@@ -41,7 +41,7 @@ The correct number of classes are automatically added.
 | beans_bats       |
 
 ## Birdset
-The birdset script [run_birdset.sh](run_birdset.sh) script is very similar to the BEANS version but for the birdset benchmark:
+The birdset script [run_birdset.sh](run_birdset.sh) is very similar to the BEANS version but for the birdset benchmark:
 
 Example:
 
