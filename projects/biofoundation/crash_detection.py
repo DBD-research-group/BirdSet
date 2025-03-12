@@ -3,15 +3,19 @@ import subprocess
 import threading
 import time
 
+# Get all arguments from the caller script (including the script name itself)
+timeout = sys.argv[1] # The first argument is the timeout
+args = sys.argv[2:]
+
+# Constants for the script
 # Define the initial timeout and the increment for retries
-INITIAL_TIMEOUT = 8_000  
-TIMEOUT_INCREMENT = 600  # 10 minutes
+INITIAL_TIMEOUT = int(timeout) * 60
+TIMEOUT_INCREMENT = 0.1 * INITIAL_TIMEOUT
 
 # Define the maximum number of retries
 MAX_RETRIES = 3
 
-# Get all arguments from the caller script (including the script name itself)
-args = sys.argv[1:]
+print(f"Running script with timeout of {INITIAL_TIMEOUT // 60} minutes.")
 
 def run_script_with_timeout(timeout):
     """Run the script with the specified timeout."""

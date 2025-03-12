@@ -8,6 +8,7 @@ default_models=("perch")
 default_seeds=(1)
 default_dnames=("beans_watkins" "beans_cbi" "beans_dogs" "beans_humbugdb" "beans_bats")
 default_dclasses=(31 264 10 14 10)
+default_timeouts=(60 180 60 130 70)
 default_tags=("run")
 gpu=1
 extras=""
@@ -59,16 +60,20 @@ fi
 if [ "${#selected_dnames[@]}" -gt 0 ]; then
   filtered_dnames=()
   filtered_dclasses=()
+  filtered_timeouts=()
   for dataset in "${selected_dnames[@]}"; do
     for i in "${!dnames[@]}"; do
       if [ "${dnames[$i]}" == "$dataset" ]; then
         filtered_dnames+=("${dnames[$i]}")
         filtered_dclasses+=("${dclasses[$i]}")
+        filtered_timeouts+=("${default_timeouts[$i]}")
       fi
     done
   done
   dnames=("${filtered_dnames[@]}")
   dclasses=("${filtered_dclasses[@]}")
+  default_timeouts=("${filtered_timeouts[@]}")
+
 fi
 
 # Function to handle Ctrl+C (SIGINT) and decide behavior
@@ -88,6 +93,7 @@ for model in "${models[@]}"; do
   for i in "${!dnames[@]}"; do
     dname=${dnames[$i]}
     dclass=${dclasses[$i]}
+    timeout=${default_timeouts[$i]}
     echo "Running with dataset_name=$dname, n_classes=$dclass"
 
     # Reset quit flag
@@ -99,6 +105,7 @@ for model in "${models[@]}"; do
     fi
 
     projects/biofoundation/train_anti_crash.sh \
+      $timeout \
       experiment="$config_path/$model" \
       seed=$seeds \
       trainer.devices=[$gpu] \
