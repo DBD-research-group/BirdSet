@@ -10,7 +10,7 @@ default_dnames=("beans_watkins" "beans_cbi" "beans_dogs" "beans_humbugdb" "beans
 default_dclasses=(31 264 10 14 10)
 default_timeouts=(60 180 60 130 70)
 default_tags=("run")
-gpu=1
+gpu=0
 extras=""
 
 # Parse arguments

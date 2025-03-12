@@ -2,7 +2,7 @@
 
 To execute runs for multiple different models and datasets scripts can be very helpful to automatically start new runs once the previous ones are finished. Additionally they make it easier to use different settings and hydra arguments.
 
-The scripts use the [anti_crash script](../train_anti_crash.sh) to detect GPU crashes which works mot of the time and retries up to 3 times.
+The scripts use the [anti_crash script](../train_anti_crash.sh) to detect GPU crashes which works mot of the time and retries up to 3 times. The timeout times are chosen automatically based on the dataset and expected runtime in the past.
 
 ####  General script logic:
 The specific script is called and then additional params can be added using `--param arg1,arg2,...`
@@ -32,7 +32,7 @@ The correct number of classes are automatically added.
 
 #### BEANS Datasets
 
-| Dataset          |
+| Datasets          |
 |------------------|
 | beans_watkins    |
 | beans_cbi        |
@@ -45,3 +45,38 @@ The birdset script [run_birdset.sh](run_birdset.sh) script is very similar to th
 
 Example:
 
+`projects/biofoundation/scripts/run_birdset.sh --config birdset/linearprobing --seeds 2 --models hubert,beats --datasets HSN,PER --tags test,run --gpu 0 --extras logger.wandb.group=example_birdset`
+
+#### Birdset Datasets
+
+| Datasets          |
+|------------------|
+| PER    |
+| POW        |
+| NES       |
+| UHH   |
+| HSN       |
+| NBP |
+| SSW |
+| SNE |
+
+
+## Models
+
+The following models are available/used in Biofoundation:
+
+| Models        |
+|------------------|
+| ast   |
+| audiomae        |
+| aves       |
+| beats   |
+| biolingual       |
+| convnext |
+| convnext_bs |
+| eat |
+| eat_ssl |
+| hubert|
+| perch|
+|ssast|
+|wav2vec2|
