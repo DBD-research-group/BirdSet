@@ -77,7 +77,7 @@ trap '
     echo "Second Ctrl+C detected. Exiting..."
     exit 1
   else
-    echo "Ctrl+C detected. Skipping current experiment..."
+    echo "Ctrl+C detected. Skipping current experiment... Press Ctrl+C again to exit"
     first_ctrl_c_triggered=true
   fi
 ' SIGINT
@@ -90,6 +90,9 @@ for model in "${models[@]}"; do
     dclass=${dclasses[$i]}
     echo "Running with dataset_name=$dname, n_classes=$dclass"
 
+    # Reset quit flag
+    sleep 3 # This allows detecting a quick second Ctrl+C press
+    first_ctrl_c_triggered=false
     # Build the extra arguments if --extras was provided
     if [ -n "$extras" ]; then
       extra_args=$(echo "$extras" | sed 's/,/ /g' | sed 's/=/=/g')

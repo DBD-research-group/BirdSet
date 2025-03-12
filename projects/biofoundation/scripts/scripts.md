@@ -19,7 +19,7 @@ The following optional params are available:
 | `--gpu` | Specifies the GPU number to use |
 | `--extras` | allows parsing any additional hydra arguments |
 
-With `Ctrl + C` the current experiment can be skipped and with a second press the entire run script can be quit. 
+With `Ctrl + C` the current experiment can be skipped and with a second press within 3 seconds the entire run script can be quit. 
 
 ## BEANS
 For the BEANS benchmark the [run_beans.sh](run_beans.sh) script is available:
