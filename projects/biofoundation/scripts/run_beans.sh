@@ -8,8 +8,8 @@ default_models=("perch")
 default_seeds=(1)
 default_dnames=("beans_watkins" "beans_cbi" "beans_dogs" "beans_humbugdb" "beans_bats")
 default_dclasses=(31 264 10 14 10)
-default_timeouts=(60 180 60 130 70)
-default_tags=("run")
+default_timeouts=(120 300 120 230 140)
+default_tags=()
 gpu=0
 extras=""
 
@@ -104,6 +104,12 @@ for model in "${models[@]}"; do
       extra_args=$(echo "$extras" | sed 's/,/ /g' | sed 's/=/=/g')
     fi
 
+    # Conditionally add tags if they exist (to not override old one if none given)
+    tag_args=""
+    if [ -n "${tags[*]}" ]; then
+      tag_args="+logger.wandb.tags=[$(IFS=,; echo "${tags[*]}")"]
+    fi
+
     projects/biofoundation/train_anti_crash.sh \
       $timeout \
       experiment="$config_path/$model" \
@@ -113,7 +119,7 @@ for model in "${models[@]}"; do
       datamodule.dataset.hf_path="DBD-research-group/$dname" \
       datamodule.dataset.n_classes=$dclass \
       trainer.devices=[$gpu] \
-      logger.wandb.tags=[$(IFS=,; echo "${tags[*]}")] \
+      $tag_args \
       $extra_args
   done
 done

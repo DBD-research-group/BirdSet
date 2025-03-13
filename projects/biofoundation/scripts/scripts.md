@@ -15,7 +15,7 @@ The following optional params are available:
 | `--models` | Specifies the models to use |
 | `--datasets` | Specifies the datasets to use |
 | `--seeds` | Specifies the seed(s) to use |
-| `--tags` | Specifies a list of tags to add |
+| `--tags` | Specifies a list of tags to add. Note that the original tags are overwritten due to [limitations](https://github.com/facebookresearch/hydra/issues/1547) |
 | `--gpu` | Specifies the GPU number to use |
 | `--extras` | allows parsing any additional hydra arguments |
 

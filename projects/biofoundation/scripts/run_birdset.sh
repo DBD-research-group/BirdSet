@@ -8,7 +8,7 @@ default_models=("perch")
 default_seeds=(1)
 default_dnames=("PER" "POW" "NES" "UHH" "HSN" "NBP" "SSW" "SNE")
 default_timeouts=(120 120 120 120 120 120 120 120) # All 2 hours for now
-default_tags=("run")
+default_tags=()
 gpu=0
 extras=""
 
@@ -93,9 +93,16 @@ for model in "${models[@]}"; do
     # Reset quit flag
     sleep 3 # This allows detecting a quick second Ctrl+C press
     first_ctrl_c_triggered=false
+
     # Build the extra arguments if --extras was provided
     if [ -n "$extras" ]; then
       extra_args=$(echo "$extras" | sed 's/,/ /g' | sed 's/=/=/g')
+    fi
+
+    # Conditionally add tags if they exist (to not override old one if none given)
+    tag_args=""
+    if [ -n "${tags[*]}" ]; then
+      tag_args="+logger.wandb.tags=[$(IFS=,; echo "${tags[*]}")"]
     fi
 
     projects/biofoundation/train_anti_crash.sh \
@@ -106,7 +113,7 @@ for model in "${models[@]}"; do
       datamodule.dataset.dataset_name=$dname \
       datamodule.dataset.hf_name=$dname \
       trainer.devices=[$gpu] \
-      logger.wandb.tags=[$(IFS=,; echo "${tags[*]}")] \
+      $tag_args \
       $extra_args
   done
 done
