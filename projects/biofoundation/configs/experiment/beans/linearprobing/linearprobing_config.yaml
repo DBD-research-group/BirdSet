@@ -44,7 +44,7 @@ module:
 trainer:
   min_epochs: 1
   max_epochs: 100
-  devices: [1]
+  devices: [3]
  
 datamodule:
   dataset:
@@ -87,7 +87,7 @@ callbacks:
   early_stopping:
     _target_: lightning.pytorch.callbacks.EarlyStopping
     monitor: "val/MulticlassAccuracy"
-    patience: 8
+    patience: 15
     mode: 'max'
     min_delta: 1e-3 
     verbose: False

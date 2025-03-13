@@ -83,7 +83,7 @@ callbacks:
   early_stopping:
     _target_: lightning.pytorch.callbacks.EarlyStopping
     monitor: "val/MulticlassAccuracy"
-    patience: 5
+    patience: 10
     mode: 'max'
     min_delta: 1e-3 
     verbose: False
