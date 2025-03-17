@@ -9,7 +9,7 @@ defaults:
   - override /datamodule/transforms: bird_default_multilabel.yaml
   - override /paths: default.yaml
   - override /hydra: default.yaml
-tags: ["biofoundation", "Birdset", "augmentations", "finetune", "${module.network.model_name}"]
+tags: ["biofoundation", "BirdSet", "augmentations", "finetune", "${module.network.model_name}"]
 seed: 1
 train: True
 test: True
