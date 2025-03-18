@@ -27,17 +27,20 @@ class EfficientNetBirdSet(nn.Module):
             checkpoint="DBD-research-group/EfficientNet-B1-BirdSet-XCL",
             num_classes=num_classes,
         )
+        self.spectrogram_converter = torchaudio.transforms.Spectrogram(
+            n_fft=2048, hop_length=256, power=2.0
+        )
+        self.mel_converter = torchaudio.transforms.MelScale(
+            n_mels=256, n_stft=1025, sample_rate=32_000
+        )
         self.powerToDB = PowerToDB(top_db=80)
         self.config = self.model.model.config
 
     def preprocess(self, waveform: torch.Tensor):
         # convert waveform to spectrogram
-        spectrogram = torchaudio.transforms.Spectrogram(
-            n_fft=2048, hop_length=256, power=2.0
-        )(waveform)
-        melspec = torchaudio.transforms.MelScale(
-            n_mels=256, n_stft=1025, sample_rate=32_000
-        )(spectrogram)
+        spectrogram = self.spectrogram_converter(waveform)
+        spectrogram = spectrogram.to(torch.float32)
+        melspec = self.mel_converter(spectrogram)
         dbscale = self.powerToDB(melspec)
         normalized_dbscale = transforms.Normalize((-4.268,), (4.569,))(dbscale)
         # add batch dimension if needed

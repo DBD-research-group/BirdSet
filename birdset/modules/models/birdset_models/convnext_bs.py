@@ -27,22 +27,26 @@ class ConvNextBirdSet(nn.Module):
             checkpoint="DBD-research-group/ConvNeXT-Base-BirdSet-XCL",
             num_classes=num_classes,
         )
+        self.spectrogram_converter = torchaudio.transforms.Spectrogram(
+            n_fft=1024, hop_length=320, power=2.0
+        )
+        self.mel_converter = torchaudio.transforms.MelScale(
+            n_mels=128, n_stft=513, sample_rate=32_000
+        )
+        self.normalizer = transforms.Normalize((-4.268,), (4.569,))
         self.powerToDB = PowerToDB(top_db=80)
         self.config = self.model.model.config
 
     def preprocess(self, waveform: torch.Tensor):
         # convert waveform to spectrogram
-        spectrogram = torchaudio.transforms.Spectrogram(
-            n_fft=1024, hop_length=320, power=2.0
-        )(waveform)
-        melspec = torchaudio.transforms.MelScale(
-            n_mels=128, n_stft=513, sample_rate=32_000
-        )(spectrogram)
+        spectrogram = self.spectrogram_converter(waveform)
+        spectrogram = spectrogram.to(torch.float32)
+        melspec = self.mel_converter(spectrogram)
         dbscale = self.powerToDB(melspec)
-        normalized_dbscale = transforms.Normalize((-4.268,), (4.569,))(dbscale)
-        # add batch dimension if needed
-        if normalized_dbscale.dim() == 3:
-            normalized_dbscale = normalized_dbscale.unsqueeze(0)
+        normalized_dbscale = self.normalizer(dbscale)
+        # add dimension 3 from left
+        normalized_dbscale = normalized_dbscale.unsqueeze(-3)
+
         return normalized_dbscale
 
     def forward(self, input: torch.Tensor):
