@@ -7,7 +7,7 @@ model:
   n_layers: 4
   nhead: 8
   factors: [4, 4, 4, 4]
-  n_classes: null
+  num_classes: null
   dim_feedforward: 512
   pretrain_info: null
   

@@ -164,7 +164,7 @@ class SoundNet(nn.Module):
         n_layers: int = 4,
         nhead: int = 8,
         factors: List[int] = [4, 4, 4, 4],
-        n_classes: int | None = None,
+        num_classes: int | None = None,
         dim_feedforward: int = 512,
         local_checkpoint: str | None = None,
         pretrain_info=None,
@@ -186,7 +186,7 @@ class SoundNet(nn.Module):
                 .names
             )
         else:
-            self.num_classes = n_classes
+            self.num_classes = num_classes
 
         ds_fac = np.prod(np.array(factors)) * 4
         clip_length = seq_len // ds_fac
