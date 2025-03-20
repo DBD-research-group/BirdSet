@@ -2,7 +2,7 @@
 
 To execute runs for multiple different models and datasets scripts can be very helpful to automatically start new runs once the previous ones are finished. Additionally they make it easier to use different settings and hydra arguments.
 
-The scripts use the [anti_crash script](../train_anti_crash.sh) to detect GPU crashes which works mot of the time and retries up to 3 times. The timeout times are chosen automatically based on the dataset and expected runtime in the past.
+The scripts use the [anti_crash script](../train_anti_crash.sh) to detect GPU crashes which works mot of the time and retries up to 3 times. The timeout times are chosen automatically based on the dataset and expected runtime in the past. Additionally they can be set globlly with a flag.
 
 ####  General script logic:
 The specific script is called and then additional params can be added using `--param arg1,arg2,...`
@@ -17,7 +17,8 @@ The following optional params are available:
 | `--seeds` | Specifies the seed(s) to use |
 | `--tags` | Specifies a list of tags to add. Note that the original tags are overwritten due to [limitations](https://github.com/facebookresearch/hydra/issues/1547) |
 | `--gpu` | Specifies the GPU number to use |
-| `--extras` | allows parsing any additional hydra arguments |
+| `--timeout` | Specifies a global timeout for crashes instead of the default per dataset. Recommended if experiencing run quits due to timeout |
+| `--extras` | Allows parsing any additional hydra arguments |
 
 With `Ctrl + C` the current experiment can be skipped and with a second press within 3 seconds the entire run script can be quit. 
 

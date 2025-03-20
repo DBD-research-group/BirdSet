@@ -7,7 +7,7 @@
 default_models=("perch")
 default_seeds=(1)
 default_dnames=("PER" "POW" "NES" "UHH" "HSN" "NBP" "SSW" "SNE")
-default_timeouts=(120 120 120 120 120 120 120 120) # All 2 hours for now
+default_timeouts=(240 240 240 240 240 240 240 240) # All 2 hours for now
 default_tags=()
 gpu=0
 extras=""
@@ -33,6 +33,9 @@ while [[ "$#" -gt 0 ]]; do
     --config)
       config_path="$2"
       shift 2;;
+    --timeout)
+      global_timeout="$2"
+      shift 2;;  
     --extras)
       extras="$2"
       shift 2;;  
@@ -103,6 +106,10 @@ for model in "${models[@]}"; do
     tag_args=""
     if [ -n "${tags[*]}" ]; then
       tag_args="+logger.wandb.tags=[$(IFS=,; echo "${tags[*]}")"]
+    fi
+
+    if [ -n "$global_timeout" ]; then
+      timeout=$global_timeout
     fi
 
     projects/biofoundation/train_anti_crash.sh \
