@@ -13,6 +13,6 @@ model:
   
 torch_compile: False
 model_type: waveform
-sampling_rate: 22050
+sample_rate: 22050
 normalize_spectrogram: False
 normalize_waveform: instance_min_max

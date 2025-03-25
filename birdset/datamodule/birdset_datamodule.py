@@ -37,7 +37,7 @@ class BirdSetDataModule(BaseDataModuleHF):
             task="multilabel",
             classlimit=500,
             eventlimit=5,
-            sampling_rate=32000,
+            sample_rate=32000,
         ),
         loaders: LoadersConfig = LoadersConfig(),
         transforms: BirdSetTransformsWrapper = BirdSetTransformsWrapper(),
