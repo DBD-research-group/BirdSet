@@ -34,7 +34,7 @@ class BioLingualClassifier(BirdSetModel):
         local_checkpoint: str = None,
         load_classifier_checkpoint: bool = True,
         freeze_backbone: bool = False,
-        preprocess_in_model: bool = True,
+        preprocess_in_model: bool = False,
         classifier: nn.Module = None,
         pretrain_info: PretrainInfoConfig = None,
         device: int | str = "cuda",
@@ -68,7 +68,7 @@ class BioLingualClassifier(BirdSetModel):
         else:
             self.classifier = classifier
 
-        self.processor = ClapProcessor.from_pretrained(checkpoint)
+        #self.processor = ClapProcessor.from_pretrained(checkpoint) This takes too much memory if activated
 
         if local_checkpoint:
             self._load_local_checkpoint()
@@ -83,11 +83,12 @@ class BioLingualClassifier(BirdSetModel):
         The waveform gets resampled to 16kHz, transformed into a fbank and then normalized.
         """
         if self.preprocess_in_model:
+            input_values = input_values .squeeze(1)
             return self.processor(
                 audios=input_values.cpu().numpy(),
                 return_tensors="pt",
                 sampling_rate=48000,
-            ).to(input_values.device)
+            ).input_features.to(input_values.device)
         else:
             return input_values
 
@@ -99,10 +100,9 @@ class BioLingualClassifier(BirdSetModel):
         return self.classifier(embeddings)
 
     def get_embeddings(self, input_tensor) -> torch.Tensor:
-        input_tensor = input_tensor.squeeze(1)
         inputs = self._preprocess(input_tensor)
         audio_embed = self.model.get_audio_features(
-            **inputs, output_hidden_states=True, return_dict=True
+            inputs, output_hidden_states=True, return_dict=True
         )
         # audio_embed doesnt return hidden states for some reason
         return audio_embed

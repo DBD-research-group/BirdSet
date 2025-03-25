@@ -3,3 +3,8 @@
 defaults:
   - beans/linearprobing/linearprobing_config.yaml 
   - override /module/network: biolingual.yaml  
+
+module:
+  network:
+    model:
+      preprocess_in_model: False
