@@ -861,22 +861,23 @@ class AddBackgroundNoise(BaseWaveformTransform):
             background_path = random.choice(self.background_paths)
             background_num_samples = audio.get_num_samples(background_path)
 
-            if background_num_samples > missing_num_samples:
+            # If the background sample is longer than what we need, extract the exact amount
+            if background_num_samples >= missing_num_samples:
                 sample_offset = random.randint(
                     0, background_num_samples - missing_num_samples
                 )
-                num_samples = missing_num_samples
                 background_samples = audio(
                     background_path,
                     sample_offset=sample_offset,
-                    num_samples=num_samples,
+                    num_samples=missing_num_samples,
                 )
-                missing_num_samples = 0
-            else:
-                background_samples = audio(background_path)
-                missing_num_samples -= background_num_samples
+                pieces.append(background_samples)
+                # background_samples matches missing_num_samples, break out of while loop
+                break
 
+            background_samples = audio(background_path)
             pieces.append(background_samples)
+            missing_num_samples -= background_num_samples
 
         # the inner call to rms_normalize ensures concatenated pieces share the same RMS (1)
         # the outer call to rms_normalize ensures that the resulting background has an RMS of 1
