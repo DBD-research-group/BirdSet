@@ -876,7 +876,7 @@ class AddBackgroundNoise(BaseWaveformTransform):
 
             background_samples = audio(background_path)
             pieces.append(background_samples)
-            missing_num_samples -= background_samples.shape[-1]
+            missing_num_samples -= background_num_samples
 
         # the inner call to rms_normalize ensures concatenated pieces share the same RMS (1)
         # the outer call to rms_normalize ensures that the resulting background has an RMS of 1
