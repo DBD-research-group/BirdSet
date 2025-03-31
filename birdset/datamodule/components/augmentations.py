@@ -872,6 +872,7 @@ class AddBackgroundNoise(BaseWaveformTransform):
                     num_samples=missing_num_samples,
                 )
                 pieces.append(background_samples)
+                # background_samples matches missing_num_samples, break out of while loop
                 break
 
             background_samples = audio(background_path)
