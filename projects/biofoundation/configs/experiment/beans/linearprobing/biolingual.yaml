@@ -8,3 +8,14 @@ module:
   network:
     model:
       preprocess_in_model: False
+
+datamodule:
+  loaders:
+    train:
+      num_workers: 10
+ 
+    valid:
+      num_workers: 10
+   
+    test:
+      num_workers: 10
