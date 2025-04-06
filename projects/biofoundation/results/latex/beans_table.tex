@@ -1,0 +1,41 @@
+\renewcommand{\arraystretch}{0.6} % Increase row height
+\setlength{\tabcolsep}{2pt}
+% Color gradient for heatmap col
+
+\begin{tabular}{p{2cm} p{1.2cm} | ccccc | ccccc !{\vrule width 1.3pt}cc}
+    \toprule
+    \multicolumn{2}{c}{}                      & \multicolumn{5}{c}{\textbf{Linearprobing}} & \multicolumn{5}{c}{\textbf{Finetuning}}  & \multicolumn{2}{c}{\textbf{Score}} \\
+    \addlinespace[2pt]
+    \cline{3-14}
+    \addlinespace[2pt]
+
+    \multicolumn{1}{c}{}                      &                                            & \cellcolor{gray!25}\textbf{\textsc{WTK}} & \cellcolor{gray!25}\textbf{\textsc{BAT}} & \cellcolor{gray!25}\textbf{\textsc{CBI}} & \cellcolor{gray!25}\textbf{\textsc{DOG}} & \cellcolor{gray!25}\textbf{\textsc{HDB}} & \cellcolor{gray!25}\textbf{\textsc{WTK}} & \cellcolor{gray!25}\textbf{\textsc{BAT}} & \cellcolor{gray!25}\textbf{\textsc{CBI}} & \cellcolor{gray!25}\textbf{\textsc{DOG}} & \cellcolor{gray!25}\textbf{\textsc{HDB}} & \cellcolor{gray!25}\textbf{\textsc{LP}} & \cellcolor{gray!25}\textbf{\textsc{FT}} \\
+    \midrule \rule{0pt}{0.8em}
+
+\multirow{2}{*}{\textbf{Ast}} & {Top-1} & \underline{48.4} & 19.8 & 2.8 & 28.8 & \textbf{65.8} & \textbf{80.2} & 51.5 & 35.7 & \underline{79.1} & 76.0 & \heatgreen{33} & \heatgreen{64} \\ [0.1em]
+ & {AUROC} & \textbf{95.6} & 66.6 & 68.2 & 78.5 & \underline{89.4} & \textbf{98.2} & 89.0 & 93.0 & \underline{97.2} & 96.1 & \heatblue{80} & \heatblue{95} \\ [0.1em]\hline \rule{0pt}{0.8em}
+\multirow{2}{*}{\textbf{Audio Mae}} & {Top-1} & 20.1 & \underline{28.7} & 7.4 & 23.0 & \textbf{72.2} & \textbf{89.4} & 71.1 & 59.9 & 80.6 & \underline{81.9} & \heatgreen{30} & \heatgreen{77} \\ [0.1em]
+ & {AUROC} & 79.2 & 79.7 & \underline{82.0} & 69.8 & \textbf{94.5} & \textbf{99.4} & 96.2 & 97.1 & \underline{99.0} & 97.7 & \heatblue{81} & \heatblue{98} \\ [0.1em]\hline \rule{0pt}{0.8em}
+\multirow{2}{*}{\textbf{Aves}} & {Top-1} & \underline{61.7} & 36.1 & 6.3 & 56.8 & \textbf{72.1} & \underline{81.7} & 72.8 & 60.1 & \textbf{95.7} & 79.2 & \heatgreen{47} & \heatgreen{78} \\ [0.1em]
+ & {AUROC} & \textbf{95.6} & 84.2 & 82.0 & 87.2 & \underline{92.9} & \underline{98.9} & 96.2 & 96.6 & \textbf{99.8} & 96.6 & \heatblue{88} & \heatblue{98} \\ [0.1em]\hline \rule{0pt}{0.8em}
+\multirow{2}{*}{\textbf{Beats}} & {Top-1} & \textbf{83.2} & 59.5 & 19.9 & \underline{80.6} & 78.1 & \underline{91.7} & 75.2 & 67.1 & \textbf{95.7} & 84.3 & \heatgreen{64} & \heatgreen{83} \\ [0.1em]
+ & {AUROC} & \textbf{98.8} & 93.2 & 89.0 & \underline{96.6} & 96.1 & \underline{99.5} & 96.6 & 97.5 & \textbf{99.6} & 97.6 & \heatblue{95} & \heatblue{98} \\ [0.1em]\hline \rule{0pt}{0.8em}
+\multirow{2}{*}{\textbf{Biolingual}} & {Top-1} & \textbf{77.9} & 53.5 & 0.0 & \underline{66.9} & 0.0 & \underline{91.7} & 74.2 & 0.0 & \textbf{93.5} & 81.3 & \heatgreen{40} & \heatgreen{68} \\ [0.1em]
+ & {AUROC} & \textbf{98.4} & 88.8 & 0.0 & \underline{93.1} & 0.0 & \underline{99.1} & 95.5 & 0.0 & \textbf{99.9} & 94.4 & \heatblue{56} & \heatblue{78} \\ [0.1em]\hline \rule{0pt}{0.8em}
+\multirow{2}{*}{\textbf{Convnext}} & {Top-1} & \textbf{67.0} & 32.6 & 10.1 & 58.3 & \underline{66.5} & \textbf{88.8} & 63.7 & 62.5 & \underline{86.3} & 80.3 & \heatgreen{47} & \heatgreen{76} \\ [0.1em]
+ & {AUROC} & \textbf{97.1} & 78.9 & 81.1 & \underline{92.7} & 91.8 & \textbf{99.4} & 93.5 & 97.1 & \underline{99.0} & 97.2 & \heatblue{88} & \heatblue{97} \\ [0.1em]\hline \rule{0pt}{0.8em}
+\multirow{2}{*}{\textbf{Convnext Bs}} & {Top-1} & \textbf{71.7} & 41.8 & 37.7 & \underline{67.6} & 34.5 & \textbf{90.6} & 68.4 & 78.4 & \underline{88.5} & 82.9 & \heatgreen{51} & \heatgreen{82} \\ [0.1em]
+ & {AUROC} & \textbf{97.8} & 82.0 & 92.4 & \underline{95.4} & 60.1 & \underline{99.5} & 94.0 & 98.4 & 99.5 & 97.1 & \heatblue{86} & \heatblue{98} \\ [0.1em]\hline \rule{0pt}{0.8em}
+\multirow{2}{*}{\textbf{Eat}} & {Top-1} & 66.4 & 41.4 & 59.8 & \textbf{84.2} & \underline{67.5} & \underline{79.4} & 75.8 & 67.1 & \textbf{84.9} & 77.6 & \heatgreen{64} & \heatgreen{77} \\ [0.1em]
+ & {AUROC} & 96.5 & 84.8 & \underline{97.0} & \textbf{97.7} & 91.5 & \textbf{98.8} & 96.6 & 97.4 & \underline{98.4} & 96.8 & \heatblue{94} & \heatblue{98} \\ [0.1em]\hline \rule{0pt}{0.8em}
+\multirow{2}{*}{\textbf{Eat Ssl}} & {Top-1} & 67.6 & 46.5 & 29.6 & \textbf{74.1} & \underline{72.0} & \underline{83.5} & 71.6 & 64.8 & \textbf{94.2} & 80.1 & \heatgreen{58} & \heatgreen{79} \\ [0.1em]
+ & {AUROC} & \underline{97.2} & 86.2 & 93.9 & \textbf{98.5} & 95.2 & \underline{99.2} & 96.4 & 96.8 & \textbf{99.8} & 96.9 & \heatblue{94} & \heatblue{98} \\ [0.1em]\hline \rule{0pt}{0.8em}
+\multirow{2}{*}{\textbf{Hubert}} & {Top-1} & 61.1 & 46.3 & 17.5 & \underline{62.6} & \textbf{73.3} & \underline{82.0} & 74.4 & 60.3 & \textbf{88.5} & 79.3 & \heatgreen{52} & \heatgreen{77} \\ [0.1em]
+ & {AUROC} & \textbf{96.5} & 88.1 & 84.8 & 90.1 & \underline{94.1} & \underline{98.3} & 96.4 & 96.5 & \textbf{99.3} & 97.0 & \heatblue{91} & \heatblue{98} \\ [0.1em]\hline \rule{0pt}{0.8em}
+\multirow{2}{*}{\textbf{Perch}} & {Top-1} & \underline{82.9} & 53.6 & 78.6 & \textbf{92.8} & 72.4 & \textbf{0.0} & 0.0 & 0.0 & \underline{0.0} & 0.0 & \heatgreen{76} & \heatgreen{0} \\ [0.1em]
+ & {AUROC} & 98.0 & 88.3 & \underline{98.8} & \textbf{99.7} & 93.9 & \textbf{0.0} & 0.0 & 0.0 & \underline{0.0} & 0.0 & \heatblue{96} & \heatblue{0} \\ [0.1em]\hline \rule{0pt}{0.8em}
+\multirow{2}{*}{\textbf{Ssast}} & {Top-1} & \underline{23.9} & 16.6 & 0.8 & 21.6 & \textbf{54.4} & \underline{67.8} & 53.1 & 28.5 & 22.3 & \textbf{72.5} & \heatgreen{23} & \heatgreen{49} \\ [0.1em]
+ & {AUROC} & \underline{84.1} & 73.4 & 58.8 & 65.9 & \textbf{85.4} & \textbf{97.0} & 89.5 & 90.1 & 66.0 & \underline{94.5} & \heatblue{73} & \heatblue{87} \\ [0.1em]\hline \rule{0pt}{0.8em}
+\multirow{2}{*}{\textbf{Wav2Vec2}} & {Top-1} & 54.3 & 48.4 & 8.3 & \underline{56.1} & \textbf{72.9} & 0.0 & 18.4 & 0.0 & \underline{21.6} & \textbf{62.3} & \heatgreen{48} & \heatgreen{20} \\ [0.1em]
+ & {AUROC} & \underline{93.7} & 89.0 & 78.5 & 89.6 & \textbf{94.0} & 0.0 & \underline{64.4} & 49.9 & 62.9 & \textbf{82.1} & \heatblue{89} & \heatblue{52} \\ [0.1em]    \bottomrule
+\end{tabular}
