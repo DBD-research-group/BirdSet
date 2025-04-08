@@ -14,7 +14,7 @@ def format_values(values):
         rounded = np.round(col, 1)
         max_idx = np.argmax(rounded)
         second_max_idx = np.argsort(rounded)[-2]
-        formatted = [f"{val:.1f}" for val in rounded]
+        formatted = [f"{val:.1f}" if val > 0 else "-" for val in rounded]
         formatted[max_idx] = f"\\textbf{{{rounded[max_idx]:.1f}}}"
         formatted[second_max_idx] = f"\\underline{{{rounded[second_max_idx]:.1f}}}"
         formatted_columns.append(formatted)
@@ -42,6 +42,14 @@ def format_name(name):
         )    
     return name
 
+def format_hm(values, color):
+    rounded = np.round(values, 1)
+    max_idx = np.argmax(rounded)
+    second_max_idx = np.argsort(rounded)[-2]
+    formatted = [f"\\heat{color}{{{val:.1f}}}" if val > 0 else "-" for val in rounded]
+    formatted[max_idx] = f"\\heat{color}[bold]{{{rounded[max_idx]:.1f}}}"
+    formatted[second_max_idx] = f"\\heat{color}[underline]{{{rounded[second_max_idx]:.1f}}}"
+    return formatted
 
 # === BEANS ===
 def beans_table(path):
@@ -132,17 +140,22 @@ def beans_table(path):
     all_auroc_lp = format_values(all_auroc_lp)
     all_auroc_ft = format_values(all_auroc_ft)
 
+    all_avg_auroc_lp = format_hm(all_avg_auroc_lp, "blue")
+    all_avg_auroc_ft = format_hm(all_avg_auroc_ft, "blue")
+    all_avg_top1_lp = format_hm(all_avg_top1_lp, "green")
+    all_avg_top1_ft = format_hm(all_avg_top1_ft, "green")
+
     with open(output_path, "a") as f:
         for i, model in enumerate(models):
 
             # Write LaTeX to a file
             f.write(f"\\multirow{{2}}{{*}}{{\\textbf{{{model.replace('_', ' ').title()}}}}} & {{Top-1}} & " +
                     " & ".join(all_top1_lp[i]) + f" & " + " & ".join(all_top1_ft[i]) +
-                    f" & \\heatgreen{{{all_avg_top1_lp[i]}}} & \\heatgreen{{{all_avg_top1_ft[i]}}} \\\\ [0.1em]\n")
+                    f" & {all_avg_top1_lp[i]} & {all_avg_top1_ft[i]} \\\\ [0.1em]\n")
 
             f.write(f" & {{AUROC}} & " +
                     " & ".join(all_auroc_lp[i]) + f" & " + " & ".join(all_auroc_ft[i]) +
-                    f" & \\heatblue{{{all_avg_auroc_lp[i]}}} & \\heatblue{{{all_avg_auroc_ft[i]}}} \\\\ [0.1em]")
+                    f" & {all_avg_auroc_lp[i]} & {all_avg_auroc_ft[i]} \\\\ [0.1em]")
             if model != models[-1]:
                 f.write(f"\\hline \\rule{{0pt}}{{0.8em}}\n")
 
@@ -230,12 +243,12 @@ def birdset_table(path):
             cmap_ft.append(ft_rows['Cmap'].max() if not ft_rows.empty else 0)  # Max value for FT Cmap
 
         # Averages
-        avg_top1_lp = int(np.round(np.mean(top1_lp), 0))
-        avg_top1_ft = int(np.round(np.mean(top1_ft), 0))
-        avg_auroc_lp = int(np.round(np.mean(auroc_lp), 0))
-        avg_auroc_ft = int(np.round(np.mean(auroc_ft), 0))
-        avg_cmap_lp = int(np.round(np.mean(cmap_lp), 0))
-        avg_cmap_ft = int(np.round(np.mean(cmap_ft), 0))
+        avg_top1_lp = round(np.mean([x for x in top1_lp if x > 0]), 1) if any(x > 0 for x in top1_lp) else 0
+        avg_top1_ft = round(np.mean([x for x in top1_ft if x > 0]), 1) if any(x > 0 for x in top1_ft) else 0
+        avg_auroc_lp = round(np.mean([x for x in auroc_lp if x > 0]), 1) if any(x > 0 for x in auroc_lp) else 0
+        avg_auroc_ft = round(np.mean([x for x in auroc_ft if x > 0]), 1) if any(x > 0 for x in auroc_ft) else 0
+        avg_cmap_lp = round(np.mean([x for x in cmap_lp if x > 0]), 1) if any(x > 0 for x in cmap_lp) else 0
+        avg_cmap_ft = round(np.mean([x for x in cmap_ft if x > 0]), 1) if any(x > 0 for x in cmap_ft) else 0
 
         # Store all values for later processing
         all_top1_lp.append(top1_lp)
@@ -255,9 +268,17 @@ def birdset_table(path):
     all_top1_lp = format_values(all_top1_lp)
     all_top1_ft = format_values(all_top1_ft)
     all_auroc_lp = format_values(all_auroc_lp)
-    all_auroc_ft = format_values(all_auroc_ft)
+    all_auroc_ft = format_values(all_auroc_ft) 
     all_cmap_lp = format_values(all_cmap_lp)
     all_cmap_ft = format_values(all_cmap_ft)
+
+    # Format cmap values for heatmap
+    all_avg_cmap_lp = format_hm(all_avg_cmap_lp, "red")
+    all_avg_cmap_ft = format_hm(all_avg_cmap_ft, "red")
+    all_avg_auroc_lp = format_hm(all_avg_auroc_lp, "blue")
+    all_avg_auroc_ft = format_hm(all_avg_auroc_ft, "blue")
+    all_avg_top1_lp = format_hm(all_avg_top1_lp, "green")
+    all_avg_top1_ft = format_hm(all_avg_top1_ft, "green")
 
     with open(output_path, "a") as f:
         for i, model in enumerate(models):
@@ -265,18 +286,18 @@ def birdset_table(path):
             # Write LaTeX to a file
             f.write(f"\\multirow{{3}}{{*}}{{\\textbf{{{format_name(model)}}}}} & {{cmAP}} & " +
                     " & ".join(all_cmap_lp[i]) + f" & " + " & ".join(all_cmap_ft[i]) +
-                    f" & \\heatred{{{all_avg_cmap_lp[i]}}} & \\heatred{{{all_avg_cmap_ft[i]}}} \\\\ [0.1em]\n")
+                    f" & {all_avg_cmap_lp[i]} & {all_avg_cmap_ft[i]} \\\\ [0.1em]\n")
 
             f.write(f" & {{AUROC}} & " +
                     " & ".join(all_auroc_lp[i]) + f" & " + " & ".join(all_auroc_ft[i]) +
-                    f" & \\heatblue{{{all_avg_auroc_lp[i]}}} & \\heatblue{{{all_avg_auroc_ft[i]}}} \\\\ [0.1em]\n")
+                    f" & {all_avg_auroc_lp[i]} & {all_avg_auroc_ft[i]} \\\\ [0.1em]\n")
             
             f.write(f" & {{Top-1}} & " +
                     " & ".join(all_top1_lp[i]) + f" & " + " & ".join(all_top1_ft[i]) +
-                    f" & \\heatgreen{{{all_avg_top1_lp[i]}}} & \\heatgreen{{{all_avg_top1_ft[i]}}} \\\\ [0.1em]")
+                    f" & {all_avg_top1_lp[i]} & {all_avg_top1_ft[i]} \\\\ [0.1em]")
             
             if model != models[-1]:
-                f.write(f"\\hline \\rule{{0pt}}{{0.8em}}\n")
+                f.write(f"\\hline \n")
 
     # === Table end part ===
     with open(output_path, "a") as f:
