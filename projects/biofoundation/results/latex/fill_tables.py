@@ -111,7 +111,7 @@ def beans_table(path):
 
         for dataset in datasets:
             lp_rows = df[(df['Model'] == model) & (df['Dataset'] == dataset) & (df['Tags'].str.contains('linearprobing'))]
-            ft_rows = df[(df['Model'] == model) & (df['Dataset'] == dataset) & (df['Tags'].str.contains('finetune'))]
+            ft_rows = df[(df['Model'] == model) & (df['Dataset'] == dataset) & (df['Tags'].str.contains('finetune|finetuning'))]
             
             top1_lp.append(lp_rows['Top1'].max() if not lp_rows.empty else 0)  # Max value for LP Top1
             top1_ft.append(ft_rows['Top1'].max() if not ft_rows.empty else 0)  # Max value for FT Top1
@@ -233,7 +233,7 @@ def birdset_table(path):
 
         for dataset in datasets:
             lp_rows = df[(df['Model'] == model) & (df['Dataset'] == dataset) & (df['Tags'].str.contains('linearprobing'))]
-            ft_rows = df[(df['Model'] == model) & (df['Dataset'] == dataset) & (df['Tags'].str.contains('finetune'))]
+            ft_rows = df[(df['Model'] == model) & (df['Dataset'] == dataset) & (df['Tags'].str.contains('finetune|finetuning'))]
             
             top1_lp.append(lp_rows['Top1'].max() if not lp_rows.empty else 0)  # Max value for LP Top1
             top1_ft.append(ft_rows['Top1'].max() if not ft_rows.empty else 0)  # Max value for FT Top1
