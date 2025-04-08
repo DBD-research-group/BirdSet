@@ -119,10 +119,10 @@ def beans_table(path):
             auroc_ft.append(ft_rows['AUROC'].max() if not ft_rows.empty else 0)  # Max value for FT AUROC
 
         # Averages
-        avg_top1_lp = int(np.round(np.mean([x for x in top1_lp if x > 0]), 0)) if any(x > 0 for x in top1_lp) else 0
-        avg_top1_ft = int(np.round(np.mean([x for x in top1_ft if x > 0]), 0)) if any(x > 0 for x in top1_ft) else 0
-        avg_auroc_lp = int(np.round(np.mean([x for x in auroc_lp if x > 0]), 0)) if any(x > 0 for x in auroc_lp) else 0
-        avg_auroc_ft = int(np.round(np.mean([x for x in auroc_ft if x > 0]), 0)) if any(x > 0 for x in auroc_ft) else 0
+        avg_top1_lp = np.round(np.mean([x for x in top1_lp if x > 0]), 1) if any(x > 0 for x in top1_lp) else 0
+        avg_top1_ft = np.round(np.mean([x for x in top1_ft if x > 0]), 1) if any(x > 0 for x in top1_ft) else 0
+        avg_auroc_lp = np.round(np.mean([x for x in auroc_lp if x > 0]), 1) if any(x > 0 for x in auroc_lp) else 0
+        avg_auroc_ft = np.round(np.mean([x for x in auroc_ft if x > 0]), 1) if any(x > 0 for x in auroc_ft) else 0
 
         # Store all values for later processing
         all_top1_lp.append(top1_lp)
