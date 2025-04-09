@@ -68,7 +68,8 @@ class BioLingualClassifier(BirdSetModel):
         else:
             self.classifier = classifier
 
-        #self.processor = ClapProcessor.from_pretrained(checkpoint) This takes too much memory if activated
+        if preprocess_in_model:
+            self.processor = ClapProcessor.from_pretrained(checkpoint) # This takes too much memory if loaded in addition to one in transforms
 
         if local_checkpoint:
             self._load_local_checkpoint()

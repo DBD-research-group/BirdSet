@@ -13,7 +13,6 @@ from birdset.datamodule.components.resize import Resizer
 import torch_audiomentations
 from torchaudio.transforms import Spectrogram, MelScale
 import torchvision
-from transformers import ClapProcessor
 
 log = utils.get_pylogger(__name__)
 
@@ -265,9 +264,6 @@ class BirdSetTransformsWrapper(BaseTransforms):
             spec_aug.append(aug)
         # if i set a debug point here, it takes ~15 skips to get to the value we need from the yaml file
         self.spec_aug = torchvision.transforms.Compose(transforms=spec_aug)
-        checkpoint = "laion/clap-htsat-unfused"
-        if self.sampling_rate == 48_000: #TODO Make into extra Biolingual thing
-            self.processor = ClapProcessor.from_pretrained(checkpoint)
 
     def transform_values(self, batch):
         if not "audio" in batch.keys():
@@ -289,13 +285,6 @@ class BirdSetTransformsWrapper(BaseTransforms):
         if self.preprocessing is not None:
             input_values = self._preprocess(input_values, attention_mask)
 
-        if self.sampling_rate == 48_000: #TODO Make into extra Biolingual thing
-            input_values = input_values.squeeze(1)
-            input_values = self.processor(
-                    audios=input_values.cpu().numpy(),
-                    return_tensors="pt",
-                    sampling_rate=48000,
-                ).input_features
         return input_values, labels
 
     def _preprocess(

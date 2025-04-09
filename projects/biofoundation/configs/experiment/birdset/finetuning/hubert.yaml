@@ -3,7 +3,6 @@
 defaults:
   - birdset/finetuning/finetuning_config.yaml 
   - override /module/network: hubert.yaml  
-train: False
 
 module:
   network:

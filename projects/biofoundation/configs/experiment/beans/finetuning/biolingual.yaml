@@ -10,6 +10,9 @@ module:
       preprocess_in_model: False
 
 datamodule:
+  transforms: 
+    _target_: biofoundation.datamodule.components.biolingual_transforms.BiolingualTransforms
+    
   loaders:
     train:
       num_workers: 10
