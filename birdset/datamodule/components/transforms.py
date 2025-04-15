@@ -79,7 +79,7 @@ class BaseTransforms:
 
     Attributes:
         mode (str): The mode in which the class is operating. Can be "train", "valid", "test", or "predict".
-        sampling_rate (int): The sampling rate of the audio data.
+        sample_rate (int): The sample rate of the audio data.
         max_length (int): Maximum segment lenght in seconds
         decoding (EventDecoding): Detecting events in sample (EventDecoding if None given)
         feature_extractor (DefaultFeatureExtractor): Configuration for extracting events from the audio data (DefaultFeatureExtractor id None given)
@@ -88,25 +88,25 @@ class BaseTransforms:
     def __init__(
         self,
         task: Literal["multiclass", "multilabel"] = "multiclass",
-        sampling_rate: int = 32000,
+        sample_rate: int = 32000,
         max_length: int = 5,
         decoding: EventDecoding | None = None,
         feature_extractor: DefaultFeatureExtractor | None = None,
     ) -> None:
         self.mode = "train"
         self.task = task
-        self.sampling_rate = sampling_rate
+        self.sample_rate = sample_rate
         self.max_length = max_length
         self.event_decoder = decoding
         if self.event_decoder is None:
             self.event_decoder = EventDecoding(
-                min_len=0, max_len=self.max_length, sampling_rate=self.sampling_rate
+                min_len=0, max_len=self.max_length, sample_rate=self.sample_rate
             )
         self.feature_extractor = feature_extractor
         if self.feature_extractor is None:
             self.feature_extractor = DefaultFeatureExtractor(
                 feature_size=1,
-                sampling_rate=self.sampling_rate,
+                sample_rate=self.sample_rate,
                 padding_value=0.0,
                 return_attention_mask=False,
             )
@@ -148,7 +148,7 @@ class BaseTransforms:
         # extract/pad/truncate
         # max_length determains the difference with input waveforms as factor 5 (embedding)
         max_length = int(
-            int(self.sampling_rate) * int(self.max_length)
+            int(self.sample_rate) * int(self.max_length)
         )  #!TODO: how to determine 5s
         assert (
             type(self.feature_extractor) == DefaultFeatureExtractor
@@ -200,8 +200,8 @@ class BirdSetTransformsWrapper(BaseTransforms):
     ----------
     task : str
         Specifies the type of task (e.g., 'multiclass' or 'multilabel').
-    sampling_rate : int
-        The sampling rate at which the audio data should be processed.
+    sample_rate : int
+        The sample rate at which the audio data should be processed.
     model_type : str
         Indicates the type of model (e.g. 'vision' for spectrogram-based models or 'waveform' for waveform-based models).
     spectrogram_augmentations : DictConfig
@@ -223,7 +223,7 @@ class BirdSetTransformsWrapper(BaseTransforms):
     def __init__(
         self,
         task: Literal["multiclass", "multilabel"] = "multilabel",
-        sampling_rate: int = 32000,
+        sample_rate: int = 32000,
         model_type: Literal["vision", "waveform"] = "vision",
         spectrogram_augmentations: DictConfig = DictConfig(
             {}
@@ -237,7 +237,7 @@ class BirdSetTransformsWrapper(BaseTransforms):
         nocall_sampler: NoCallMixer | None = None,
         preprocessing: PreprocessingConfig | None = PreprocessingConfig(),
     ):
-        super().__init__(task, sampling_rate, max_length, decoding, feature_extractor)
+        super().__init__(task, sample_rate, max_length, decoding, feature_extractor)
 
         self.modes_to_skip = ["test", "predict"]
 
@@ -330,14 +330,14 @@ class BirdSetTransformsWrapper(BaseTransforms):
         if self.task == "multilabel":
             labels = labels.unsqueeze(1).unsqueeze(1)
             output_dict = self.wave_aug(
-                samples=input_values, sample_rate=self.sampling_rate, targets=labels
+                samples=input_values, sample_rate=self.sample_rate, targets=labels
             )
             labels = output_dict.targets.squeeze(1).squeeze(1)
 
         elif self.task == "multiclass":  # multilabel mix is questionable
             output_dict = self.wave_aug(
                 samples=input_values,
-                sample_rate=self.sampling_rate,
+                sample_rate=self.sample_rate,
             )
 
         input_values = output_dict.samples
@@ -350,7 +350,7 @@ class BirdSetTransformsWrapper(BaseTransforms):
         # extract/pad/truncate
         # max_length determains the difference with input waveforms as factor 5 (embedding)
         max_length = int(
-            int(self.sampling_rate) * int(self.max_length)
+            int(self.sample_rate) * int(self.max_length)
         )  #!TODO: how to determine 5s
         waveform_batch = self.feature_extractor(
             waveform_batch,
@@ -485,12 +485,12 @@ class EmbeddingTransforms(BaseTransforms):
     def __init__(
         self,
         task: Literal["multiclass", "multilabel"] = "multiclass",
-        sampling_rate: int = 3200,
+        sample_rate: int = 3200,
         max_length: int = 5,
         decoding: EventDecoding | None = None,
         feature_extractor: DefaultFeatureExtractor | None = None,
     ) -> None:
-        super().__init__(task, sampling_rate, max_length, decoding, feature_extractor)
+        super().__init__(task, sample_rate, max_length, decoding, feature_extractor)
 
     def _transform(self, batch):
         embeddings = [embedding for embedding in batch["embeddings"]]

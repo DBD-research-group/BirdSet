@@ -9,6 +9,6 @@ model:
 model_name: resnet18
 model_type: vision
 torch_compile: False
-sampling_rate: 32_000
+sample_rate: 32_000
 normalize_waveform: null
 normalize_spectrogram: True

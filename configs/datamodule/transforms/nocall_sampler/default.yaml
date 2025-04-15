@@ -1,6 +1,6 @@
 _target_: birdset.datamodule.components.augmentations.NoCallMixer
 directory: ${paths.background_path}
 p: 0.075
-sampling_rate: ${module.network.sampling_rate}
+sample_rate: ${module.network.sample_rate}
 length: 5
 

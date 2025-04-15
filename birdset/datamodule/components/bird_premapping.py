@@ -12,9 +12,9 @@ class AudioPreprocessor:
 
         inputs = self.feature_extractor(
             audio_arrays,
-            sampling_rate=self.feature_extractor.sampling_rate,
+            sample_rate=self.feature_extractor.sample_rate,
             padding=True,
-            max_length=self.feature_extractor.sampling_rate * self.window_length,
+            max_length=self.feature_extractor.sample_rate * self.window_length,
             truncation=True,
             return_tensors="pt",
         )
@@ -26,9 +26,9 @@ class AudioPreprocessor:
 
         output_dict = self.feature_extractor(
             audio_arrays,
-            sampling_rate=self.feature_extractor.sampling_rate,
+            sample_rate=self.feature_extractor.sample_rate,
             padding=True,
-            max_length=self.feature_extractor.sampling_rate * self.window_length,
+            max_length=self.feature_extractor.sample_rate * self.window_length,
             truncation=True,
             return_tensors="pt",
         )

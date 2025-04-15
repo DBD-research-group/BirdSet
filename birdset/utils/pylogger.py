@@ -2,6 +2,7 @@ import logging
 from pytorch_lightning.utilities import rank_zero_only
 from pytorch_lightning import loggers
 from typing import Dict
+from configs.module_configs import NetworkConfig
 
 
 def get_pylogger(name=__name__):
@@ -31,11 +32,13 @@ class TBLogger(loggers.TensorBoardLogger):
     ):
         if isinstance(params, dict):
             try:
-                network = params.pop("network")  # network is of class NetworkConfig
+                network: NetworkConfig = params.pop("network")
                 params["model_name"] = network.model_name
                 params["model_type"] = network.model_type
                 params["torch_compile"] = network.torch_compile
-                params["sampling_rate"] = network.sampling_rate
+                params["sample_rate"] = (
+                    network.sample_rate
+                )  # refactor note: maybe it should be 'sampling_rate' as key in params
                 params["normalize_waverform"] = network.normalize_waveform
                 params["normalize_spectrogram"] = network.normalize_spectrogram
             except KeyError:

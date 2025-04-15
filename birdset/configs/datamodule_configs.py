@@ -25,8 +25,8 @@ class DatasetConfig:
         Defines the type of task (e.g., 'multilabel' or 'multiclass').
     subset : int, optional
         A subset of the dataset to use. If None, the entire dataset is used.
-    sampling_rate : int
-        The sampling rate for audio data processing.
+    sample_rate : int
+        The sample rate for audio data processing.
     class_weights_loss : bool, optional
         (Deprecated) Previously used for applying class weights in loss calculation.
     class_weights_sampler : bool, optional
@@ -47,7 +47,7 @@ class DatasetConfig:
     val_split: float = 0.2
     task: Literal["multiclass", "multilabel"] = "multilabel"
     subset: Optional[int] = None
-    sampling_rate: int = 32_000
+    sample_rate: int = 32_000
     class_weights_loss: Optional[bool] = None
     class_weights_sampler: Optional[bool] = None
     classlimit: Optional[int] = None
