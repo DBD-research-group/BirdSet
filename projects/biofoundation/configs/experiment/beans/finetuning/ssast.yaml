@@ -3,3 +3,7 @@
 defaults:
   - beans/finetuning/finetuning_config.yaml 
   - override /module/network: ssast.yaml  
+
+module:
+  optimizer:
+    lr: 1e-5

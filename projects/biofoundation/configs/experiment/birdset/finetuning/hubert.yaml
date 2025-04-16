@@ -7,7 +7,7 @@ defaults:
 module:
   network:
     model:
-      preprocess_in_model: False
+      preprocess_in_model: True
       classifier:
         _target_: biofoundation.modules.models.linear_classifier.LinearClassifier
         num_classes: ${module.network.model.num_classes}
@@ -16,7 +16,7 @@ module:
 datamodule:
   loaders:
     train:
-      num_workers: 5
+      num_workers: 5 # Test up to 16, could change batch size?!
  
     valid:
       num_workers: 5

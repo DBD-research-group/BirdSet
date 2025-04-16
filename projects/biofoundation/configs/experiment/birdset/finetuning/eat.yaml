@@ -6,5 +6,15 @@ defaults:
 
 module:
   network:
+    name: eat_bs
+    model_name: eat_bs
     model:
       local_checkpoint: /workspace/models/eat/eat-XCL-2024-05-19_105101-checkpoint-26.ckpt
+  optimizer:
+    lr: 1e-4
+    weight_decay: 1e-4
+
+datamodule:
+  loaders:
+    train:
+      batch_size: 64

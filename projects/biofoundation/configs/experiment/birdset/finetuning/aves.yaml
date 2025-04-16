@@ -3,3 +3,24 @@
 defaults:
   - birdset/finetuning/finetuning_config.yaml 
   - override /module/network: aves.yaml  
+
+module:
+  optimizer:
+    lr: 1e-4
+    weight_decay: 1e-4
+
+datamodule:
+  loaders:
+    train:
+      batch_size: 32
+      shuffle: True
+      num_workers: 24
+      drop_last: True
+    valid:
+      batch_size: 32
+      num_workers: 24
+      shuffle: False
+    test:
+      batch_size: 16
+      num_workers: 8
+      shuffle: False

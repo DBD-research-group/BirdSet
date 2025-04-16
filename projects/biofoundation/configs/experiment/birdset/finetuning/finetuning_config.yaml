@@ -23,8 +23,8 @@ logger:
  
 module:
   optimizer:
-    lr: 3e-4
-    weight_decay: 1e-5
+    lr: 1e-4
+    weight_decay: 1e-4
   loss:
   #  _target_: birdset.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
     _target_: torch.nn.BCEWithLogitsLoss
@@ -86,8 +86,8 @@ callbacks:
   early_stopping:
     _target_: lightning.pytorch.callbacks.EarlyStopping
     monitor: "val/BCEWithLogitsLoss_epoch"
-    patience: 3
+    patience: 5
     mode: 'min'
-    min_delta: 5e-3
+    min_delta: 1e-4
     verbose: False
     check_finite: True

@@ -177,9 +177,10 @@ class BirdSetDataModule(BaseDataModuleHF):
                 dataset[split] = dataset[split].map(
                     self._classes_one_hot,
                     batched=True,
-                    batch_size=300,
+                    batch_size=200,
                     load_from_cache_file=True,
                     num_proc=self.dataset_config.n_workers,
+                    # num_proc=1,
                     desc=f"One-hot-encoding {split} labels.",
                 )
 
