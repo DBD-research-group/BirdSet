@@ -2,7 +2,7 @@
 
 To execute runs for multiple different models and datasets scripts can be very helpful to automatically start new runs once the previous ones are finished. Additionally they make it easier to use different settings and hydra arguments.
 
-The scripts use the [anti_crash script](../train_anti_crash.sh) to detect GPU crashes which works mot of the time and retries up to 3 times. The timeout times are chosen automatically based on the dataset and expected runtime in the past. Additionally they can be set globlly with a flag.
+The scripts use the [anti_crash script](../train_anti_crash.sh) to detect GPU crashes which works most of the time and retries up to 3 times. The timeout times are chosen automatically based on the dataset and expected runtime in the past. Additionally they can be set globlly with a flag.
 
 ####  General script logic:
 The specific script is called and then additional params can be added using `--param arg1,arg2,...`
