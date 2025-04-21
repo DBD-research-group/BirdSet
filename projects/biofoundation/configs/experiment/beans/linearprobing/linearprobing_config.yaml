@@ -81,6 +81,7 @@ callbacks:
   model_checkpoint:
     monitor: "val/MulticlassAccuracy"
     mode: "max"
+    filename: ${module.network.model_name}_${datamodule.dataset.dataset_name}_{epoch:02d}
     save_top_k: 1
     every_n_epochs: 1
     every_n_train_steps: null
