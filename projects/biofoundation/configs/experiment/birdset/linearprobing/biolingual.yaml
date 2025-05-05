@@ -3,3 +3,22 @@
 defaults:
   - birdset/linearprobing/linearprobing_config.yaml 
   - override /module/network: biolingual.yaml  
+
+module:
+  network:
+    model:
+      preprocess_in_model: False
+
+datamodule:
+  transforms: 
+    _target_: biofoundation.datamodule.components.biolingual_transforms.BiolingualTransforms
+    
+  loaders:
+    train:
+      num_workers: 10
+ 
+    valid:
+      num_workers: 10
+   
+    test:
+      num_workers: 10

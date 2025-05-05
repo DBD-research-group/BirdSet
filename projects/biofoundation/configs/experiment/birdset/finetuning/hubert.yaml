@@ -16,18 +16,10 @@ module:
 datamodule:
   loaders:
     train:
-      batch_size: 16
-      shuffle: True
-      num_workers: 16
-      drop_last: True
-      prefetch_factor: 2
+      num_workers: 5 # Test up to 16, could change batch size?!
  
     valid:
-      batch_size: 16
-      num_workers: 16
-      shuffle: False
+      num_workers: 5
    
     test:
-      batch_size: 16
-      num_workers: 16
-      shuffle: False
+      num_workers: 5         

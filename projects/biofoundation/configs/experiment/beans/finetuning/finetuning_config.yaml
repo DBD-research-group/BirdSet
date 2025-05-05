@@ -9,7 +9,7 @@ defaults:
   - override /datamodule/transforms: bird_default_multiclass.yaml
   - override /paths: default.yaml
   - override /hydra: default.yaml
-tags: ["biofoundation", "${module.network.model_name}", "finetune", "BEANS"]
+tags: ["biofoundation", "BEANS", "augmentations", "finetune", "${module.network.model_name}"]
 seed: 1
 train: True
 test: True
@@ -77,13 +77,14 @@ callbacks:
   model_checkpoint:
     monitor: "val/MulticlassAccuracy"
     mode: "max"
-    save_last: False
-    every_n_epochs: null
+    filename: ${module.network.model_name}_${datamodule.dataset.dataset_name}_{epoch:02d}
+    save_top_k: 1
+    every_n_epochs: 1
     every_n_train_steps: null
   early_stopping:
     _target_: lightning.pytorch.callbacks.EarlyStopping
     monitor: "val/MulticlassAccuracy"
-    patience: 5
+    patience: 10
     mode: 'max'
     min_delta: 1e-3 
     verbose: False

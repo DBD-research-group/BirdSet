@@ -9,7 +9,7 @@ defaults:
   - override /datamodule/transforms: bird_default_multilabel.yaml
   - override /paths: default.yaml
   - override /hydra: default.yaml
-tags: ["biofoundation", "${module.network.model_name}", "linearprobing", "augs_birdset"]
+tags: ["biofoundation", "BirdSet", "augmentations", "linearprobing", "${module.network.model_name}"]
 seed: 1
 train: True
 test: True
@@ -82,8 +82,8 @@ datamodule:
  
 callbacks:
   model_checkpoint:
-    save_last: False
-    every_n_epochs: null
+    save_top_k: 1
+    every_n_epochs: 1
     every_n_train_steps: null
   early_stopping:
     _target_: lightning.pytorch.callbacks.EarlyStopping
