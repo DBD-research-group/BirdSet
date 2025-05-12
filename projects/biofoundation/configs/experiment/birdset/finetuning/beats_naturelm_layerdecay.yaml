@@ -1,0 +1,23 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - birdset/finetuning/finetuning_config.yaml 
+  - override /module/network: beats.yaml  
+
+module:
+  network:
+    model_name: BEATs_NatureLM
+    model:
+      checkpoint_path: '/workspace/models/beats/beats_naturelm.pt'
+  optimizer:
+    lr: 1e-4
+    weight_decay: 1e-4
+    extras:
+      layer_decay: 0.75
+      decay_type: 'right'
+      no_weight_decay_list: []
+
+datamodule:
+  loaders:
+    train:
+      batch_size: 128

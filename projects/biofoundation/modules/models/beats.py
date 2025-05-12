@@ -126,3 +126,12 @@ class BEATsModel(BirdSetModel):
             return self.attentive_pooling(embeddings)
 
         return embeddings
+
+    def get_num_layers(self) -> int:
+        """
+        Get the number of layers in the model.
+
+        Returns:
+            int: The number of layers in the model.
+        """
+        return len(self.model.encoder.layers)

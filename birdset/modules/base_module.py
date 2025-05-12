@@ -1,3 +1,4 @@
+from biofoundation.modules.optimizer.lr_decay import param_groups_lrd
 import torch
 import math
 import lightning as L
@@ -90,6 +91,12 @@ class BaseModule(L.LightningModule):
         self.loss = loss
         self.optimizer = optimizer
         self.lr_scheduler = lr_scheduler
+        if self.optimizer.keywords['extras'] and "layer_decay" in self.optimizer.keywords['extras']:
+            self.layer_decay = self.optimizer.keywords['extras'].layer_decay
+            self.decay_type = self.optimizer.keywords['extras'].decay_type
+            self.no_weight_decay_list = self.optimizer.keywords['extras'].no_weight_decay_list
+        else:
+            self.layer_decay = None
         self.warmup_ratio = 0.05
         self.metrics = metrics
         self.logging_params = logging_params
@@ -145,7 +152,20 @@ class BaseModule(L.LightningModule):
         return self.model.forward(*args, **kwargs)
 
     def configure_optimizers(self):
-        self.optimizer = self.optimizer(self.model.parameters())
+        if self.layer_decay is not None:
+            params = param_groups_lrd(
+                model=self.model,
+                weight_decay=self.optimizer.keywords["weight_decay"],
+                no_weight_decay_list=self.no_weight_decay_list,
+                layer_decay=self.layer_decay
+            )
+        else:
+            params = self.model.parameters()
+        
+        # strip extras from optimizer.keywords
+        self.optimizer.keywords.pop("extras", None)
+        
+        self.optimizer = self.optimizer(params)
         if self.lr_scheduler is not None:
             # TODO: Handle the case when we do not want warmup
             num_training_steps = math.ceil(
