@@ -9,3 +9,8 @@ module:
     model_name: BEATs_NatureLM
     model:
       checkpoint_path: '/workspace/models/beats/beats_naturelm.pt'
+
+datamodule:
+  dataset:
+    dataset_name: POW
+    hf_name: POW
