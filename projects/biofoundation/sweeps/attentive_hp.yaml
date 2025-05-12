@@ -1,0 +1,30 @@
+program: projects/biofoundation/train.sh 
+name: BEATs_naturelm_attentive_POW # Name of the sweep
+entity: deepbirddetect
+project: BioFoundation
+method: bayes  # random, grid, or bayes
+metric:
+  name: val/cmAP  # Metric to optimize
+  goal: maximize
+parameters:
+  experiment:
+    values: [birdset/attentive/beats_naturelm_sweep] # The hydra experiment
+  trainer.devices:
+    values: [2]
+  module.optimizer.lr:
+    min: 0.0001 
+    max: 0.01  
+  module.optimizer.weight_decay:
+    min: 0.000001
+    max: 0.01  
+  datamodule.loaders.train.batch_size:
+    values: [16, 32, 64, 128, 256, 512] 
+  
+
+command:
+  - ${env}
+  - ${program}
+  - ${args_no_hyphens}
+
+
+
