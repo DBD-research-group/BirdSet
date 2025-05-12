@@ -1,0 +1,24 @@
+_target_: biofoundation.datamodule.audioset_datamodule.AS20DataModule
+
+defaults: 
+  - _self_
+  - transforms: esc_default.yaml # For now
+  - loaders: default.yaml
+
+dataset:
+  data_dir: ${paths.dataset_path}
+  dataset_name: beans_watkins # Overwrite these through the experiment config
+  hf_path: confit/audioset-20k-wds
+  hf_name: default
+  seed: ${seed}
+  n_classes: 527
+  n_workers: 1
+  val_split: null
+  task: ${module.task}
+  subset: null
+  sampling_rate: ${module.network.sampling_rate}
+  class_weights_loss: null
+  class_weights_sampler: null
+  classlimit: 500
+  eventlimit: 5
+  use_test_as_valid: False  

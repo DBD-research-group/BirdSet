@@ -1,0 +1,63 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - override /datamodule: audioset.yaml
+  - override /module: multilabel.yaml
+  - override /module/network: beats.yaml
+  - override /callbacks: default.yaml
+  - override /trainer: single_gpu.yaml
+  - override /paths: default.yaml
+  - override /hydra: default.yaml
+tags: ["audioset-20k", "finetune", "${module.network.model_name}"]
+seed: 1
+train: True
+test: True
+ 
+module:
+  optimizer:
+    lr: 1e-4 # 1e-4 3e-4            
+    weight_decay: 5e-4 # 5e-4 1e-5
+  loss:
+    _target_: torch.nn.BCEWithLogitsLoss
+  network:
+    torch_compile: False
+    model:
+      preprocess_in_model: True
+
+trainer:
+  min_epochs: 1
+  max_epochs: 50
+  devices: [3]
+
+datamodule: 
+  loaders:
+    train:
+      batch_size: 32
+      shuffle: True
+      num_workers: 16
+      drop_last: True
+      prefetch_factor: 2
+ 
+    valid:
+      batch_size: 32
+      num_workers: 16
+      shuffle: False
+   
+    test:
+      batch_size: 16
+      num_workers: 16
+      shuffle: False
+ 
+callbacks:
+  model_checkpoint:
+    save_top_k: 1
+    every_n_epochs: 1
+    every_n_train_steps: null
+  early_stopping:
+    _target_: lightning.pytorch.callbacks.EarlyStopping
+    monitor: "val/BCEWithLogitsLoss_epoch"
+    patience: 5
+    mode: 'min'
+    min_delta: 1e-4
+    verbose: False
+    check_finite: True
