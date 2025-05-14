@@ -2,6 +2,7 @@ import json
 import numpy as np
 from scipy.stats import norm
 from typing import Literal
+import re
 
 def param_groups_lrd(model, weight_decay=0.05, no_weight_decay_list=[], layer_decay=.75, decay_type: Literal['right', 'inverse_normal', 'normal']="right"):
     """
@@ -85,6 +86,8 @@ def get_layer_id_for_vit(name, num_layers):
         return 0
     elif name.startswith('patch_embed'):
         return 0
+    elif re.search(r'layers\.(\d+)\.', name):
+        return int(re.search(r'layers\.(\d+)\.', name).group(1))
     elif name.startswith('blocks'):
         return int(name.split('.')[1]) + 1
     elif name.startswith('ppnet'):

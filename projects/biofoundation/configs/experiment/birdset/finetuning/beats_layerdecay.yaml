@@ -5,10 +5,6 @@ defaults:
   - override /module/network: beats.yaml  
 
 module:
-  network:
-    model_name: BEATs_NatureLM
-    model:
-      checkpoint_path: '/workspace/models/beats/beats_naturelm.pt'
   optimizer:
     lr: 1e-4
     weight_decay: 1e-4
@@ -18,11 +14,6 @@ module:
       no_weight_decay_list: []
 
 datamodule:
-  dataset:
-    dataset_name: 'POW'
-    hf_name: 'POW'
-    use_test_as_valid: True
   loaders:
     train:
       batch_size: 128
-    

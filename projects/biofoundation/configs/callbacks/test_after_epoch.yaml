@@ -1,0 +1,2 @@
+test_after_epoch:
+  _target_: biofoundation.callbacks.callbacks.TestAfterEpoch

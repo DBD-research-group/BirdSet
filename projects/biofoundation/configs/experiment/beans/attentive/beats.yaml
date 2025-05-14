@@ -1,0 +1,5 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - beans/attentive/attentive_config.yaml 
+  - override /module/network: beats.yaml  

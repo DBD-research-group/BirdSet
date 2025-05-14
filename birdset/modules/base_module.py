@@ -91,10 +91,12 @@ class BaseModule(L.LightningModule):
         self.loss = loss
         self.optimizer = optimizer
         self.lr_scheduler = lr_scheduler
-        if self.optimizer.keywords['extras'] and "layer_decay" in self.optimizer.keywords['extras']:
-            self.layer_decay = self.optimizer.keywords['extras'].layer_decay
-            self.decay_type = self.optimizer.keywords['extras'].decay_type
-            self.no_weight_decay_list = self.optimizer.keywords['extras'].no_weight_decay_list
+        optimizer_keywords = getattr(self.optimizer, "keywords", {})
+        extras = optimizer_keywords.get('extras')
+        if extras and "layer_decay" in extras:
+            self.layer_decay = extras.layer_decay
+            self.decay_type = extras.decay_type
+            self.no_weight_decay_list = extras.no_weight_decay_list
         else:
             self.layer_decay = None
         self.warmup_ratio = 0.05

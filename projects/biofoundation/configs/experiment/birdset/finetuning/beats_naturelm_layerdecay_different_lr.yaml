@@ -10,8 +10,8 @@ module:
     model:
       checkpoint_path: '/workspace/models/beats/beats_naturelm.pt'
   optimizer:
-    lr: 1e-4
-    weight_decay: 1e-4
+    lr: 3e-4
+    weight_decay: 3e-4
     extras:
       layer_decay: 0.75
       decay_type: 'right'
