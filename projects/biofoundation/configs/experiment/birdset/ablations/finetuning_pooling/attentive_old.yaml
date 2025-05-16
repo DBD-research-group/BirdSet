@@ -1,0 +1,10 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - birdset/ablations/finetuning_pooling/config.yaml 
+  - override /module/network: beats.yaml 
+
+module:
+  network:
+    model:
+      pooling: "attentive_old"

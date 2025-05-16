@@ -1,5 +1,5 @@
 from typing import Optional, Literal
-from biofoundation.modules.models.AttentivePooling import AttentivePooling
+from biofoundation.modules.models.Pooling import AttentivePooling, AttentivePooling_old, AveragePooling
 import torch
 from torch import nn
 
@@ -33,7 +33,7 @@ class BEATsModel(BirdSetModel):
         preprocess_in_model: bool = True,
         classifier: nn.Module | None = None,
         pretrain_info = None,
-        pooling: Literal['just_cls', 'attentive'] = "just_cls",
+        pooling: Literal['just_cls', 'attentive', 'attentive_old', 'average'] = "just_cls",
     ) -> None:
         super().__init__(
             num_classes=num_classes,
@@ -48,10 +48,17 @@ class BEATsModel(BirdSetModel):
         self.checkpoint_path = checkpoint_path
         self.pooling = pooling
         if pooling == "attentive":
-            attentive_heads = embedding_size // 8 # beats uses 8 heads
+            attentive_heads = embedding_size // 64 # embedding_size // 64 should be 12 for 768
             self.attentive_pooling = AttentivePooling(
+                dim=embedding_size, num_heads=attentive_heads
+            )
+        elif pooling == "attentive_old":
+            attentive_heads = embedding_size // 8 # beats uses 8 heads
+            self.attentive_pooling = AttentivePooling_old(
                 embed_dim=embedding_size, num_heads=attentive_heads
             )
+        elif pooling == "average":
+            self.average_pooling = AveragePooling()
         self.load_model()
         if classifier is None:
             self.classifier = nn.Linear(embedding_size, num_classes)
@@ -124,6 +131,14 @@ class BEATsModel(BirdSetModel):
             return embeddings[:, 0, :]
         elif pooling == "attentive":
             return self.attentive_pooling(embeddings)
+        elif pooling == "attentive_old":
+            return self.attentive_pooling(embeddings)
+        elif pooling == "average":
+            return self.average_pooling(embeddings)
+        else:
+            raise ValueError(
+                f"Pooling method '{pooling}' is not supported. Choose from 'just_cls', 'attentive', 'attentive_old', or 'average'."
+            )
 
         return embeddings
 

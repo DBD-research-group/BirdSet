@@ -26,3 +26,12 @@ datamodule:
     train:
       batch_size: 128
     
+callbacks:
+    early_stopping:
+    _target_: lightning.pytorch.callbacks.EarlyStopping
+    monitor: "val/BCEWithLogitsLoss_epoch"
+    patience: 50
+    mode: 'min'
+    min_delta: 1e-4
+    verbose: False
+    check_finite: True
