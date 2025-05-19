@@ -501,7 +501,7 @@ class BaseDataModuleHF(L.LightningDataModule):
 
     def val_dataloader(self):
         if self.dataset_config.use_test_as_valid:
-            return DataLoader(self.test_dataset, **asdict(self.loaders_config.valid))
+            return [DataLoader(self.val_dataset, **asdict(self.loaders_config.valid)), DataLoader(self.test_dataset, **asdict(self.loaders_config.valid))]
         else:
             return DataLoader(self.val_dataset, **asdict(self.loaders_config.valid))  # type: ignore
 

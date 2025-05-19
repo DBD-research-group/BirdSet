@@ -9,7 +9,7 @@ defaults:
   - override /datamodule/transforms: bird_default_multilabel.yaml
   - override /paths: default.yaml
   - override /hydra: default.yaml
-tags: ["biofoundation", "BirdSet", "augmentations", "attentive", "${module.network.model_name}"]
+tags: ["biofoundation", "BirdSet", "augmentations", "finetuning", "${module.network.model_name}", "layer_decay"]
 seed: 1
 train: True
 test: True
@@ -17,9 +17,9 @@ test: True
 logger:
   wandb:
     tags: ${tags}
-    group: "biofoundation_${module.network.model_name}_finetuning_pooling_ablation_BirdSet__${datamodule.dataset.dataset_name}"
+    group: "biofoundation_${module.network.model_name}_ablation_early_stopping_BirdSet__${datamodule.dataset.dataset_name}"
     mode: online
-    version: ${module.network.model_name}_finetuning_${module.network.model.pooling}_BirdSet_${datamodule.dataset.dataset_name}_${seed}_${start_time} #to resume train run # needs to be tested
+    version: ${module.network.model_name}_finetuning_BirdSet_${datamodule.dataset.dataset_name}_${seed}_${start_time} #to resume train run # needs to be tested
  
 module:
   optimizer:
@@ -29,6 +29,8 @@ module:
       layer_decay: 0.75
       decay_type: 'right'
       no_weight_decay_list: []
+  
+    
   loss:
   #  _target_: birdset.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
     _target_: torch.nn.BCEWithLogitsLoss
@@ -39,6 +41,7 @@ module:
     model:
       checkpoint_path: '/workspace/models/beats/beats_naturelm.pt'
       preprocess_in_model: True
+      freeze_backbone: False
     # pretrain_info:
     #   hf_path: DBD-research-group/BirdSet
     #   hf_name: SNE
@@ -46,11 +49,13 @@ module:
  
 trainer:
   min_epochs: 1
-  max_epochs: 50
+  max_epochs: 20
   devices: [2]
  
 datamodule:
   dataset:
+    hf_name: 'POW'
+    dataset_name: 'POW'
     val_split: 0.2
     class_weights_loss: null
     class_weights_sampler: null
@@ -84,18 +89,11 @@ datamodule:
  
   mapper:
     biggest_cluster: True
-    no_call: False
  
 callbacks:
   model_checkpoint:
+    monitor: "val/BCEWithLogitsLoss/dataloader_idx_0" 
     save_top_k: 1
     every_n_epochs: 1
     every_n_train_steps: null
-  early_stopping:
-    _target_: lightning.pytorch.callbacks.EarlyStopping
-    monitor: "val/BCEWithLogitsLoss_epoch"
-    patience: 5
-    mode: 'min'
-    min_delta: 1e-4
-    verbose: False
-    check_finite: True
+  early_stopping: null

@@ -2,7 +2,6 @@ model:
   _target_: biofoundation.modules.models.beats.BEATsModel
   num_classes: null
 
-
 model_name: BEATs
 model_type: waveform
 torch_compile: False
