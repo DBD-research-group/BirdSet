@@ -33,7 +33,7 @@ class BEATsModel(BirdSetModel):
         preprocess_in_model: bool = True,
         classifier: nn.Module | None = None,
         pretrain_info = None,
-        pooling: Literal['just_cls', 'attentive', 'attentive_old', 'average'] = "just_cls",
+        pooling: Literal['just_cls', 'attentive', 'attentive_old', 'average', 'mean'] = "just_cls",
     ) -> None:
         super().__init__(
             num_classes=num_classes,
@@ -59,6 +59,7 @@ class BEATsModel(BirdSetModel):
             )
         elif pooling == "average":
             self.average_pooling = AveragePooling()
+
         self.load_model()
         if classifier is None:
             self.classifier = nn.Linear(embedding_size, num_classes)
@@ -135,6 +136,8 @@ class BEATsModel(BirdSetModel):
             return self.attentive_pooling(embeddings)
         elif pooling == "average":
             return self.average_pooling(embeddings)
+        elif pooling == "mean":
+            return torch.mean(embeddings, dim=1)
         else:
             raise ValueError(
                 f"Pooling method '{pooling}' is not supported. Choose from 'just_cls', 'attentive', 'attentive_old', or 'average'."

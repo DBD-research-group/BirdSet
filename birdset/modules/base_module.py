@@ -166,8 +166,17 @@ class BaseModule(L.LightningModule):
                 no_weight_decay_list=self.no_weight_decay_list,
                 layer_decay=self.layer_decay
             )
+            # scale learning rate for layer decay
+            for param_group in params:
+                param_group["lr"] = (
+                    self.optimizer.keywords["lr"]
+                    * param_group["lr_scale"])
+                
         else:
             params = self.model.parameters()
+        
+        # filter out parameters that are not trainable
+        params = filter(lambda p: p.requires_grad, params)
         
         # strip extras from optimizer.keywords
         self.optimizer.keywords.pop("extras", None)
