@@ -2,7 +2,6 @@ model:
   _target_: biofoundation.modules.models.audiomae.AudioMAEModel
   num_classes: null
   
-
 model_name: audio_mae
 model_type: waveform
 torch_compile: False

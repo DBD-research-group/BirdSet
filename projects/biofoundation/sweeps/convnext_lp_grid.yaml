@@ -1,0 +1,27 @@
+program: projects/biofoundation/train.sh 
+name: convnext_lp_grid # Name of the sweep
+entity: deepbirddetect
+project: BioFoundation
+method: grid  # random, grid, or bayes
+metric:
+  name: val/cmAP/dataloader_idx_1  # Metric to optimize
+  goal: maximize
+parameters:
+  experiment:
+    values: [birdset/linearprobing/sweeps/convnext_bs] # The hydra experiment
+  datamodule.loaders.train.batch_size:
+    values: [32, 64, 128, 265] 
+  module.optimizer.lr:
+    values: [0.0001, 0.0005, 0.005, 0.001, 0.01]  # Grid of learning rates
+
+#early_terminate:
+#  type: hyperband
+#  min_iter: 3
+  
+command:
+  - ${env}
+  - ${program}
+  - ${args_no_hyphens}
+
+#run_cap: 50
+

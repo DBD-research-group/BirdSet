@@ -72,3 +72,7 @@ class BirdSetModel(nn.Module):
                     log.info(f">> Also loaded classifier state dict from local checkpoint: {self.local_checkpoint}")
                 except Exception as e:
                     log.error(f"Could not load classifier state dict from local checkpoint: {e}")  
+
+
+
+    

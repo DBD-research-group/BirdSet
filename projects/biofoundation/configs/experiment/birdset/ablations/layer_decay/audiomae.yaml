@@ -1,0 +1,14 @@
+# @package _global_
+#package global is neccessary!
+defaults:
+  - birdset/ablations/layer_decay/finetuning_config.yaml 
+  - override /module/network: audiomae.yaml 
+
+module:
+  optimizer:
+    lr: 1e-4
+    weight_decay: 1e-4
+    extras:
+      layer_decay: 0.75
+      decay_type: 'right'
+      no_weight_decay_list: []

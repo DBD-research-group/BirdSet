@@ -9,7 +9,7 @@ defaults:
   - override /datamodule/transforms: bird_default_multilabel.yaml
   - override /paths: default.yaml
   - override /hydra: default.yaml
-tags: ["biofoundation", "BirdSet", "augmentations", "attentive", "${module.network.model_name}"]
+tags: ["biofoundation", "BirdSet", "augmentations", "finetune", "${module.network.model_name}"]
 seed: 1
 train: True
 test: True
@@ -17,14 +17,14 @@ test: True
 logger:
   wandb:
     tags: ${tags}
-    group: "biofoundation_${module.network.model_name}_attentive_BirdSet__${datamodule.dataset.dataset_name}"
+    group: "biofoundation_${module.network.model_name}_ablation_layerdecay_BirdSet__${datamodule.dataset.dataset_name}"
     mode: online
-    version: ${module.network.model_name}_attentive_BirdSet_${datamodule.dataset.dataset_name}_${seed}_${start_time} #to resume train run # needs to be tested
+    version: ${module.network.model_name}_finetune_BirdSet_${datamodule.dataset.dataset_name}_${seed}_${start_time} #to resume train run # needs to be tested
  
 module:
   optimizer:
-    lr: 1.3e-3
-    weight_decay: 7e-3
+    lr: 1e-4
+    weight_decay: 1e-4
   loss:
   #  _target_: birdset.modules.losses.asymmetric_loss.AsymmetricLossMultiLabel
     _target_: torch.nn.BCEWithLogitsLoss
@@ -33,8 +33,6 @@ module:
     torch_compile: False
     model:
       preprocess_in_model: True
-      freeze_backbone: True
-      pooling: "attentive"
     # pretrain_info:
     #   hf_path: DBD-research-group/BirdSet
     #   hf_name: SNE
@@ -61,24 +59,25 @@ datamodule:
  
   loaders:
     train:
-      batch_size: 64
+      batch_size: 32
       shuffle: True
       num_workers: 16
       drop_last: True
       prefetch_factor: 2
  
     valid:
-      batch_size: 64
+      batch_size: 32
       num_workers: 16
       shuffle: False
    
     test:
-      batch_size: 32
+      batch_size: 16
       num_workers: 16
       shuffle: False
  
   mapper:
     biggest_cluster: True
+    no_call: False
  
 callbacks:
   model_checkpoint:
@@ -90,6 +89,6 @@ callbacks:
     monitor: "val/BCEWithLogitsLoss_epoch"
     patience: 5
     mode: 'min'
-    min_delta: 1e-3
+    min_delta: 1e-4
     verbose: False
     check_finite: True

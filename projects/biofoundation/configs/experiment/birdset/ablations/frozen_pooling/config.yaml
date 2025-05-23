@@ -9,7 +9,7 @@ defaults:
   - override /datamodule/transforms: bird_default_multilabel.yaml
   - override /paths: default.yaml
   - override /hydra: default.yaml
-tags: ["biofoundation", "BirdSet", "augmentations", "attentive", "${module.network.model_name}"]
+tags: ["biofoundation", "BirdSet", "augmentations", "ablation", "${module.network.model_name}"]
 seed: 1
 train: True
 test: True
@@ -17,7 +17,7 @@ test: True
 logger:
   wandb:
     tags: ${tags}
-    group: "biofoundation_${module.network.model_name}_pooling_ablation_BirdSet__${datamodule.dataset.dataset_name}"
+    group: "biofoundation_${module.network.model_name}_pooling_${module.network.model.pooling}_BirdSet__${datamodule.dataset.dataset_name}"
     mode: online
     version: ${module.network.model_name}_${module.network.model.pooling}_BirdSet_${datamodule.dataset.dataset_name}_${seed}_${start_time} #to resume train run # needs to be tested
  
@@ -43,16 +43,19 @@ module:
  
 trainer:
   min_epochs: 1
-  max_epochs: 50
+  max_epochs: 20
   devices: [2]
  
 datamodule:
   dataset:
+    hf_name: 'POW'
+    dataset_name: 'POW'
     val_split: 0.2
     class_weights_loss: null
     class_weights_sampler: null
     classlimit: 600
     eventlimit: 5
+    use_test_as_valid: True
   transforms:
     max_length: ${module.network.length}
     preprocessing:
@@ -83,14 +86,8 @@ datamodule:
  
 callbacks:
   model_checkpoint:
+    monitor: "val/BCEWithLogitsLoss/dataloader_idx_0" 
     save_top_k: 1
     every_n_epochs: 1
     every_n_train_steps: null
-  early_stopping:
-    _target_: lightning.pytorch.callbacks.EarlyStopping
-    monitor: "val/BCEWithLogitsLoss_epoch"
-    patience: 5
-    mode: 'min'
-    min_delta: 1e-3
-    verbose: False
-    check_finite: True
+  early_stopping: null
