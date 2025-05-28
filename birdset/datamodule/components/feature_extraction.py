@@ -19,7 +19,7 @@ class DefaultFeatureExtractor(SequenceFeatureExtractor):
         Specifies the feature extractor component used in the pipeline.
     feature_size : int
         Determines the size of the extracted features.
-    sample_rate : int
+    sampling_rate : int
         The sample rate at which the audio data should be processed.
     padding_value : float
         The value used for padding shorter sequences to a consistent length.
@@ -32,14 +32,14 @@ class DefaultFeatureExtractor(SequenceFeatureExtractor):
     def __init__(
         self,
         feature_size: int = 1,
-        sample_rate: int = 32000,
+        sampling_rate: int = 32000,
         padding_value: float = 0.0,
         return_attention_mask: bool = False,
         **kwargs,
     ):
         super().__init__(
             feature_size=feature_size,
-            sampling_rate=sample_rate,
+            sampling_rate=sampling_rate,
             padding_value=padding_value,
             **kwargs,
         )
